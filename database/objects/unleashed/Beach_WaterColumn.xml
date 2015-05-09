@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <DamageTime type="float" default="2" description="" />
+  <Distance type="float" default="10" description="" />
+  <EffectType type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Height type="float" default="6" description="" />
+  <Radius type="float" default="1.5" description="" />
+</Template>

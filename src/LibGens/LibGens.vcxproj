@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7A61FCB4-BD18-4C87-9346-751FC4BBD1DF}</ProjectGuid>
+    <RootNamespace>LibGens</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>../../lib/$(Configuration)/</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../depends/allegro/include;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PreprocessorDefinitions>ALLEGRO_NO_MAGIC_MAIN;LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>../../lib/$(Configuration)/$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>../../depends/allegro/lib;../../depends/fbxsdk/lib/vs2010/x86/release;../../depends/hk2010_2_0_r1/Lib/win32_net_9-0/release_multithreaded_dll;../../depends/pthreads/lib/x86;../../lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>hkaAnimation.lib;pthreadVC2.lib;libfbxsdk-md.lib;allegro-5.0.10-monolith-mt.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaInternal.lib;hkaRagdoll.lib;LibGens-externals.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationSet.cpp" />
+    <ClCompile Include="AR.cpp" />
+    <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="BIXF.cpp" />
+    <ClCompile Include="Bone.cpp" />
+    <ClCompile Include="Endian.cpp" />
+    <ClCompile Include="Error.cpp" />
+    <ClCompile Include="FBX.cpp" />
+    <ClCompile Include="FBXExport.cpp" />
+    <ClCompile Include="FBXManager.cpp" />
+    <ClCompile Include="File.cpp" />
+    <ClCompile Include="Ghost.cpp" />
+    <ClCompile Include="GhostNode.cpp" />
+    <ClCompile Include="GITextureGroup.cpp" />
+    <ClCompile Include="Havok.cpp" />
+    <ClCompile Include="HavokAnimationCache.cpp" />
+    <ClCompile Include="HavokEnviroment.cpp" />
+    <ClCompile Include="HavokPhysicsCache.cpp" />
+    <ClCompile Include="HavokPropertyDatabase.cpp" />
+    <ClCompile Include="HavokSkeletonCache.cpp" />
+    <ClCompile Include="InstanceMTI.cpp" />
+    <ClCompile Include="Keyframe.cpp" />
+    <ClCompile Include="KeyframeSet.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="LibGens.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LightField.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MaterialLibrary.cpp" />
+    <ClCompile Include="MathGens.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelLibrary.cpp" />
+    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ObjectCategory.cpp" />
+    <ClCompile Include="ObjectElement.cpp" />
+    <ClCompile Include="ObjectExtra.cpp" />
+    <ClCompile Include="ObjectLibrary.cpp" />
+    <ClCompile Include="ObjectProduction.cpp" />
+    <ClCompile Include="ObjectSet.cpp" />
+    <ClCompile Include="PAC.cpp" />
+    <ClCompile Include="Parameter.cpp" />
+    <ClCompile Include="Path.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="StringTable.cpp" />
+    <ClCompile Include="Submesh.cpp" />
+    <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainBlock.cpp" />
+    <ClCompile Include="TerrainGroup.cpp" />
+    <ClCompile Include="TerrainInstance.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UVAnimation.cpp" />
+    <ClCompile Include="UVAnimationLibrary.cpp" />
+    <ClCompile Include="UVAnimationSet.cpp" />
+    <ClCompile Include="Vertex.cpp" />
+    <ClCompile Include="VertexFormat.cpp" />
+    <ClCompile Include="VRMap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationSet.h" />
+    <ClInclude Include="AR.h" />
+    <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="BIXF.h" />
+    <ClInclude Include="Bone.h" />
+    <ClInclude Include="Endian.h" />
+    <ClInclude Include="Error.h" />
+    <ClInclude Include="FBX.h" />
+    <ClInclude Include="FBXManager.h" />
+    <ClInclude Include="File.h" />
+    <ClInclude Include="Ghost.h" />
+    <ClInclude Include="GhostNode.h" />
+    <ClInclude Include="GITextureGroup.h" />
+    <ClInclude Include="Havok.h" />
+    <ClInclude Include="HavokAnimationCache.h" />
+    <ClInclude Include="HavokEnviroment.h" />
+    <ClInclude Include="HavokPhysicsCache.h" />
+    <ClInclude Include="HavokPropertyDatabase.h" />
+    <ClInclude Include="HavokSkeletonCache.h" />
+    <ClInclude Include="InstanceMTI.h" />
+    <ClInclude Include="Keyframe.h" />
+    <ClInclude Include="KeyframeSet.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="LibGens.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="LightField.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialLibrary.h" />
+    <ClInclude Include="MathGens.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="ModelLibrary.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="ObjectCategory.h" />
+    <ClInclude Include="ObjectElement.h" />
+    <ClInclude Include="ObjectExtra.h" />
+    <ClInclude Include="ObjectLibrary.h" />
+    <ClInclude Include="ObjectProduction.h" />
+    <ClInclude Include="ObjectSet.h" />
+    <ClInclude Include="PAC.h" />
+    <ClInclude Include="Parameter.h" />
+    <ClInclude Include="Path.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="StringTable.h" />
+    <ClInclude Include="Submesh.h" />
+    <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainBlock.h" />
+    <ClInclude Include="TerrainGroup.h" />
+    <ClInclude Include="TerrainInstance.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="UVAnimation.h" />
+    <ClInclude Include="UVAnimationLibrary.h" />
+    <ClInclude Include="UVAnimationSet.h" />
+    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="VertexFormat.h" />
+    <ClInclude Include="VRMap.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

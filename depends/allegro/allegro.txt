@@ -1,0 +1,5 @@
+Allegro 5.0.10
+https://www.allegro.cc/
+http://cdn.allegro.cc/file/library/allegro/5.0.10/allegro-5.0.10-msvc-10.0.7z
+
+Put include and lib folder here.

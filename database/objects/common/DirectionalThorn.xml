@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <ForetasteTime type="float" default="0.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsUsePanel type="bool" default="true" description="" />
+  <MoveTime type="float" default="0.5" description="" />
+  <OffTime type="float" default="1" description="" />
+  <OnTime type="float" default="1" description="" />
+  <Phase type="float" default="0" description="" />
+  <Range type="float" default="30" description="" />
+  <Type type="float" default="0" description="" />
+  <UseRigidBody type="bool" default="true" description="" />
+  <UsePanel type="bool" default="true" description="" />
+  <Extra type="model" name="cmn_obj_thorn_HD.model" />
+</Template>

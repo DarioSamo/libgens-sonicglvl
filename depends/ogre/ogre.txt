@@ -1,0 +1,4 @@
+Ogre3D 1.9 SDK
+http://sourceforge.net/projects/ogre/files/ogre/1.9/1.9/OgreSDK_vc10_v1-9-0.exe/download
+
+Copy distribution here.

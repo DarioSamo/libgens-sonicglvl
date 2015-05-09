@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Externals">
+      <UniqueIdentifier>{9713a720-75e4-4057-af98-af21c57bb260}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\half">
+      <UniqueIdentifier>{a84f3c1a-4e0c-41f2-b801-6907560d61b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\sha1">
+      <UniqueIdentifier>{06f55bc1-9d1f-41f4-b1a3-5cf226eea8fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\tinyxml">
+      <UniqueIdentifier>{b25006fd-9bcd-44db-802c-3bf6acfc6b54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\tristripper">
+      <UniqueIdentifier>{51bf87b8-82d5-4d7d-84c1-312bcf7ae699}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\tristripper\detail">
+      <UniqueIdentifier>{e55ac474-994d-487f-8926-b1f1f86a07cd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="half\half.cpp">
+      <Filter>Externals\half</Filter>
+    </ClCompile>
+    <ClCompile Include="sha1\sha1.cpp">
+      <Filter>Externals\sha1</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinystr.cpp">
+      <Filter>Externals\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxml.cpp">
+      <Filter>Externals\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxmlerror.cpp">
+      <Filter>Externals\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml\tinyxmlparser.cpp">
+      <Filter>Externals\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="tristripper\connectivity_graph.cpp">
+      <Filter>Externals\tristripper</Filter>
+    </ClCompile>
+    <ClCompile Include="tristripper\policy.cpp">
+      <Filter>Externals\tristripper</Filter>
+    </ClCompile>
+    <ClCompile Include="tristripper\tri_stripper.cpp">
+      <Filter>Externals\tristripper</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="half\half.h">
+      <Filter>Externals\half</Filter>
+    </ClInclude>
+    <ClInclude Include="sha1\sha1.h">
+      <Filter>Externals\sha1</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml\tinystr.h">
+      <Filter>Externals\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml\tinyxml.h">
+      <Filter>Externals\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\public_types.h">
+      <Filter>Externals\tristripper</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\tri_stripper.h">
+      <Filter>Externals\tristripper</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\detail\cache_simulator.h">
+      <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\detail\connectivity_graph.h">
+      <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\detail\graph_array.h">
+      <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\detail\heap_array.h">
+      <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\detail\policy.h">
+      <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="tristripper\detail\types.h">
+      <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

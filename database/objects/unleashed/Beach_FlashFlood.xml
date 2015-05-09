@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <HeraldTime type="float" default="1" description="" />
+  <IdleTime type="float" default="2" description="" />
+  <ModelType type="float" default="3" description="" />
+  <ShotTime type="float" default="2" description="" />
+</Template>

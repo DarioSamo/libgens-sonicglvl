@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <DivingDist type="float" default="3" description="" />
+  <DivingSpeed type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <WalkDist type="float" default="10" description="" />
+  <WalkSpeed type="float" default="0.5" description="" />
+  <WalkingRadius type="float" default="3" description="" />
+</Template>

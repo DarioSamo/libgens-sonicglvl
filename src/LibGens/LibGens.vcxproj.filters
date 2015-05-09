@@ -1,0 +1,398 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="AR.cpp">
+      <Filter>Packfile</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX.cpp">
+      <Filter>FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXExport.cpp">
+      <Filter>FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="Error.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="PAC.cpp">
+      <Filter>Packfile</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectCategory.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectElement.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectLibrary.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectProduction.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectSet.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainBlock.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainGroup.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainInstance.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Bitmap.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Havok.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
+    <ClCompile Include="GITextureGroup.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="InstanceMTI.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="BIXF.cpp">
+      <Filter>BIXF</Filter>
+    </ClCompile>
+    <ClCompile Include="Ghost.cpp">
+      <Filter>Ghost</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGens.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="LightField.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="MathGens.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="VRMap.cpp">
+      <Filter>Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Path</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Keyframe.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyframeSet.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="UVAnimation.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationSet.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="UVAnimationSet.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="UVAnimationLibrary.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="Endian.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="File.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXManager.cpp">
+      <Filter>FBX</Filter>
+    </ClCompile>
+    <ClCompile Include="GhostNode.cpp">
+      <Filter>Ghost</Filter>
+    </ClCompile>
+    <ClCompile Include="HavokEnviroment.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
+    <ClCompile Include="HavokAnimationCache.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
+    <ClCompile Include="HavokSkeletonCache.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
+    <ClCompile Include="HavokPhysicsCache.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
+    <ClCompile Include="HavokPropertyDatabase.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Parameter.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialLibrary.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLibrary.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Bone.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Submesh.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexFormat.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="StringTable.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectExtra.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AR.h">
+      <Filter>Packfile</Filter>
+    </ClInclude>
+    <ClInclude Include="FBX.h">
+      <Filter>FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="Error.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="PAC.h">
+      <Filter>Packfile</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectProduction.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainInstance.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainBlock.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainGroup.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitmap.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Havok.h">
+      <Filter>Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="GITextureGroup.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceMTI.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="BIXF.h">
+      <Filter>BIXF</Filter>
+    </ClInclude>
+    <ClInclude Include="Ghost.h">
+      <Filter>Ghost</Filter>
+    </ClInclude>
+    <ClInclude Include="LibGens.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="LightField.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="MathGens.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="VRMap.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
+      <Filter>Path</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Keyframe.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyframeSet.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="UVAnimation.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationSet.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="UVAnimationSet.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="UVAnimationLibrary.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Endian.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="File.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXManager.h">
+      <Filter>FBX</Filter>
+    </ClInclude>
+    <ClInclude Include="GhostNode.h">
+      <Filter>Ghost</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokEnviroment.h">
+      <Filter>Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokAnimationCache.h">
+      <Filter>Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokSkeletonCache.h">
+      <Filter>Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokPhysicsCache.h">
+      <Filter>Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokPropertyDatabase.h">
+      <Filter>Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Parameter.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialLibrary.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLibrary.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Bone.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Submesh.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexFormat.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="StringTable.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectCategory.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectElement.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectLibrary.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectSet.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectExtra.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="BIXF">
+      <UniqueIdentifier>{77b0e55a-8d58-4517-b8a6-4ede3766782f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{ec0c0ce3-68fe-458e-a189-d230bceea5bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{f200727a-0115-4899-9e28-46e095a4592b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{7b653f73-ce70-4e54-aa36-02b8cc829a4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBX">
+      <UniqueIdentifier>{acc2a0af-4731-445b-b5f7-22f67a9e13a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ghost">
+      <UniqueIdentifier>{1aa446eb-10ae-41b1-8d65-218f72fdd96c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Havok">
+      <UniqueIdentifier>{b28dfdd0-917a-40fb-87ac-57d109573872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{039560de-eb7f-48cf-ba2d-a80692eef7a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Material">
+      <UniqueIdentifier>{4079a190-cc6f-455b-9471-45210aeaf882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{e0639657-7d08-4e91-a563-b24c63e2fbac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{8d9db980-5b2a-4ce5-843d-894ce17345fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packfile">
+      <UniqueIdentifier>{aeb5b00c-063f-4f31-a199-14eb18c889b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Path">
+      <UniqueIdentifier>{bebd579e-fa20-4617-8a7f-57bafe674914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{7dabb93b-cf36-4f61-a3b1-dba6f0c5eaa3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

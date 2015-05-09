@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddUserRange type="float" default="0" description="" />
+  <DownLength0 type="float" default="0" description="" />
+  <DownLength1 type="float" default="0" description="" />
+  <DownLength2 type="float" default="0" description="" />
+  <DownLength3 type="float" default="0" description="" />
+  <DownLength4 type="float" default="0" description="" />
+  <DownLength5 type="float" default="0" description="" />
+  <DownLength6 type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <MotionSpeed type="float" default="1" description="" />
+</Template>

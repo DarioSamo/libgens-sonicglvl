@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="BaseApplication.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorApplication.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorApplicationLevel.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorGlobalIllumination.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorNodeHistory.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorObjects.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="HavokNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="GhostNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectNodeHistory.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="PathNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorAnimations.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWindow.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorAxis.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorBottom.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorConfiguration.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorGhost.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorGUI.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorHavok.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorLevel.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorMaterial.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorObjectsPalette.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorObjectsProperties.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorPaths.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorPhysics.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorSceneExporter.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorTerrain.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorViewport.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorVisibility.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraManager.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicLines.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DynamicRenderable.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="History.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryAction.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGensHavokMesh.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="LibGensOgreMesh.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseApplication.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorApplication.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorGlobalIllumination.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorNodeHistory.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="GhostNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectNodeHistory.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="PathNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorNode.h">
+      <Filter>Editor Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorAnimations.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorAxis.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorConfiguration.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorLevel.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorMaterial.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorTerrain.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorViewport.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraManager.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicLines.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicRenderable.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="History.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryAction.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{2fc7b3ab-03ac-4bac-abde-8e77593d576f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{080db5ef-4c05-4a16-9221-d6bb59e90eb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor Nodes">
+      <UniqueIdentifier>{c32ced5f-a6a4-480f-9315-67ea858fab1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{d284170e-3f38-41a4-9ae4-db1b57891ec6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
