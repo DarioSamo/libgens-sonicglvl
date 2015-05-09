@@ -552,42 +552,6 @@ namespace LibGens {
 		return lMesh;
 	}
 
-	/*
-	FbxMesh *FBX::addSonicCollision(SonicCollision *sonic_collision) {
-		FbxNode* lMeshNode = NULL;
-		FbxMesh* lMesh = NULL;
-
-		if (sonic_collision) {
-			lMeshNode = FbxNode::Create(scene, "collision_mesh_node");
-			lMesh = FbxMesh::Create(scene, "collision_mesh");
-
-			lMesh->InitControlPoints(sonic_collision->vertex_pool.size());
-			FbxVector4* lControlPoints = lMesh->GetControlPoints();
-
-			unsigned int index=0;
-			for (index=0; index<sonic_collision->vertex_pool.size(); index++) {
-				lControlPoints[index] = FbxVector4(sonic_collision->vertex_pool[index].x, 
-												   sonic_collision->vertex_pool[index].y, 
-												   sonic_collision->vertex_pool[index].z);
-			}
-
-			for (index=0; index<sonic_collision->face_pool.size(); index++) {
-				lMesh->BeginPolygon();
-				lMesh->AddPolygon(sonic_collision->face_pool[index].face_1);
-				lMesh->AddPolygon(sonic_collision->face_pool[index].face_2);
-				lMesh->AddPolygon(sonic_collision->face_pool[index].face_3);
-				lMesh->EndPolygon();
-			}
-		
-			lMeshNode->SetNodeAttribute(lMesh);
-			FbxNode *lRootNode = scene->GetRootNode();
-			lRootNode->AddChild(lMeshNode);
-		}
-
-		return lMesh;
-	}
-	*/
-
 	FbxMesh *FBX::addHavokCollision(string name, hkGeometry *geometry, Matrix4 transform) {
 		FbxNode* lMeshNode = NULL;
 		FbxMesh* lMesh = NULL;
