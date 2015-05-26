@@ -46,7 +46,7 @@ namespace LibGens {
 			Model();
 			Model(string filename_p);
 			Model(File *file, bool terrain_mode_p);
-			void save(string filename_p);
+			void save(string filename_p, int root_type = LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS);
 			void write(File *file);
 			void readRootNode(File *file);
 			void readRootNodeDynamicUnleashed2(File *file);
@@ -54,6 +54,7 @@ namespace LibGens {
 			void readRootNodeDynamicLostWorld(File *file);
 			void readSkeleton(File *file);
 			void writeRootNodeDynamicGenerations(File *file);
+			void writeRootNodeDynamicUnleashed2(File *file);
 			void buildAABB();
 			AABB getAABB();
 			void setTerrainMode(bool v);

@@ -125,13 +125,18 @@ namespace LibGens {
 		}
 	}
 
-	void Mesh::write(File *file) {		
+	void Mesh::write(File *file, bool unleashed2_mode) {		
 		size_t header_address=file->getCurrentAddress();
 		vector<unsigned int> slot_addresses;
 		size_t water_slot_address=0;
 
 		// Prepare address table
-		for (int slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
+		int slots = LIBGENS_MODEL_SUBMESH_SLOTS;
+		if (unleashed2_mode) {
+			slots = LIBGENS_MODEL_SUBMESH_ROOT_SLOTS;
+		}
+
+		for (int slot=0; slot<slots; slot++) {
 			unsigned int submesh_count=submeshes[slot].size();
 
 			if (slot == LIBGENS_MODEL_SUBMESH_SLOT_WATER) {
@@ -154,6 +159,10 @@ namespace LibGens {
 				file->writeInt32BE(&submesh_count);
 				file->writeNull(4);
 			}
+		}
+
+		if (unleashed2_mode) {
+			file->writeNull(24);
 		}
 
 		// Write Submesh slots

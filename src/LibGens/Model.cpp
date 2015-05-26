@@ -248,11 +248,11 @@ namespace LibGens {
 	}
 
 
-	void Model::save(string filename_p) {
+	void Model::save(string filename_p, int root_type) {
 		File file(filename_p, LIBGENS_FILE_WRITE_BINARY);
 
 		if (file.valid()) {
-			file.prepareHeader(LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS);
+			file.prepareHeader(root_type);
 			write(&file);
 			file.writeHeader(true);
 			file.close();
@@ -268,6 +268,9 @@ namespace LibGens {
 		switch (file->getRootNodeType()) {
 			case LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS:
 				writeRootNodeDynamicGenerations(file);
+				break;
+			case LIBGENS_MODEL_ROOT_DYNAMIC_UNLEASHED_2:
+				writeRootNodeDynamicUnleashed2(file);
 				break;
 		}
 	}
@@ -369,6 +372,66 @@ namespace LibGens {
 
 		file->goToEnd();
 	}
+
+	
+	void Model::writeRootNodeDynamicUnleashed2(File *file) {
+		if (!file) {
+			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_WRITE_NULL_FILE);
+			return;
+		}
+
+		size_t table_address=file->getCurrentAddress();
+		unsigned int mesh_count=meshes.size();
+		size_t model_table_address=0;
+		size_t model_name_address=0;
+
+		size_t unknown_address=0;
+		unsigned int bone_count=bones.size();
+		size_t bone_definition_table_address=0;
+		size_t bone_matrix_address=0;
+		size_t global_aabb_address=0;
+
+		meshes[0]->write(file, true);
+
+		file->goToEnd();
+		file->fixPadding();
+
+		unknown_address = file->getCurrentAddress();
+
+		bone_definition_table_address = file->getCurrentAddress();
+		vector<unsigned int> bone_definition_addresses;
+		file->writeNull(bone_count*4);
+
+		for (size_t i=0; i<bone_count; i++) {
+			bone_definition_addresses.push_back(file->getCurrentAddress());
+			bones[i]->writeDescription(file);
+		}
+
+		for (size_t i=0; i<bone_count; i++) {
+			file->goToAddress(bone_definition_table_address + i*4);
+			file->writeInt32BEA(&bone_definition_addresses[i]);
+		}
+		file->goToEnd();
+
+		bone_matrix_address = file->getCurrentAddress();
+		for (size_t i=0; i<bone_count; i++) {
+			bones[i]->writeMatrix(file);
+		}
+
+		global_aabb_address = file->getCurrentAddress();
+		global_aabb.write(file);
+
+		file->goToAddress(table_address + 28);
+		file->writeInt32BEA(&unknown_address);
+		file->writeInt32BE(&bone_count);
+		file->writeInt32BEA(&bone_definition_table_address);
+		file->writeInt32BEA(&bone_matrix_address);
+		file->writeInt32BEA(&global_aabb_address);
+
+		file->goToEnd();
+	}
+
+
 
 	list<Vertex *> Model::getVertexList() {
 		list<Vertex *> vertices;

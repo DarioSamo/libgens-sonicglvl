@@ -37,7 +37,7 @@ namespace LibGens {
 			Mesh();
 			~Mesh();
 
-			void write(File *file);
+			void write(File *file, bool unleashed2_mode=false);
 			void read(File *file);
 			void buildAABB();
 			AABB getAABB();
