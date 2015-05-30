@@ -28,6 +28,9 @@
 #include "Submesh.h"
 #include "Vertex.h"
 #include "Bone.h"
+#include "DefaultShaderParameters.h"
+
+DefaultShaderParameters default_shader_parameters("../database/DefaultShaderParameterDatabase.xml");
 
 void buildBones(hkaSkeleton *havok_skeleton, Ogre::Skeleton *ogre_skeleton, Ogre::Bone *parent_bone, unsigned int parent_index) {
 	for (int b=0; b<havok_skeleton->m_bones.getSize(); b++) {
@@ -210,6 +213,21 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 					if (shader_parameter->getName() == "ambient")  color.a = 1.0;
 
 					program_params->setConstant((size_t)index, Ogre::Vector4(color.r, color.g, color.b, color.a));
+					continue;
+				}
+
+				bool found_in_list = false;
+				string shader_parameter_name = shader_parameter->getName();
+
+				for (list<DefaultShaderParameter *>::iterator it = default_shader_parameters.parameters.begin(); it != default_shader_parameters.parameters.end(); it++) {
+					if ((*it)->name == shader_parameter_name) {
+						program_params->setConstant((size_t)index, Ogre::Vector4((*it)->r, (*it)->g, (*it)->b, (*it)->a));
+						found_in_list = true;
+						break;
+					}
+				}
+
+				if (found_in_list) {
 					continue;
 				}
 				
@@ -409,9 +427,6 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 				}
 				else if (shader_parameter->getName() == "g_MotionBlur_AlphaRef_VelocityLimit_VelocityCutoff_BlurMagnitude") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
-				}
-				else if (shader_parameter->getName() == "mrgPlayableParam") {
-					program_params->setConstant((size_t)index, Ogre::Vector4(-1, 1, 0, 0));
 				}
 				else if (shader_parameter->getName() == "mrgDebugDistortionParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
