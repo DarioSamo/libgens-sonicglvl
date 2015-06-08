@@ -702,6 +702,32 @@ namespace LibGens {
 	}
 
 	
+	void File::readAddressTableBBIN(size_t table_size) {
+		size_t current_address = root_node_address;
+		unsigned char *offset_table = new unsigned char[table_size];
+		read(offset_table, table_size);
+
+		final_address_table.clear();
+
+		for (size_t i=0; i<table_size; i++) {
+			size_t low = offset_table[i] & 0x3F;
+
+			if ((offset_table[i] & 0x80) && (offset_table[i] & 0x40)) {
+				i += 3;
+				current_address += (low * 0x4000000) + (offset_table[i-2] * 0x40000) + (offset_table[i-1] * 0x400) + (offset_table[i] * 0x4);
+			}
+			else if (offset_table[i] & 0x80) {
+				i++;
+				current_address += (low * 0x400) + (offset_table[i] * 4);
+			}
+			else if (offset_table[i] & 0x40) {
+				current_address += 4 * low;
+			}
+
+			final_address_table.push_back(current_address - root_node_address);
+		}
+	}
+	
 	void File::writeAddressTableBBIN(size_t negative_offset) {
 		size_t current_address = negative_offset;
 		for (list<size_t>::iterator it=final_address_table.begin(); it!=final_address_table.end(); it++) {

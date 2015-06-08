@@ -115,6 +115,7 @@ namespace LibGens {
 			void writeFloat32BE(float *dest);
 			void writeNull(size_t size);
 			void writeFloat32E(float *dest, bool big_endian);
+			void readAddressTableBBIN(size_t table_size);
 			void writeAddressTableBBIN(size_t negative_offset=0);
 
 			size_t fixPadding(size_t multiple=4);

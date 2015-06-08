@@ -91,6 +91,10 @@ namespace LibGens {
 			}
 
 			file.goToAddress(48+file_data_size+extension_table_size+string_offset_table_size+string_table_data_size);
+			if (offset_table_size) {
+				file.readAddressTableBBIN(offset_table_size);
+			}
+
 			// Fix Current Files based on the offset table locations
 			scanForAddressesInsideFiles(&file);
 
