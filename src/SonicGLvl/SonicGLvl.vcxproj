@@ -71,6 +71,7 @@
     <ClCompile Include="BaseApplication.cpp" />
     <ClCompile Include="CameraManager.cpp" />
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="DefaultShaderParameters.cpp" />
     <ClCompile Include="DynamicLines.cpp" />
     <ClCompile Include="DynamicRenderable.cpp" />
     <ClCompile Include="EditorAnimations.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="BaseApplication.h" />
     <ClInclude Include="CameraManager.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="DefaultShaderParameters.h" />
     <ClInclude Include="DynamicLines.h" />
     <ClInclude Include="DynamicRenderable.h" />
     <ClInclude Include="EditorAnimations.h" />
