@@ -17,14 +17,10 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#pragma once
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
-
-    return a.exec();
-}
+#include <QMainWindow>
+#include <QWidget>
+#include <QGridLayout>
+#include <QElapsedTimer>
+#include <QMouseEvent>

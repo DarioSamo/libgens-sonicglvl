@@ -17,14 +17,35 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#pragma once
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+#include "QtCommon.h"
+#include "OgreCommon.h"
 
-    return a.exec();
+namespace Ui {
+class EditorWindow;
 }
+
+class OgreSystem;
+class OgreViewportWidget;
+
+class EditorWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    static const int UpdateTimerMs;
+
+    explicit EditorWindow(QWidget *parent = 0);
+    ~EditorWindow();
+
+    void timerEvent(QTimerEvent* event);
+private:
+    OgreSystem *ogre_system;
+    Ui::EditorWindow *ui;
+    OgreViewportWidget *viewport_widget;
+    Ogre::SceneManager *stage_scene_manager;
+    int timer_index;
+    QElapsedTimer timer_elapsed;
+};
+

@@ -17,14 +17,19 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#pragma once
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+#include "OgreCommon.h"
 
-    return a.exec();
-}
+class OgreSystem {
+protected:
+    Ogre::Root *root;
+    Ogre::RenderSystem *render_system;
+public:
+    OgreSystem();
+    ~OgreSystem();
+
+    Ogre::SceneManager *createSceneManager();
+    Ogre::Root *getRoot();
+    void setupResources();
+};

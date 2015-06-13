@@ -17,14 +17,34 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#include "EditorViewportsWidget.h"
+#include "EditorViewport.h"
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+EditorViewportsWidget::EditorViewportsWidget(QWidget *parent) : QWidget(parent) {
 
-    return a.exec();
+
+}
+
+EditorViewportsWidget::~EditorViewportsWidget() {
+
+}
+
+void EditorViewportsWidget::setup(OgreSystem *ogre_system, Ogre::SceneManager *scene_manager) {
+    grid_layout = new QGridLayout(this);
+
+    EditorViewport *viewport_widget = new EditorViewport(ogre_system, scene_manager, "ViewportA", this);
+    viewports.append(viewport_widget);
+    grid_layout->addWidget(viewport_widget, 0, 0);
+
+    setLayout(grid_layout);
+}
+
+void EditorViewportsWidget::update() {
+    foreach(EditorViewport *viewport, viewports) {
+        viewport->update();
+    }
+}
+
+void EditorViewportsWidget::createResources() {
+
 }

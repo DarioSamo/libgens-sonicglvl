@@ -17,14 +17,17 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#pragma once
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+#include "OgreCommon.h"
 
-    return a.exec();
-}
+class EditorViewerGrid {
+    protected:
+        Ogre::SceneNode *scene_node;
+    public:
+        static const Ogre::String GridLineXName;
+        static const Ogre::String GridLineZName;
+
+        EditorViewerGrid(Ogre::SceneManager *scene_manager);
+        ~EditorViewerGrid();
+};

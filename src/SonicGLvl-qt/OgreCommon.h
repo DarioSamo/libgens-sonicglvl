@@ -17,14 +17,12 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#pragma once
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+#include <Ogre.h>
+#include <OgreRenderWindow.h>
+#include <OgreCamera.h>
+#include <OgreResourceManager.h>
+#include <OgreResourceGroupManager.h>
+#include <OgreSceneManager.h>
 
-    return a.exec();
-}

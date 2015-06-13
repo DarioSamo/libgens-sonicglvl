@@ -17,14 +17,29 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#include "EditorWindow.h"
-#include <QApplication>
+#pragma once
 
-int main(int argc, char *argv[])
+#include "QtCommon.h"
+#include "OgreCommon.h"
+
+class OgreSystem;
+class EditorViewport;
+
+class EditorViewportsWidget : public QWidget
 {
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+    Q_OBJECT
+private:
+    QGridLayout *grid_layout;
+    QList<EditorViewport *> viewports;
+public:
+    explicit EditorViewportsWidget(QWidget *parent = 0);
+    ~EditorViewportsWidget();
 
-    return a.exec();
-}
+    void setup(OgreSystem *ogre_system, Ogre::SceneManager *scene_manager);
+    void update();
+    void createResources();
+signals:
+
+public slots:
+};
+

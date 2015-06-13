@@ -18,13 +18,36 @@
 //=========================================================================
 
 #include "EditorWindow.h"
-#include <QApplication>
+#include "ui_EditorWindow.h"
+#include "OgreSystem.h"
+#include "EditorViewerGrid.h"
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    EditorWindow w;
-    w.show();
+const int EditorWindow::UpdateTimerMs = 4;
 
-    return a.exec();
+EditorWindow::EditorWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::EditorWindow) {
+    ui->setupUi(this);
+
+    ogre_system = new OgreSystem();
+    stage_scene_manager = ogre_system->createSceneManager();
+    ui->viewports_widget->setup(ogre_system, stage_scene_manager);
+    ogre_system->setupResources();
+
+    EditorViewerGrid *viewer_grid = new EditorViewerGrid(stage_scene_manager);
+
+    timer_index = startTimer(UpdateTimerMs);
+    timer_elapsed.start();
+
+    resize(1600, 900);
+}
+
+EditorWindow::~EditorWindow() {
+    delete ui;
+    delete ogre_system;
+    killTimer(timer_index);
+}
+
+void EditorWindow::timerEvent(QTimerEvent* event) {
+    ui->viewports_widget->update();
 }
