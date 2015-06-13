@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditorWindow</class>
+ <widget class="QMainWindow" name="EditorWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1297</width>
+    <height>759</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1297</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_Stage"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Stage_Data"/>
+    <addaction name="actionSave_Stage_Terrain"/>
+    <addaction name="separator"/>
+    <addaction name="actionExport_Scene_as_FBX"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelect_All"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionShow"/>
+    <addaction name="actionGraphics"/>
+    <addaction name="separator"/>
+    <addaction name="actionUse_World_Transform"/>
+    <addaction name="actionUse_Placement_Snap"/>
+   </widget>
+   <widget class="QMenu" name="menuPhysics">
+    <property name="title">
+     <string>Physics</string>
+    </property>
+    <addaction name="actionOpen_Physics_Editor"/>
+   </widget>
+   <widget class="QMenu" name="menuTerrain">
+    <property name="title">
+     <string>Terrain</string>
+    </property>
+    <addaction name="actionDelete_all_Terrain"/>
+    <addaction name="separator"/>
+    <addaction name="actionImport_FBX_as_Terrain"/>
+    <addaction name="separator"/>
+    <addaction name="actionGenerate_Terrain_Groups"/>
+   </widget>
+   <widget class="QMenu" name="menuObjects">
+    <property name="title">
+     <string>Objects</string>
+    </property>
+    <addaction name="actionReload_Objects_Template_Database"/>
+    <addaction name="actionSave_Objects_Template_Database"/>
+   </widget>
+   <widget class="QMenu" name="menuMaterials">
+    <property name="title">
+     <string>Materials</string>
+    </property>
+    <addaction name="actionOpen_Material_Editor"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuPhysics"/>
+   <addaction name="menuTerrain"/>
+   <addaction name="menuObjects"/>
+   <addaction name="menuMaterials"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="viewport_dock_widget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>1280</width>
+     <height>720</height>
+    </size>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="EditorViewportsWidget" name="viewports_widget" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionOpen_Stage">
+   <property name="text">
+    <string>Open Stage...</string>
+   </property>
+  </action>
+  <action name="actionSave_Stage_Data">
+   <property name="text">
+    <string>Save Stage Data...</string>
+   </property>
+  </action>
+  <action name="actionSave_Stage_Terrain">
+   <property name="text">
+    <string>Save Stage Terrain...</string>
+   </property>
+  </action>
+  <action name="actionExport_Scene_as_FBX">
+   <property name="text">
+    <string>Export Scene as FBX...</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionSelect_All">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+  </action>
+  <action name="actionShow">
+   <property name="text">
+    <string>Show</string>
+   </property>
+  </action>
+  <action name="actionGraphics">
+   <property name="text">
+    <string>Graphics</string>
+   </property>
+  </action>
+  <action name="actionUse_World_Transform">
+   <property name="text">
+    <string>Use World Transform</string>
+   </property>
+  </action>
+  <action name="actionUse_Placement_Snap">
+   <property name="text">
+    <string>Use Placement Snap</string>
+   </property>
+  </action>
+  <action name="actionOpen_Physics_Editor">
+   <property name="text">
+    <string>Open Physics Editor...</string>
+   </property>
+  </action>
+  <action name="actionDelete_all_Terrain">
+   <property name="text">
+    <string>Delete all Terrain...</string>
+   </property>
+  </action>
+  <action name="actionGenerate_Terrain_Groups">
+   <property name="text">
+    <string>Generate Terrain Groups...</string>
+   </property>
+  </action>
+  <action name="actionImport_FBX_as_Terrain">
+   <property name="text">
+    <string>Import FBX as Terrain...</string>
+   </property>
+  </action>
+  <action name="actionReload_Objects_Template_Database">
+   <property name="text">
+    <string>Reload Objects Template Database...</string>
+   </property>
+  </action>
+  <action name="actionSave_Objects_Template_Database">
+   <property name="text">
+    <string>Save Objects Template Database...</string>
+   </property>
+  </action>
+  <action name="actionOpen_Material_Editor">
+   <property name="text">
+    <string>Open Material Editor...</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EditorViewportsWidget</class>
+   <extends>QWidget</extends>
+   <header>EditorViewportsWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
