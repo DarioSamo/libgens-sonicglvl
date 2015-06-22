@@ -176,6 +176,7 @@
     <ClCompile Include="ObjectExtra.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="ArchiveTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -350,6 +351,7 @@
     <ClInclude Include="ObjectExtra.h">
       <Filter>Object</Filter>
     </ClInclude>
+    <ClInclude Include="ArchiveTree.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BIXF">

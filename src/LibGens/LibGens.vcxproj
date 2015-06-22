@@ -73,6 +73,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationSet.cpp" />
     <ClCompile Include="AR.cpp" />
+    <ClCompile Include="ArchiveTree.cpp" />
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="BIXF.cpp" />
     <ClCompile Include="Bone.cpp" />
@@ -136,6 +137,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimationSet.h" />
     <ClInclude Include="AR.h" />
+    <ClInclude Include="ArchiveTree.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="BIXF.h" />
     <ClInclude Include="Bone.h" />
