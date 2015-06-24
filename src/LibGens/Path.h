@@ -50,11 +50,10 @@
 #define LIBGENS_PATH_TAG_QUICKSTEP               "@QS"
 #define LIBGENS_PATH_TAG_DASH                    "@DP"
 #define LIBGENS_PATH_TAG_GRIND_RAIL              "@GR"
+#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_1      "@GR_spd1"
+#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_2      "@GR_spd2"
+#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_3      "@GR_spd3"
 #define LIBGENS_PATH_TAG_SUPERSONIC              "super_sonic"
-
-#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_1      "@GRspd1"
-#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_2      "@GRspd2"
-#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_3      "@GRspd3"
 
 namespace LibGens {
 	class Knot {

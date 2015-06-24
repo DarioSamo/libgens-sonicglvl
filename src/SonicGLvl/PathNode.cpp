@@ -66,6 +66,9 @@ PathNode::PathNode(string path_name, LibGens::Spline *spline_p, LibGens::Node *n
 			pos.z = knots[i]->point.z;
 			lines->addPoint(pos);
 
+			// Spline interpolation is commented out for Lost World paths.
+			// Lost World's path2 format doesn't support invec/outvec but GLvl tries to interpolate the splines anyway
+			// This results in them getting fairly screwed up
 			/*if (i < (knots_size-1)) {
 				float segment_length = (*it_s)->getSegmentLength(i);
 				int interpolation_steps = segment_length / spline_precision;

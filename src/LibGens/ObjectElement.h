@@ -80,9 +80,6 @@ namespace LibGens {
 			}
 
 			virtual void writeXMLTemplate(TiXmlElement *root);
-
-			virtual void writeORC(File *file) {
-			}
 	};
 
 	class ObjectElementBool : public ObjectElement {
@@ -95,7 +92,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	// Being lazy and keeping ObjectElementInteger even though I'm adding other integer types to avoid breaking existing code
@@ -122,7 +118,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementString : public ObjectElement {
@@ -135,7 +130,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementID : public ObjectElement {
@@ -198,7 +192,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementUint8 : public ObjectElement {
@@ -211,7 +204,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementSint16 : public ObjectElement {
@@ -224,7 +216,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementUint16 : public ObjectElement {
@@ -237,7 +228,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementSint32 : public ObjectElement {
@@ -250,7 +240,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementUint32 : public ObjectElement {
@@ -263,7 +252,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementEnum : public ObjectElement {
@@ -276,7 +264,6 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
-			void writeORC(File *file);
 	};
 
 	class ObjectElementTarget : public ObjectElementID {
@@ -285,8 +272,6 @@ namespace LibGens {
 				type=OBJECT_ELEMENT_TARGET;
 				value=0;
 			}
-
-			void writeORC(File *file);
 	};
 
 	class ObjectElementPosition : public ObjectElementVector {
@@ -295,8 +280,6 @@ namespace LibGens {
 				type=OBJECT_ELEMENT_POSITION;
 				value=Vector3();
 			}
-
-			void writeORC(File *file);
 	};
 
 	class ObjectElementVector3 : public ObjectElementVector {
@@ -305,8 +288,6 @@ namespace LibGens {
 				type=OBJECT_ELEMENT_VECTOR3;
 				value=Vector3();
 			}
-
-			void writeORC(File *file);
 	};
 
 	class ObjectElementUint32Array : public ObjectElementIDList {
@@ -314,8 +295,6 @@ namespace LibGens {
 			ObjectElementUint32Array() {
 				type=OBJECT_ELEMENT_UINT32ARRAY;
 			}
-
-			void writeORC(File *file);
 	};
 
 };
