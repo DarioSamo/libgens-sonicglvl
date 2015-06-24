@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <GroundOffset type="float" default="0" description="" />
-  <Interval type="float" default="8" description="" />
-  <IsCastShadow type="bool" default="false" description="" />
-  <LifeTime type="float" default="8" description="" />
-  <PhaseTime type="float" default="0" description="" />
-  <Range type="float" default="30" description="" />
-</Template>

@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <Collision_Height type="float" default="10" description="" />
-  <Collision_Width type="float" default="15" description="" />
-  <GroundOffset type="float" default="0" description="" />
-  <m_CullingFarDistance type="float" default="3000" description="" />
-</Template>

@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="true" description="" />
-  <Range type="float" default="200" description="" />
-  <Type type="float" default="0" description="" />
-  <m_Scale type="float" default="1" description="" />
-  <Scale type="float" default="1" description="" />
-</Template>
