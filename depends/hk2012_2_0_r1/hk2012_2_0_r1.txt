@@ -1,0 +1,4 @@
+Havok 2012 2.0 SDK
+https://software.intel.com/sites/havok/en/ (Havok 2012 2.0 for compatibility with Lost World)
+
+Copy distribution here.

@@ -1,4 +1,0 @@
-Havok 2010 2.0 SDK
-https://software.intel.com/sites/havok/en/ (Havok 2010 2.0 for compatibility with Generations)
-
-Copy distribution here.
