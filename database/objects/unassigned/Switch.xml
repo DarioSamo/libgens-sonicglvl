@@ -1,16 +1,20 @@
 <?xml version="1.0" ?>
 <Template>
-  <EventOFF type="float" default="0" description="" />
-  <EventON type="float" default="6" description="" />
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="false" description="" />
-  <IsMoveCollision type="bool" default="false" description="" />
-  <IsPrimitiveCollision type="bool" default="true" description="" />
-  <OffTimer type="float" default="5" description="" />
-  <Range type="float" default="30" description="" />
-  <TargetListOFF type="undefined" description="" />
-  <TargetListON type="id_list" description="" />
-  <TimerOFF type="float" default="0" description="" />
-  <TimerON type="float" default="0" description="" />
-  <Type type="float" default="0" description="" />
+  <RangeIn type="float" default="1000" description="Distance from object before it spawns" />
+  <RangeOut type="float" default="1200" description="Distance from object before it despawns" />
+  <Parent type="target" description="" />
+  <Unknown1 type="uint16" default="0" description="" />
+  <Unknown2 type="uint32" default="0" description="" />
+  <Unknown3 type="float" default="0" description="" />
+  <TargetList type="uint32array" description="the event target" />
+  <EventTimer type="float" default="0" description="time until an event occurs" />
+  <EventType type="enum" default="0" description="the event type" />
+  <TargetList2 type="uint32array" description="the event target 2" />
+  <EventTimer2 type="float" default="0" description="until an event occurs time 2" />
+  <EventType2 type="enum" default="0" description="event type 2" />
+  <TargetList3 type="uint32array" description="the event target 3" />
+  <EventTimer3 type="float" default="0" description="time 3 until an event occurs" />
+  <EventType3 type="enum" default="0" description="event type 3" />
+  <OffTimer type="float" default="0" description="time until the Off" />
+  <SwitchType type="enum" default="0" description="switch type" />
 </Template>
