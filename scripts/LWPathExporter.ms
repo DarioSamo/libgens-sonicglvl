@@ -144,7 +144,7 @@ fn ShapeToLWPath SrcShape = (
 		
 		-- For double splines, the knot count needs to match on both splines
 		if ((NumKnots SrcShape 1) != (NumKnots SrcShape 2)) then (
-			MessageBox("Error: " + p.name + " is a double spline, but the splines have a different knot count")
+			MessageBox("Error: " + SrcShape.name + " is a double spline, but the splines have a different knot count")
 			return undefined
 		)
 		
@@ -180,7 +180,7 @@ fn ShapeToLWPath SrcShape = (
 	
 	-- More than 2? Invalid
 	else (
-		if (NumSplines p == 0) then (
+		if (NumSplines SrcShape == 0) then (
 			MessageBox("Error: " + SrcShape.name + " cannot be exported because it has no splines")
 		)
 		else MessageBox("Error: " + SrcShape.name + " cannot be exported because it has more than two splines")
