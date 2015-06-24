@@ -376,7 +376,7 @@ class EditorApplication : public BaseApplication {
 		HWND getEditPropertyDlg();
 
 		void updateEditPropertyBool(bool v);
-		void updateEditPropertyInteger(unsigned int v);
+		void updateEditPropertyInteger(int v);
 		void updateEditPropertyFloat(float v);
 		void updateEditPropertyString(string v);
 		void updateEditPropertyID(size_t v);

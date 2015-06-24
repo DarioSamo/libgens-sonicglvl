@@ -111,13 +111,13 @@ void EditorAxis::update(EditorViewport *viewport) {
 }
 
 
-Ogre::Vector3 EditorAxis::raycastPointToAxis(EditorViewport *viewport, float raycast_x, float raycast_y, int axis) {
+Ogre::Vector3 EditorAxis::raycastPointToAxis(EditorViewport *viewport, float raycast_x, float raycast_y, int axis, Ogre::Vector3 *output_surface_normal) {
 	Ogre::Vector3 point(0, 0, 0);
 	Ogre::Ray ray = viewport->getCamera()->getCameraToViewportRay(raycast_x, raycast_y);
 
 	if (current_axis == LIBGENS_MATH_AXIS_W) {
 		Ogre::Vector3 result(0, 0, 0);
-		viewport->raycastPlacement(raycast_x, raycast_y, current_w_offset, &result, EDITOR_NODE_QUERY_TERRAIN | EDITOR_NODE_QUERY_HAVOK);
+		viewport->raycastPlacement(raycast_x, raycast_y, current_w_offset, &result, output_surface_normal, EDITOR_NODE_QUERY_TERRAIN | EDITOR_NODE_QUERY_HAVOK);
 		return result;
 	}
 	else {
@@ -283,16 +283,33 @@ bool EditorAxis::mouseMoved(EditorViewport *viewport, const OIS::MouseEvent &arg
 		viewport->convertMouseToLocalScreen(raycast_x, raycast_y);
 
 		if (!mode) {
-			Ogre::Vector3 point=raycastPointToAxis(viewport, raycast_x, raycast_y, current_axis);
+			Ogre::Vector3 tri_normal;
+			Ogre::Vector3 point=raycastPointToAxis(viewport, raycast_x, raycast_y, current_axis, &tri_normal);
 
 			if (current_axis == LIBGENS_MATH_AXIS_W) {
 				translate = point - position;
 				position += translate;
+
+				if (!tri_normal.isZeroLength()) {
+					Ogre::Quaternion oldrot = rotation;
+					Ogre::Vector3 olddir = rotation * Ogre::Vector3::UNIT_Y;
+					Ogre::Vector3 axis = rotation.yAxis().crossProduct(tri_normal);
+					Ogre::Vector3 right = tri_normal.crossProduct(rotation.zAxis());
+					Ogre::Vector3 forward = right.crossProduct(tri_normal);
+					rotation = Ogre::Quaternion(right, tri_normal, forward);
+					rotate = oldrot.Inverse() * rotation;
+					
+				}
+
+				else {
+					rotate = Ogre::Quaternion::IDENTITY;
+				}
 			}
 			else {
 				translate = point-holding_offset;
 				holding_offset = point;
 				position += translate;
+				rotate = Ogre::Quaternion::IDENTITY;
 			}
 		}
 		else {
@@ -325,7 +342,7 @@ bool EditorAxis::mousePressed(EditorViewport *viewport, const OIS::MouseEvent &a
 		viewport->convertMouseToLocalScreen(raycast_x, raycast_y);
 
 		if (!mode) {
-			holding_offset = raycastPointToAxis(viewport, raycast_x, raycast_y, current_axis);
+			holding_offset = raycastPointToAxis(viewport, raycast_x, raycast_y, current_axis, NULL);
 			current_w_offset = viewport->getCamera()->getPosition().distance(position);
 		}
 		else {

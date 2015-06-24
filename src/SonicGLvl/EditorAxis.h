@@ -90,7 +90,7 @@ class EditorAxis {
 		bool mouseMoved(EditorViewport *viewport, const OIS::MouseEvent &arg);
 		bool mousePressed(EditorViewport *viewport, const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 		bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-		Ogre::Vector3 raycastPointToAxis(EditorViewport *vieport, float raycast_x, float raycast_y, int axis);
+		Ogre::Vector3 raycastPointToAxis(EditorViewport *vieport, float raycast_x, float raycast_y, int axis, Ogre::Vector3 *output_surface_normal);
 		Ogre::Radian raycastAngleToAxis(EditorViewport *viewport, float raycast_x, float raycast_y, int axis);
 
 		Ogre::Vector3 getTranslate() {

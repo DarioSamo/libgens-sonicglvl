@@ -145,7 +145,8 @@ void EditorApplication::mouseMovedObjectsPalettePreview(const OIS::MouseEvent &a
 
 	// Raycast from camera to viewport
 	Ogre::Vector3 raycast_point(0.0f);
-	viewport->raycastPlacement(mouse_x, mouse_y, 15.0f, &raycast_point, EDITOR_NODE_QUERY_TERRAIN | EDITOR_NODE_QUERY_HAVOK);
+	Ogre::Vector3 raycast_normal(0.0f);
+	viewport->raycastPlacement(mouse_x, mouse_y, 15.0f, &raycast_point, &raycast_normal, EDITOR_NODE_QUERY_TERRAIN | EDITOR_NODE_QUERY_HAVOK);
 
 	if (placement_grid_snap > 0.0f) {
 		float half_placement_grid_snap = placement_grid_snap/2.0f;
@@ -174,6 +175,24 @@ void EditorApplication::mouseMovedObjectsPalettePreview(const OIS::MouseEvent &a
 	Ogre::Vector3 translate = raycast_point - center;
 	for (list<ObjectNode *>::iterator it=current_palette_nodes.begin(); it!=current_palette_nodes.end(); it++) {
 		(*it)->translate(translate);
+	}
+
+	// Calculate rotation
+	Ogre::Quaternion rotation;
+
+	if (!raycast_normal.isZeroLength()) {
+		Ogre::Vector3 right = raycast_normal.crossProduct(Ogre::Vector3::UNIT_Z);
+		Ogre::Vector3 forward = right.crossProduct(raycast_normal);
+		rotation = Ogre::Quaternion(right, raycast_normal, forward);
+	}
+
+	else {
+		rotation = Ogre::Quaternion::IDENTITY;
+	}
+
+	// Rotate all nodes
+	for (list<ObjectNode *>::iterator it=current_palette_nodes.begin(); it!=current_palette_nodes.end(); it++) {
+		(*it)->setRotation(rotation);
 	}
 }
 

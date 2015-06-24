@@ -32,7 +32,7 @@ namespace LibGens {
 		file->goToAddress(name_address);
 		file->readString(&name);
 
-		printf("   Parameter %s - Index: %d Size: %d\n", name.c_str(), (int)index_flag, (int)size_flag);
+		//printf("   Parameter %s - Index: %d Size: %d\n", name.c_str(), (int)index_flag, (int)size_flag);
 	}
 
 	
@@ -71,7 +71,7 @@ namespace LibGens {
 			file->readInt32BE(&parameters_count);
 			file->readInt32BEA(&parameters_table_address);
 
-			printf("Reading parameter list #%d with %d elements.\n", slot, parameters_count);
+			//printf("Reading parameter list #%d with %d elements.\n", slot, parameters_count);
 			
 			for (size_t i=0; i<parameters_count; i++) {
 				file->goToAddress(parameters_table_address + i*4);
@@ -128,7 +128,7 @@ namespace LibGens {
 		file->goToAddress(shader_filename_address);
 		file->readString(&shader_filename);
 
-		printf("Shader that uses the %s file and has %d parameter files.\n", shader_filename.c_str(), shader_parameter_count);
+		//printf("Shader that uses the %s file and has %d parameter files.\n", shader_filename.c_str(), shader_parameter_count);
 
 		for (size_t i=0; i<shader_parameter_count; i++) {
 			file->goToAddress(shader_parameter_table_address + i*4);
@@ -141,7 +141,7 @@ namespace LibGens {
 			file->readString(&shader_parameter);
 			shader_parameter_filenames.push_back(shader_parameter);
 
-			printf("   Parameter file: %s\n", shader_parameter.c_str());
+			//printf("   Parameter file: %s\n", shader_parameter.c_str());
 		}
 	}
 
@@ -163,7 +163,7 @@ namespace LibGens {
 		file->goToAddress(vertex_shader_name_address);
 		file->readString(&vertex_shader_name);
 
-		printf("  Vertex Shader Set %s (Mode: %s, Flag: %d)\n", vertex_shader_name.c_str(), rendering_mode.c_str(), shader_flag);
+		//printf("  Vertex Shader Set %s (Mode: %s, Flag: %d)\n", vertex_shader_name.c_str(), rendering_mode.c_str(), shader_flag);
 	}
 
 
@@ -188,7 +188,7 @@ namespace LibGens {
 		file->goToAddress(pixel_shader_name_address);
 		file->readString(&pixel_shader_name);
 
-		printf("Pixel Shader Set %s (Mode: %s, Flag: %d) with %d Vertex Shader sets.\n", pixel_shader_name.c_str(), rendering_mode.c_str(), shader_flag, vertex_shader_sets_count);
+		//printf("Pixel Shader Set %s (Mode: %s, Flag: %d) with %d Vertex Shader sets.\n", pixel_shader_name.c_str(), rendering_mode.c_str(), shader_flag, vertex_shader_sets_count);
 
 		for (size_t i=0; i<vertex_shader_sets_count; i++) {
 			file->goToAddress(vertex_shader_set_table_address + i*4);
@@ -250,7 +250,7 @@ namespace LibGens {
 		file->readInt32BE(&shader_set_count);
 		file->readInt32BEA(&shader_set_table_address);
 
-		printf("Found %d Pixel Shader Sets in shader list.\n", shader_set_count);
+		//printf("Found %d Pixel Shader Sets in shader list.\n", shader_set_count);
 
 		for (size_t i=0; i<shader_set_count; i++) {
 			file->goToAddress(shader_set_table_address + i*4);

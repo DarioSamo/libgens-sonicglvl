@@ -176,6 +176,9 @@
     <ClCompile Include="ObjectExtra.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="LostWorldObjectSet.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -272,9 +275,6 @@
     <ClInclude Include="UVAnimation.h">
       <Filter>Animation</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationSet.h">
-      <Filter>Animation</Filter>
-    </ClInclude>
     <ClInclude Include="UVAnimationSet.h">
       <Filter>Animation</Filter>
     </ClInclude>
@@ -349,6 +349,12 @@
     </ClInclude>
     <ClInclude Include="ObjectExtra.h">
       <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="LostWorldObjectSet.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationSet.h">
+      <Filter>Havok</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

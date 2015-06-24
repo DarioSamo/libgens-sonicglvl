@@ -31,7 +31,7 @@ namespace LibGens {
 		unsigned int keyframe_sets_count=0;
 		file->readInt32BE(&keyframe_sets_count);
 
-		printf("  Animation Set %s: %d Keyframe Sets [%f - %f] FPS: %f\n", animation_name.c_str(), keyframe_sets_count, start_time, end_time, fps);
+		//printf("  Animation Set %s: %d Keyframe Sets [%f - %f] FPS: %f\n", animation_name.c_str(), keyframe_sets_count, start_time, end_time, fps);
 
 		for (size_t i=0; i<keyframe_sets_count; i++) {
 			KeyframeSet *keyframe_set = new KeyframeSet();

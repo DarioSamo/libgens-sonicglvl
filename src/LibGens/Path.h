@@ -22,6 +22,7 @@
 #define LIBGENS_PATH_ERROR_MESSAGE_NULL_FILE     "Trying to read path data from unreferenced file."
 #define LIBGENS_PATH_XML_EXTENSION               ".xml"
 #define LIBGENS_PATH_FULL_GENERATIONS_EXTENSION  ".path.xml"
+#define LIBGENS_PATH_FULL_LOST_WORLD_EXTENSION   ".path2.bin"
 
 #define LIBGENS_PATH_XML_ROOT                    "SonicPath"
 #define LIBGENS_PATH_XML_LIBRARY                 "library"
@@ -51,6 +52,10 @@
 #define LIBGENS_PATH_TAG_GRIND_RAIL              "@GR"
 #define LIBGENS_PATH_TAG_SUPERSONIC              "super_sonic"
 
+#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_1      "@GRspd1"
+#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_2      "@GRspd2"
+#define LIBGENS_PATH_TAG_GRIND_RAIL_SPEED_3      "@GRspd3"
+
 namespace LibGens {
 	class Knot {
 		public:
@@ -63,6 +68,7 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void readPath2(File *file);
 
 
 	};
@@ -76,6 +82,7 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void readPath2(File *file, unsigned int knot_count, bool dual);
 
 			vector<Knot *> getKnots() {
 				return knots;
@@ -148,6 +155,7 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void readPath2(File *file);
 
 			list<Spline3D *> getSplines() {
 				return splines;
@@ -215,6 +223,7 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void readPath2(File *file);
 
 			string getID() {
 				return id;
@@ -238,8 +247,13 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void readPath2(File *file, int num_paths);
 
 			Spline *getSpline(string instance_name);
+
+			list<Geometry *> getGeometry() {
+				return geoms;
+			}
 	};
 
 	class Node {
@@ -260,6 +274,7 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void fromGeometryPath2(Geometry *geom);
 
 			void setStageID(size_t v) {
 				stage_id = v;
@@ -297,6 +312,7 @@ namespace LibGens {
 			void read(File *file);
 			void readXML(TiXmlElement *parent);
 			void writeXML(TiXmlElement *parent);
+			void fromPath2(Library *library);
 
 			list<Node *> getNodes() {
 				return nodes;
@@ -308,10 +324,16 @@ namespace LibGens {
 			Library *library;
 			Scene *scene;
 		public:
+			Path() {
+				library = nullptr;
+				scene = nullptr;
+			}
+
 			Path(string filename);
 			void read(File *file);
 			void readXML(string filename);
 			void save(string filename);
+			void readPath2(string filename);
 
 			Library *getLibrary() {
 				return library;

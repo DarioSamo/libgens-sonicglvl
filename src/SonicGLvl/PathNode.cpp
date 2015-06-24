@@ -66,7 +66,7 @@ PathNode::PathNode(string path_name, LibGens::Spline *spline_p, LibGens::Node *n
 			pos.z = knots[i]->point.z;
 			lines->addPoint(pos);
 
-			if (i < (knots_size-1)) {
+			/*if (i < (knots_size-1)) {
 				float segment_length = (*it_s)->getSegmentLength(i);
 				int interpolation_steps = segment_length / spline_precision;
 
@@ -84,7 +84,7 @@ PathNode::PathNode(string path_name, LibGens::Spline *spline_p, LibGens::Node *n
 						current_interpolation += interpolation_step;
 					}
 				}
-			}
+			}*/
 		}
 
 		lines->update();

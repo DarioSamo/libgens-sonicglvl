@@ -320,12 +320,20 @@ namespace LibGens {
 
 			}
 
+			Vector3 toLostWorldEuler() const {
+				return Vector3( asinf(-2 * (y*z - w*x)),
+								atan2f(2*(x*z + w*y), powf(w,2) - powf(x,2) - powf(y,2) + powf(z,2)),
+								atan2f(2*(x*y + w*z), powf(w,2) - powf(x,2) + powf(y,2) - powf(z,2))
+							  );
+			}
+
 			float getYaw();
 			float getYawDegrees();
 
 			void fromXYZInts(int rx, int ry, int rz);
 			void fromZXYInts(int rx, int ry, int rz);
 			void fromXZYInts(int rx, int ry, int rz);
+			void fromLostWorldEuler(Vector3 euler);
 			void fromAngleAxis(float rfAngle, Vector3 rkAxis);
 			void fromRotationMatrix(const Matrix3& kRot);
 			void toRotationMatrix(Matrix3& kRot);

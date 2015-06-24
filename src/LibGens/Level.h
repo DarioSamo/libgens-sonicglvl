@@ -60,6 +60,18 @@
 #define LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_Z       	 "ms_FarNearScale.z"
 #define LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_W       	 "ms_FarNearScale.w"
 
+#define LIBGENS_LEVEL_LUA_SCENE                      "Scene"
+#define LIBGENS_LEVEL_LUA_LIGHT_SCATTERING           "LightScattering"
+#define LIBGENS_LEVEL_LUA_NAME                       "name"
+#define LIBGENS_LEVEL_LUA_PARAMS                     "params"
+#define LIBGENS_LEVEL_LUA_PARAMS_FAR                 "params_far"
+#define LIBGENS_LEVEL_LUA_SKY_INTENSITY_SCALE        "sky_intensity_scale"
+#define LIBGENS_LEVEL_LUA_SKY_FOLLOWUP_RATIO_Y       "sky_followup_ratio_y"
+#define LIBGENS_LEVEL_LUA_COLOR						 "color"
+#define LIBGENS_LEVEL_LUA_RAYLEIGH                   "rayleigh"
+#define LIBGENS_LEVEL_LUA_MIE                        "mie"
+#define LIBGENS_LEVEL_LUA_NEAR                       "near"
+#define LIBGENS_LEVEL_LUA_FAR                        "far"
 
 #define LIBGENS_LEVEL_XML_SONIC                      "Sonic"
 #define LIBGENS_LEVEL_XML_YAW                        "Yaw"
@@ -82,6 +94,7 @@
 
 #define LIBGENS_LEVEL_GAME_GENERATIONS               0
 #define LIBGENS_LEVEL_GAME_UNLEASHED                 1
+#define LIBGENS_LEVEL_GAME_LOST_WORLD                2
 
 #define LIBGENS_LEVEL_GAME_STRING_GENERATIONS        "Generations"
 #define LIBGENS_LEVEL_GAME_STRING_UNLEASHED          "Unleashed"
@@ -146,6 +159,7 @@ namespace LibGens {
 			float spawn_dead_height;
 			string spawn_camera_view;
 			Vector3 spawn_position;
+			Quaternion spawn_rotation;
 			string spawn_mode;
 			float spawn_speed;
 			float spawn_time;
@@ -160,6 +174,7 @@ namespace LibGens {
 		public:
 			Level();
 			Level(string folder_p, string game_name=LIBGENS_LEVEL_GAME_STRING_GENERATIONS);
+			static Level* LostWorldLevel(string folder_p, ObjectLibrary *library);
 			void setName(string nm);
 			size_t getGameMode();
 			void setGameMode(size_t v);
@@ -181,6 +196,7 @@ namespace LibGens {
 			void loadTerrain();
 			void loadSceneEffect();
 			void loadSpawn(TiXmlElement *root);
+			void loadLuaConfig(File *file);
 			void saveSpawn();
 			SceneEffect &getSceneEffect();
 			ObjectSet *getSet(string name);

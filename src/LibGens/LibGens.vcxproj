@@ -5,6 +5,10 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release - Havok 2012|Win32">
+      <Configuration>Release - Havok 2012</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -26,6 +30,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release - Havok 2012|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -35,8 +45,14 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release - Havok 2012|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>../../lib/$(Configuration)/</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release - Havok 2012|Win32'">
     <OutDir>../../lib/$(Configuration)/</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -55,6 +71,27 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>../../depends/allegro/include;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PreprocessorDefinitions>ALLEGRO_NO_MAGIC_MAIN;LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <ImportLibrary>../../lib/$(Configuration)/$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>../../depends/allegro/lib;../../depends/fbxsdk/lib/vs2010/x86/release;../../depends/hk2010_2_0_r1/Lib/win32_net_9-0/release_multithreaded_dll;../../depends/pthreads/lib/x86;../../lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>hkaAnimation.lib;pthreadVC2.lib;libfbxsdk-md.lib;allegro-5.0.10-monolith-mt.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaInternal.lib;hkaRagdoll.lib;LibGens-externals.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release - Havok 2012|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../depends/allegro/include;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2012_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>ALLEGRO_NO_MAGIC_MAIN;LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -98,6 +135,7 @@
     <ClCompile Include="LibGens.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightField.cpp" />
+    <ClCompile Include="LostWorldObjectSet.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialLibrary.cpp" />
     <ClCompile Include="MathGens.cpp" />
@@ -117,6 +155,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release - Havok 2012|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="StringTable.cpp" />
     <ClCompile Include="Submesh.cpp" />
@@ -160,6 +199,7 @@
     <ClInclude Include="LibGens.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightField.h" />
+    <ClInclude Include="LostWorldObjectSet.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialLibrary.h" />
     <ClInclude Include="MathGens.h" />

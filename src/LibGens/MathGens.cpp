@@ -549,6 +549,14 @@ namespace LibGens {
 		file->writeFloat32BE(&z);
 		file->writeFloat32BE(&w);
 	}
+	
+	void Quaternion::fromLostWorldEuler(Vector3 euler) {
+		Quaternion quatX, quatY, quatZ;
+		quatX.fromAngleAxis(euler.x, Vector3(1,0,0));
+		quatY.fromAngleAxis(euler.y, Vector3(0,1,0));
+		quatZ.fromAngleAxis(euler.z, Vector3(0,0,1));
+		*this = quatY * quatX * quatZ;
+	}
 
 	void Quaternion::fromAngleAxis(float rfAngle, Vector3 rkAxis) {
         float fHalfAngle ( 0.5*rfAngle );

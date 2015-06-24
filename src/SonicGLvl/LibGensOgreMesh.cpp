@@ -125,7 +125,7 @@ void buildAnimation(string animation_name, hkaAnimation *havok_animation, Ogre::
 		// Retrieve Transforms
 		int transforms_size = havok_animation->m_numberOfTransformTracks;
 		hkQsTransform *transforms = (hkQsTransform *) malloc(sizeof(hkQsTransform) * transforms_size);
-		havok_animation->sampleTracks(current_time, transforms, NULL, NULL);
+		havok_animation->sampleTracks(current_time, transforms, NULL);
 		hkaSkeletonUtils::normalizeRotations(transforms, transforms_size);
 
 		// Create Animation Tracks

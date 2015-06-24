@@ -246,7 +246,7 @@ bool EditorViewport::isMouseInLocalScreen(const OIS::MouseEvent &arg) {
 }
 
 
-Ogre::Entity *EditorViewport::raycast(float raycast_x, float raycast_y, Ogre::RaySceneQuery *query, Ogre::Vector3 *output_point, Ogre::uint32 flags) {
+Ogre::Entity *EditorViewport::raycast(float raycast_x, float raycast_y, Ogre::RaySceneQuery *query, Ogre::Vector3 *output_point, Ogre::Vector3 *output_surface_normal, Ogre::uint32 flags) {
 	Ogre::Ray ray = camera->getCameraToViewportRay(raycast_x, raycast_y);
 	if (flags) query->setQueryMask(flags);
 	query->setRay(ray);
@@ -275,11 +275,11 @@ Ogre::Entity *EditorViewport::raycast(float raycast_x, float raycast_y, Ogre::Ra
             size_t index_count;
             Ogre::Vector3 *vertices;
             unsigned long *indices;
- 
+
 			getEntityInformation(pentity, vertex_count, vertices, index_count, indices,             
-                              pentity->getParentNode()->_getDerivedPosition(),
-                              pentity->getParentNode()->_getDerivedOrientation(),
-                              pentity->getParentNode()->_getDerivedScale());
+				pentity->getParentNode()->_getDerivedPosition(),
+				pentity->getParentNode()->_getDerivedOrientation(),
+				pentity->getParentNode()->_getDerivedScale());
  
 
             bool new_closest_found = false;
@@ -290,6 +290,9 @@ Ogre::Entity *EditorViewport::raycast(float raycast_x, float raycast_y, Ogre::Ra
 					if ((closest_distance < 0.0f) || (hit.second < closest_distance)) {
                         closest_distance = hit.second;
                         new_closest_found = true;
+
+						if (output_surface_normal)
+							*output_surface_normal = Ogre::Math::calculateBasicFaceNormal(vertices[indices[i]], vertices[indices[i+1]], vertices[indices[i+2]]);
                     }
                 }
             }
@@ -309,21 +312,24 @@ Ogre::Entity *EditorViewport::raycast(float raycast_x, float raycast_y, Ogre::Ra
 }
 
 
-bool EditorViewport::raycastPlacement(float raycast_x, float raycast_y, float placement_distance, Ogre::Vector3 *output_point, Ogre::uint32 flags) {
-	if (raycast(raycast_x, raycast_y, ray_scene_query, output_point, flags)) {
+bool EditorViewport::raycastPlacement(float raycast_x, float raycast_y, float placement_distance, Ogre::Vector3 *output_point, Ogre::Vector3 *output_surface_normal, Ogre::uint32 flags) {
+	if (raycast(raycast_x, raycast_y, ray_scene_query, output_point, output_surface_normal, flags)) {
 		return true;
 	}
 
 	if (output_point) {
 		Ogre::Ray ray = camera->getCameraToViewportRay(raycast_x, raycast_y);
-		*output_point = ray.getPoint(placement_distance);    
+		*output_point = ray.getPoint(placement_distance); 
 	}
+	if (output_surface_normal)
+		*output_surface_normal = Ogre::Vector3::ZERO;
+
 	return false;
 }
 
 
 Ogre::Entity *EditorViewport::raycastEntity(float raycast_x, float raycast_y, Ogre::uint32 flags) {
-	return raycast(raycast_x, raycast_y, ray_scene_query, NULL, flags);
+	return raycast(raycast_x, raycast_y, ray_scene_query, NULL, NULL, flags);
 }
 
 
@@ -373,11 +379,11 @@ bool EditorViewport::mouseMoved(const OIS::MouseEvent &arg) {
 
 	convertMouseToLocalScreen(mouse_x, mouse_y);
 
-	current_entity = raycast(mouse_x, mouse_y, ray_scene_query_overlay, NULL, EDITOR_NODE_AXIS);
+	current_entity = raycast(mouse_x, mouse_y, ray_scene_query_overlay, NULL, NULL, EDITOR_NODE_AXIS);
 
 	// Raycast to 3D scene if it didn't hit anything in the overlay
 	if (!current_entity) {
-		current_entity = raycast(mouse_x, mouse_y, ray_scene_query, NULL, query_flags);
+		current_entity = raycast(mouse_x, mouse_y, ray_scene_query, NULL, NULL, query_flags);
 	}
     return true;
 }

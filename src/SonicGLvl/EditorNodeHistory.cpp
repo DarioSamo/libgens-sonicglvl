@@ -70,12 +70,14 @@ void HistoryActionMoveNode::undo() {
 	if (!node) return;
 
 	node->setPosition(previous_position);
+	node->setRotation(previous_rotation);
 }
 
 void HistoryActionMoveNode::redo() {
 	if (!node) return;
 
 	node->setPosition(new_position);
+	node->setRotation(new_rotation);
 }
 
 void HistoryActionRotateNode::undo() {

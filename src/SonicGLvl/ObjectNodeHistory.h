@@ -83,7 +83,6 @@ class HistoryActionEditObjectElementBool : public HistoryAction {
 		void redo();
 };
 
-
 class HistoryActionEditObjectElementInteger : public HistoryAction {
 	protected:
 		LibGens::Object *object;
@@ -227,6 +226,111 @@ class HistoryActionEditObjectElementVectorList : public HistoryAction {
 	public:
 		HistoryActionEditObjectElementVectorList(LibGens::Object *object_p, ObjectNodeManager *object_node_manager_p, LibGens::ObjectElementVectorList *object_element_p, vector<LibGens::Vector3> previous_value_p, vector<LibGens::Vector3> new_value_p) {
 			type = HISTORY_ACTION_EDIT_OBJECT_ELEMENT_VECTOR_LIST;
+			object = object_p;
+			object_node_manager = object_node_manager_p;
+			object_element = object_element_p;
+			previous_value = previous_value_p;
+			new_value = new_value_p;
+		}
+
+		void undo();
+		void redo();
+};
+
+class HistoryActionEditObjectElementSint8 : public HistoryAction {
+	protected:
+		LibGens::Object *object;
+		ObjectNodeManager *object_node_manager;
+		LibGens::ObjectElementSint8 *object_element;
+		signed char previous_value;
+		signed char new_value;
+	public:
+		HistoryActionEditObjectElementSint8(LibGens::Object *object_p, ObjectNodeManager *object_node_manager_p, LibGens::ObjectElementSint8 *object_element_p, signed char previous_value_p, signed char new_value_p) {
+			type = HISTORY_ACTION_EDIT_OBJECT_ELEMENT_SINT8;
+			object = object_p;
+			object_node_manager = object_node_manager_p;
+			object_element = object_element_p;
+			previous_value = previous_value_p;
+			new_value = new_value_p;
+		}
+
+		void undo();
+		void redo();
+};
+
+class HistoryActionEditObjectElementUint8 : public HistoryAction {
+	protected:
+		LibGens::Object *object;
+		ObjectNodeManager *object_node_manager;
+		LibGens::ObjectElementUint8 *object_element;
+		unsigned char previous_value;
+		unsigned char new_value;
+	public:
+		HistoryActionEditObjectElementUint8(LibGens::Object *object_p, ObjectNodeManager *object_node_manager_p, LibGens::ObjectElementUint8 *object_element_p, unsigned char previous_value_p, unsigned char new_value_p) {
+			type = HISTORY_ACTION_EDIT_OBJECT_ELEMENT_UINT8;
+			object = object_p;
+			object_node_manager = object_node_manager_p;
+			object_element = object_element_p;
+			previous_value = previous_value_p;
+			new_value = new_value_p;
+		}
+
+		void undo();
+		void redo();
+};
+
+class HistoryActionEditObjectElementSint16 : public HistoryAction {
+	protected:
+		LibGens::Object *object;
+		ObjectNodeManager *object_node_manager;
+		LibGens::ObjectElementSint16 *object_element;
+		signed short previous_value;
+		signed short new_value;
+	public:
+		HistoryActionEditObjectElementSint16(LibGens::Object *object_p, ObjectNodeManager *object_node_manager_p, LibGens::ObjectElementSint16 *object_element_p, signed short previous_value_p, signed short new_value_p) {
+			type = HISTORY_ACTION_EDIT_OBJECT_ELEMENT_SINT16;
+			object = object_p;
+			object_node_manager = object_node_manager_p;
+			object_element = object_element_p;
+			previous_value = previous_value_p;
+			new_value = new_value_p;
+		}
+
+		void undo();
+		void redo();
+};
+
+class HistoryActionEditObjectElementUint16 : public HistoryAction {
+	protected:
+		LibGens::Object *object;
+		ObjectNodeManager *object_node_manager;
+		LibGens::ObjectElementUint16 *object_element;
+		unsigned short previous_value;
+		unsigned short new_value;
+	public:
+		HistoryActionEditObjectElementUint16(LibGens::Object *object_p, ObjectNodeManager *object_node_manager_p, LibGens::ObjectElementUint16 *object_element_p, unsigned short previous_value_p, unsigned short new_value_p) {
+			type = HISTORY_ACTION_EDIT_OBJECT_ELEMENT_UINT16;
+			object = object_p;
+			object_node_manager = object_node_manager_p;
+			object_element = object_element_p;
+			previous_value = previous_value_p;
+			new_value = new_value_p;
+		}
+
+		void undo();
+		void redo();
+};
+
+class HistoryActionEditObjectElementSint32 : public HistoryAction {
+	protected:
+		LibGens::Object *object;
+		ObjectNodeManager *object_node_manager;
+		LibGens::ObjectElementSint32 *object_element;
+		signed long previous_value;
+		signed long new_value;
+	public:
+		HistoryActionEditObjectElementSint32(LibGens::Object *object_p, ObjectNodeManager *object_node_manager_p, LibGens::ObjectElementSint32 *object_element_p, signed long previous_value_p, signed long new_value_p) {
+			type = HISTORY_ACTION_EDIT_OBJECT_ELEMENT_SINT32;
 			object = object_p;
 			object_node_manager = object_node_manager_p;
 			object_element = object_element_p;

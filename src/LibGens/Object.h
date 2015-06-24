@@ -38,6 +38,18 @@
 #define LIBGENS_OBJECT_ELEMENT_VECTOR_TEMPLATE		  "vector"
 #define LIBGENS_OBJECT_ELEMENT_VECTOR_LIST_TEMPLATE   "vector_list"
 
+#define LIBGENS_OBJECT_ELEMENT_SINT8_TEMPLATE         "sint8"
+#define LIBGENS_OBJECT_ELEMENT_UINT8_TEMPLATE         "uint8"
+#define LIBGENS_OBJECT_ELEMENT_SINT16_TEMPLATE        "sint16"
+#define LIBGENS_OBJECT_ELEMENT_UINT16_TEMPLATE        "uint16"
+#define LIBGENS_OBJECT_ELEMENT_SINT32_TEMPLATE        "sint32"
+#define LIBGENS_OBJECT_ELEMENT_UINT32_TEMPLATE        "uint32"
+#define LIBGENS_OBJECT_ELEMENT_ENUM_TEMPLATE          "enum"
+#define LIBGENS_OBJECT_ELEMENT_TARGET_TEMPLATE        "target"
+#define LIBGENS_OBJECT_ELEMENT_POSITION_TEMPLATE      "position"
+#define LIBGENS_OBJECT_ELEMENT_VECTOR3_TEMPLATE       "vector3"
+#define LIBGENS_OBJECT_ELEMENT_UINT32ARRAY_TEMPLATE   "uint32array"
+
 #define LIBGENS_OBJECT_ELEMENT_POSITION               "Position"
 #define LIBGENS_OBJECT_ELEMENT_POSITION_STR_SIZE      8
 #define LIBGENS_OBJECT_ELEMENT_ROTATION               "Rotation"
@@ -87,18 +99,25 @@
 
 
 namespace LibGens {
+	class Object;
+
 	class MultiSetNode {
 		public:
 			Vector3 position;
 			Quaternion rotation;
+
+			// Local transform is used for Lost World objects with parents; see below for the reason for including them
+			Vector3 local_position;
+			Quaternion local_rotation;
 
 			MultiSetNode() : position(), rotation() {
 
 			}
 
 			void readXML(TiXmlElement *root);
-
 			void writeXML(TiXmlElement *root, size_t index);
+			void readORC(File *file);
+			void recalcTransform(Object *parent);
 	};
 
 	class MultiSetParam {
@@ -141,6 +160,10 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 
+			void readORC(File *file, unsigned int count);
+
+			void recalcTransform(Object *parent);
+
 			size_t getSize() {
 				return nodes.size();
 			}
@@ -150,6 +173,7 @@ namespace LibGens {
 	class ObjectExtra;
 	class ObjectSet;
 	class ObjectLibrary;
+	class Level;
 
 	class Object {
 		protected:
@@ -162,6 +186,15 @@ namespace LibGens {
 			Quaternion rotation;
 			size_t id;
 			ObjectSet *parent_set;
+			
+			// Local Transform is used for Lost World levels - only preent so that in the event that
+			// two objects are parented to each other, the generated world position can fall back to
+			// the file's world position rather than 0,0,0 or something
+			Vector3 local_position;
+			Quaternion local_rotation;
+			bool needs_transform_recalc; //  used for objects with parents in SLW
+			unsigned int orc_offset; // used for orc saving. not the best solution, but whatever
+
 		public:
 			Object(string nm);
 			Object(Object *obj);
@@ -193,5 +226,10 @@ namespace LibGens {
 			void setParentSet(ObjectSet *v);
 			ObjectSet *getParentSet();
 			MultiSetParam *getMultiSetParam();
+
+			void readORC(File *file);
+			void writeORC(File *file, vector<unsigned int>& offset_vector);
+			void writeUnitsORC(File *file, Level *level);
+			void recalcTransform(Level *level);
 	};
 };

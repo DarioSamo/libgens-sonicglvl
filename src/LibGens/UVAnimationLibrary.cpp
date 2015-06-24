@@ -28,14 +28,14 @@ namespace LibGens {
 	void UVAnimationLibrary::addFolder(string folder_p) {
 		WIN32_FIND_DATA FindFileData;
 		HANDLE hFind;
-		hFind = FindFirstFile((folder_p+"*"+LIBGENS_UV_ANIMATION_EXTENSION).c_str(), &FindFileData);
+		hFind = FindFirstFile((folder_p+"/*"+LIBGENS_UV_ANIMATION_EXTENSION).c_str(), &FindFileData);
 		if (hFind == INVALID_HANDLE_VALUE) {} 
 		else {
 			do {
 				const char *name=FindFileData.cFileName;
 				if (name[0]=='.') continue;
 
-				string new_filename=folder_p+ToString(name);
+				string new_filename=folder_p+"/"+ToString(name);
 				UVAnimation *uv_animation=new LibGens::UVAnimation(new_filename);
 				animations.push_back(uv_animation);
 			} while (FindNextFile(hFind, &FindFileData) != 0);

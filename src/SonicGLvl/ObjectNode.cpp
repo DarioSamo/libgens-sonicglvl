@@ -39,7 +39,20 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	current_animation_name = "";
 	current_skeleton_name = "";
 	current_type_name = "";
+
+	// Look for offset position
+	string offset_position_x_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_POSITION_X, "0.0");
+	string offset_position_y_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_POSITION_Y, "0.0");
+	string offset_position_z_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_POSITION_Z, "0.0");
 	
+	float offset_position_x, offset_position_y, offset_position_z;
+
+	FromString<float>(offset_position_x, offset_position_x_str, std::dec);
+	FromString<float>(offset_position_y, offset_position_y_str, std::dec);
+	FromString<float>(offset_position_z, offset_position_z_str, std::dec);
+
+	EditorNode::setOffset(offset_position_x, offset_position_y, offset_position_z);
+
 	// Look for offset rotations
 	string offset_rotation_x_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_X, "0.0");
 	string offset_rotation_y_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y, "0.0");
@@ -88,6 +101,8 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	list<LibGens::MultiSetNode *> msp_nodes = object->getMultiSetParam()->getNodes();
 	for (list<LibGens::MultiSetNode *>::iterator it=msp_nodes.begin(); it!=msp_nodes.end(); it++) {
 		ObjectMultiSetNode *object_msp_node = new ObjectMultiSetNode(object, (*it), scene_manager);
+		object_msp_node->local_offset = local_offset;
+
 		object_msp_node->offset_rotation_x = offset_rotation_x;
 		object_msp_node->offset_rotation_y = offset_rotation_y;
 		object_msp_node->offset_rotation_z = offset_rotation_z;
@@ -107,7 +122,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	reloadEntities(scene_manager, model_library, material_library, object_production, slot_id_name);
 
 	preview_box_node->setVisible(false);
-
 	
 }
 
@@ -138,6 +152,30 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 	string model_name=object->queryEditorModel(slot_id_name, OBJECT_NODE_UNKNOWN_MESH);
 	string skeleton_name=object->queryEditorSkeleton(slot_id_name, "");
 	string animation_name=object->queryEditorAnimation(slot_id_name, "");
+
+	// Checck for property names provided as the model/skeleton/animation name
+	LibGens::ObjectElement *elem;
+	
+	if (elem = object->getElement(model_name)) {
+		if (elem->getType() == LibGens::OBJECT_ELEMENT_STRING) {
+			LibGens::ObjectElementString *string_cast = static_cast<LibGens::ObjectElementString*>(elem);
+			model_name = string_cast->value + OBJECT_NODE_MODEL_EXTENSION;
+		}
+	}
+	
+	if (elem = object->getElement(skeleton_name)) {
+		if (elem->getType() == LibGens::OBJECT_ELEMENT_STRING) {
+			LibGens::ObjectElementString *string_cast = static_cast<LibGens::ObjectElementString*>(elem);
+			skeleton_name = string_cast->value + OBJECT_NODE_SKELETON_EXTENSION;
+		}
+	}
+	
+	if (elem = object->getElement(animation_name)) {
+		if (elem->getType() == LibGens::OBJECT_ELEMENT_STRING) {
+			LibGens::ObjectElementString *string_cast = static_cast<LibGens::ObjectElementString*>(elem);
+			animation_name = string_cast->value + OBJECT_NODE_ANIMATION_EXTENSION;
+		}
+	}
 
 	string preview_box_x=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_X, "");
 	string preview_box_y=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Y, "");
@@ -191,7 +229,7 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 		if (new_scale.y <= 0.0) new_scale.y = 0.1;
 		if (new_scale.z <= 0.0) new_scale.z = 0.1;
 
-		preview_box_node->setScale(new_scale);
+		preview_box_node->setScale(new_scale / 10.f);
 	}
 
 	if ((object->getName() == OBJECT_NODE_OBJECT_PHYSICS) && object_production) {

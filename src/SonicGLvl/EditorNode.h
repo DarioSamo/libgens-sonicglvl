@@ -41,6 +41,7 @@ class EditorNode {
 		Ogre::Vector3 position;
 		Ogre::Quaternion rotation;
 		Ogre::Vector3 scale;
+		Ogre::Vector3 local_offset;
 
 		Ogre::Vector3 last_position;
 		Ogre::Quaternion last_rotation;
@@ -95,7 +96,12 @@ class EditorNode {
 
 		virtual void setPosition(Ogre::Vector3 v) {
 			position = v;
-			if (scene_node) scene_node->setPosition(position);
+			if (scene_node) scene_node->setPosition(getPositionWithOffset());
+		}
+
+		void setOffset(float x, float y, float z) {
+			local_offset = Ogre::Vector3(x, y, z);
+			if (scene_node) scene_node->setPosition(getPositionWithOffset());
 		}
 
 		void translate(Ogre::Vector3 v) {
@@ -116,7 +122,10 @@ class EditorNode {
 
 		virtual void setRotation(Ogre::Quaternion v) {
 			rotation = v;
-			if (scene_node) scene_node->setOrientation(rotation);
+			if (scene_node) {
+				scene_node->setOrientation(rotation);
+				scene_node->setPosition(getPositionWithOffset());
+			}
 		}
 
 		Ogre::Quaternion getRotation() {
@@ -133,6 +142,17 @@ class EditorNode {
 
 		EditorNodeType getType() {
 			return type;
+		}
+
+		Ogre::Vector3 getPositionWithOffset() {
+			Ogre::Vector3 x, y, z;
+			rotation.ToAxes(x, y, z);
+
+			Ogre::Vector3 out = position;
+			out += x * local_offset.x;
+			out += y * local_offset.y;
+			out += z * local_offset.z;
+			return out;
 		}
 };
 

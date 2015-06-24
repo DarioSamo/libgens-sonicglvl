@@ -123,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="DefaultShaderParameters.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -204,6 +207,9 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="DefaultShaderParameters.h">
+      <Filter>Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource">

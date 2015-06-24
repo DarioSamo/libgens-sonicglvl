@@ -22,7 +22,7 @@
 #ifndef EDITOR_VIEWPORT_H_INCLUDED
 #define EDITOR_VIEWPORT_H_INCLUDED
 
-#define EDITOR_VIEWPORT_FAR_CLIP_DEFAULT   9000
+#define EDITOR_VIEWPORT_FAR_CLIP_DEFAULT   10000
 
 class EditorViewport {
 	protected:
@@ -76,8 +76,8 @@ class EditorViewport {
 		void convertMouseToLocalScreen(float &mouse_x, float &mouse_y);
 		bool isMouseInLocalScreen(const OIS::MouseEvent &arg);
 		
-		Ogre::Entity *raycast(float raycast_x, float raycast_y, Ogre::RaySceneQuery *query, Ogre::Vector3 *output_point=NULL, Ogre::uint32 flags=0);
-		bool raycastPlacement(float raycast_x, float raycast_y, float placement_distance=5.0f, Ogre::Vector3 *output_point=NULL, Ogre::uint32 flags=0);
+		Ogre::Entity *raycast(float raycast_x, float raycast_y, Ogre::RaySceneQuery *query, Ogre::Vector3 *output_point=NULL, Ogre::Vector3 *output_surface_normal=NULL, Ogre::uint32 flags=0);
+		bool raycastPlacement(float raycast_x, float raycast_y, float placement_distance=5.0f, Ogre::Vector3 *output_point=NULL, Ogre::Vector3 *output_surface_normal=NULL, Ogre::uint32 flags=0);
 		Ogre::Entity *raycastEntity(float raycast_x, float raycast_y, Ogre::uint32 flags=0);
 
 		Ogre::Entity *getCurrentEntity() {

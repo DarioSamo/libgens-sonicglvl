@@ -17,11 +17,14 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
+#define _USE_MATH_DEFINES
 #include "Level.h"
 #include "Object.h"
 #include "ObjectSet.h"
 #include "ObjectElement.h"
+#include "LostWorldObjectSet.h"
 #include "Path.h"
+#include <math.h>
 
 namespace LibGens {
 	Level::Level() {
@@ -52,6 +55,70 @@ namespace LibGens {
 		loadTerrain();
 	}
 
+	Level* Level::LostWorldLevel(string folder_p, ObjectLibrary *library)
+	{
+		// Static method
+		Level *level = new Level();
+		level->folder = folder_p;
+		level->game_mode = LIBGENS_LEVEL_GAME_LOST_WORLD;
+
+		// Get slot name - folder is "<slot>/data/" so remove "data" and fetch <slot>
+		level->slot = folder_p.substr(0, folder_p.size() - 6);
+		level->slot = LibGens::File::nameFromFilename(level->slot);
+
+		// Fill in SceneEffect with default values from ghz200
+		level->scene_effect.light_scattering_color = Color(0.11f, 0.35f, 0.760001f);
+		level->scene_effect.light_scattering_far_near_scale = Color(3200.f, 380.f, 1.2f, 114.f);
+		level->scene_effect.light_scattering_ray_mie_ray2_mie2.r = 0.291f;
+		level->scene_effect.light_scattering_ray_mie_ray2_mie2.g = 0.96f;
+		level->scene_effect.sky_follow_up_ratio_y = 1.0f;
+		level->scene_effect.sky_intensity_scale = 1.3f;
+
+		// Load sets from cache folder
+		WIN32_FIND_DATA FindFileData;
+		HANDLE hFind;
+		hFind = FindFirstFile((folder_p + "*.orc").c_str(), &FindFileData);
+		if (hFind == INVALID_HANDLE_VALUE) {} 
+		else {
+			do {
+				const char *name=FindFileData.cFileName;
+				if (name[0]=='.') continue;
+
+				string new_filename = folder_p + ToString(name);
+				LostWorldObjectSet *object_set = new LibGens::LostWorldObjectSet(new_filename, library);
+				level->addSet(object_set);
+			} while (FindNextFile(hFind, &FindFileData) != 0);
+			FindClose(hFind);
+		}
+
+		// Fix local transform on sets
+		for (list<ObjectSet*>::iterator it = level->sets.begin(); it != level->sets.end(); it++) {
+			LostWorldObjectSet *lw_set = static_cast<LostWorldObjectSet*>(*it);
+			lw_set->fixTransform(level);
+		}
+
+		// Set collision entries (doesn't actually load, presumably because of big endian hkx)
+		string collision_filename = folder_p + level->slot + "_col.phy.hkx";
+		LevelCollisionEntry *entry = new LevelCollisionEntry();
+		entry->name = collision_filename;
+		entry->rendering = true;
+		level->collision_entries.push_back(entry);
+		
+		// Load paths
+		Path *path = new Path();
+		string path_filename = folder_p + level->slot + "_path.path2.bin";
+		path->readPath2(path_filename);
+		level->paths.push_back(path);
+
+		// Load config
+		string lua_config = folder_p + level->slot + "_config.lua";
+
+		File config(lua_config, "r");
+		if (config.valid())
+			level->loadLuaConfig(&config);
+
+		return level;
+	}
 	
 	void Level::loadStage() {
 		TiXmlDocument doc(folder + LIBGENS_LEVEL_DATA_STAGE);
@@ -173,6 +240,79 @@ namespace LibGens {
 		}
 	}
 
+	void Level::loadLuaConfig(File *file) {
+		string line;
+		string currentParamGroup;
+		string currentParamType;
+
+		while (!file->endOfFile()) {
+			file->readLine(&line);
+
+			unsigned int numWhitespace = 0;
+			for (; numWhitespace < line.size() && isspace(line[numWhitespace]); numWhitespace++) {}
+			line = line.substr(numWhitespace, line.size() - numWhitespace);
+
+			size_t pre_eq = line.find_first_of("=");
+			size_t post_eq = line.find_last_of("=");
+
+			if (pre_eq == string::npos) continue;
+			pre_eq -= 1;
+			post_eq += 2;
+
+			string name = line.substr(0, pre_eq);
+			string parm = line.substr(post_eq, line.size() - post_eq);
+
+			if (name == LIBGENS_LEVEL_LUA_NAME)
+			{
+				size_t nameStart = parm.find_first_of("\"");
+				size_t nameEnd = parm.find_last_of("\"");
+				currentParamGroup = parm.substr(nameStart+1, nameEnd-nameStart-1);
+			}
+
+			if (name == LIBGENS_LEVEL_LUA_PARAMS)
+			{
+				currentParamType = LIBGENS_LEVEL_LUA_PARAMS;
+			}
+
+			if (name == LIBGENS_LEVEL_LUA_PARAMS_FAR)
+			{
+				currentParamType = LIBGENS_LEVEL_LUA_PARAMS_FAR;
+			}
+
+			if (currentParamGroup == LIBGENS_LEVEL_LUA_SCENE)
+			{
+				if (name == LIBGENS_LEVEL_LUA_SKY_INTENSITY_SCALE)
+					sscanf(parm.c_str(), "%f,", &(scene_effect.sky_intensity_scale));
+
+				if (name == LIBGENS_LEVEL_LUA_SKY_FOLLOWUP_RATIO_Y)
+					sscanf(parm.c_str(), "%f,", &(scene_effect.sky_follow_up_ratio_y));
+			}
+
+			if ((currentParamGroup == LIBGENS_LEVEL_LUA_LIGHT_SCATTERING) && (currentParamType == LIBGENS_LEVEL_LUA_PARAMS)) {
+				if (name == LIBGENS_LEVEL_LUA_COLOR) {
+					sscanf(parm.c_str(), "{ %f, %f, %f, %f },",
+						&(scene_effect.light_scattering_color.r),
+						&(scene_effect.light_scattering_color.g),
+						&(scene_effect.light_scattering_color.b),
+						&(scene_effect.light_scattering_color.a)
+						);
+				}
+
+				if (name == LIBGENS_LEVEL_LUA_RAYLEIGH)
+					sscanf(parm.c_str(), "%f,", &(scene_effect.light_scattering_ray_mie_ray2_mie2.r));
+
+				if (name == LIBGENS_LEVEL_LUA_MIE)
+					sscanf(parm.c_str(), "%f,", &(scene_effect.light_scattering_ray_mie_ray2_mie2.g));
+
+				if (name == LIBGENS_LEVEL_LUA_FAR)
+					sscanf(parm.c_str(), "%f,", &(scene_effect.light_scattering_far_near_scale.r));
+
+				if (name == LIBGENS_LEVEL_LUA_NEAR)
+					sscanf(parm.c_str(), "%f,", &(scene_effect.light_scattering_far_near_scale.g));
+
+			}
+		}
+	}
 
 	void Level::loadPath(TiXmlElement *root) {
 		for(TiXmlElement *pElem=root->FirstChildElement(); pElem; pElem=pElem->NextSiblingElement()) {

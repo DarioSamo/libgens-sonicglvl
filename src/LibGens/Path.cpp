@@ -695,4 +695,142 @@ namespace LibGens {
 
 		return closest_point;
 	}
+
+	string ReadStringPath2(File *file) {
+		unsigned int offset;
+		file->readInt32BE(&offset);
+		unsigned int cur = file->getCurrentAddress();
+
+		file->goToAddress(offset);
+		string str;
+		file->readString(&str);
+		file->goToAddress(cur);
+		return str;
+	}
+	
+	void Knot::readPath2(File *file) {
+		point.read(file);
+		point = point / 10.f;
+		type = "corner";
+	}
+	
+	void Spline3D::readPath2(File *file, unsigned int knot_count, bool dual) {
+
+		if (dual) {
+			count = knot_count/2;
+			knots.resize(count);
+
+			for (unsigned int k = 0; k < count; k++) {
+				knots[k] = new Knot();
+				knots[k]->readPath2(file);
+				file->moveAddress(12);
+			}
+		}
+
+		else {
+			count = knot_count;
+			knots.resize(count);
+
+			for (unsigned int k = 0; k < count; k++) {
+				knots[k] = new Knot();
+				knots[k]->readPath2(file);
+			}
+		}
+	}
+	
+	void Spline::readPath2(File *file) {
+		width = 0.2f;
+		unsigned int start = file->getCurrentAddress() - 4;
+
+		unsigned int num_knots = 0, num_dual_knots, knots_offset, dual_knots_offset;
+		file->moveAddress(2);
+		file->readInt16BE((unsigned short*) &num_knots);
+		file->moveAddress(0xC);
+		file->readInt32BE(&knots_offset);
+		file->moveAddress(0x8);
+		file->readInt32BE(&num_dual_knots);
+		file->readInt32BE(&dual_knots_offset);
+		file->moveAddress(0x28);
+		int end = file->getCurrentAddress();
+
+		if (num_dual_knots > 0) {
+			count = 2;
+
+			file->goToAddress(dual_knots_offset);
+			Spline3D *spline1 = new Spline3D();
+			spline1->readPath2(file, num_dual_knots, true);
+			splines.push_back(spline1);
+			
+			file->goToAddress(dual_knots_offset+12);
+			Spline3D *spline2 = new Spline3D();
+			spline2->readPath2(file, num_dual_knots, true);
+			splines.push_back(spline2);
+		}
+
+		else {
+			count = 1;
+
+			file->goToAddress(knots_offset);
+			Spline3D *spline = new Spline3D();
+			spline->readPath2(file, num_knots, false);
+			splines.push_back(spline);
+		}
+
+		file->goToAddress(end);
+	}
+	
+	void Geometry::readPath2(File *file) {
+		name = ReadStringPath2(file);
+		id = name;
+		spline = new Spline();
+		spline->readPath2(file);
+	}
+	
+	void Library::readPath2(File *file, int num_paths) {
+		type = "GEOMETRY";
+
+		for (int p = 0; p < num_paths; p++) {
+			Geometry *geom = new Geometry();
+			geom->readPath2(file);
+			geoms.push_back(geom);
+		}
+	}
+	
+	void Node::fromGeometryPath2(Geometry *geom) {
+		name = geom->getName();
+		id = name;
+		instance_url = "#" + name;
+		translate = Vector3(0,0,0);
+		rotate = Quaternion(1,0,0,0);
+		scale = Vector3(1,1,1);
+	}
+	
+	void Scene::fromPath2(Library *library) {
+		id = "DefaultScene";
+		list<Geometry*> geoms = library->getGeometry();
+
+		for (list<Geometry*>::iterator it = geoms.begin(); it != geoms.end(); it++) {
+			Geometry *geom = *it;
+			Node *node = new Node();
+			node->fromGeometryPath2(geom);
+			nodes.push_back(node);
+		}
+	}
+	
+	void Path::readPath2(string filename) {
+		LibGens::File file(filename, LIBGENS_FILE_READ_BINARY);
+
+		if (file.valid()) {
+			file.moveAddress(8);
+			int num_paths;
+			file.readInt32BE(&num_paths);
+			file.moveAddress(4);
+
+			library = new Library();
+			library->readPath2(&file, num_paths);
+
+			scene = new Scene();
+			scene->fromPath2(library);
+		}
+	}
 };

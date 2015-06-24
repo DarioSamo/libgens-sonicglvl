@@ -272,6 +272,18 @@ void EditorApplication::updateObjectsPropertiesValuesGUI(LibGens::Object *object
 			LibGens::ObjectElementIDList *element_cast_id_list;
 			LibGens::ObjectElementVector *element_cast_vector;
 			LibGens::ObjectElementVectorList *element_cast_vector_list;
+
+			LibGens::ObjectElementSint8 *element_cast_sint8;
+			LibGens::ObjectElementUint8 *element_cast_uint8;
+			LibGens::ObjectElementSint16 *element_cast_sint16;
+			LibGens::ObjectElementUint16 *element_cast_uint16;
+			LibGens::ObjectElementSint32 *element_cast_sint32;
+			LibGens::ObjectElementUint32 *element_cast_uint32;
+			LibGens::ObjectElementEnum *element_cast_enum;
+			LibGens::ObjectElementTarget *element_cast_target;
+			LibGens::ObjectElementPosition *element_cast_position;
+			LibGens::ObjectElementVector3 *element_cast_vector3;
+			LibGens::ObjectElementUint32Array *element_cast_uint32array;
 			
 			switch (current_properties_types[i]) {
 				case LibGens::OBJECT_ELEMENT_BOOL :
@@ -316,6 +328,62 @@ void EditorApplication::updateObjectsPropertiesValuesGUI(LibGens::Object *object
 				case LibGens::OBJECT_ELEMENT_VECTOR_LIST :
 					element_cast_vector_list=static_cast<LibGens::ObjectElementVectorList *>(element);
 					value = "Vector Count: " + ToString(element_cast_vector_list->value.size());
+					break;
+
+				case LibGens::OBJECT_ELEMENT_SINT8 :
+					element_cast_sint8=static_cast<LibGens::ObjectElementSint8 *>(element);
+					value = ToString((int) element_cast_sint8->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_UINT8 :
+					element_cast_uint8=static_cast<LibGens::ObjectElementUint8 *>(element);
+					value = ToString((int) element_cast_uint8->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_SINT16 :
+					element_cast_sint16=static_cast<LibGens::ObjectElementSint16 *>(element);
+					value = ToString(element_cast_sint16->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_UINT16 :
+					element_cast_uint16=static_cast<LibGens::ObjectElementUint16 *>(element);
+					value = ToString(element_cast_uint16->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_SINT32 :
+					element_cast_sint32=static_cast<LibGens::ObjectElementSint32 *>(element);
+					value = ToString(element_cast_sint32->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_UINT32 :
+					element_cast_uint32=static_cast<LibGens::ObjectElementUint32 *>(element);
+					value = ToString(element_cast_uint32->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_ENUM :
+					element_cast_enum=static_cast<LibGens::ObjectElementEnum *>(element);
+					value = ToString((int) element_cast_enum->value);
+					break;
+				case LibGens::OBJECT_ELEMENT_TARGET :
+					element_cast_target=static_cast<LibGens::ObjectElementTarget *>(element);
+
+					if (current_level) {
+						if (current_level->getLevel()) {
+							LibGens::Object *target_object = current_level->getLevel()->getObjectByID(element_cast_target->value);
+
+							if (target_object) {
+								value = target_object->getName();
+							}
+						}
+					}
+
+					value += "(ID: " + ToString(element_cast_target->value) + ")";
+					break;
+				case LibGens::OBJECT_ELEMENT_POSITION :
+					element_cast_position=static_cast<LibGens::ObjectElementPosition *>(element);
+					value = "(" + ToString(element_cast_position->value.x) + ", " + ToString(element_cast_position->value.y) + ", " + ToString(element_cast_position->value.z) + ")";
+					break;
+				case LibGens::OBJECT_ELEMENT_VECTOR3 :
+					element_cast_vector3=static_cast<LibGens::ObjectElementVector3 *>(element);
+					value = "(" + ToString(element_cast_vector3->value.x) + ", " + ToString(element_cast_vector3->value.y) + ", " + ToString(element_cast_vector3->value.z) + ")";
+					break;
+				case LibGens::OBJECT_ELEMENT_UINT32ARRAY :
+					element_cast_uint32array=static_cast<LibGens::ObjectElementUint32Array *>(element);
+					value = "Array Count: " + ToString(element_cast_uint32array->value.size());
 					break;
 			};
 
@@ -380,191 +448,282 @@ void EditorApplication::editObjectPropertyIndex(int selection_index) {
 
 		if (!hEditPropertyDlg) {
 			history_edit_property_wrapper = new HistoryActionWrapper();
+			LibGens::ObjectElementType type = current_properties_types[current_property_index];
 
-			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_BOOL) {
-				// Create Dialog for Bool
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_BOOL_DIALOG), hwnd, EditBoolCallback);
+			switch (type)
+			{
 
-				SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
-				SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)"false");
-				SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)"true");
+			case LibGens::OBJECT_ELEMENT_BOOL:
+				{
+					// Create Dialog for Bool
+					hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_BOOL_DIALOG), hwnd, EditBoolCallback);
 
-				COMBOBOXINFO hComboBoxInfo;
-				hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
+					SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
+					SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)"false");
+					SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)"true");
 
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE);
-				GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
-				SetFocus(hEditMainControl);
-				globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndList, GWL_WNDPROC, (LONG) EditControlCallback);
+					COMBOBOXINFO hComboBoxInfo;
+					hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
 
-				// Set Default
-				if (current_single_property_object) {
-					string element_name = current_properties_names[current_property_index];
-					LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
+					HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE);
+					GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
+					SetFocus(hEditMainControl);
+					globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndList, GWL_WNDPROC, (LONG) EditControlCallback);
 
-					if (element) {
-						LibGens::ObjectElementBool *element_bool = static_cast<LibGens::ObjectElementBool *>(element);
-						bool default_value = element_bool->value;
-						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, CB_SETCURSEL, (WPARAM) (default_value ? 1 : 0), (LPARAM) 0);
-					}
-				}
-			}
-
-			
-			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_ID) {
-				// Create Dialog for Float
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditIntCallback);
-
-				COMBOBOXINFO hComboBoxInfo;
-				hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
-
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
-				GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
-				SetFocus(hEditMainControl);
-				globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
-
-				// Set Default
-				if (current_single_property_object) {
-					string element_name = current_properties_names[current_property_index];
-					LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
-
-					if (element) {
-						LibGens::ObjectElementID *element_id = static_cast<LibGens::ObjectElementID *>(element);
-						unsigned int default_value = element_id->value;
-						SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
-						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
-					}
-				}
-			}
-
-
-			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_INTEGER) {
-				// Create Dialog for Float
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditIntCallback);
-
-				COMBOBOXINFO hComboBoxInfo;
-				hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
-
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
-				GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
-				SetFocus(hEditMainControl);
-				globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
-
-				// Set Default
-				if (current_single_property_object) {
-					string element_name = current_properties_names[current_property_index];
-					LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
-
-					if (element) {
-						LibGens::ObjectElementInteger *element_integer = static_cast<LibGens::ObjectElementInteger *>(element);
-						unsigned int default_value = element_integer->value;
-						SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
-						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
-					}
-				}
-			}
-
-			
-			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_FLOAT) {
-				// Create Dialog for Float
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditFloatCallback);
-
-				COMBOBOXINFO hComboBoxInfo;
-				hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
-
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
-				GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
-				SetFocus(hEditMainControl);
-				globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
-
-				// Set Default
-				if (current_single_property_object) {
-					string element_name = current_properties_names[current_property_index];
-					LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
-
-					if (element) {
-						LibGens::ObjectElementFloat *element_float = static_cast<LibGens::ObjectElementFloat *>(element);
-						float default_value = element_float->value;
-						SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
-						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
-					}
-				}
-			}
-
-
-			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_STRING) {
-				// Create Dialog for String
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_STRING_DIALOG), hwnd, EditStringCallback);
-
-				COMBOBOXINFO hComboBoxInfo;
-				hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
-
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_STRING_VALUE);
-				GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
-				SetFocus(hEditMainControl);
-				globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
-
-				// Set Default
-				if (current_single_property_object) {
-					string element_name = current_properties_names[current_property_index];
-					LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
-
-					if (element) {
-						LibGens::ObjectElementString *element_string = static_cast<LibGens::ObjectElementString *>(element);
-						string default_value = element_string->value;
-						SetDlgItemText(hEditPropertyDlg, IDC_EDIT_STRING_VALUE, default_value.c_str());
-						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_STRING_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
-					}
-				}
-
-				// If ObjectPhysics & Type, pre-load all ObjectProduction entries into the ComboBox
-				if (current_object_list_properties.size() && object_production) {
-					LibGens::Object *first_object = (*current_object_list_properties.begin());
-					
-					if (first_object) {
-						string object_name = first_object->getName();
+					// Set Default
+					if (current_single_property_object) {
 						string element_name = current_properties_names[current_property_index];
+						LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
 
-						if ((object_name == OBJECT_NODE_OBJECT_PHYSICS) && (element_name == OBJECT_NODE_OBJECT_PHYSICS_ELEMENT_TYPE)) {
-							object_production->readySortedEntries();
+						if (element) {
+							LibGens::ObjectElementBool *element_bool = static_cast<LibGens::ObjectElementBool *>(element);
+							bool default_value = element_bool->value;
+							SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_BOOL_VALUE, CB_SETCURSEL, (WPARAM) (default_value ? 1 : 0), (LPARAM) 0);
+						}
+					}
 
-							string entry_name="";
-							while (object_production->getNextEntryName(entry_name)) {
-								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_STRING_VALUE, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)entry_name.c_str());
+					break;
+				}
+
+			case LibGens::OBJECT_ELEMENT_ID:
+			case LibGens::OBJECT_ELEMENT_TARGET:
+				{
+					// Create Dialog for ID
+					hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditIntCallback);
+
+					COMBOBOXINFO hComboBoxInfo;
+					hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
+
+					HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
+					GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
+					SetFocus(hEditMainControl);
+					globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
+
+					// Set Default
+					if (current_single_property_object) {
+						string element_name = current_properties_names[current_property_index];
+						LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
+
+						if (element) {
+							LibGens::ObjectElementID *element_id = static_cast<LibGens::ObjectElementID *>(element);
+							unsigned int default_value = element_id->value;
+							SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
+							SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+						}
+					}
+
+					break;
+				}
+
+
+			case LibGens::OBJECT_ELEMENT_INTEGER:
+			case LibGens::OBJECT_ELEMENT_SINT8:
+			case LibGens::OBJECT_ELEMENT_UINT8:
+			case LibGens::OBJECT_ELEMENT_SINT16:
+			case LibGens::OBJECT_ELEMENT_UINT16:
+			case LibGens::OBJECT_ELEMENT_SINT32:
+			case LibGens::OBJECT_ELEMENT_UINT32:
+			case LibGens::OBJECT_ELEMENT_ENUM:
+				{
+					// Create Dialog for Integer
+					if (type == LibGens::OBJECT_ELEMENT_SINT8)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_SINT8_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_UINT8)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_UINT8_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_SINT16)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_SINT16_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_UINT16)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_UINT16_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_SINT32)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_SINT32_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_UINT32)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_UINT32_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_ENUM)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_ENUM_DIALOG), hwnd, EditIntCallback);
+					else if (type == LibGens::OBJECT_ELEMENT_INTEGER)
+						hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditIntCallback);
+
+					COMBOBOXINFO hComboBoxInfo;
+					hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
+
+					HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
+					GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
+					SetFocus(hEditMainControl);
+					globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
+
+					// Set Default
+					if (current_single_property_object) {
+						string element_name = current_properties_names[current_property_index];
+						LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
+
+						if (element) {
+
+							// Sint8
+							if (type == LibGens::OBJECT_ELEMENT_SINT8) {
+								LibGens::ObjectElementSint8 *element_sint8 = static_cast<LibGens::ObjectElementSint8 *>(element);
+								signed char default_value = element_sint8->value;
+								SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString((int) default_value).c_str());
+								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+							}
+
+							// Uint8
+							else if ((type == LibGens::OBJECT_ELEMENT_UINT8) ||
+									 (type == LibGens::OBJECT_ELEMENT_ENUM)) {
+								LibGens::ObjectElementUint8 *element_uint8 = static_cast<LibGens::ObjectElementUint8 *>(element);
+								unsigned char default_value = element_uint8->value;
+								SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString((int) default_value).c_str());
+								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+							}
+
+							// Sint16
+							if (type == LibGens::OBJECT_ELEMENT_SINT16) {
+								LibGens::ObjectElementSint16 *element_sint16 = static_cast<LibGens::ObjectElementSint16 *>(element);
+								signed short default_value = element_sint16->value;
+								SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
+								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+							}
+
+							// Uint16
+							if (type == LibGens::OBJECT_ELEMENT_UINT16) {
+								LibGens::ObjectElementUint16 *element_uint16 = static_cast<LibGens::ObjectElementUint16 *>(element);
+								unsigned short default_value = element_uint16->value;
+								SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
+								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+							}
+
+							// Sint32
+							if (type == LibGens::OBJECT_ELEMENT_SINT32) {
+								LibGens::ObjectElementSint32 *element_sint32 = static_cast<LibGens::ObjectElementSint32 *>(element);
+								signed long default_value = element_sint32->value;
+								SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
+								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+							}
+							
+							// Uint32
+							if ((type == LibGens::OBJECT_ELEMENT_INTEGER) ||
+								(type == LibGens::OBJECT_ELEMENT_UINT32))
+							{
+								LibGens::ObjectElementInteger *element_integer = static_cast<LibGens::ObjectElementInteger *>(element);
+								unsigned long default_value = element_integer->value;
+								SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
+								SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
 							}
 						}
 					}
+
+					break;
 				}
-			}
+			
+			case LibGens::OBJECT_ELEMENT_FLOAT:
+				{
+					// Create Dialog for Float
+					hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditFloatCallback);
+
+					COMBOBOXINFO hComboBoxInfo;
+					hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
+
+					HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
+					GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
+					SetFocus(hEditMainControl);
+					globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
+
+					// Set Default
+					if (current_single_property_object) {
+						string element_name = current_properties_names[current_property_index];
+						LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
+
+						if (element) {
+							LibGens::ObjectElementFloat *element_float = static_cast<LibGens::ObjectElementFloat *>(element);
+							float default_value = element_float->value;
+							SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
+							SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+						}
+					}
+
+					break;
+				}
+
+
+			case LibGens::OBJECT_ELEMENT_STRING:
+				{
+					// Create Dialog for String
+					hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_STRING_DIALOG), hwnd, EditStringCallback);
+
+					COMBOBOXINFO hComboBoxInfo;
+					hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
+
+					HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_STRING_VALUE);
+					GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
+					SetFocus(hEditMainControl);
+					globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
+
+					// Set Default
+					if (current_single_property_object) {
+						string element_name = current_properties_names[current_property_index];
+						LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
+
+						if (element) {
+							LibGens::ObjectElementString *element_string = static_cast<LibGens::ObjectElementString *>(element);
+							string default_value = element_string->value;
+							SetDlgItemText(hEditPropertyDlg, IDC_EDIT_STRING_VALUE, default_value.c_str());
+							SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_STRING_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+						}
+					}
+
+					// If ObjectPhysics & Type, pre-load all ObjectProduction entries into the ComboBox
+					if (current_object_list_properties.size() && object_production) {
+						LibGens::Object *first_object = (*current_object_list_properties.begin());
+					
+						if (first_object) {
+							string object_name = first_object->getName();
+							string element_name = current_properties_names[current_property_index];
+
+							if ((object_name == OBJECT_NODE_OBJECT_PHYSICS) && (element_name == OBJECT_NODE_OBJECT_PHYSICS_ELEMENT_TYPE)) {
+								object_production->readySortedEntries();
+
+								string entry_name="";
+								while (object_production->getNextEntryName(entry_name)) {
+									SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_STRING_VALUE, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)entry_name.c_str());
+								}
+							}
+						}
+					}
+
+					break;
+				}
 
 			
-			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR) {
-				// Create Dialog for Vector
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_VECTOR_DIALOG), hwnd, EditVectorCallback);
+			case LibGens::OBJECT_ELEMENT_VECTOR:
+			case LibGens::OBJECT_ELEMENT_VECTOR3:
+			case LibGens::OBJECT_ELEMENT_POSITION:
+				{
+					// Create Dialog for Vector
+					hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_VECTOR_DIALOG), hwnd, EditVectorCallback);
 
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_X);
-				SetFocus(hEditMainControl);
+					HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_X);
+					SetFocus(hEditMainControl);
 
-				LibGens::Vector3 dv(0.0, 0.0, 0.0);
+					LibGens::Vector3 dv(0.0, 0.0, 0.0);
 
-				// Set Default
-				if (current_single_property_object) {
-					string element_name = current_properties_names[current_property_index];
-					LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
+					// Set Default
+					if (current_single_property_object) {
+						string element_name = current_properties_names[current_property_index];
+						LibGens::ObjectElement *element = current_single_property_object->getElement(element_name);
 
-					if (element) {
-						LibGens::ObjectElementVector *element_vector = static_cast<LibGens::ObjectElementVector *>(element);
-						dv = element_vector->value;
+						if (element) {
+							LibGens::ObjectElementVector *element_vector = static_cast<LibGens::ObjectElementVector *>(element);
+							dv = element_vector->value;
 
-						SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_X, ToString(dv.x).c_str());
-						SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Y, ToString(dv.y).c_str());
-						SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Z, ToString(dv.z).c_str());
+							SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_X, ToString(dv.x).c_str());
+							SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Y, ToString(dv.y).c_str());
+							SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Z, ToString(dv.z).c_str());
+						}
 					}
-				}
 
-				VectorNode *vector_node = new VectorNode(scene_manager);
-				vector_node->setPosition(Ogre::Vector3(dv.x, dv.y, dv.z));
-				property_vector_nodes.push_back(vector_node);
+					VectorNode *vector_node = new VectorNode(scene_manager);
+					vector_node->setPosition(Ogre::Vector3(dv.x, dv.y, dv.z));
+					property_vector_nodes.push_back(vector_node);
+				}
 			}
 		}
 	}
@@ -596,29 +755,89 @@ void EditorApplication::updateEditPropertyBool(bool v) {
 
 
 
-void EditorApplication::updateEditPropertyInteger(unsigned int v) {
+void EditorApplication::updateEditPropertyInteger(int v) {
 	string element_name = current_properties_names[current_property_index];
 
 	for (list<LibGens::Object *>::iterator it=current_object_list_properties.begin(); it!=current_object_list_properties.end(); it++) {
 		LibGens::ObjectElement *element = (*it)->getElement(element_name);
 
 		if (element) {
-			if (element->getType() == LibGens::OBJECT_ELEMENT_ID) {
-				LibGens::ObjectElementID *element_id = static_cast<LibGens::ObjectElementID *>(element);
-				HistoryActionEditObjectElementID *history_action = new HistoryActionEditObjectElementID((*it), object_node_manager, element_id, element_id->value, v);
-				element_id->value = v;
-				history_edit_property_wrapper->push(history_action);
 
-				object_node_manager->reloadObjectNode((*it));
-			}
+			switch (element->getType())
+			{
 
-			if (element->getType() == LibGens::OBJECT_ELEMENT_INTEGER) {
-				LibGens::ObjectElementInteger *element_integer = static_cast<LibGens::ObjectElementInteger *>(element);
-				HistoryActionEditObjectElementInteger *history_action = new HistoryActionEditObjectElementInteger((*it), object_node_manager, element_integer, element_integer->value, v);
-				element_integer->value = v;
-				history_edit_property_wrapper->push(history_action);
+			case LibGens::OBJECT_ELEMENT_ID :
+			case LibGens::OBJECT_ELEMENT_TARGET :
+				{
+					LibGens::ObjectElementID *element_id = static_cast<LibGens::ObjectElementID *>(element);
+					HistoryActionEditObjectElementID *history_action = new HistoryActionEditObjectElementID((*it), object_node_manager, element_id, element_id->value, v);
+					element_id->value = v;
+					history_edit_property_wrapper->push(history_action);
 
-				object_node_manager->reloadObjectNode((*it));
+					object_node_manager->reloadObjectNode((*it));
+				}
+				
+			case LibGens::OBJECT_ELEMENT_SINT8 :
+				{
+					LibGens::ObjectElementSint8 *element_sint8 = static_cast<LibGens::ObjectElementSint8 *>(element);
+					HistoryActionEditObjectElementSint8 *history_action = new HistoryActionEditObjectElementSint8((*it), object_node_manager, element_sint8, element_sint8->value, v);
+					element_sint8->value = v;
+					history_edit_property_wrapper->push(history_action);
+
+					object_node_manager->reloadObjectNode((*it));
+				}
+				
+			case LibGens::OBJECT_ELEMENT_UINT8 :
+			case LibGens::OBJECT_ELEMENT_ENUM :
+				{
+					LibGens::ObjectElementUint8 *element_uint8 = static_cast<LibGens::ObjectElementUint8 *>(element);
+					HistoryActionEditObjectElementUint8 *history_action = new HistoryActionEditObjectElementUint8((*it), object_node_manager, element_uint8, element_uint8->value, v);
+					element_uint8->value = v;
+					history_edit_property_wrapper->push(history_action);
+
+					object_node_manager->reloadObjectNode((*it));
+				}
+				
+			case LibGens::OBJECT_ELEMENT_SINT16 :
+				{
+					LibGens::ObjectElementSint16 *element_sint16 = static_cast<LibGens::ObjectElementSint16 *>(element);
+					HistoryActionEditObjectElementSint16 *history_action = new HistoryActionEditObjectElementSint16((*it), object_node_manager, element_sint16, element_sint16->value, v);
+					element_sint16->value = v;
+					history_edit_property_wrapper->push(history_action);
+
+					object_node_manager->reloadObjectNode((*it));
+				}
+				
+			case LibGens::OBJECT_ELEMENT_UINT16 :
+				{
+					LibGens::ObjectElementUint16 *element_uint16 = static_cast<LibGens::ObjectElementUint16 *>(element);
+					HistoryActionEditObjectElementUint16 *history_action = new HistoryActionEditObjectElementUint16((*it), object_node_manager, element_uint16, element_uint16->value, v);
+					element_uint16->value = v;
+					history_edit_property_wrapper->push(history_action);
+
+					object_node_manager->reloadObjectNode((*it));
+				}
+				
+			case LibGens::OBJECT_ELEMENT_SINT32 :
+				{
+					LibGens::ObjectElementSint32 *element_sint32 = static_cast<LibGens::ObjectElementSint32 *>(element);
+					HistoryActionEditObjectElementSint32 *history_action = new HistoryActionEditObjectElementSint32((*it), object_node_manager, element_sint32, element_sint32->value, v);
+					element_sint32->value = v;
+					history_edit_property_wrapper->push(history_action);
+
+					object_node_manager->reloadObjectNode((*it));
+				}
+
+			case LibGens::OBJECT_ELEMENT_INTEGER :
+			case LibGens::OBJECT_ELEMENT_UINT32 :
+				{
+					LibGens::ObjectElementInteger *element_integer = static_cast<LibGens::ObjectElementInteger *>(element);
+					HistoryActionEditObjectElementInteger *history_action = new HistoryActionEditObjectElementInteger((*it), object_node_manager, element_integer, element_integer->value, v);
+					element_integer->value = v;
+					history_edit_property_wrapper->push(history_action);
+
+					object_node_manager->reloadObjectNode((*it));
+				}
 			}
 		}
 	}
@@ -685,7 +904,10 @@ void EditorApplication::updateEditPropertyVector(LibGens::Vector3 v) {
 		LibGens::ObjectElement *element = (*it)->getElement(element_name);
 
 		if (element) {
-			if (element->getType() == LibGens::OBJECT_ELEMENT_VECTOR) {
+			if ((element->getType() == LibGens::OBJECT_ELEMENT_VECTOR) ||
+				(element->getType() == LibGens::OBJECT_ELEMENT_POSITION) ||
+				(element->getType() == LibGens::OBJECT_ELEMENT_VECTOR3))
+			{
 				LibGens::ObjectElementVector *element_vector = static_cast<LibGens::ObjectElementVector *>(element);
 				HistoryActionEditObjectElementVector *history_action = new HistoryActionEditObjectElementVector((*it), object_node_manager, element_vector, element_vector->value, v);
 				element_vector->value = v;
@@ -916,12 +1138,12 @@ HWND EditorApplication::getEditPropertyDlg() {
 	return hEditPropertyDlg;
 }
 
-float GetDlgItemInteger(HWND hDlg, int idDlgItem) {
+int GetDlgItemInteger(HWND hDlg, int idDlgItem) {
 	char value_str[1024] = "";
-	unsigned int value = 0.0f;
+	int value = 0;
 
 	GetDlgItemText(hDlg, idDlgItem, value_str, 1024);
-	FromString<unsigned int>(value, ToString(value_str), std::dec);
+	FromString<int>(value, ToString(value_str), std::dec);
 
 	return value;
 }
@@ -991,19 +1213,18 @@ INT_PTR CALLBACK EditIntCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 		case WM_COMMAND:
 			if(HIWORD(wParam) == CBN_SELCHANGE) { 
 				char value_str[1024] = "";
-				unsigned int value = 0.0f;
+				int value = 0;
 
 				int nIndex=SendDlgItemMessage(hDlg, IDC_EDIT_FLOAT_VALUE, (UINT) CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
 				SendDlgItemMessage(hDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_GETLBTEXT, (WPARAM)nIndex, (LPARAM)value_str);
 
-				FromString<unsigned int>(value, ToString(value_str), std::dec);
+				FromString<int>(value, ToString(value_str), std::dec);
 				editor_application->updateEditPropertyInteger(value);
 				break;
 			}
 
 			if (HIWORD(wParam) == CBN_EDITCHANGE) {
-				unsigned int value = 0.0f;
-				value = GetDlgItemInteger(hDlg, IDC_EDIT_FLOAT_VALUE);
+				int value = GetDlgItemInteger(hDlg, IDC_EDIT_FLOAT_VALUE);
 				editor_application->updateEditPropertyInteger(value);
 				break;
 			}

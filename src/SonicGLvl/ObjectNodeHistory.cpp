@@ -290,3 +290,118 @@ void HistoryActionEditObjectElementVectorList::redo() {
 		object_node_manager->reloadObjectNode(object);
 	}
 }
+
+// Edit Sint8
+void HistoryActionEditObjectElementSint8::undo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = previous_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+void HistoryActionEditObjectElementSint8::redo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = new_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+// Edit Uint8
+void HistoryActionEditObjectElementUint8::undo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = previous_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+void HistoryActionEditObjectElementUint8::redo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = new_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+// Edit Sint16
+void HistoryActionEditObjectElementSint16::undo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = previous_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+void HistoryActionEditObjectElementSint16::redo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = new_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+// Edit Uint16
+void HistoryActionEditObjectElementUint16::undo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = previous_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+void HistoryActionEditObjectElementUint16::redo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = new_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+// Edit Sint32
+void HistoryActionEditObjectElementSint32::undo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = previous_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}
+
+void HistoryActionEditObjectElementSint32::redo() {
+	if (!object) return;
+	if (!object_element) return;
+
+	object_element->value = new_value;
+
+	if (object_node_manager) {
+		object_node_manager->reloadObjectNode(object);
+	}
+}

@@ -111,7 +111,7 @@ void TerrainNode::setGIQualityLevel(LibGens::GITextureGroupInfo *gi_group_info, 
 			string texture_name = terrain_instance->getName() + LIBGENS_TEXTURE_FILE_EXTENSION;
 			string texture_path = LibGens::File::folderFromFilename(terrain_instance->getFilename()) + texture_name;
 
-			printf("Searching for %s\n", texture_path);
+			//printf("Searching for %s\n", texture_path);
 
 			if (LibGens::File::check(texture_path)) {
 				gi_texture = new LibGens::GISubtexture();

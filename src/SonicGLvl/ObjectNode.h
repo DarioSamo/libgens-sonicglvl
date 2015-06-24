@@ -35,6 +35,9 @@
 #define OBJECT_NODE_MESH_EXTENSION                 ".mesh"
 
 #define OBJECT_NODE_EXTRA_DESCRIPTION              "description"
+#define OBJECT_NODE_EXTRA_OFFSET_POSITION_X        "offset_position_x"
+#define OBJECT_NODE_EXTRA_OFFSET_POSITION_Y        "offset_position_y"
+#define OBJECT_NODE_EXTRA_OFFSET_POSITION_Z        "offset_position_z"
 #define OBJECT_NODE_EXTRA_OFFSET_ROTATION_X        "offset_rotation_x"
 #define OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y        "offset_rotation_y"
 #define OBJECT_NODE_EXTRA_OFFSET_ROTATION_Z		   "offset_rotation_z"

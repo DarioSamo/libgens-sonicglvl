@@ -48,12 +48,16 @@ class HistoryActionMoveNode : public HistoryAction {
 		EditorNode *node;
 		Ogre::Vector3 previous_position;
 		Ogre::Vector3 new_position;
+		Ogre::Quaternion previous_rotation;
+		Ogre::Quaternion new_rotation;
 	public:
-		HistoryActionMoveNode(EditorNode *node_p, Ogre::Vector3 previous_position_p, Ogre::Vector3 new_position_p) {
+		HistoryActionMoveNode(EditorNode *node_p, Ogre::Vector3 previous_position_p, Ogre::Vector3 new_position_p, Ogre::Quaternion previous_rotation_p, Ogre::Quaternion new_rotation_p) {
 			type=HISTORY_ACTION_MOVE_NODE;
 			node=node_p;
 			previous_position=previous_position_p;
 			new_position=new_position_p;
+			previous_rotation=previous_rotation_p;
+			new_rotation=new_rotation_p;
 		}
 
 		void undo();

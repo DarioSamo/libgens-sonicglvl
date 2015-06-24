@@ -21,6 +21,8 @@
 #include "Object.h"
 
 namespace LibGens {
+
+	// writeXML
 	void ObjectElementBool::writeXML(TiXmlElement *root) {
 		TiXmlElement* eleRoot=new TiXmlElement(name);
 
@@ -100,6 +102,71 @@ namespace LibGens {
 		root->LinkEndChild(eleRoot);
 	}
 
+	// writeXML() Lost World
+	void ObjectElementSint8::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString((int) value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementUint8::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString((int) value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementSint16::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString(value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementUint16::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString(value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementSint32::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString(value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementUint32::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString(value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementEnum::writeXML(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+
+		TiXmlText* eleValue=new TiXmlText(ToString((int) value));
+		eleRoot->LinkEndChild(eleValue);
+
+		root->LinkEndChild(eleRoot);
+	}
+
+	// writeXMLTemplate()
 	void ObjectElement::writeXMLTemplate(TiXmlElement *root) {
 		TiXmlElement* eleRoot=new TiXmlElement(name);
 		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_UNDEFINED_TEMPLATE);
@@ -141,21 +208,31 @@ namespace LibGens {
 
 	void ObjectElementID::writeXMLTemplate(TiXmlElement *root) {
 		TiXmlElement* eleRoot=new TiXmlElement(name);
-		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_ID_TEMPLATE);
+		const char *element = (getType() == OBJECT_ELEMENT_ID) ? LIBGENS_OBJECT_ELEMENT_ID_TEMPLATE : LIBGENS_OBJECT_ELEMENT_TARGET_TEMPLATE;
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, element);
 		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
 		root->LinkEndChild(eleRoot);
 	}
 
 	void ObjectElementIDList::writeXMLTemplate(TiXmlElement *root) {
 		TiXmlElement* eleRoot=new TiXmlElement(name);
-		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_ID_LIST_TEMPLATE);
+		const char *element = (getType() == OBJECT_ELEMENT_ID_LIST) ? LIBGENS_OBJECT_ELEMENT_ID_LIST_TEMPLATE : LIBGENS_OBJECT_ELEMENT_UINT32ARRAY_TEMPLATE;
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, element);
 		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
 		root->LinkEndChild(eleRoot);
 	}
 
 	void ObjectElementVector::writeXMLTemplate(TiXmlElement *root) {
 		TiXmlElement* eleRoot=new TiXmlElement(name);
-		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_VECTOR_TEMPLATE);
+
+		const char *element;
+		switch (getType()) {
+		case OBJECT_ELEMENT_VECTOR:   element = LIBGENS_OBJECT_ELEMENT_VECTOR_TEMPLATE;     break;
+		case OBJECT_ELEMENT_POSITION: element = LIBGENS_OBJECT_ELEMENT_POSITION_TEMPLATE;   break;
+		case OBJECT_ELEMENT_VECTOR3:  element = LIBGENS_OBJECT_ELEMENT_VECTOR3_TEMPLATE;    break;
+		}
+
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, element);
 		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
 		root->LinkEndChild(eleRoot);
 	}
@@ -165,5 +242,119 @@ namespace LibGens {
 		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_VECTOR_LIST_TEMPLATE);
 		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
 		root->LinkEndChild(eleRoot);
+	}
+
+	// writeXMLTemplate() Lost World
+	void ObjectElementSint8::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_SINT8_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString((int) value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementUint8::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_UINT8_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString((int) value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementSint16::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_SINT16_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString(value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementUint16::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_UINT16_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString(value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementSint32::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_SINT32_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString(value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementUint32::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_UINT32_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString(value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	void ObjectElementEnum::writeXMLTemplate(TiXmlElement *root) {
+		TiXmlElement* eleRoot=new TiXmlElement(name);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_TYPE, LIBGENS_OBJECT_ELEMENT_ENUM_TEMPLATE);
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DEFAULT, ToString((int) value));
+		eleRoot->SetAttribute(LIBGENS_OBJECT_ELEMENT_ATTRIBUTE_DESCRIPTION, description);
+		root->LinkEndChild(eleRoot);
+	}
+
+	// writeORC()
+	void ObjectElementBool::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementFloat::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementString::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementSint8::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementUint8::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementSint16::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementUint16::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementSint32::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementUint32::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementEnum::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementTarget::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementPosition::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementVector3::writeORC(File *file) {
+		// todo
+	}
+
+	void ObjectElementUint32Array::writeORC(File *file) {
+		// todo
 	}
 };

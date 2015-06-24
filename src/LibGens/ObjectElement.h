@@ -29,7 +29,19 @@ namespace LibGens {
 		OBJECT_ELEMENT_ID,
 		OBJECT_ELEMENT_ID_LIST,
 		OBJECT_ELEMENT_VECTOR,
-		OBJECT_ELEMENT_VECTOR_LIST
+		OBJECT_ELEMENT_VECTOR_LIST,
+		// Lost World
+		OBJECT_ELEMENT_SINT8,
+		OBJECT_ELEMENT_UINT8,
+		OBJECT_ELEMENT_SINT16,
+		OBJECT_ELEMENT_UINT16,
+		OBJECT_ELEMENT_SINT32,
+		OBJECT_ELEMENT_UINT32,
+		OBJECT_ELEMENT_ENUM,
+		OBJECT_ELEMENT_TARGET,
+		OBJECT_ELEMENT_POSITION,
+		OBJECT_ELEMENT_VECTOR3,
+		OBJECT_ELEMENT_UINT32ARRAY
 	};
 
 	class ObjectElement {
@@ -68,6 +80,9 @@ namespace LibGens {
 			}
 
 			virtual void writeXMLTemplate(TiXmlElement *root);
+
+			virtual void writeORC(File *file) {
+			}
 	};
 
 	class ObjectElementBool : public ObjectElement {
@@ -80,8 +95,11 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
 	};
 
+	// Being lazy and keeping ObjectElementInteger even though I'm adding other integer types to avoid breaking existing code
+	// Should be merged into ObjectElementUint32
 	class ObjectElementInteger : public ObjectElement {
 		public:
 			unsigned int value;
@@ -104,6 +122,7 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
 	};
 
 	class ObjectElementString : public ObjectElement {
@@ -116,6 +135,7 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
 	};
 
 	class ObjectElementID : public ObjectElement {
@@ -162,6 +182,140 @@ namespace LibGens {
 
 			void writeXML(TiXmlElement *root);
 			void writeXMLTemplate(TiXmlElement *root);
+	};
+
+	// Lost World element types begin here
+	// There is a lot of overlap with Generations element types.
+	// They're implemented separately because they have different names in the templates
+	// Ideally a lot of these should be merged in, but for now that might break template saving
+	class ObjectElementSint8 : public ObjectElement {
+		public:
+			signed char value;
+			ObjectElementSint8() {
+				type=OBJECT_ELEMENT_SINT8;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementUint8 : public ObjectElement {
+		public:
+			unsigned char value;
+			ObjectElementUint8() {
+				type=OBJECT_ELEMENT_UINT8;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementSint16 : public ObjectElement {
+		public:
+			signed short value;
+			ObjectElementSint16() {
+				type=OBJECT_ELEMENT_SINT16;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementUint16 : public ObjectElement {
+		public:
+			unsigned short value;
+			ObjectElementUint16() {
+				type=OBJECT_ELEMENT_UINT16;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementSint32 : public ObjectElement {
+		public:
+			signed long value;
+			ObjectElementSint32() {
+				type=OBJECT_ELEMENT_SINT32;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementUint32 : public ObjectElement {
+		public:
+			unsigned long value;
+			ObjectElementUint32() {
+				type=OBJECT_ELEMENT_UINT32;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementEnum : public ObjectElement {
+		public:
+			unsigned char value;
+			ObjectElementEnum() {
+				type=OBJECT_ELEMENT_ENUM;
+				value=0;
+			}
+
+			void writeXML(TiXmlElement *root);
+			void writeXMLTemplate(TiXmlElement *root);
+			void writeORC(File *file);
+	};
+
+	class ObjectElementTarget : public ObjectElementID {
+		public:
+			ObjectElementTarget() {
+				type=OBJECT_ELEMENT_TARGET;
+				value=0;
+			}
+
+			void writeORC(File *file);
+	};
+
+	class ObjectElementPosition : public ObjectElementVector {
+		public:
+			ObjectElementPosition() {
+				type=OBJECT_ELEMENT_POSITION;
+				value=Vector3();
+			}
+
+			void writeORC(File *file);
+	};
+
+	class ObjectElementVector3 : public ObjectElementVector {
+		public:
+			ObjectElementVector3() {
+				type=OBJECT_ELEMENT_VECTOR3;
+				value=Vector3();
+			}
+
+			void writeORC(File *file);
+	};
+
+	class ObjectElementUint32Array : public ObjectElementIDList {
+		public:
+			ObjectElementUint32Array() {
+				type=OBJECT_ELEMENT_UINT32ARRAY;
+			}
+
+			void writeORC(File *file);
 	};
 
 };

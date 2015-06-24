@@ -248,7 +248,10 @@ void EditorApplication::setSelectionRotation(Ogre::Quaternion q) {
 
 void EditorApplication::rememberSelection(bool mode) {
 	for (list<EditorNode *>::iterator it=selected_nodes.begin(); it!=selected_nodes.end(); it++) {
-		if (!mode) (*it)->rememberPosition();
+		if (!mode) {
+			(*it)->rememberPosition();
+			(*it)->rememberRotation();
+		}
 		else {
 			if (selected_nodes.size() > 1) (*it)->rememberPosition();
 			(*it)->rememberRotation();
@@ -260,7 +263,7 @@ void EditorApplication::makeHistorySelection(bool mode) {
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
 	for (list<EditorNode *>::iterator it=selected_nodes.begin(); it!=selected_nodes.end(); it++) {
 		if (!mode) {
-			HistoryActionMoveNode *action = new HistoryActionMoveNode((*it), (*it)->getLastPosition(), (*it)->getPosition());
+			HistoryActionMoveNode *action = new HistoryActionMoveNode((*it), (*it)->getLastPosition(), (*it)->getPosition(), (*it)->getLastRotation(), (*it)->getRotation());
 			wrapper->push(action);
 
 			if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
@@ -277,7 +280,7 @@ void EditorApplication::makeHistorySelection(bool mode) {
 			else {
 				HistoryActionWrapper *sub_wrapper = new HistoryActionWrapper();
 
-				HistoryActionMoveNode *action_mov   = new HistoryActionMoveNode((*it), (*it)->getLastPosition(), (*it)->getPosition());
+				HistoryActionMoveNode *action_mov   = new HistoryActionMoveNode((*it), (*it)->getLastPosition(), (*it)->getPosition(), (*it)->getLastRotation(), (*it)->getRotation());
 				sub_wrapper->push(action_mov);
 
 				HistoryActionRotateNode *action_rot = new HistoryActionRotateNode((*it), (*it)->getLastRotation(), (*it)->getRotation());
@@ -787,8 +790,10 @@ bool EditorApplication::mouseMoved(const OIS::MouseEvent &arg) {
 		if (current_node) current_node->setHighlight(true);
 	
 		if (axis->mouseMoved(viewport, arg)) {
-			if (!axis->getMode()) translateSelection(axis->getTranslate());
-			else rotateSelection(axis->getRotate());
+			if (!axis->getMode())
+				translateSelection(axis->getTranslate());
+				
+			rotateSelection(axis->getRotate());
 
 			updateBottomSelectionGUI();
 		}

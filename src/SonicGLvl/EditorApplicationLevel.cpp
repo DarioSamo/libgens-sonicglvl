@@ -111,30 +111,46 @@ void EditorApplication::openLostWorldLevel(string filename) {
 
 	EditorLevel *lost_world_level = new EditorLevel(folder, slot_name, slot_name, "", LIBGENS_LEVEL_GAME_STRING_LOST_WORLD);
 	current_level = lost_world_level;
+	current_level_filename = filename;
 
 	lost_world_level->unpackResources();
+	lost_world_level->unpackData();
 
 	Ogre::ResourceGroupManager::getSingleton().addResourceLocation(lost_world_level->getResourcesFolder(), "FileSystem");
 	uv_animation_library->addFolder(lost_world_level->getResourcesFolder());
+	
+	lost_world_level->loadData(library, object_node_manager);
 
 	lost_world_level->loadTerrain(scene_manager, &terrain_nodes_list);
+
+	current_set = lost_world_level->getLevel()->getSets().front();
 
 	/*
 	current_level->getTerrain()->addModels(lost_world_level->getTerrain()->getModelsToOrganize());
 	current_level->getTerrain()->addInstances(lost_world_level->getTerrain()->getInstancesToOrganize());
 	current_level->getTerrain()->getMaterialLibrary()->merge(lost_world_level->getMaterialLibrary(), true);
 	*/
-	
+		
 	LibGens::Light *direct_light=lost_world_level->getDirectLight();
 	if (direct_light) {
 		createDirectionalLight(direct_light);
 	}
-
-	string skybox_name = slot_name + "_sky";
-	if (skybox_name.size()) {
-		createSkybox(skybox_name);
+	
+	WIN32_FIND_DATA FindFileData;
+	HANDLE hFind;
+	hFind = FindFirstFile((lost_world_level->getResourcesFolder() + "/*sky*.model").c_str(), &FindFileData);
+	if (hFind == INVALID_HANDLE_VALUE) {}
+	else {
+		do {
+			cout << "Creating skybox: " << FindFileData.cFileName << "\n";
+			createSkybox(LibGens::File::nameFromFilenameNoExtension(FindFileData.cFileName));
+		} while (FindNextFile(hFind, &FindFileData) != 0);
+		FindClose(hFind);
 	}
-
+	
+	loadLevelPaths();
+	
+	current_level->loadCollision(havok_enviroment, scene_manager, havok_nodes_list);
 	terrain_streamer = NULL;
 }
 
@@ -232,7 +248,7 @@ void EditorApplication::openLevel(string filename) {
 
 	// Create Skybox
 	string skybox_name = current_level->getLevel()->getSkybox();
-	if (skybox_name.size()) {
+	if (!skybox_name.empty()) {
 		createSkybox(skybox_name);
 	}
 
@@ -275,10 +291,10 @@ void EditorApplication::createDirectionalLight(LibGens::Light *direct_light) {
 
 void EditorApplication::createSkybox(string skybox_name) {
 	LibGens::Model *skybox_model=current_level->getModelLibrary()->getModel(skybox_name);
+
 	if (skybox_model) {
 		Ogre::SceneNode *scene_node = scene_manager->getRootSceneNode()->createChildSceneNode();
 		buildModel(scene_node, skybox_model, skybox_model->getName(), "", scene_manager, current_level->getMaterialLibrary(), 0, GENERAL_MESH_GROUP, false);
-
 
 		unsigned short attached_objects=scene_node->numAttachedObjects();
 		for (unsigned short i=0; i<attached_objects; i++) {

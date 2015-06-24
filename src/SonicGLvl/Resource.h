@@ -18,6 +18,13 @@
 #define IDD_MATERIAL_EDITOR                     133
 #define IDD_MATERIAL_EDITOR_PREVIEW             135
 #define IDD_PHYSICS_EDITOR                      137
+#define IDD_EDIT_SINT8_DIALOG                   139
+#define IDD_EDIT_UINT8_DIALOG                   141
+#define IDD_EDIT_SINT16_DIALOG                  143
+#define IDD_EDIT_UINT16_DIALOG                  145
+#define IDD_EDIT_SINT32_DIALOG                  147
+#define IDD_EDIT_UINT32_DIALOG                  149
+#define IDD_EDIT_ENUM_DIALOG                    151
 #define IDC_EDIT_FLOAT_VALUE                    40000
 #define IDC_PALETTE_CATEGORY                    40000
 #define IDE_BOTTOM_SELECTION_POS_X              40000

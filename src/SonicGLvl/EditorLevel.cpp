@@ -22,6 +22,7 @@
 #include "PAC.h"
 #include "ObjectLibrary.h"
 #include "ObjectSet.h"
+#include "LostWorldObjectSet.h"
 
 EditorLevel::EditorLevel(string folder_p, string slot_name_p, string geometry_name_p, string merge_name_p, string game_name_p) {
 	folder = folder_p;
@@ -41,7 +42,7 @@ EditorLevel::EditorLevel(string folder_p, string slot_name_p, string geometry_na
 	gi_cache_folder         = SONICGLVL_CACHE_PATH + slot_name + "/" + SONICGLVL_CACHE_GI_TEMP_PATH;
 	terrain_cache_folder    = SONICGLVL_CACHE_PATH + geometry_name + "/" + SONICGLVL_CACHE_TERRAIN_PATH;
 	resources_cache_folder  = SONICGLVL_CACHE_PATH + geometry_name + "/" + SONICGLVL_CACHE_RESOURCES_PATH;
-
+	
 	model_library    = new LibGens::ModelLibrary(resources_cache_folder + "/");
 	material_library = NULL;
 
@@ -139,27 +140,69 @@ void EditorLevel::cleanData() {
 }
 
 void EditorLevel::unpackData() {
-	string main_filename=folder + "#" + slot_name + ".ar.00";
-
-	LibGens::ArPack *level_data_ar_pack=new LibGens::ArPack(main_filename);
-	bool unpack=false;
-	for (size_t i=0; i<5; i++) {
-		if (level_data_ar_pack->getHash()[i] != data_hash[i]) {
-			unpack = true;
-			break;
-		}
-	}
-
-	if (unpack) {
-		cleanData();
+	if (game_name == LIBGENS_LEVEL_GAME_STRING_LOST_WORLD) {
 		CreateDirectory(data_cache_folder.c_str(), NULL);
-		level_data_ar_pack->extract(data_cache_folder+"/");
+		
+		// This is the same way the game loads .orc files from the set folder
+		char orc_name[50];
 
-		for (size_t i=0; i<5; i++) {
-			data_hash[i] = level_data_ar_pack->getHash()[i];
+		for (int orc_num = 0; orc_num < 9; orc_num++) {
+			memset(orc_name, 0, 50);
+			sprintf(orc_name, "%s_obj_%02d.orc", slot_name.c_str(), orc_num);
+			string orc_src = folder + "../set/" + orc_name;
+
+			if (LibGens::File::check(orc_src)) {
+				string orc_dst = data_cache_folder + "/" + string(orc_name);
+				CopyFile(orc_src.c_str(), orc_dst.c_str(), false);
+			}
+		}
+
+		string lua_src = folder + "../actstgmission.lua";
+		if (LibGens::File::check(lua_src))
+		{
+			string lua_dst = data_cache_folder + "/actstgmission.lua";
+			CopyFile(lua_src.c_str(), lua_dst.c_str(), false);
+		}
+
+		lua_src = folder + slot_name + "_config.lua";
+		if (LibGens::File::check(lua_src)) {
+			string lua_dst = data_cache_folder + "/" + slot_name + "_config.lua";
+			CopyFile(lua_src.c_str(), lua_dst.c_str(), false);
+		}
+
+		string misc_filename = folder + slot_name + "_misc.pac";
+
+		if (LibGens::File::check(misc_filename)) {
+			LibGens::PacSet *pac_set = new LibGens::PacSet(misc_filename);
+			pac_set->extract(data_cache_folder + "/", true);
+			delete pac_set;
 		}
 	}
-	delete level_data_ar_pack;
+
+	else
+	{
+		string main_filename=folder + "#" + slot_name + ".ar.00";
+
+		LibGens::ArPack *level_data_ar_pack=new LibGens::ArPack(main_filename);
+		bool unpack=false;
+		for (size_t i=0; i<5; i++) {
+			if (level_data_ar_pack->getHash()[i] != data_hash[i]) {
+				unpack = true;
+				break;
+			}
+		}
+
+		if (unpack) {
+			cleanData();
+			CreateDirectory(data_cache_folder.c_str(), NULL);
+			level_data_ar_pack->extract(data_cache_folder+"/");
+
+			for (size_t i=0; i<5; i++) {
+				data_hash[i] = level_data_ar_pack->getHash()[i];
+			}
+		}
+		delete level_data_ar_pack;
+	}
 }
 
 
@@ -353,6 +396,7 @@ void EditorLevel::unpackResources() {
 		string main_filename=folder + slot_name;
 		string trr_cmn_filename = main_filename + "_trr_cmn.pac";
 		string sky_cmn_filename = main_filename + "_sky.pac";
+		string far_filename     = main_filename + "_far.pac";
 
 		CreateDirectory(resources_cache_folder.c_str(), NULL);
 
@@ -364,6 +408,12 @@ void EditorLevel::unpackResources() {
 
 		if (LibGens::File::check(sky_cmn_filename)) {
 			LibGens::PacSet *pac_set = new LibGens::PacSet(sky_cmn_filename);
+			pac_set->extract(resources_cache_folder + "/", true);
+			delete pac_set;
+		}
+
+		if (LibGens::File::check(far_filename)) {
+			LibGens::PacSet *pac_set = new LibGens::PacSet(far_filename);
 			pac_set->extract(resources_cache_folder + "/", true);
 			delete pac_set;
 		}
@@ -400,21 +450,26 @@ void EditorLevel::unpackResources() {
 
 
 void EditorLevel::loadData(LibGens::ObjectLibrary *library, ObjectNodeManager *object_node_manager) {
-	level = new LibGens::Level(data_cache_folder + "/", game_name);
+	if (game_name == LIBGENS_LEVEL_GAME_STRING_LOST_WORLD) {
+		level = LibGens::Level::LostWorldLevel(data_cache_folder + "/", library);
+	}
+	
+	else {
+		level = new LibGens::Level(data_cache_folder + "/", game_name);
 
-	// Fix anything inside the level to fit with the library
-	level->learnFromLibrary(library);
+		// Fix anything inside the level to fit with the library
+		level->learnFromLibrary(library);
 
-	// Add any new templates from the level to the library
-	library->learnFromLevel(level, library->getCategory(SONICGLVL_UNASSIGNED_OBJECT_CATEGORY));
+		// Add any new templates from the level to the library
+		library->learnFromLevel(level, library->getCategory(SONICGLVL_UNASSIGNED_OBJECT_CATEGORY));
+	}
 
 	list<LibGens::ObjectSet *> sets=level->getSets();
 	for (list<LibGens::ObjectSet *>::iterator set=sets.begin(); set!=sets.end(); set++) {
 		list<LibGens::Object *> objects=(*set)->getObjects();
 
-		for (list<LibGens::Object *>::iterator it=objects.begin(); it!=objects.end(); it++) {
+		for (list<LibGens::Object *>::iterator it=objects.begin(); it!=objects.end(); it++)
 			object_node_manager->createObjectNode(*it);
-		}
 	}
 }
 
@@ -630,19 +685,36 @@ void EditorLevel::importTerrainFBX(LibGens::FBX *fbx) {
 void EditorLevel::saveData(string filename) {
 	if (!level) return;
 
-	level->saveSpawn();
+	if (game_name == LIBGENS_LEVEL_GAME_STRING_LOST_WORLD) {
+		list<LibGens::ObjectSet *> sets = level->getSets();
 
-	list<LibGens::ObjectSet *> sets=level->getSets();
-	for (list<LibGens::ObjectSet *>::iterator set=sets.begin(); set!=sets.end(); set++) {
-		(*set)->saveXML((*set)->getFilename());
+		for (list<LibGens::ObjectSet *>::iterator set=sets.begin(); set!=sets.end(); set++) {
+			LibGens::LostWorldObjectSet *lwset = static_cast<LibGens::LostWorldObjectSet*>(*set);
+			lwset->saveORC(level);
+
+			string orc_name = LibGens::File::nameFromFilename(lwset->getFilename());
+			char copy_dst[100];
+			memset(copy_dst, 0, 100);
+			sprintf(copy_dst, "%s/../set/%s", filename.c_str(), orc_name.c_str());
+			CopyFile(lwset->getFilename().c_str(), &copy_dst[0], false);
+		}
 	}
 
-	LibGens::ArPack *data_ar_pack=new LibGens::ArPack(data_cache_folder + "/");
-	data_ar_pack->save(filename);
-	for (size_t i=0; i<5; i++) {
-		data_hash[i] = data_ar_pack->getHash()[i];
+	else {
+		level->saveSpawn();
+
+		list<LibGens::ObjectSet *> sets=level->getSets();
+		for (list<LibGens::ObjectSet *>::iterator set=sets.begin(); set!=sets.end(); set++) {
+			(*set)->saveXML((*set)->getFilename());
+		}
+
+		LibGens::ArPack *data_ar_pack=new LibGens::ArPack(data_cache_folder + "/");
+		data_ar_pack->save(filename);
+		for (size_t i=0; i<5; i++) {
+			data_hash[i] = data_ar_pack->getHash()[i];
+		}
+		delete data_ar_pack;
 	}
-	delete data_ar_pack;
 }
 
 
