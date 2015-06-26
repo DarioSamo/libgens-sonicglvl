@@ -43,17 +43,18 @@ HEADERS  += EditorWindow.h \
 
 FORMS    += EditorWindow.ui
 
-INCLUDEPATH += ../../depends/ogre/include \
-               ../../depends/ogre/include/OGRE \
-               ../../depends/ogre/boost \
-               ../../depends/pthreads/include \
-               ../../depends/allegro/include \
-               ../../depends/fbxsdk/include \
+INCLUDEPATH += ../../depends/fbxsdk/include \
                ../LibGens \
                ../LibGens-externals
 
+win32 {
+    INCLUDEPATH += ../../depends/ogre/include \
+                   ../../depends/ogre/boost \
+                   ../../depends/pthreads/include \
+                   ../../depends/allegro/include
+}
 
-LIBS += -L../../depends/ogre/lib/Release -lOgreMain
+LIBS += -L../../depends/ogre/lib/Release -lOgreMain -lboost_system
 
 QMAKE_LIBDIR += ../../depends/ogre/boost/lib
 
