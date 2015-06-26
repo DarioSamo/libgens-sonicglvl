@@ -7,8 +7,8 @@ global MeterScale = 10
 fn GetString fstream offset = (
 	cur = ftell fstream
 	fseek fstream offset #seek_set
-	str = ReadString f
-	fseek f cur #seek_set
+	str = ReadString fstream
+	fseek fstream cur #seek_set
 	return str
 )
 
