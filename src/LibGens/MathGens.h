@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include <cmath>
+
 //=========================================================================
 //	Most of this code has been copied and modified from the Ogre3D Project.
 //=========================================================================
@@ -248,7 +250,7 @@ namespace LibGens {
 				return *this;
 			}
 
-			Quaternion Quaternion::operator* (const Quaternion& rkQ) {
+                        Quaternion operator* (const Quaternion& rkQ) {
 				return Quaternion
 				(
 					w * rkQ.w - x * rkQ.x - y * rkQ.y - z * rkQ.z,
@@ -441,7 +443,7 @@ namespace LibGens {
 			}
 
 			Color(Color8 col) {
-				Color::Color((unsigned char *) &col);
+                               Color((unsigned char *) &col);
 			}
 
 			inline bool operator == (const Color& color) {

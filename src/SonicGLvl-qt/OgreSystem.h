@@ -29,6 +29,7 @@ public:
     OgreSystem();
     ~OgreSystem();
 
+    Ogre::RenderSystem *loadRenderSystem(const std::string systemName);
     Ogre::SceneManager *createSceneManager();
     Ogre::Root *getRoot();
     void setupResources();

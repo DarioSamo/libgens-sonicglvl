@@ -30,8 +30,10 @@ using namespace std;
 #include <pthread.h>
 #include "allegro5/allegro.h"
 #include "allegro5/allegro_image.h"
+#if defined(_WIN32) || defined(WIN32)
 #include <fbxsdk.h>
 #include <fbxsdk/fileio/fbxiosettings.h>
+#endif
 
 // Common Headers only should be pre-compiled
 #include "half/half.h"
