@@ -35,7 +35,6 @@ namespace LibGens {
 	}
 
 	FBX::FBX(FbxScene* lScene) {
-		/*
 		material_library = new MaterialLibrary("");
 
 		// This function show how to cycle through scene elements in a linear way.
@@ -53,7 +52,6 @@ namespace LibGens {
 				models.push_back(terrain_instance->getModel());
 			}
 		}
-		*/
 
 		scene = lScene;
 	}
@@ -171,18 +169,20 @@ namespace LibGens {
 
 					new_faces.push_back(face);
 				}
-				else printf("Unsupported polygon size.\n");
+				else printf("Unsupported polygon size %d.\n", polygon_size);
 			}
 
 			printf("Building submesh with %d vertices and %d faces\n", new_vertices.size(), new_faces.size());
 
-			Submesh *submesh=new Submesh();
-			submesh->build(new_vertices, new_faces);
-			submesh->addBone(0);
+			if ((new_vertices.size() >= 3) && new_faces.size()) {
+				Submesh *submesh=new Submesh();
+				submesh->build(new_vertices, new_faces);
+				submesh->addBone(0);
 
-			VertexFormat *vertex_format=new VertexFormat(LIBGENS_VERTEX_FORMAT_PC);
-			submesh->setVertexFormat(vertex_format);
-			return submesh;
+				VertexFormat *vertex_format=new VertexFormat(LIBGENS_VERTEX_FORMAT_PC);
+				submesh->setVertexFormat(vertex_format);
+				return submesh;
+			}
 		}
 
 		return NULL;
