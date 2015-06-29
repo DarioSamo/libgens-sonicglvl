@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <Ogre.h>
-#include <OgreRenderWindow.h>
-#include <OgreCamera.h>
-#include <OgreResourceManager.h>
-#include <OgreResourceGroupManager.h>
-#include <OgreSceneManager.h>
+#include <OGRE/Ogre.h>
+#include <OGRE/OgreRenderWindow.h>
+#include <OGRE/OgreCamera.h>
+#include <OGRE/OgreResourceManager.h>
+#include <OGRE/OgreResourceGroupManager.h>
+#include <OGRE/OgreSceneManager.h>
 

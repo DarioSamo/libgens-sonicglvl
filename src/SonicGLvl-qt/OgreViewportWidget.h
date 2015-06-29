@@ -45,5 +45,5 @@ public:
     void moveAndResize();
     void createCamera(Ogre::String viewport_name);
     void createViewport();
-    QPaintEngine *OgreViewportWidget::paintEngine() const;
+    QPaintEngine *paintEngine() const;
 };
