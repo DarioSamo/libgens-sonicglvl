@@ -157,7 +157,7 @@ namespace LibGens {
 							FbxVector2 uv;
 							bool no_uv;
 							lMesh->GetPolygonVertexUV(lPolygonIndex, j, uv_sets[set].Buffer(), uv, no_uv);
-							vertex->setUV(Vector2(uv[0], uv[1]), set);
+							vertex->setUV(Vector2(uv[0], 1.0 - uv[1]), set);
 						}
 						
 						if (j == 0) face.x=new_vertices.size();
