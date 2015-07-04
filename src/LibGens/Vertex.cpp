@@ -258,5 +258,9 @@ namespace LibGens {
 	void Vertex::setBoneWeight(unsigned char v, size_t index) {
 		bone_weights[index] = v;
 	}
+
+	void Vertex::setColor(Color v) {
+		color = v;
+	}
 };
 

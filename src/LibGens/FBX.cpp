@@ -128,6 +128,7 @@ namespace LibGens {
 			int control_points_count=lMesh->GetControlPointsCount();
 			FbxVector4 *control_points=lMesh->GetControlPoints();
 
+			int vertex_index = 0;
 			for (int lPolygonIndex = 0; lPolygonIndex < lPolygonCount; ++lPolygonIndex) {
 				if (lMaterialIndice) {
 					const int lMaterialIndex = lMaterialIndice->GetAt(lPolygonIndex);
@@ -145,13 +146,14 @@ namespace LibGens {
 						FbxVector4 control_point=control_points[control_point_index];
 						vertex->setPosition(Vector3(control_point[0], control_point[2], -control_point[1]));
 
+						// Get Normal for Vertex
 						FbxVector4 normal;
 						lMesh->GetPolygonVertexNormal(lPolygonIndex, j, normal);
 						vertex->setNormal(Vector3(normal[0], normal[2], -normal[1]));
 
+						// Get UVs for Vertex
 						FbxStringList uv_sets;
 						lMesh->GetUVSetNames(uv_sets);
-
 						for (int set=0; set<uv_sets.GetCount(); set++) {
 							if (set >= 4) break;
 							FbxVector2 uv;
@@ -159,15 +161,43 @@ namespace LibGens {
 							lMesh->GetPolygonVertexUV(lPolygonIndex, j, uv_sets[set].Buffer(), uv, no_uv);
 							vertex->setUV(Vector2(uv[0], 1.0 - uv[1]), set);
 						}
+
+						// Get Vertex Color for Vertex
+						FbxColor vtx_c(1.0, 1.0, 1.0, 1.0);
+						for (int l = 0; l < lMesh->GetElementVertexColorCount(); l++) {
+							FbxGeometryElementVertexColor* leVtxc = lMesh->GetElementVertexColor(l);
+
+							if (leVtxc->GetMappingMode() == FbxGeometryElement::eByControlPoint) {
+								if (leVtxc->GetReferenceMode() == FbxGeometryElement::eDirect) {
+									vtx_c = leVtxc->GetDirectArray().GetAt(control_point_index);
+								}
+								else if (leVtxc->GetReferenceMode() == FbxGeometryElement::eIndexToDirect) {
+									int id = leVtxc->GetIndexArray().GetAt(control_point_index);
+									vtx_c = leVtxc->GetDirectArray().GetAt(id);
+								}
+							}
+							else if (leVtxc->GetMappingMode() == FbxGeometryElement::eByPolygonVertex) {
+								if (leVtxc->GetReferenceMode() == FbxGeometryElement::eDirect) {
+									vtx_c = leVtxc->GetDirectArray().GetAt(vertex_index);
+								}
+								else if (leVtxc->GetReferenceMode() == FbxGeometryElement::eIndexToDirect) {
+									int id = leVtxc->GetIndexArray().GetAt(vertex_index);
+									vtx_c = leVtxc->GetDirectArray().GetAt(id);
+								}
+							}
+						}
+
+						vertex->setColor(Color(vtx_c.mRed, vtx_c.mGreen, vtx_c.mBlue, vtx_c.mAlpha));
 						
 						if (j == 0) face.x=new_vertices.size();
 						if (j == 1) face.y=new_vertices.size();
 						if (j == 2) face.z=new_vertices.size();
 
 						new_vertices.push_back(vertex);
+						vertex_index++;
 					}
-
 					new_faces.push_back(face);
+					
 				}
 				else printf("Unsupported polygon size %d.\n", polygon_size);
 			}

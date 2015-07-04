@@ -67,5 +67,6 @@ namespace LibGens {
 			void setUV(Vector2 v, size_t channel);
 			void setBoneIndex(unsigned char v, size_t index);
 			void setBoneWeight(unsigned char v, size_t index);
+			void setColor(Color v);
 	};
 };
