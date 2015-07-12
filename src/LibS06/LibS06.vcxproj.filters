@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="S06Collision.cpp" />
+    <ClCompile Include="S06XnTexture.cpp" />
+    <ClCompile Include="S06Common.cpp" />
+    <ClCompile Include="S06DAE.cpp" />
+    <ClCompile Include="S06Set.cpp" />
+    <ClCompile Include="S06Text.cpp" />
+    <ClCompile Include="S06XnBones.cpp" />
+    <ClCompile Include="S06XnEffect.cpp" />
+    <ClCompile Include="S06XnFile.cpp" />
+    <ClCompile Include="S06XnFileFBX.cpp" />
+    <ClCompile Include="S06XnMotion.cpp" />
+    <ClCompile Include="S06XnObject.cpp" />
+    <ClCompile Include="S06XnObjectBone.cpp" />
+    <ClCompile Include="S06XnObjectIndex.cpp" />
+    <ClCompile Include="S06XnObjectMaterial.cpp" />
+    <ClCompile Include="S06XnObjectMesh.cpp" />
+    <ClCompile Include="S06XnObjectOldMaterial.cpp" />
+    <ClCompile Include="S06XnObjectPolygon.cpp" />
+    <ClCompile Include="S06XnObjectVertex.cpp" />
+    <ClCompile Include="S06XnObjectVertexResource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="S06Collision.h" />
+    <ClInclude Include="S06Common.h" />
+    <ClInclude Include="S06Set.h" />
+    <ClInclude Include="S06Text.h" />
+    <ClInclude Include="S06XnFile.h" />
+  </ItemGroup>
+</Project>
