@@ -33,7 +33,7 @@ namespace LibGens {
 		public:
 			GensStringTable();
 			void writeString(File *file, string str);
-			void write(File *file);
+			void write(File *file, bool big_endian);
 			void clear();
 	};
 }
