@@ -753,7 +753,7 @@ namespace LibGens {
 
 
 	void PacFile::write(File *file, GensStringTable *string_table) {
-		unsigned int empty_flag = (data ? 0 : 0x80000000);
+		unsigned int empty_flag = (data ? 0 : 0x80);
 		
 		file_data_address = file->getCurrentAddress();
 
@@ -898,11 +898,11 @@ namespace LibGens {
 
 			// Header Section
 			unsigned int file_size = 0;
-			char header[] = "PACx201B";
+			char header[] = "PACx201L";
 			file.write(header, strlen(header));
 			file.writeNull(4);
 
-			unsigned int unknown_1 = 0x10000;
+			unsigned int unknown_1 = 0x1;
 			file.writeInt32(&unknown_1);
 
 			// Data Section
@@ -916,7 +916,7 @@ namespace LibGens {
 			char data_header[] = "DATA";
 			file.write(data_header, strlen(data_header));
 
-			unsigned int data_flag = 0x1000000;
+			unsigned int data_flag = 0x1;
 			file.writeNull(24);
 			file.writeInt32(&data_flag);
 
@@ -983,7 +983,7 @@ namespace LibGens {
 			// String Table Section
 			size_t string_table_section_address = file.getCurrentAddress();
 			{
-				string_table.write(&file);
+				string_table.write(&file, false);
 				file.goToEnd();
 				file.fixPadding(4);
 
