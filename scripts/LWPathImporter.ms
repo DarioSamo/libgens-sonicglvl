@@ -3,7 +3,7 @@ fileIn "IO.ms"
 
 global yzflip = true
 global MeterScale = 10
-
+	
 fn GetString fstream offset = (
 	cur = ftell fstream
 	fseek fstream offset #seek_set
@@ -17,19 +17,25 @@ path_file = getOpenFileName caption:"Load paths" types:"Sonic Lost World Path (*
 if (path_file != undefined) do (
 	f = fopen path_file "rb"
 	
-	fseek f 0x8 #seek_cur
-	NumPaths = ReadBELong f
+	magic = ReadLongLE f #unsigned
+	if (magic == 0x48544150) then SetBigEndian()
+	else SetLittleEndian()
+	
+	fseek f 0x4 #seek_cur
+	NumPaths = ReadLongAgnostic f #unsigned
+	format "Num paths %\n" NumPaths
 	fseek f 0x4 #seek_cur
 
 	for p = 1 to NumPaths do (
-		PathNameStr = GetString f (ReadBELong f)
+		PathNameStr = GetString f (ReadLongBE f #unsigned)
+		format "%. %\n" p PathNameStr
 		fseek f 0x2 #seek_cur
-		KnotCount = ReadUBEShort f
+		KnotCount = ReadShortAgnostic f #unsigned
 		fseek f 0xC #seek_cur
-		KnotsOffset = ReadUBELong f
+		KnotsOffset = ReadLongBE f #unsigned
 		fseek f 0x8 #seek_cur
-		DoubleKnotCount = ReadUBELong f
-		DoubleKnotsOffset = ReadUBELong f
+		DoubleKnotCount = ReadLongAgnostic f #unsigned
+		DoubleKnotsOffset = ReadLongBE f #unsigned
 		fseek f 0x28 #seek_cur
 		end = ftell f
 		
@@ -46,15 +52,15 @@ if (path_file != undefined) do (
 				local knot
 				
 				if (yzflip == true) then (
-					x = ReadBEFloat f
-					z = ReadBEFloat f
-					y = -(ReadBEFloat f)
+					x = ReadFloatAgnostic f
+					z = ReadFloatAgnostic f
+					y = -(ReadFloatAgnostic f)
 					knot = [x, y, z]
 				)
 				else (
-					x = ReadBEFloat f
-					y = ReadBEFloat f
-					z = ReadBEFloat f
+					x = ReadFloatAgnostic f
+					y = ReadFloatAgnostic f
+					z = ReadFloatAgnostic f
 					knot = [x, y, z]
 				)
 				
@@ -72,15 +78,15 @@ if (path_file != undefined) do (
 				local knot
 				
 				if (yzflip == true) then (
-					x = ReadBEFloat f
-					z = ReadBEFloat f
-					y = -(ReadBEFloat f)
+					x = ReadFloatAgnostic f
+					z = ReadFloatAgnostic f
+					y = -(ReadFloatAgnostic f)
 					knot = [x, y, z] / MeterScale
 				)
 				else (
-					x = ReadBEFloat f
-					y = ReadBEFloat f
-					z = ReadBEFloat f
+					x = ReadFloatAgnostic f
+					y = ReadFloatAgnostic f
+					z = ReadFloatAgnostic f
 					knot = [x, y, z] / MeterScale
 				)
 				addknot spline 1 #corner #line knot
@@ -90,4 +96,6 @@ if (path_file != undefined) do (
 		
 		fseek f end #seek_set
 	)
+	
+	fclose f
 )

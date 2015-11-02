@@ -3,6 +3,7 @@ fileIn "IO.ms"
 global GlobalUp = [0,1,0]
 global yzflip = true
 global MeterScale = 10
+global Version = 0 -- 0: Wii U / 1: PC
 
 offset_array = #()
 fn addOffset f = (
@@ -31,7 +32,7 @@ fn AddString f str = (
 		append StringEntries entry
 	)
 	
-	WriteBELong f 0
+	WriteLongLE f 0 #unsigned
 )
 
 fn WriteTable f = (
@@ -39,8 +40,9 @@ fn WriteTable f = (
 		offset = ftell f
 		
 		for a = 1 to StringEntries[s].addresses.count do (
+			-- Whyyyy are the offsets Big Endian even when the rest of the file is Little Endian
 			fseek f StringEntries[s].addresses[a] #seek_set
-			WriteBELong f offset
+			WriteLongBE f offset #unsigned
 		)
 		
 		fseek f offset #seek_set
@@ -59,9 +61,9 @@ fn DirectionTo v1 v2 = (
 )
 
 fn WritePoint3 f P3 = (
-	WriteBEFloat f P3.x
-	WriteBEFloat f P3.y
-	WriteBEFloat f P3.z
+	WriteFloatAgnostic f P3.x
+	WriteFloatAgnostic f P3.y
+	WriteFloatAgnostic f P3.z
 )
 
 -- String Util
@@ -204,6 +206,9 @@ path_file = getSaveFileName caption:"Save paths" types:"Sonic Lost World Path (*
 if (path_file != undefined) do (
 	f = fopen path_file "wb"
 	
+	if (version == 0) then SetBigEndian()
+	else if (version == 1) then SetLittleEndian()
+	
 	-- Create paths
 	PathArray = #()
 	for p in selection where (isKindOf p shape) do (
@@ -219,11 +224,11 @@ if (path_file != undefined) do (
 	NextAvailableID = 1
 	
 	-- Header
-	WriteBELong f 0x50415448 -- "PATH" magic
-	WriteBELong f 0x200
-	WriteBELong f PathCount
+	WriteLongAgnostic f 0x50415448 #unsigned -- "PATH" magic
+	WriteLongAgnostic f 0x200 #unsigned
+	WriteLongAgnostic f PathCount #unsigned
 	append offsets (ftell f)
-	WriteBELong f 0x10
+	WriteLongBE f 0x10 #unsigned
 	
 	-- Path headers - first pass, enter junk. We'll write this later. The only thing we'll do now is add strings/offsets.
 	for iPath = 1 to PathCount do (
@@ -243,7 +248,7 @@ if (path_file != undefined) do (
 		append offsets (start + 0x4C)
 		
 		-- Write temp junk
-		for i = 1 to 19 do WriteLong f 0
+		for i = 1 to 19 do WriteLongLE f 0 #unsigned
 	)
 	
 	-- Actual path data
@@ -263,7 +268,7 @@ if (path_file != undefined) do (
 		
 		for k = 1 to p.Knots.count do (
 			if (k > 1) then dist += distance p.Knots[k] p.Knots[k-1]
-			WriteBEFloat f dist
+			WriteFloatAgnostic f dist
 		)
 		
 		PathLength = dist
@@ -363,8 +368,8 @@ if (path_file != undefined) do (
 		if (type == 0) then (
 			append offsets (ftell f)
 			AddString f "uid"
-			WriteBELong f 0
-			WriteBELong f (GetPathID p.Name)
+			WriteLongAgnostic f 0 #unsigned
+			WriteLongAgnostic f (GetPathID p.Name) #unsigned
 			
 			MetaCount += 1
 		)
@@ -372,8 +377,8 @@ if (path_file != undefined) do (
 		-- "type" field present for all types
 		append offsets (ftell f)
 		AddString f "type"
-		WriteBELong f 0
-		WriteBELong f type
+		WriteLongAgnostic f 0 #unsigned
+		WriteLongAgnostic f type #unsigned
 		MetaCount += 1
 		
 		-- "next" field present for type 0 @ptX
@@ -388,7 +393,7 @@ if (path_file != undefined) do (
 					if (OtherNum == PartNum + 1) then (
 						append offsets (ftell f)
 						AddString f "next"
-						WriteBELong f 0x02000000
+						WriteLongAgnostic f 0x02000000 #unsigned
 						append offsets (ftell f)
 						AddString f PathArray[i].Name
 						MetaCount += 1
@@ -403,12 +408,12 @@ if (path_file != undefined) do (
 		if (type == 2) then (
 			append offsets (ftell f)
 			AddString f "grind_speed"
-			WriteBELong f 0
+			WriteLongAgnostic f 0
 			
-			if (p.Type == "GR") then WriteBELong f 0 -- Default to regular
-			else if (p.Type == "GR_spd1") then WriteBELong f 1 -- Slow
-			else if (p.Type == "GR_spd2") then WriteBELong f 0 -- Regular
-			else if (p.Type == "GR_spd3") then WriteBELong f 2 -- Fast
+			if (p.Type == "GR") then WriteLongAgnostic f 0 #unsigned -- Default to regular
+			else if (p.Type == "GR_spd1") then WriteLongAgnostic f 1 #unsigned -- Slow
+			else if (p.Type == "GR_spd2") then WriteLongAgnostic f 0 #unsigned -- Regular
+			else if (p.Type == "GR_spd3") then WriteLongAgnostic f 2 #unsigned -- Fast
 			
 			MetaCount += 1
 		)
@@ -422,33 +427,33 @@ if (path_file != undefined) do (
 		if (p.IsDouble == true) then NumLineSegments = p.DoubleKnots.count - 2
 		else NumLineSegments = p.Knots.count - 1
 		
-		WriteBELong f 0
-		WriteBELong f 2
+		WriteLongAgnostic f 0 #unsigned
+		WriteLongAgnostic f 2 #unsigned
 		append offsets (ftell f)
-		WriteBELong f (KDTreeOffset + 0x1C)
+		WriteLongAgnostic f (KDTreeOffset + 0x1C) #unsigned
 		
-		WriteBELong f 1
+		WriteLongAgnostic f 1 #unsigned
 		append offsets (ftell f)
-		WriteBELong f (KDTreeOffset + 0x2C)
+		WriteLongAgnostic f (KDTreeOffset + 0x2C) #unsigned
 		
-		WriteBELong f NumLineSegments
+		WriteLongAgnostic f NumLineSegments #unsigned
 		append offsets (ftell f)
-		WriteBELong f (KDTreeOffset + 0x34)
+		WriteLongAgnostic f (KDTreeOffset + 0x34) #unsigned
 		
 		-- The first data section is the unknown bit
-		WriteBELong f 0
-		WriteBELong f 0
-		WriteBELong f 3
-		WriteBELong f 0
+		WriteLongAgnostic f 0 #unsigned
+		WriteLongAgnostic f 0 #unsigned
+		WriteLongAgnostic f 3 #unsigned
+		WriteLongAgnostic f 0 #unsigned
 		
 		-- The second bit assigns line segments to... something.
 		-- [count] int pairs - first is count, second is starting index.
 		-- eg "add 6 segments staring from segment 7"
-		WriteBELong f NumLineSegments
-		WriteBELong f 0
+		WriteLongAgnostic f NumLineSegments #unsigned
+		WriteLongAgnostic f 0 #unsigned
 		
 		-- The third bit seems to be just line segment indices/IDs
-		for i = 1 to NumLineSegments do WriteBELong f (i - 1)
+		for i = 1 to NumLineSegments do WriteLongAgnostic f (i - 1) #unsigned
 		
 		-- Done with path data - now backtrack and write path header
 		PathDataEnd = ftell f
@@ -457,35 +462,36 @@ if (path_file != undefined) do (
 		
 		-- Path Header
 		--format "Writing path header % at 0x%\n" iPath (bit.intashex (ftell f))
-		WriteBELong f 0 -- This is the name offset; will be filled in by the WriteTable() call later
-		WriteBEShort f 0x100 -- Unknown value, always 0x100
-		WriteBEShort f p.Knots.count
-		WriteBEFloat f PathLength
-		WriteBELong f BoolsOffset
-		WriteBELong f DistOffset
-		WriteBELong f KnotsOffset
-		WriteBELong f UpVecsOffset
-		WriteBELong f ForwardVecsOffset
-		WriteBELong f p.DoubleKnots.count
-		WriteBELong f DoubleSplineOffset
+		WriteLongBE f 0 #unsigned -- This is the name offset; will be filled in by the WriteTable() call later
+		WriteByte f 0x1 #unsigned -- Unknown value, always 0x1
+		WriteByte f 0x0 #unsigned -- Unknown value, always 0x0
+		WriteShortAgnostic f p.Knots.count #unsigned
+		WriteFloatAgnostic f PathLength
+		WriteLongBE f BoolsOffset #unsigned
+		WriteLongBE f DistOffset #unsigned
+		WriteLongBE f KnotsOffset #unsigned
+		WriteLongBE f UpVecsOffset #unsigned
+		WriteLongBE f ForwardVecsOffset #unsigned
+		WriteLongAgnostic f p.DoubleKnots.count #unsigned
+		WriteLongBE f DoubleSplineOffset #unsigned
 		WritePoint3 f p.BBMin
 		WritePoint3 f p.BBMax
-		WriteBELong f MetaCount
-		WriteBELong f MetaOffset
-		WriteBELong f 0 -- Unknown value, always 0
-		WriteBELong f KDTreeOffset
+		WriteLongAgnostic f MetaCount #unsigned
+		WriteLongBE f MetaOffset #unsigned
+		WriteLongAgnostic f 0 #unsigned -- Unknown value, always 0
+		WriteLongBE f KDTreeOffset #unsigned
 		
 		fseek f PathDataEnd #seek_set
 	)
 	
 	-- pacpack footer
-	WriteBELong f 0x50414350 -- "PACP"
-	WriteBELong f 0x41434B5F -- "ACK_"
-	WriteBELong f 0x4D455441 -- "META"
-	WriteBELong f 0x44415441 -- "DATA"
+	WriteLongBE f 0x50414350 #unsigned -- "PACP"
+	WriteLongBE f 0x41434B5F #unsigned -- "ACK_"
+	WriteLongBE f 0x4D455441 #unsigned -- "META"
+	WriteLongBE f 0x44415441 #unsigned -- "DATA"
 	
-	WriteBELong f offsets.count
-	for o = 1 to offsets.count do WriteBELong f offsets[o]
+	WriteLongBE f offsets.count #unsigned
+	for o = 1 to offsets.count do WriteLongBE f offsets[o] #unsigned
 	
 	WriteTable f
 	
