@@ -28,6 +28,9 @@ int main(int argc, char** argv) {
     }
 
 	string pack_name = ToString(argv[1]);
+
+	LibGens::Error::setLogging(true);
+	LibGens::initialize();
 	
 	if (pack_name.find(".pac") != string::npos) {
 		LibGens::PacSet *pac_set = new LibGens::PacSet(pack_name);

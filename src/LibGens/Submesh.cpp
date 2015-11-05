@@ -310,11 +310,6 @@ namespace LibGens {
 			faces_vectors[i].x = new_face_map[(int)faces_vectors[i].x];
 			faces_vectors[i].y = new_face_map[(int)faces_vectors[i].y];
 			faces_vectors[i].z = new_face_map[(int)faces_vectors[i].z];
-
-			faces.push_back(faces_vectors[i].z);
-			faces.push_back(faces_vectors[i].y);
-			faces.push_back(faces_vectors[i].x);
-			faces.push_back(0xFFFF);
 		}
 
 		

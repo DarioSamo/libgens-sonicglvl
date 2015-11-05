@@ -65,9 +65,7 @@ namespace LibGens {
 
 	void Error::addMessage(Code error_code_p, string description_p) {
 		if (FileLogging) {
-			FILE *fp=fopen(LIBGENS_ERROR_H_FILE_LOG, "wt");
-			fseek(fp, SEEK_END, 0L);
-
+			FILE *fp=fopen(LIBGENS_ERROR_H_FILE_LOG, "at");
 			if (fp) {
 				fprintf(fp, "%s - %s\n", ErrorCodeID(error_code_p).c_str(), description_p.c_str());
 				fclose(fp);

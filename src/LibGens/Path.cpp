@@ -21,6 +21,9 @@
 
 namespace LibGens {
 	Path::Path(string filename) {
+		library = NULL;
+		scene = NULL;
+
 		if (filename.find(LIBGENS_PATH_XML_EXTENSION) != string::npos) {
 			readXML(filename);
 		}

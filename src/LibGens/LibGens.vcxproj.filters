@@ -177,6 +177,9 @@
       <Filter>Object</Filter>
     </ClCompile>
     <ClCompile Include="ArchiveTree.cpp" />
+    <ClCompile Include="LostWorldObjectSet.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -352,6 +355,9 @@
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="ArchiveTree.h" />
+    <ClInclude Include="LostWorldObjectSet.h">
+      <Filter>Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BIXF">

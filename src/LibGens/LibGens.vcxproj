@@ -99,6 +99,7 @@
     <ClCompile Include="LibGens.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightField.cpp" />
+    <ClCompile Include="LostWorldObjectSet.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialLibrary.cpp" />
     <ClCompile Include="MathGens.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="LibGens.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightField.h" />
+    <ClInclude Include="LostWorldObjectSet.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialLibrary.h" />
     <ClInclude Include="MathGens.h" />

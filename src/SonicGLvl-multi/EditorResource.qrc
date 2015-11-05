@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="Editor">
+    <file alias="Category">resource/Category.png</file>
+    <file alias="Template">resource/Template.png</file>
+    <file alias="Banner">resource/Banner.png</file>
+  </qresource>
+</RCC>

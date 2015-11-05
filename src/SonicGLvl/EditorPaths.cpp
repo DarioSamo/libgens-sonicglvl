@@ -29,17 +29,19 @@ void EditorApplication::loadLevelPaths() {
 		LibGens::Library *path_library = (*it)->getLibrary();
 		LibGens::Scene *path_scene = (*it)->getScene();
 
-		list<LibGens::Node *> path_scene_nodes = path_scene->getNodes();
-		for (list<LibGens::Node *>::iterator it_n = path_scene_nodes.begin(); it_n != path_scene_nodes.end(); it_n++) {
-			LibGens::Node *path_node = (*it_n);
-			string path_instance_name = path_node->getInstanceName();
+		if (path_scene && path_library) {
+			list<LibGens::Node *> path_scene_nodes = path_scene->getNodes();
+			for (list<LibGens::Node *>::iterator it_n = path_scene_nodes.begin(); it_n != path_scene_nodes.end(); it_n++) {
+				LibGens::Node *path_node = (*it_n);
+				string path_instance_name = path_node->getInstanceName();
 
-			// Delete first character #
-			path_instance_name.erase(path_instance_name.begin());
+				// Delete first character #
+				path_instance_name.erase(path_instance_name.begin());
 
-			LibGens::Spline *path_spline = path_library->getSpline(path_instance_name);
-			if (path_spline) {
-				PathNode *editor_path_node = new PathNode(path_instance_name, path_spline, path_node, scene_manager);
+				LibGens::Spline *path_spline = path_library->getSpline(path_instance_name);
+				if (path_spline) {
+					PathNode *editor_path_node = new PathNode(path_instance_name, path_spline, path_node, scene_manager);
+				}
 			}
 		}
 	}

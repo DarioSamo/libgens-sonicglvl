@@ -1,0 +1,9 @@
+#ifndef QT_QT3DINPUT_MODULE_H
+#define QT_QT3DINPUT_MODULE_H
+#include <Qt3DInput/Qt3DInputDepends>
+#include "q3dkeyevent.h"
+#include "qinputaspect.h"
+#include "qkeyboardcontroller.h"
+#include "qkeyboardinput.h"
+#include "qt3dinputversion.h"
+#endif

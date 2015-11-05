@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="EditorViewport.cpp" />
+    <ClCompile Include="EditorViewportsWidget.cpp" />
+    <ClCompile Include="EditorWindow.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="OgreSystem.cpp" />
+    <ClCompile Include="OgreViewportWidget.cpp" />
+    <ClCompile Include="QtMocs.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="EditorCache.cpp" />
+    <ClCompile Include="EditorStage.cpp" />
+    <ClCompile Include="EditorTerrain.cpp" />
+    <ClCompile Include="EditorNode.cpp" />
+    <ClCompile Include="EditorMaterialConverter.cpp" />
+    <ClCompile Include="EditorModelConverter.cpp" />
+    <ClCompile Include="EditorMaterials.cpp" />
+    <ClCompile Include="DefaultShaderParameters.cpp" />
+    <ClCompile Include="EditorGI.cpp" />
+    <ClCompile Include="EditorSky.cpp" />
+    <ClCompile Include="EditorCamera.cpp" />
+    <ClCompile Include="EditorDefaultCamera.cpp" />
+    <ClCompile Include="EditorObjects.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OgreSystem.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="EditorCache.h" />
+    <ClInclude Include="EditorStage.h" />
+    <ClInclude Include="EditorTerrain.h" />
+    <ClInclude Include="EditorNode.h" />
+    <ClInclude Include="EditorMaterialConverter.h" />
+    <ClInclude Include="EditorModelConverter.h" />
+    <ClInclude Include="EditorMaterials.h" />
+    <ClInclude Include="DefaultShaderParameters.h" />
+    <ClInclude Include="EditorGI.h" />
+    <ClInclude Include="EditorSky.h" />
+    <ClInclude Include="EditorCamera.h" />
+    <ClInclude Include="EditorDefaultCamera.h" />
+    <ClInclude Include="EditorObjects.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="EditorWindow.ui" />
+    <CustomBuild Include="EditorWindow.h" />
+    <CustomBuild Include="EditorViewportsWidget.h" />
+    <CustomBuild Include="EditorViewport.h" />
+    <CustomBuild Include="OgreViewportWidget.h" />
+    <CustomBuild Include="EditorResource.qrc" />
+  </ItemGroup>
+</Project>

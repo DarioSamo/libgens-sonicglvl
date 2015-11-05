@@ -18,11 +18,14 @@
 //=========================================================================
 
 #include "LibGens.h"
+#include "PAC.h"
 
 int main() {
 	LibGens::initialize();
 	LibGens::Error::setLogging(true);
 
-	/* Test Code for the library goes here */
+	LibGens::PacSet *pac_set = new LibGens::PacSet("Sonic.pac");
+	pac_set->save("output/Sonic.pac");
+
     return 0;
 }

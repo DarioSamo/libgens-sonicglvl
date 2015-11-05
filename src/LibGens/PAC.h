@@ -30,8 +30,12 @@
 #define LIBGENS_PAC_EXTENSION_LFT_FULL				   "lft:ResMirageLightField"
 #define LIBGENS_PAC_EXTENSION_GISM                     "gism"
 #define LIBGENS_PAC_EXTENSION_GISM_FULL                "gism:ResGismoConfig"
+#define LIBGENS_PAC_EXTENSION_HHD                      "hhd"
+#define LIBGENS_PAC_EXTENSION_HHD_FULL                 "hhd:ResCustomData"
 #define LIBGENS_PAC_EXTENSION_PAC_PHY_HKX              "phy.hkx"
 #define LIBGENS_PAC_EXTENSION_PAC_PHY_HKX_FULL         "phy.hkx:ResHavokMesh"
+#define LIBGENS_PAC_EXTENSION_LUA		               "lua"
+#define LIBGENS_PAC_EXTENSION_PAC_LUA_FULL             "lua:ResLuaData"
 #define LIBGENS_PAC_EXTENSION_MATERIAL                 "material"
 #define LIBGENS_PAC_EXTENSION_MATERIAL_FULL            "material:ResMirageMaterial"
 #define LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO      "terrain-instanceinfo"
@@ -40,6 +44,8 @@
 #define LIBGENS_PAC_EXTENSION_TERRAIN_MODEL_FULL	   "terrain-model:ResMirageTerrainModel"
 #define LIBGENS_PAC_EXTENSION_PAC_DEPEND               "pac.d"
 #define LIBGENS_PAC_EXTENSION_PAC_DEPEND_FULL          "pac.d:ResPacDepend"
+#define LIBGENS_PAC_EXTENSION_PAC_FXCOL                "fxcol.bin"
+#define LIBGENS_PAC_EXTENSION_PAC_FXCOL_FULL           "fxcol.bin:ResFxColFile"
 #define LIBGENS_PAC_EXTENSION_PAC_RAW                  ""
 #define LIBGENS_PAC_EXTENSION_PAC_RAW_FULL             ":ResRawData"
 #define LIBGENS_PAC_EXTENSION_PAC_MAT_ANIM             "mat-anim"
@@ -62,6 +68,26 @@
 #define LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL_FULL    "shadow-model:ResShadowModel"
 #define LIBGENS_PAC_EXTENSION_PAC_SWIF                 "swif"
 #define LIBGENS_PAC_EXTENSION_PAC_SWIF_FULL            "swif:ResSurfRideProject"
+#define LIBGENS_PAC_EXTENSION_PAC_PATH2                "path2.bin"
+#define LIBGENS_PAC_EXTENSION_PAC_PATH2_FULL           "path2.bin:ResSplinePath2"
+#define LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER		   "pixelshader"
+#define LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER_FULL	   "pixelshader:ResMiragePixelShader"
+#define LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERCODE	   "fpo"
+#define LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERCODE_FULL "fpo:ResMiragePixelShaderCode"
+#define LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERPARAMETER "psparam"
+#define LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERPARAMETER_FULL	   "psparam:ResMiragePixelShaderParameter"
+#define LIBGENS_PAC_EXTENSION_PAC_SHADERLIST	       "shader-list"
+#define LIBGENS_PAC_EXTENSION_PAC_SHADERLIST_FULL	   "shader-list:ResMirageShaderList"
+#define LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADER	       "vertexshader"
+#define LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADER_FULL	   "vertexshader:ResMirageVertexShader"
+#define LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERCODE	   "vpo"
+#define LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERCODE_FULL	  "vpo:ResMirageVertexShaderCode"
+#define LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERPARAMETER	  "vsparam"
+#define LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERPARAMETER_FULL "vsparam:ResMirageVertexShaderParameter"
+#define LIBGENS_PAC_EXTENSION_PAC_SM4SHADERCONTAINER	     "gsh"
+#define LIBGENS_PAC_EXTENSION_PAC_SM4SHADERCONTAINER_FULL	 "gsh:ResMirageResSM4ShaderContainer"
+#define LIBGENS_PAC_EXTENSION_PAC_XTB2DATA	                 "xtb2"
+#define LIBGENS_PAC_EXTENSION_PAC_XTB2DATA_FULL		         "xtb2:ResXTB2Data"
 
 #define LIBGENS_PAC_SPLIT_BYTES_LIMIT                  0x999999
 
@@ -92,6 +118,8 @@ namespace LibGens {
 			PacFile(vector<string> pac_names);
 			// Generate a proxy
 			PacFile(PacFile *pac_file);
+			~PacFile();
+
 			void read(File *file);
 			void save(string filename);
 			string getName();
@@ -101,6 +129,7 @@ namespace LibGens {
 			void writeFixed(File *file);
 			vector<string> getPacDependNames();
 			unsigned int getDataSize();
+			void hashInput(SHA1Context &sha1_context);
 	};
 
 	class PacExtension {
@@ -110,8 +139,9 @@ namespace LibGens {
 			size_t file_address;
 		public:
 			PacExtension();
+			~PacExtension();
 			void read(File *file);
-			void extract(string folder, bool convert_textures=false);
+			void extract(string folder, bool convert_textures=false, void (*callback)(string)=NULL);
 			bool scanForAddress(size_t address, File *file);
 			void setName(string v);
 			string getName();
@@ -125,6 +155,7 @@ namespace LibGens {
 			void deleteFiles();
 			bool isEmpty();
 			bool isSpecialExtension();
+			void hashInput(SHA1Context &sha1_context);
 	};
 
 	class PacProxyEntry {
@@ -151,6 +182,7 @@ namespace LibGens {
 		public:
 			PacPack(string filename);
 			PacPack();
+			~PacPack();
 			void addFile(string filename);
 			void addFolder(string folder);
 			void save(string filename);
@@ -162,12 +194,13 @@ namespace LibGens {
 			void addProxy(PacProxyEntry *entry);
 			void createExtensions();
 			void cleanUnusedExtensions();
-			void extract(string folder, bool convert_textures=false);
+			void extract(string folder, bool convert_textures=false, void (*callback)(string)=NULL);
 			void readFile(string filename);
 			void scanForAddressesInsideFiles(File *file);
 			void setName(string v);
 			string getName();
 			size_t getInternalSize();
+			void hashInput(SHA1Context &sha1_context);
 	};
 
 	class PacSet {
@@ -175,13 +208,17 @@ namespace LibGens {
 			vector<PacPack *> packs;
 			string name;
 			string folder;
+			unsigned int sha1_hash[5];
+			SHA1Context sha1_context;
 		public:
 			PacSet();
 			PacSet(string filename);
+			~PacSet();
 			void addFolder(string target_folder);
 			void splitPacks();
 			void save(string filename);
 			void openDependFile(PacFile *file);
-			void extract(string target_folder, bool convert_textures=false);
+			void extract(string target_folder, bool convert_textures=false, void (*callback)(string)=NULL);
+			int getSHA1Hash(int i);
 	};
 };
