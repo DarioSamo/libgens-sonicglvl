@@ -23,6 +23,7 @@
 namespace LibGens {
 	PacPack::PacPack(string filename) {
 		name = File::nameFromFilename(filename);
+		version = 0;
 
 		readFile(filename);
 	}
@@ -30,41 +31,51 @@ namespace LibGens {
 	void PacPack::readFile(string filename) {
 		size_t offset_count = 0;
 
-		File file(filename, LIBGENS_FILE_READ_BINARY);
+		File file(filename, LIBGENS_FILE_READ_BINARY, true);
 		if (file.valid()) {
 			string signature="";
+
+			size_t PACx;
+			size_t type;
+			file.readInt32BE(&PACx);
+			file.readInt32BE(&type);
+			if (type == 0x3230314C) // 201L
+				version = 1;
+
+			file.setBigEndian(version == 0);
+
 			size_t file_size=0;
 			size_t unknown_1=0;
 			
 
-			file.readString(&signature, 8);
-			file.readInt32BE(&file_size);
-			file.readInt32BE(&unknown_1);
+			file.readInt32E(&file_size);
+			file.readInt32E(&unknown_1);
 			
 
 			string data_header="";
 			size_t data_size = 0;
 			file.readString(&data_header, 4);
-			file.readInt32BE(&data_size);
+			file.readInt32E(&data_size);
 
 			unsigned int file_data_size=0;
 			unsigned int extension_table_size=0;
 			unsigned int string_offset_table_size=0;
 			unsigned int string_table_data_size=0;
 			unsigned int offset_table_size=0;
-			unsigned int data_flag=0;
+			unsigned char data_flag=0;
 
-			file.readInt32BE(&file_data_size);
-			file.readInt32BE(&extension_table_size);
-			file.readInt32BE(&string_offset_table_size);
-			file.readInt32BE(&string_table_data_size);
-			file.readInt32BE(&offset_table_size);
-			file.readInt32BE(&data_flag);
+			file.readInt32E(&file_data_size);
+			file.readInt32E(&extension_table_size);
+			file.readInt32E(&string_offset_table_size);
+			file.readInt32E(&string_table_data_size);
+			file.readInt32E(&offset_table_size);
+			file.readUChar(&data_flag);
+			file.moveAddress(3);
 
 			size_t file_extensions = 0;
 			size_t file_extensions_table_address = 0;
-			file.readInt32BE(&file_extensions);
-			file.readInt32BE(&file_extensions_table_address);
+			file.readInt32E(&file_extensions);
+			file.readInt32E(&file_extensions_table_address);
 
 			for (size_t i=0; i<file_extensions; i++) {
 				file.goToAddress(file_extensions_table_address + i*8);
@@ -78,8 +89,8 @@ namespace LibGens {
 			if (string_offset_table_size) {
 				unsigned int string_data_table_count=0;
 				unsigned int string_data_table_offset=0;
-				file.readInt32BE(&string_data_table_count);
-				file.readInt32BE(&string_data_table_offset);
+				file.readInt32E(&string_data_table_count);
+				file.readInt32E(&string_data_table_offset);
 
 				for (size_t i=0; i<string_data_table_count; i++) {
 					file.goToAddress(string_data_table_offset + i*12);
@@ -111,7 +122,7 @@ namespace LibGens {
 			file->goToAddress(address);
 
 			PacMetaString meta_string;
-			file->readInt32BE(&meta_string.address);
+			file->readInt32E(&meta_string.address);
 			file->goToAddress(meta_string.address);
 			meta_string.relative_address = address - lower_limit;
 			meta_string.name = "";
@@ -157,9 +168,9 @@ namespace LibGens {
 		unsigned int string_data_extension_offset=0;
 		unsigned int string_data_filename_offset=0;
 
-		file->readInt32BE(&string_data_extension_offset);
-		file->readInt32BE(&string_data_filename_offset);
-		file->readInt32BE(&index);
+		file->readInt32E(&string_data_extension_offset);
+		file->readInt32E(&string_data_filename_offset);
+		file->readInt32E(&index);
 		file->goToAddress(string_data_extension_offset);
 		file->readString(&extension);
 		file->goToAddress(string_data_filename_offset);
@@ -169,8 +180,8 @@ namespace LibGens {
 	void PacExtension::read(File *file) {
 		size_t file_extension_string_address=0;
 		size_t file_table_address=0;
-		file->readInt32BE(&file_extension_string_address);
-		file->readInt32BE(&file_table_address);
+		file->readInt32E(&file_extension_string_address);
+		file->readInt32E(&file_table_address);
 		file->goToAddress(file_extension_string_address);
 		file->readString(&name);
 
@@ -178,14 +189,12 @@ namespace LibGens {
 
 		size_t file_count = 0;
 		size_t file_sub_table_address = 0;
-		file->readInt32BE(&file_count);
-		file->readInt32BE(&file_sub_table_address);
+		file->readInt32E(&file_count);
+		file->readInt32E(&file_sub_table_address);
 
-		/*
-		printfErrorMessageNoFlush(LOG, "-----------------------------------", name.c_str());
-		printfErrorMessageNoFlush(LOG, "FILE EXTENSION: %s", name.c_str());
-		printfErrorMessageNoFlush(LOG, "-----------------------------------", name.c_str());
-		*/
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "-----------------------------------", name.c_str());
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "FILE EXTENSION: %s", name.c_str());
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "-----------------------------------", name.c_str());
 
 		for (size_t i=0; i<file_count; i++) {
 			file->goToAddress(file_sub_table_address + i*8);
@@ -201,11 +210,14 @@ namespace LibGens {
 		if (name == LIBGENS_PAC_EXTENSION_LIGHT_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_LFT_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_GISM_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_HHD_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_PHY_HKX_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_LUA_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_MATERIAL_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_TERRAIN_MODEL_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_DEPEND_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_FXCOL_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_RAW_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_MAT_ANIM_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_ANM_HKX_FULL) return false;
@@ -217,6 +229,16 @@ namespace LibGens {
 		if (name == LIBGENS_PAC_EXTENSION_PAC_DDS_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_SWIF_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_PATH2_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERCODE_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERPARAMETER_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_SHADERLIST_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADER_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERCODE_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERPARAMETER_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_SM4SHADERCONTAINER_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_XTB2DATA_FULL) return false;
 
 		return false;
 	}
@@ -227,6 +249,10 @@ namespace LibGens {
 		data_size = 0;
 		file_data_address = 0;
 		meta_pac_extra_strings.clear();
+	}
+
+	PacFile::~PacFile() {
+		free(data);
 	}
 
 	PacFile::PacFile(string filename) {
@@ -265,14 +291,14 @@ namespace LibGens {
 				file.fixPaddingRead(4);
 
 				unsigned int meta_pac_count = 0;
-				file.readInt32BE(&meta_pac_count);
+				file.readInt32E(&meta_pac_count);
 
 				// Read Pac Metadata
 				for (size_t i=0; i<meta_pac_count; i++) {
 					PacMetaString pac_meta_string;
 
 					unsigned int meta_pac_address = 0;
-					file.readInt32BE(&meta_pac_address);
+					file.readInt32E(&meta_pac_address);
 					pac_meta_string.name = "";
 					pac_meta_string.relative_address = meta_pac_address;
 					meta_pac_extra_strings.push_back(pac_meta_string);
@@ -281,7 +307,7 @@ namespace LibGens {
 				// Detect if Pac Metadata points to either strings or other binary data
 				for (size_t i=0; i<meta_pac_count; i++) {
 					file.goToAddress(meta_pac_extra_strings[i].relative_address);
-					file.readInt32BE(&meta_pac_extra_strings[i].address);
+					file.readInt32E(&meta_pac_extra_strings[i].address);
 
 					// If it points to the PAC Metadata, it's a string
 					if (meta_pac_extra_strings[i].address >= metadata_address) {
@@ -311,7 +337,6 @@ namespace LibGens {
 
 		unsigned int *count = (unsigned int *)(data + 4);
 		*count = pac_names.size();
-		Endian::swap(*count);
 
 		PacMetaString base_offset;
 		base_offset.address = 8;
@@ -332,21 +357,24 @@ namespace LibGens {
 	void PacFile::read(File *file) {
 		size_t file_name_string_address=0;
 
-		file->readInt32BE(&file_name_string_address);
-		file->readInt32BE(&file_data_address);
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "0x%x Header", file->getCurrentAddress());
+
+		file->readInt32E(&file_name_string_address);
+		file->readInt32E(&file_data_address);
 
 		file->goToAddress(file_name_string_address);
 		file->readString(&name);
 
-		//printfErrorMessageNoFlush(LOG, "0x%x: %s", file_data_address, name.c_str());
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "0x%x: %s", file_data_address, name.c_str());
 
 		file->goToAddress(file_data_address);
-		size_t empty_flag=0;
-		file->readInt32BE(&data_size);
+		unsigned char empty_flag=0;
+		file->readInt32E(&data_size);
 		file->moveAddress(8);
-		file->readInt32BE(&empty_flag);
+		file->readUChar(&empty_flag);
+		file->moveAddress(3);
 
-		if (empty_flag == 0x80000000) {
+		if (empty_flag == 0x80) {
 			data = NULL;
 			return;
 		}
@@ -357,7 +385,7 @@ namespace LibGens {
 		size_t lower_limit = file_data_address + 16;
 		size_t upper_limit = lower_limit + data_size;
 
-		//printfErrorMessage(LOG, "Lower Limit: %d Upper Limit: %d Name: %s", lower_limit, upper_limit, name.c_str());
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "Lower Limit: %d Upper Limit: %d Name: %s", lower_limit, upper_limit, name.c_str());
 	}
 
 	vector<string> PacFile::getPacDependNames() {
@@ -372,14 +400,14 @@ namespace LibGens {
 		return names;
 	}
 
-	void PacFile::save(string filename) {
+	void PacFile::save(string filename, bool PC) {
 		if (!data) {
 			return;
 		}
 
 		bool meta_pac_strings = (meta_pac_extra_strings.size() != 0);
 
-		File file(filename, LIBGENS_FILE_WRITE_BINARY);
+		File file(filename, LIBGENS_FILE_WRITE_BINARY, PC);
 		file.write(data, data_size);
 
 		if (meta_pac_strings) {
@@ -389,10 +417,10 @@ namespace LibGens {
 			file.fixPadding(4);
 
 			unsigned int meta_pac_count = meta_pac_extra_strings.size();
-			file.writeInt32BE(&meta_pac_count);
+			file.writeInt32E(&meta_pac_count);
 
 			for (size_t i=0; i<meta_pac_count; i++) {
-				file.writeInt32BE(&meta_pac_extra_strings[i].relative_address);
+				file.writeInt32E(&meta_pac_extra_strings[i].relative_address);
 			}
 
 			for (size_t i=0; i<meta_pac_count; i++) {
@@ -403,7 +431,7 @@ namespace LibGens {
 				}
 
 				file.goToAddress(meta_pac_extra_strings[i].relative_address);
-				file.writeInt32BE(&meta_pac_extra_strings[i].address);
+				file.writeInt32E(&meta_pac_extra_strings[i].address);
 
 				file.goToEnd();
 			}
@@ -427,6 +455,12 @@ namespace LibGens {
 
 	PacExtension::PacExtension() {
 		name = "";
+	}
+
+	PacExtension::~PacExtension() {
+		for (size_t i=0; i<files.size(); i++) {
+			delete files[i];
+		}
 	}
 
 	void PacExtension::setName(string v) {
@@ -458,7 +492,7 @@ namespace LibGens {
 		return (files.size() == 0);
 	}
 
-	void PacExtension::extract(string folder, bool convert_textures) {
+	void PacExtension::extract(string folder, bool convert_textures, void (*callback)(string)) {
 		// Don't extract depend files
 		if (name == LIBGENS_PAC_EXTENSION_PAC_DEPEND_FULL) {
 			return;
@@ -481,15 +515,19 @@ namespace LibGens {
 				system(command.c_str());
 			}
 			else {
+				if (callback) {
+					(*callback)(files[i]->getName());
+				}
+
 				files[i]->save(new_filename);
 			}
 		}
 	}
 
 
-	void PacPack::extract(string folder, bool convert_textures) {
+	void PacPack::extract(string folder, bool convert_textures, void (*callback)(string)) {
 		for (size_t i=0; i<extensions.size(); i++) {
-			extensions[i]->extract(folder, convert_textures);
+			extensions[i]->extract(folder, convert_textures, callback);
 		}
 	}
 
@@ -538,11 +576,14 @@ namespace LibGens {
 		getExtension(LIBGENS_PAC_EXTENSION_LIGHT);
 		getExtension(LIBGENS_PAC_EXTENSION_LFT);
 		getExtension(LIBGENS_PAC_EXTENSION_GISM);
+		getExtension(LIBGENS_PAC_EXTENSION_HHD);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_PHY_HKX);
+		getExtension(LIBGENS_PAC_EXTENSION_LUA);
 		getExtension(LIBGENS_PAC_EXTENSION_MATERIAL);
 		getExtension(LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO);
 		getExtension(LIBGENS_PAC_EXTENSION_TERRAIN_MODEL);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_DEPEND);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_FXCOL);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_RAW);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_MAT_ANIM);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_ANM_HKX);
@@ -553,7 +594,17 @@ namespace LibGens {
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_SKL_HKX);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_SWIF);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_DDS);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_PATH2);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERCODE);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERPARAMETER);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_SHADERLIST);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADER);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERCODE);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERPARAMETER);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_SM4SHADERCONTAINER);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_XTB2DATA);
 	}
 
 	void PacPack::cleanUnusedExtensions() {
@@ -579,8 +630,14 @@ namespace LibGens {
 		else if (ext == LIBGENS_PAC_EXTENSION_GISM) {
 			return LIBGENS_PAC_EXTENSION_GISM_FULL;
 		}
+		else if (ext == LIBGENS_PAC_EXTENSION_HHD) {
+			return LIBGENS_PAC_EXTENSION_HHD_FULL;
+		}
 		else if (ext == LIBGENS_PAC_EXTENSION_PAC_PHY_HKX) {
 			return LIBGENS_PAC_EXTENSION_PAC_PHY_HKX_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_LUA) {
+			return LIBGENS_PAC_EXTENSION_PAC_LUA_FULL;
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_MATERIAL) {
 			return LIBGENS_PAC_EXTENSION_MATERIAL_FULL;
@@ -593,6 +650,9 @@ namespace LibGens {
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_PAC_DEPEND) {
 			return LIBGENS_PAC_EXTENSION_PAC_DEPEND_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_FXCOL) {
+			return LIBGENS_PAC_EXTENSION_PAC_FXCOL_FULL;
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_PAC_RAW) {
 			return LIBGENS_PAC_EXTENSION_PAC_RAW_FULL;
@@ -626,6 +686,36 @@ namespace LibGens {
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_PAC_SWIF) {
 			return LIBGENS_PAC_EXTENSION_PAC_SWIF_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_PATH2) {
+			return LIBGENS_PAC_EXTENSION_PAC_PATH2_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER) {
+			return LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERCODE) {
+			return LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERCODE_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERPARAMETER) {
+			return LIBGENS_PAC_EXTENSION_PAC_PIXELSHADERPARAMETER_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_SHADERLIST) {
+			return LIBGENS_PAC_EXTENSION_PAC_SHADERLIST_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADER) {
+			return LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADER_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERCODE) {
+			return LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERCODE_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERPARAMETER) {
+			return LIBGENS_PAC_EXTENSION_PAC_VERTEXSHADERPARAMETER_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_SM4SHADERCONTAINER) {
+			return LIBGENS_PAC_EXTENSION_PAC_SM4SHADERCONTAINER_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_XTB2DATA) {
+			return LIBGENS_PAC_EXTENSION_PAC_XTB2DATA_FULL;
 		}
 		else {
 			return "";
@@ -675,14 +765,14 @@ namespace LibGens {
 
 
 	void PacFile::write(File *file, GensStringTable *string_table) {
-		unsigned int empty_flag = (data ? 0 : 0x80000000);
+		unsigned int empty_flag = (data ? 0 : 0x80);
 		
 		file_data_address = file->getCurrentAddress();
 
 		// Write Header and Data
-		file->writeInt32BE(&data_size);
+		file->writeInt32E(&data_size);
 		file->writeNull(8);
-		file->writeInt32BE(&empty_flag);
+		file->writeInt32E(&empty_flag);
 
 		size_t data_address = file->getCurrentAddress();
 		if (data) {
@@ -696,9 +786,15 @@ namespace LibGens {
 				}
 				else {
 					size_t new_address = meta_pac_extra_strings[i].address + data_address;
-					file->writeInt32BEA(&new_address);
+					file->writeInt32EA(&new_address);
 				}
 			}
+		}
+	}
+
+	void PacFile::hashInput(SHA1Context &sha1_context) {
+		if (data) {
+			SHA1Input(&sha1_context, data, data_size);
 		}
 	}
 
@@ -723,7 +819,7 @@ namespace LibGens {
 	void PacProxyEntry::write(File *file, GensStringTable *string_table) {
 		string_table->writeString(file, extension);
 		string_table->writeString(file, name);
-		file->writeInt32BE(&index);
+		file->writeInt32E(&index);
 	}
 
 	void PacExtension::write(File *file, GensStringTable *string_table) {
@@ -732,11 +828,11 @@ namespace LibGens {
 
 		file_address = file->getCurrentAddress();
 
-		//printfErrorMessage(LOG, "Extension Address: %d", file_address);
+		//LibGens::Error::printfMessage(LibGens::Error::LOG, "Extension Address: %d", file_address);
 
 		// Reserve Space for Extensions section
-		file->writeInt32BE(&files_count);
-		file->writeInt32BEA(&files_table_address);
+		file->writeInt32E(&files_count);
+		file->writeInt32EA(&files_table_address);
 
 		// Write Table
 		for (size_t i=0; i<files_count; i++) {
@@ -771,11 +867,11 @@ namespace LibGens {
 
 
 	void PacFile::writeFixed(File *file) {
-		file->writeInt32BEA(&file_data_address);
+		file->writeInt32EA(&file_data_address);
 	}
 
 	void PacExtension::writeFixed(File *file) {
-		file->writeInt32BEA(&file_address);
+		file->writeInt32EA(&file_address);
 
 		for (size_t i=0; i<files.size(); i++) {
 			file->goToAddress(file_address + 12 + i*8);
@@ -783,25 +879,48 @@ namespace LibGens {
 		}
 	}
 
+	void PacExtension::hashInput(SHA1Context &sha1_context) {
+		for (size_t i=0; i<files.size(); i++) {
+			files[i]->hashInput(sha1_context);
+		}
+	}
+
+	/** PacPack */
+
 	PacPack::PacPack() {
 	}
 
-	void PacPack::save(string filename) {
+	PacPack::~PacPack() {
+		for (size_t i=0; i < extensions.size(); i++) {
+			delete extensions[i];
+		}
+
+		for (size_t i=0; i < proxy_entries.size(); i++) {
+			delete proxy_entries[i];
+		}
+	}
+
+	void PacPack::save(string filename, bool PC) {
 		cleanUnusedExtensions();
 
-		File file(filename, LIBGENS_FILE_WRITE_BINARY);
+		File file(filename, LIBGENS_FILE_WRITE_BINARY, PC);
 		if (file.valid()) {
 			GensStringTable string_table;
 			file.setRootNodeAddress(0);
 
 			// Header Section
 			unsigned int file_size = 0;
-			char header[] = "PACx201B";
-			file.write(header, strlen(header));
+			unsigned int PACx = 0x50414378;
+			unsigned int suffix = (PC ? 0x3230314C : 0x32303142);
+
+			file.writeInt32BE(&PACx); // "PACx"
+			file.writeInt32BE(&suffix); // 201L / 201B
+			
+
 			file.writeNull(4);
 
-			unsigned int unknown_1 = 0x10000;
-			file.writeInt32BE(&unknown_1);
+			unsigned int unknown_1 = 0x1;
+			file.writeInt32E(&unknown_1);
 
 			// Data Section
 			unsigned int data_size=0;
@@ -814,9 +933,10 @@ namespace LibGens {
 			char data_header[] = "DATA";
 			file.write(data_header, strlen(data_header));
 
-			unsigned int data_flag = 0x1000000;
+			unsigned char data_flag = 0x1;
 			file.writeNull(24);
-			file.writeInt32BE(&data_flag);
+			file.writeUChar(&data_flag);
+			file.writeNull(3);
 
 			// Extensions Section
 			size_t extension_section_address = file.getCurrentAddress();
@@ -825,8 +945,8 @@ namespace LibGens {
 				unsigned int extensions_table_address = file.getCurrentAddress() + 8;
 
 				// Reserve Space for Extensions section
-				file.writeInt32BE(&extensions_count);
-				file.writeInt32BEA(&extensions_table_address);
+				file.writeInt32E(&extensions_count);
+				file.writeInt32EA(&extensions_table_address);
 
 				for (size_t i=0; i<extensions_count; i++) {
 					string_table.writeString(&file, extensions[i]->getName());
@@ -865,8 +985,8 @@ namespace LibGens {
 			if (proxy_entries.size()) {
 				unsigned int proxy_table_count=proxy_entries.size();
 				unsigned int proxy_table_offset=file.getCurrentAddress() + 8;
-				file.writeInt32BE(&proxy_table_count);
-				file.writeInt32BEA(&proxy_table_offset);
+				file.writeInt32E(&proxy_table_count);
+				file.writeInt32EA(&proxy_table_offset);
 
 				for (size_t i=0; i<proxy_table_count; i++) {
 					proxy_entries[i]->write(&file, &string_table);
@@ -901,18 +1021,18 @@ namespace LibGens {
 			file.goToEnd();
 			file_size = file.getCurrentAddress();
 			file.goToAddress(8);
-			file.writeInt32BE(&file_size);
+			file.writeInt32E(&file_size);
 
 
 			file.goToAddress(20);
 			data_size = file_size - 16;
 
-			file.writeInt32BE(&data_size);
-			file.writeInt32BE(&file_data_size);
-			file.writeInt32BE(&extension_table_size);
-			file.writeInt32BE(&proxy_table_size);
-			file.writeInt32BE(&string_table_data_size);
-			file.writeInt32BE(&offset_table_size);
+			file.writeInt32E(&data_size);
+			file.writeInt32E(&file_data_size);
+			file.writeInt32E(&extension_table_size);
+			file.writeInt32E(&proxy_table_size);
+			file.writeInt32E(&string_table_data_size);
+			file.writeInt32E(&offset_table_size);
 		}
 	}
 
@@ -940,11 +1060,31 @@ namespace LibGens {
 
 		return internal_size;
 	}
+	
+	
+	int PacPack::getVersion()
+	{
+		return version;
+	}
 
+	void PacPack::hashInput(SHA1Context &sha1_context) {
+		for (size_t i=0; i<extensions.size(); i++) {
+			extensions[i]->hashInput(sha1_context);
+		}
+	}
 
 
 	PacSet::PacSet() {
 		name = folder = "";
+		for (int i=0; i<5; i++) {
+			sha1_hash[i] = 0;
+		}
+	}
+
+	PacSet::~PacSet() {
+		for (size_t i=0; i<packs.size(); i++) {
+			delete packs[i];
+		}
 	}
 
 	PacSet::PacSet(string filename) {
@@ -952,6 +1092,7 @@ namespace LibGens {
 		folder = File::folderFromFilename(filename);
 
 		PacPack *root_pack = new PacPack(filename);
+		version = root_pack->getVersion();
 
 		if (root_pack) {
 			packs.push_back(root_pack);
@@ -966,6 +1107,21 @@ namespace LibGens {
 				}
 			}
 		}
+
+		// Generate SHA1 Hash
+		SHA1Reset(&sha1_context);
+		for (size_t i=0; i < packs.size(); i++) {
+			packs[i]->hashInput(sha1_context);
+		}
+		SHA1Result(&sha1_context);
+
+		for (int i=0; i<5; i++) {
+			sha1_hash[i] = sha1_context.Message_Digest[i];
+		}
+	}
+
+	int PacSet::getSHA1Hash(int i) {
+		return sha1_hash[i];
 	}
 
 	void PacSet::openDependFile(PacFile *file) {
@@ -1080,10 +1236,15 @@ namespace LibGens {
 		}
 	}
 
-	void PacSet::extract(string target_folder, bool convert_textures) {
+	void PacSet::extract(string target_folder, bool convert_textures, void (*callback)(string)) {
 		for (size_t i=0; i<packs.size(); i++) {
-			packs[i]->extract(target_folder, convert_textures);
+			packs[i]->extract(target_folder, convert_textures, callback);
 		}
+	}
+	
+	int PacSet::getVersion()
+	{
+		return version;
 	}
 
 	void PacSet::save(string filename) {

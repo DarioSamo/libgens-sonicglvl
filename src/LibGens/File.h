@@ -45,6 +45,7 @@ namespace LibGens {
 	class File {
 		protected:
 			FILE *file_ptr;
+			bool is_big_endian;
 			string name;
 			string path;
 			int root_node_type;
@@ -57,7 +58,8 @@ namespace LibGens {
 			unsigned char *comparison_bytes_max;
 			size_t comparison_size;
 		public:
-			File(string filename, string mode);
+			File(string filename, string mode, bool big_endian = true);
+			void setBigEndian(bool big_endian);
 			void prepareHeader(int root_type, int root_offset=LIBGENS_FILE_HEADER_ROOT_ADDRESS_DEFAULT);
 			void writeHeader(bool no_extra_foot=false);
 			void readHeader();
@@ -93,12 +95,12 @@ namespace LibGens {
 			void readUChar(unsigned char *dest);
 			void readString(string *dest);
 			void readString(string *dest, size_t n);
-			void readInt16E(unsigned short *dest, bool big_endian);
-			void readInt32E(int *dest, bool big_endian);
-			void readInt32E(unsigned int *dest, bool big_endian);
-			void readInt32EA(size_t *dest, bool big_endian);
-			void readFloat16E(float *dest, bool big_endian);
-			void readFloat32E(float *dest, bool big_endian);
+			void readInt16E(unsigned short *dest);
+			void readInt32E(int *dest);
+			void readInt32E(unsigned int *dest);
+			void readInt32EA(size_t *dest);
+			void readFloat16E(float *dest);
+			void readFloat32E(float *dest);
 			bool readLine(string *dest);
 			void write(void *dest, size_t sz);
 			void writeString(const char *dest);
@@ -106,15 +108,18 @@ namespace LibGens {
 			void writeUChar(unsigned char *dest);
 			void writeInt16(unsigned short *dest); 
 			void writeInt16BE(unsigned short *dest);
+			void writeInt16E(unsigned short *dest);
 			void writeInt32(unsigned int *dest);
+			void writeInt32E(unsigned int *dest);
 			void writeInt32A(size_t *dest, bool add_to_table=true);
+			void writeInt32EA(size_t *dest, bool add_to_table=true);
 			void writeInt32BE(unsigned int *dest);
 			void writeInt32BE(int *dest);
 			void writeInt32BEA(size_t *dest);
 			void writeFloat32(float *dest);
 			void writeFloat32BE(float *dest);
 			void writeNull(size_t size);
-			void writeFloat32E(float *dest, bool big_endian);
+			void writeFloat32E(float *dest);
 			void readAddressTableBBIN(size_t table_size);
 			void writeAddressTableBBIN(size_t negative_offset=0);
 

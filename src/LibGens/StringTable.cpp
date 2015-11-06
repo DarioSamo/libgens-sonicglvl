@@ -61,7 +61,7 @@ namespace LibGens {
 
 			for (size_t j=0; j<strings[i].addresses.size(); j++) {
 				file->goToAddress(strings[i].addresses[j]);
-				file->writeInt32BEA(&address);
+				file->writeInt32EA(&address);
 			}
 
 			file->goToEnd();

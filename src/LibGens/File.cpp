@@ -21,8 +21,9 @@
 #include "Model.h"
 
 namespace LibGens {
-	File::File(string filename, string mode) {
+	File::File(string filename, string mode, bool big_endian) {
 		file_ptr=fopen(filename.c_str(), mode.c_str());
+		is_big_endian = big_endian;
 
 		path=filename;
 		root_node_address=0;
@@ -33,6 +34,11 @@ namespace LibGens {
 			Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
 			return;
 		}
+	}
+	
+	void File::setBigEndian(bool big_endian)
+	{
+		is_big_endian = big_endian;
 	}
 
 	int File::endOfFile() {
@@ -204,33 +210,33 @@ namespace LibGens {
 	}
 
 
-	void File::readInt16E(unsigned short *dest, bool big_endian) {
-		if (big_endian) readInt16BE(dest);
+	void File::readInt16E(unsigned short *dest) {
+		if (is_big_endian) readInt16BE(dest);
 		else readInt16(dest);
 	}
 
-	void File::readInt32E(int *dest, bool big_endian) {
-		if (big_endian) readInt32BE(dest);
+	void File::readInt32E(int *dest) {
+		if (is_big_endian) readInt32BE(dest);
 		else readInt32(dest);
 	}
 
-	void File::readInt32E(unsigned int *dest, bool big_endian) {
-		if (big_endian) readInt32BE(dest);
+	void File::readInt32E(unsigned int *dest) {
+		if (is_big_endian) readInt32BE(dest);
 		else readInt32(dest);
 	}
 
-	void File::readInt32EA(size_t *dest, bool big_endian) {
-		if (big_endian) readInt32BEA(dest);
+	void File::readInt32EA(size_t *dest) {
+		if (is_big_endian) readInt32BEA(dest);
 		else readInt32A(dest);
 	}
 
-	void File::readFloat16E(float *dest, bool big_endian) {
-		if (big_endian) readFloat16BE(dest);
+	void File::readFloat16E(float *dest) {
+		if (is_big_endian) readFloat16BE(dest);
 		else readFloat16(dest);
 	}
 
-	void File::readFloat32E(float *dest, bool big_endian) {
-		if (big_endian) readFloat32BE(dest);
+	void File::readFloat32E(float *dest) {
+		if (is_big_endian) readFloat32BE(dest);
 		else readFloat32(dest);
 	}
 
@@ -272,10 +278,27 @@ namespace LibGens {
 		Endian::swap(target);
 		fwrite(&target, sizeof(short), 1, file_ptr);
 	}
+	
+	void File::writeInt16E(unsigned short *dest) {
+		if (!readSafeCheck(dest)) return;
+
+		unsigned short target=*dest;
+		if (is_big_endian) Endian::swap(target);
+		fwrite(&target, sizeof(short), 1, file_ptr);
+	}
 
 	void File::writeInt32(unsigned int *dest) {
 		if (!readSafeCheck(dest)) return;
 
+		fwrite(dest, sizeof(int), 1, file_ptr);
+	}
+	
+	void File::writeInt32E(unsigned int *dest) {
+		if (!readSafeCheck(dest)) return;
+
+		unsigned int target = *dest;
+		if (is_big_endian) Endian::swap(target);
+		
 		fwrite(dest, sizeof(int), 1, file_ptr);
 	}
 
@@ -285,6 +308,16 @@ namespace LibGens {
 		if (add_to_table) final_address_table.push_back(getCurrentAddress()-root_node_address);
 
 		unsigned int target=(*dest) - root_node_address;
+		fwrite(&target, sizeof(int), 1, file_ptr);
+	}
+
+	void File::writeInt32EA(size_t *dest, bool add_to_table) {
+		if (!readSafeCheck(dest)) return;
+
+		if (add_to_table) final_address_table.push_back(getCurrentAddress()-root_node_address);
+
+		unsigned int target=(*dest) - root_node_address;
+		if (is_big_endian) Endian::swap(target);
 		fwrite(&target, sizeof(int), 1, file_ptr);
 	}
 
@@ -327,8 +360,8 @@ namespace LibGens {
 		fwrite(&target, sizeof(float), 1, file_ptr);
 	}
 
-	void File::writeFloat32E(float *dest, bool big_endian) {
-		if (big_endian) writeFloat32BE(dest);
+	void File::writeFloat32E(float *dest) {
+		if (is_big_endian) writeFloat32BE(dest);
 		else writeFloat32(dest);
 	}
 

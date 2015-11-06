@@ -10,7 +10,7 @@ namespace LibGens {
 		LostWorldObjectSet(string filename_p, ObjectLibrary *library);
 		LostWorldObjectSet();
 		void readORC(File *file, ObjectLibrary *library);
-		void saveORC(Level *level);
+		void saveORC(Level *level, bool PC);
 		void fixTransform(Level *level);
 	};
 }

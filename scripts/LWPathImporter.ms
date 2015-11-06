@@ -27,15 +27,15 @@ if (path_file != undefined) do (
 	fseek f 0x4 #seek_cur
 
 	for p = 1 to NumPaths do (
-		PathNameStr = GetString f (ReadLongBE f #unsigned)
+		PathNameStr = GetString f (ReadLongAgnostic f #unsigned)
 		format "%. %\n" p PathNameStr
 		fseek f 0x2 #seek_cur
 		KnotCount = ReadShortAgnostic f #unsigned
 		fseek f 0xC #seek_cur
-		KnotsOffset = ReadLongBE f #unsigned
+		KnotsOffset = ReadLongAgnostic f #unsigned
 		fseek f 0x8 #seek_cur
 		DoubleKnotCount = ReadLongAgnostic f #unsigned
-		DoubleKnotsOffset = ReadLongBE f #unsigned
+		DoubleKnotsOffset = ReadLongAgnostic f #unsigned
 		fseek f 0x28 #seek_cur
 		end = ftell f
 		

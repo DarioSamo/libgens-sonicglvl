@@ -698,7 +698,7 @@ namespace LibGens {
 
 	string ReadStringPath2(File *file) {
 		unsigned int offset;
-		file->readInt32BE(&offset);
+		file->readInt32E(&offset);
 		unsigned int cur = file->getCurrentAddress();
 
 		file->goToAddress(offset);
@@ -744,12 +744,12 @@ namespace LibGens {
 
 		unsigned int num_knots = 0, num_dual_knots, knots_offset, dual_knots_offset;
 		file->moveAddress(2);
-		file->readInt16BE((unsigned short*) &num_knots);
+		file->readInt16E((unsigned short*) &num_knots);
 		file->moveAddress(0xC);
-		file->readInt32BE(&knots_offset);
+		file->readInt32E(&knots_offset);
 		file->moveAddress(0x8);
-		file->readInt32BE(&num_dual_knots);
-		file->readInt32BE(&dual_knots_offset);
+		file->readInt32E(&num_dual_knots);
+		file->readInt32E(&dual_knots_offset);
 		file->moveAddress(0x28);
 		int end = file->getCurrentAddress();
 
@@ -818,12 +818,16 @@ namespace LibGens {
 	}
 	
 	void Path::readPath2(string filename) {
-		LibGens::File file(filename, LIBGENS_FILE_READ_BINARY);
+		LibGens::File file(filename, LIBGENS_FILE_READ_BINARY, true);
 
 		if (file.valid()) {
-			file.moveAddress(8);
+			unsigned int PATH_magic;
+			file.readInt32BE(&PATH_magic);
+			if (PATH_magic == 0x48544150) file.setBigEndian(false);
+			file.moveAddress(4);
+
 			int num_paths;
-			file.readInt32BE(&num_paths);
+			file.readInt32E(&num_paths);
 			file.moveAddress(4);
 
 			library = new Library();

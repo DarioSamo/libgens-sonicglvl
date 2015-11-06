@@ -41,7 +41,7 @@ namespace LibGens {
 		file->readString(&name);
 
 		file->goToAddress(color_address);
-		color.read(file, true);
+		color.read(file);
 	}
 
 	
@@ -62,7 +62,7 @@ namespace LibGens {
 		file->fixPadding();
 
 		color_address = file->getCurrentAddress();
-		color.write(file, true);
+		color.write(file);
 
 		file->goToAddress(header_address+4);
 		file->writeInt32BEA(&name_address);

@@ -79,9 +79,9 @@ namespace LibGens {
 			Vector2(float x_p, float y_p) : x(x_p), y(y_p) {
 			}
 
-			void read(File *file, bool big_endian=true);
-			void readHalf(File *file, bool big_endian=true);
-			void write(File *file, bool big_endian=true);
+			void read(File *file);
+			void readHalf(File *file);
+			void write(File *file);
 
 			inline bool operator == (const Vector2& vector) {
 	            return (x == vector.x && y == vector.y);
@@ -121,9 +121,9 @@ namespace LibGens {
 			Vector3(float x_p, float y_p, float z_p) : x(x_p), y(y_p), z(z_p) {
 			}
 
-			void read(File *file, bool big_endian=true);
-			void readNormal360(File *file, bool big_endian=true);
-			void write(File *file, bool big_endian=true);
+			void read(File *file);
+			void readNormal360(File *file);
+			void write(File *file);
 
 			void readXML(TiXmlElement *root);
 			void readSingleXML(TiXmlElement *root);
@@ -469,12 +469,12 @@ namespace LibGens {
 				return *this;
 			}
 
-			void read(File *file, bool big_endian=false);
+			void read(File *file);
 			void readARGB8(File *file);
 			void readABGR8(File *file);
 			void readRGBA8(File *file);
 
-			void write(File *file, bool big_endian=false);
+			void write(File *file);
 			void writeARGB8(File *file);
 
 			void interpolate(const Color &v, const float m) {

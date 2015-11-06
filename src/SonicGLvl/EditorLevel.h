@@ -116,6 +116,8 @@ class EditorLevel {
 		unsigned int data_hash[5];
 		unsigned int terrain_hash[5];
 		unsigned int resources_hash[5];
+
+		int lost_world_version; // 0 = Wii U, 1 = PC
 	public:
 		EditorLevel(string folder_p, string slot_name_p, string geometry_name_p, string merge_name_p, string game_name_p);
 

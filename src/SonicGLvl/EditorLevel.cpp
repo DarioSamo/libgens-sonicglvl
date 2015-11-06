@@ -174,7 +174,7 @@ void EditorLevel::unpackData() {
 
 		if (LibGens::File::check(misc_filename)) {
 			LibGens::PacSet *pac_set = new LibGens::PacSet(misc_filename);
-			pac_set->extract(data_cache_folder + "/", true);
+			pac_set->extract(data_cache_folder + "/", pac_set->getVersion() == 0);
 			delete pac_set;
 		}
 	}
@@ -402,19 +402,20 @@ void EditorLevel::unpackResources() {
 
 		if (LibGens::File::check(trr_cmn_filename)) {
 			LibGens::PacSet *pac_set = new LibGens::PacSet(trr_cmn_filename);
-			pac_set->extract(resources_cache_folder + "/", true);
+			pac_set->extract(resources_cache_folder + "/", pac_set->getVersion() == 0);
+			lost_world_version = pac_set->getVersion();
 			delete pac_set;
 		}
 
 		if (LibGens::File::check(sky_cmn_filename)) {
 			LibGens::PacSet *pac_set = new LibGens::PacSet(sky_cmn_filename);
-			pac_set->extract(resources_cache_folder + "/", true);
+			pac_set->extract(resources_cache_folder + "/", pac_set->getVersion() == 0);
 			delete pac_set;
 		}
 
 		if (LibGens::File::check(far_filename)) {
 			LibGens::PacSet *pac_set = new LibGens::PacSet(far_filename);
-			pac_set->extract(resources_cache_folder + "/", true);
+			pac_set->extract(resources_cache_folder + "/", pac_set->getVersion() == 0);
 			delete pac_set;
 		}
 	}
@@ -690,7 +691,7 @@ void EditorLevel::saveData(string filename) {
 
 		for (list<LibGens::ObjectSet *>::iterator set=sets.begin(); set!=sets.end(); set++) {
 			LibGens::LostWorldObjectSet *lwset = static_cast<LibGens::LostWorldObjectSet*>(*set);
-			lwset->saveORC(level);
+			lwset->saveORC(level, (lost_world_version == 1));
 
 			string orc_name = LibGens::File::nameFromFilename(lwset->getFilename());
 			char copy_dst[100];

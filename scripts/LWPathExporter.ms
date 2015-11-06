@@ -3,7 +3,7 @@ fileIn "IO.ms"
 global GlobalUp = [0,1,0]
 global yzflip = true
 global MeterScale = 10
-global Version = 0 -- 0: Wii U / 1: PC
+global Version = 1 -- 0: Wii U / 1: PC
 
 offset_array = #()
 fn addOffset f = (
@@ -40,9 +40,8 @@ fn WriteTable f = (
 		offset = ftell f
 		
 		for a = 1 to StringEntries[s].addresses.count do (
-			-- Whyyyy are the offsets Big Endian even when the rest of the file is Little Endian
 			fseek f StringEntries[s].addresses[a] #seek_set
-			WriteLongBE f offset #unsigned
+			WriteLongAgnostic f offset #unsigned
 		)
 		
 		fseek f offset #seek_set
@@ -228,7 +227,7 @@ if (path_file != undefined) do (
 	WriteLongAgnostic f 0x200 #unsigned
 	WriteLongAgnostic f PathCount #unsigned
 	append offsets (ftell f)
-	WriteLongBE f 0x10 #unsigned
+	WriteLongAgnostic f 0x10 #unsigned
 	
 	-- Path headers - first pass, enter junk. We'll write this later. The only thing we'll do now is add strings/offsets.
 	for iPath = 1 to PathCount do (
@@ -462,24 +461,24 @@ if (path_file != undefined) do (
 		
 		-- Path Header
 		--format "Writing path header % at 0x%\n" iPath (bit.intashex (ftell f))
-		WriteLongBE f 0 #unsigned -- This is the name offset; will be filled in by the WriteTable() call later
+		WriteLongAgnostic f 0 #unsigned -- This is the name offset; will be filled in by the WriteTable() call later
 		WriteByte f 0x1 #unsigned -- Unknown value, always 0x1
 		WriteByte f 0x0 #unsigned -- Unknown value, always 0x0
 		WriteShortAgnostic f p.Knots.count #unsigned
 		WriteFloatAgnostic f PathLength
-		WriteLongBE f BoolsOffset #unsigned
-		WriteLongBE f DistOffset #unsigned
-		WriteLongBE f KnotsOffset #unsigned
-		WriteLongBE f UpVecsOffset #unsigned
-		WriteLongBE f ForwardVecsOffset #unsigned
+		WriteLongAgnostic f BoolsOffset #unsigned
+		WriteLongAgnostic f DistOffset #unsigned
+		WriteLongAgnostic f KnotsOffset #unsigned
+		WriteLongAgnostic f UpVecsOffset #unsigned
+		WriteLongAgnostic f ForwardVecsOffset #unsigned
 		WriteLongAgnostic f p.DoubleKnots.count #unsigned
-		WriteLongBE f DoubleSplineOffset #unsigned
+		WriteLongAgnostic f DoubleSplineOffset #unsigned
 		WritePoint3 f p.BBMin
 		WritePoint3 f p.BBMax
 		WriteLongAgnostic f MetaCount #unsigned
-		WriteLongBE f MetaOffset #unsigned
+		WriteLongAgnostic f MetaOffset #unsigned
 		WriteLongAgnostic f 0 #unsigned -- Unknown value, always 0
-		WriteLongBE f KDTreeOffset #unsigned
+		WriteLongAgnostic f KDTreeOffset #unsigned
 		
 		fseek f PathDataEnd #seek_set
 	)
@@ -490,8 +489,8 @@ if (path_file != undefined) do (
 	WriteLongBE f 0x4D455441 #unsigned -- "META"
 	WriteLongBE f 0x44415441 #unsigned -- "DATA"
 	
-	WriteLongBE f offsets.count #unsigned
-	for o = 1 to offsets.count do WriteLongBE f offsets[o] #unsigned
+	WriteLongAgnostic f offsets.count #unsigned
+	for o = 1 to offsets.count do WriteLongAgnostic f offsets[o] #unsigned
 	
 	WriteTable f
 	

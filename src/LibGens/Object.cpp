@@ -1348,19 +1348,19 @@ namespace LibGens {
 		ObjectElementUint32 *Unknown2 = (ObjectElementUint32*) getElement("Unknown2");
 		ObjectElementFloat *Unknown3 = (ObjectElementFloat*) getElement("Unknown3");
 		
-		file->readInt16BE(&Unknown1->value);
-		unsigned short _id;
-		file->readInt16BE(&_id);
-		id = (int) _id;
+		unsigned int temp;
+		file->readInt32E(&temp);
+		Unknown1->value = (temp >> 16) & 0xFFFF;
+		id = (int) temp & 0xFFFF;
 
-		file->readInt32BE((unsigned int*) &Unknown2->value);
+		file->readInt32E((unsigned int*) &Unknown2->value);
 		file->moveAddress(4);
-		file->readFloat32BE(&Unknown3->value);
-		file->readFloat32BE(&RangeIn->value);
-		file->readFloat32BE(&RangeOut->value);
-		file->readInt32BE(&Parent->value);
-		file->readInt32BEA(&nodeTransformOffset);
-		file->readInt32BE(&transformCount);
+		file->readFloat32E(&Unknown3->value);
+		file->readFloat32E(&RangeIn->value);
+		file->readFloat32E(&RangeOut->value);
+		file->readInt32E(&Parent->value);
+		file->readInt32EA(&nodeTransformOffset);
+		file->readInt32E(&transformCount);
 		file->moveAddress(0xC);
 
 		// Objects with parents use a local offset relative to the parent instead of the normal global position
@@ -1410,15 +1410,15 @@ namespace LibGens {
 				{
 				file->fixPaddingRead(4);
 				ObjectElementFloat *float_cast = static_cast<ObjectElementFloat*>(elem);
-				file->readFloat32BE(&float_cast->value);
+				file->readFloat32E(&float_cast->value);
 				break;
 				}
 
 			case OBJECT_ELEMENT_STRING:
 				{
 				unsigned int offset, unknown;
-				file->readInt32BEA(&offset);
-				file->readInt32BE(&unknown);
+				file->readInt32EA(&offset);
+				file->readInt32E(&unknown);
 
 				if (offset != file->getRootNodeAddress()) {
 					ObjectElementString *string_cast = static_cast<ObjectElementString*>(elem);
@@ -1449,7 +1449,7 @@ namespace LibGens {
 				// There's only one uint16 property, and no sint16 ones, and it's already 4-byte-aligned
 				// so there's no way to check if this type needs padding (and no reason to)
 				ObjectElementUint16 *uint16_cast = static_cast<ObjectElementUint16*>(elem);
-				file->readInt16BE(&uint16_cast->value);
+				file->readInt16E(&uint16_cast->value);
 				break;
 				}
 
@@ -1459,7 +1459,7 @@ namespace LibGens {
 				{
 				file->fixPaddingRead(4);
 				ObjectElementInteger *int_cast = static_cast<ObjectElementInteger*>(elem);
-				file->readInt32BE(&int_cast->value);
+				file->readInt32E(&int_cast->value);
 				break;
 				}
 
@@ -1472,7 +1472,7 @@ namespace LibGens {
 				if (elem->getType() == OBJECT_ELEMENT_POSITION) vector_cast->value = vector_cast->value / 10.f;
 				
 				unsigned int unknown;
-				file->readInt32BE(&unknown);
+				file->readInt32E(&unknown);
 
 				if (unknown != 0)
 				{
@@ -1487,9 +1487,9 @@ namespace LibGens {
 				{
 				file->fixPaddingRead(4);
 				unsigned int offset = 0, count = 0, unknown = 0;
-				file->readInt32BEA(&offset);
-				file->readInt32BE(&count);
-				file->readInt32BE(&unknown);
+				file->readInt32EA(&offset);
+				file->readInt32E(&count);
+				file->readInt32E(&unknown);
 				ObjectElementUint32Array *array_cast = static_cast<ObjectElementUint32Array*>(elem);
 				array_cast->value.resize(count);
 
@@ -1498,7 +1498,7 @@ namespace LibGens {
 					file->goToAddress(offset);
 
 					for (int a = 0; a < count; a++)
-						file->readInt32BE(&array_cast->value[a]);
+						file->readInt32E(&array_cast->value[a]);
 
 					file->goToAddress(curAddr);
 				}
@@ -1515,7 +1515,7 @@ namespace LibGens {
 	void Object::writeORC(File *file, vector<unsigned int>& offset_vector) {
 		orc_offset = file->getCurrentAddress();
 
-		int zero = 0;
+		unsigned int zero = 0;
 		ObjectElementFloat *range_in_element  = (ObjectElementFloat*) getElement("RangeIn");
 		ObjectElementFloat *range_out_element = (ObjectElementFloat*) getElement("RangeOut");
 		ObjectElementTarget *parent_element = (ObjectElementTarget*) getElement("Parent");
@@ -1529,20 +1529,20 @@ namespace LibGens {
 		unsigned int unknown2 = unknown2_element->value;
 		float unknown3 = unknown3_element->value;
 
-		int num_nodes = getMultiSetParam()->getSize() + 1;
+		unsigned int num_nodes = getMultiSetParam()->getSize() + 1;
 		unsigned short id16 = (unsigned short) id;
+		unsigned int temp = id | (unknown1 << 16);
 
-		file->writeInt16BE(&unknown1); // unknown value that precedes ID
-		file->writeInt16BE(&id16);
-		file->writeInt32BE(&unknown2); // unknown value - no clue what it is
-		file->writeInt32BE(&zero); // unknown value - always 0
-		file->writeFloat32BE(&unknown3); // unknown float
-		file->writeFloat32BE(&range_in);
-		file->writeFloat32BE(&range_out);
-		file->writeInt32BE(&parent); // unknown value - usually 0
+		file->writeInt32E(&temp); // unknown value that precedes ID
+		file->writeInt32E(&unknown2); // unknown value - no clue what it is
+		file->writeInt32E(&zero); // unknown value - always 0
+		file->writeFloat32E(&unknown3); // unknown float
+		file->writeFloat32E(&range_in);
+		file->writeFloat32E(&range_out);
+		file->writeInt32E(&parent); // unknown value - usually 0
 		offset_vector.push_back(file->getCurrentAddress());
 		file->writeNull(4); // filler for units offset
-		file->writeInt32BE(&num_nodes);
+		file->writeInt32E(&num_nodes);
 		file->writeNull(0xC); // padding to 16 bytes
 
 		GensStringTable strings;
@@ -1568,7 +1568,7 @@ namespace LibGens {
 				{
 				file->fixPadding(4);
 				ObjectElementFloat *float_cast =static_cast<ObjectElementFloat*>(elem);
-				file->writeFloat32BE(&float_cast->value);
+				file->writeFloat32E(&float_cast->value);
 				break;
 				}
 
@@ -1605,7 +1605,7 @@ namespace LibGens {
 				{
 				file->fixPadding(2);
 				ObjectElementUint16 *uint16_cast = static_cast<ObjectElementUint16*>(elem);
-				file->writeInt16BE(&uint16_cast->value);
+				file->writeInt16E(&uint16_cast->value);
 				break;
 				}
 
@@ -1615,7 +1615,7 @@ namespace LibGens {
 				{
 				file->fixPadding(4);
 				ObjectElementInteger *int_cast = static_cast<ObjectElementInteger*>(elem);
-				file->writeInt32BE(&int_cast->value);
+				file->writeInt32E(&int_cast->value);
 				break;
 				}
 
@@ -1662,12 +1662,12 @@ namespace LibGens {
 			unsigned int num = array_p->elem->value.size();
 
 			file->goToAddress(array_p->offset);
-			file->writeInt32BEA(&cur);
-			file->writeInt32BE(&num);
+			file->writeInt32EA(&cur);
+			file->writeInt32E(&num);
 			file->goToAddress(cur);
 
 			for (int i = 0; i < num; i++)
-				file->writeInt32BE(&array_p->elem->value[i]);
+				file->writeInt32E(&array_p->elem->value[i]);
 		}
 	}
 
@@ -1675,7 +1675,7 @@ namespace LibGens {
 		unsigned int units_start = file->getCurrentAddress();
 		file->goToAddress(orc_offset);
 		file->moveAddress(0x1C);
-		file->writeInt32BEA(&units_start);
+		file->writeInt32EA(&units_start);
 		file->goToAddress(units_start);
 		
 		int num_nodes = multi_set_param.getSize() + 1;

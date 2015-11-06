@@ -112,7 +112,7 @@ void EditorApplication::openLostWorldLevel(string filename) {
 	EditorLevel *lost_world_level = new EditorLevel(folder, slot_name, slot_name, "", LIBGENS_LEVEL_GAME_STRING_LOST_WORLD);
 	current_level = lost_world_level;
 	current_level_filename = filename;
-
+	
 	lost_world_level->unpackResources();
 	lost_world_level->unpackData();
 

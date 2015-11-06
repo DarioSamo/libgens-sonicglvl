@@ -85,7 +85,7 @@ namespace LibGens {
 					if ((*it).getData() == VECTOR3_360) tangent.readNormal360(file);
 					break;
 				case RGBA :
-					if ((*it).getData() == VECTOR4) color.read(file, true);
+					if ((*it).getData() == VECTOR4) color.read(file);
 					if ((*it).getData() == VECTOR4_CHAR) color.readABGR8(file);
 					break;
 			}
@@ -131,7 +131,7 @@ namespace LibGens {
 					if ((*it).getData() == VECTOR3) tangent.write(file);
 					break;
 				case RGBA :
-					if ((*it).getData() == VECTOR4) color.write(file, true);
+					if ((*it).getData() == VECTOR4) color.write(file);
 					break;
 			}
 		}

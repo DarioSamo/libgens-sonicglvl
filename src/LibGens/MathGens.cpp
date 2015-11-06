@@ -354,53 +354,40 @@ namespace LibGens {
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
 
-	void Vector2::read(File *file, bool big_endian) {
-		file->readFloat32E(&x, big_endian);
-		file->readFloat32E(&y, big_endian);
+	void Vector2::read(File *file) {
+		file->readFloat32E(&x);
+		file->readFloat32E(&y);
 	}
 
-	void Vector2::readHalf(File *file, bool big_endian) {
-		file->readFloat16E(&x, big_endian);
-		file->readFloat16E(&y, big_endian);
+	void Vector2::readHalf(File *file) {
+		file->readFloat16E(&x);
+		file->readFloat16E(&y);
 	}
 
-	void Vector2::write(File *file, bool big_endian) {
-		if (big_endian) {
-			file->writeFloat32BE(&x);
-			file->writeFloat32BE(&y);
-		}
-		else {
-			file->writeFloat32(&x);
-			file->writeFloat32(&y);
-		}
+	void Vector2::write(File *file) {
+		file->writeFloat32E(&x);
+		file->writeFloat32E(&y);
 	}
 
-	void Vector3::read(File *file, bool big_endian) {
-		file->readFloat32E(&x, big_endian);
-		file->readFloat32E(&y, big_endian);
-		file->readFloat32E(&z, big_endian);
+	void Vector3::read(File *file) {
+		file->readFloat32E(&x);
+		file->readFloat32E(&y);
+		file->readFloat32E(&z);
 	}
 
-	void Vector3::readNormal360(File *file, bool big_endian) {
+	void Vector3::readNormal360(File *file) {
 		unsigned int value=0;
-		file->readInt32E(&value, big_endian);
+		file->readInt32E(&value);
 
 		x = ((value&0x00000400 ? -1 : 0) + (float)((value>>2)&0x0FF)  / 256.0f);
 		y = ((value&0x00200000 ? -1 : 0) + (float)((value>>13)&0x0FF) / 256.0f);
 		z = ((value&0x80000000 ? -1 : 0) + (float)((value>>23)&0x0FF) / 256.0f);
 	}
 
-	void Vector3::write(File *file, bool big_endian) {
-		if (big_endian) {
-			file->writeFloat32BE(&x);
-			file->writeFloat32BE(&y);
-			file->writeFloat32BE(&z);
-		}
-		else {
-			file->writeFloat32(&x);
-			file->writeFloat32(&y);
-			file->writeFloat32(&z);
-		}
+	void Vector3::write(File *file) {
+		file->writeFloat32E(&x);
+		file->writeFloat32E(&y);
+		file->writeFloat32E(&z);
 	}
 
 	void Vector3::readXML(TiXmlElement *root) {
@@ -442,34 +429,18 @@ namespace LibGens {
 	}
 
 
-	void Color::read(File *file, bool big_endian) {
-		if (big_endian) {
-			file->readFloat32BE(&r);
-			file->readFloat32BE(&g);
-			file->readFloat32BE(&b);
-			file->readFloat32BE(&a);
-		}
-		else {
-			file->readFloat32(&r);
-			file->readFloat32(&g);
-			file->readFloat32(&b);
-			file->readFloat32(&a);
-		}
+	void Color::read(File *file) {
+		file->readFloat32E(&r);
+		file->readFloat32E(&g);
+		file->readFloat32E(&b);
+		file->readFloat32E(&a);
 	}
 
-	void Color::write(File *file, bool big_endian) {
-		if (big_endian) {
-			file->writeFloat32BE(&r);
-			file->writeFloat32BE(&g);
-			file->writeFloat32BE(&b);
-			file->writeFloat32BE(&a);
-		}
-		else {
-			file->writeFloat32(&r);
-			file->writeFloat32(&g);
-			file->writeFloat32(&b);
-			file->writeFloat32(&a);
-		}
+	void Color::write(File *file) {
+		file->writeFloat32E(&r);
+		file->writeFloat32E(&g);
+		file->writeFloat32E(&b);
+		file->writeFloat32E(&a);
 	}
 
 	void Color::readARGB8(File *file) {
