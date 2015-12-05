@@ -407,7 +407,7 @@ if (path_file != undefined) do (
 		if (type == 2) then (
 			append offsets (ftell f)
 			AddString f "grind_speed"
-			WriteLongAgnostic f 0
+			WriteLongAgnostic f 0 #unsigned
 			
 			if (p.Type == "GR") then WriteLongAgnostic f 0 #unsigned -- Default to regular
 			else if (p.Type == "GR_spd1") then WriteLongAgnostic f 1 #unsigned -- Slow
