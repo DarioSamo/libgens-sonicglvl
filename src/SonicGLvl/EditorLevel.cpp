@@ -694,10 +694,7 @@ void EditorLevel::saveData(string filename) {
 			lwset->saveORC(level, (lost_world_version == 1));
 
 			string orc_name = LibGens::File::nameFromFilename(lwset->getFilename());
-			char copy_dst[100];
-			memset(copy_dst, 0, 100);
-			sprintf(copy_dst, "%s/../set/%s", filename.c_str(), orc_name.c_str());
-			CopyFile(lwset->getFilename().c_str(), &copy_dst[0], false);
+			CopyFile(lwset->getFilename().c_str(), (filename + "/../set/" + orc_name).c_str(), false);
 		}
 	}
 
