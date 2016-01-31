@@ -203,7 +203,8 @@ namespace LibGens {
 		if (name == LIBGENS_PAC_EXTENSION_PAC_PHY_HKX_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_LUA_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_MATERIAL_FULL) return true;
-		if (name == LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_TERRAIN_MODEL_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_DEPEND_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_FXCOL_FULL) return false;
@@ -216,6 +217,7 @@ namespace LibGens {
 		if (name == LIBGENS_PAC_EXTENSION_PAC_MODEL_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_SKL_HKX_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_DDS_FULL) return true;
+		if (name == LIBGENS_PAC_EXTENSION_PAC_SVCOL_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_SWIF_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_PATH2_FULL) return false;
@@ -568,7 +570,8 @@ namespace LibGens {
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_PHY_HKX);
 		getExtension(LIBGENS_PAC_EXTENSION_LUA);
 		getExtension(LIBGENS_PAC_EXTENSION_MATERIAL);
-		getExtension(LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO);
+		getExtension(LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO);
+		getExtension(LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO);
 		getExtension(LIBGENS_PAC_EXTENSION_TERRAIN_MODEL);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_DEPEND);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_FXCOL);
@@ -582,6 +585,7 @@ namespace LibGens {
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_SKL_HKX);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_SWIF);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_DDS);
+		getExtension(LIBGENS_PAC_EXTENSION_PAC_SVCOL);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_PATH2);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL);
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_PIXELSHADER);
@@ -630,8 +634,11 @@ namespace LibGens {
 		else if (ext == LIBGENS_PAC_EXTENSION_MATERIAL) {
 			return LIBGENS_PAC_EXTENSION_MATERIAL_FULL;
 		}
-		else if (ext == LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO) {
-			return LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO_FULL;
+		else if (ext == LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO) {
+			return LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO) {
+			return LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO_FULL;
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_TERRAIN_MODEL) {
 			return LIBGENS_PAC_EXTENSION_TERRAIN_MODEL_FULL;
@@ -668,6 +675,9 @@ namespace LibGens {
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_PAC_DDS) {
 			return LIBGENS_PAC_EXTENSION_PAC_DDS_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_PAC_SVCOL) {
+			return LIBGENS_PAC_EXTENSION_PAC_SVCOL_FULL;
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL) {
 			return LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL_FULL;
@@ -724,6 +734,10 @@ namespace LibGens {
 				if (pac_file) {
 					pac_extension->addFile(pac_file);
 				}
+			}
+			else {
+				printf("Can't process %s\n", filename.c_str());
+				getchar();
 			}
 		}
 	}
@@ -1177,7 +1191,7 @@ namespace LibGens {
 				size_t next_file_size = 0;
 
 				while (true) {
-					if (!current_split_pack || (current_split_pack->getInternalSize() > LIBGENS_PAC_SPLIT_BYTES_LIMIT+next_file_size)) {
+					if (!current_split_pack || (current_split_pack->getInternalSize() > (LIBGENS_PAC_SPLIT_BYTES_LIMIT - next_file_size))) {
 						current_split_pack = new PacPack();
 						current_split_pack->createExtensions();
 						packs.push_back(current_split_pack);

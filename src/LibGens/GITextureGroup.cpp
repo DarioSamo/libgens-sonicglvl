@@ -105,6 +105,10 @@ namespace LibGens {
 		subtextures.push_back(v);
 	}
 
+	list<GISubtexture *> GITexture::getSubtextures() {
+		return subtextures;
+	}
+
 	string GITexture::getFilename() {
 		return folder + "/" + texture_name + LIBGENS_TEXTURE_FILE_EXTENSION;
 	}

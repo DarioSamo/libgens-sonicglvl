@@ -38,8 +38,10 @@
 #define LIBGENS_PAC_EXTENSION_PAC_LUA_FULL             "lua:ResLuaData"
 #define LIBGENS_PAC_EXTENSION_MATERIAL                 "material"
 #define LIBGENS_PAC_EXTENSION_MATERIAL_FULL            "material:ResMirageMaterial"
-#define LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO      "terrain-instanceinfo"
-#define LIBGENS_PAC_EXTENSION_TERAIN_INSTANCEINFO_FULL "terrain-instanceinfo:ResMirageTerrainInstanceInfo"
+#define LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO      "terrain-instanceinfo"
+#define LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO_FULL "terrain-instanceinfo:ResMirageTerrainInstanceInfo"
+#define LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO       "model-instanceinfo"
+#define LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO_FULL  "model-instanceinfo:ResModelInstanceInfo"
 #define LIBGENS_PAC_EXTENSION_TERRAIN_MODEL     	   "terrain-model"
 #define LIBGENS_PAC_EXTENSION_TERRAIN_MODEL_FULL	   "terrain-model:ResMirageTerrainModel"
 #define LIBGENS_PAC_EXTENSION_PAC_DEPEND               "pac.d"
@@ -64,6 +66,8 @@
 #define LIBGENS_PAC_EXTENSION_PAC_SKL_HKX_FULL         "skl.hkx:ResSkeleton"
 #define LIBGENS_PAC_EXTENSION_PAC_DDS                  "dds"
 #define LIBGENS_PAC_EXTENSION_PAC_DDS_FULL             "dds:ResTexture"
+#define LIBGENS_PAC_EXTENSION_PAC_SVCOL                "svcol.bin"
+#define LIBGENS_PAC_EXTENSION_PAC_SVCOL_FULL           "svcol.bin:ResSvCol"
 #define LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL         "shadow-model"
 #define LIBGENS_PAC_EXTENSION_PAC_SHADOW_MODEL_FULL    "shadow-model:ResShadowModel"
 #define LIBGENS_PAC_EXTENSION_PAC_SWIF                 "swif"
@@ -89,7 +93,7 @@
 #define LIBGENS_PAC_EXTENSION_PAC_XTB2DATA	                 "xtb2"
 #define LIBGENS_PAC_EXTENSION_PAC_XTB2DATA_FULL		         "xtb2:ResXTB2Data"
 
-#define LIBGENS_PAC_SPLIT_BYTES_LIMIT                  0x999999
+#define LIBGENS_PAC_SPLIT_BYTES_LIMIT                  0xA00000
 
 namespace LibGens {
 	class GensStringTable;

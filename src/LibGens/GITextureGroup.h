@@ -76,6 +76,7 @@ namespace LibGens {
 			string getName();
 			void setName(string v);
 			void addSubtexture(GISubtexture *v);
+			list<GISubtexture *> getSubtextures();
 			string getFilename();
 			~GITexture();
 	};
