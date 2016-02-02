@@ -29,6 +29,25 @@ namespace LibGens {
 		extra="";
 	}
 
+	Submesh::Submesh(Submesh *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom) {
+		size_t vertex_sz = clone->vertices.size();
+		for (size_t v=0; v<vertex_sz; v++) {
+			 Vertex *vertex = new Vertex(clone->vertices[v], transform, uv2_left, uv2_right, uv2_top, uv2_bottom);
+			 vertex->setParent(this);
+			 vertices.push_back(vertex);
+		}
+
+		faces = clone->faces;
+		faces_vectors = clone->faces_vectors;
+		bone_table = clone->bone_table;
+		texture_units = clone->texture_units;
+		texture_ids = clone->texture_ids;
+		material_name = clone->material_name;
+		vertex_format = new VertexFormat(clone->vertex_format);
+		mesh_slot = clone->mesh_slot;
+		buildAABB();
+	}
+
 	Submesh::~Submesh() {
 		for (vector<Vertex *>::iterator it=vertices.begin(); it!=vertices.end(); it++) {
 			delete (*it);

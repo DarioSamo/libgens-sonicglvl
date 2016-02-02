@@ -37,6 +37,18 @@ namespace LibGens {
 			submeshes[slot].clear();
 		}
 	}
+
+	Mesh::Mesh(Mesh *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom) {
+		for (int slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
+			for (int i = 0; i < clone->submeshes[slot].size(); i++) {
+				Submesh *submesh = new Submesh(clone->submeshes[slot][i], transform, uv2_left, uv2_right, uv2_top, uv2_bottom);
+				submeshes[slot].push_back(submesh);
+			}
+		}
+
+		water_slot_string = clone->water_slot_string;
+		buildAABB();
+	}
 	
 	void Mesh::read(File *file) {
 		size_t header_address=file->getCurrentAddress();

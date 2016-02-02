@@ -22,7 +22,7 @@
 #define LIBGENS_BONE_AFFECT_LIMIT            4
 #define LIBGENS_MAX_VERTEX_FORMAT_ENTRIES    256
 
-#define LIBGENS_VERTEX_FORMAT_PC             0
+#define LIBGENS_VERTEX_FORMAT_PC             1
 
 namespace LibGens {
 	// Model Vertex Declaration
@@ -30,6 +30,8 @@ namespace LibGens {
 	class VertexFormat;
 
 	class Vertex {
+		friend class Vertex;
+
 		protected:
 			Vector3 position;
 			Vector3 normal;
@@ -42,6 +44,7 @@ namespace LibGens {
 			Submesh *parent;
 		public:
 			Vertex();
+			Vertex(Vertex *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
 			void setParent(Submesh *v);
 			Submesh *getParent();
 			bool operator == (const Vertex& vertex);

@@ -34,6 +34,31 @@ namespace LibGens {
 		color=Color();
 	}
 
+	Vertex::Vertex(Vertex *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom) {
+		Vector3 pos, sca;
+		Quaternion ori;
+		transform.decomposition(pos, sca, ori);
+
+		position = transform * clone->position;
+		normal = ori * clone->normal;
+		tangent = ori * clone->tangent;
+		binormal = ori * clone->binormal;
+		normal.normalise();
+		tangent.normalise();
+		binormal.normalise();
+		color = clone->color;
+		for (int i=0; i<4; i++) {
+			uv[i] = clone->uv[i];
+			bone_indices[i] = clone->bone_indices[i];
+			bone_weights[i] = clone->bone_weights[i];
+		}
+
+		uv[1].x = uv2_left + uv[1].x * (uv2_right - uv2_left);
+		uv[1].y = uv2_top + uv[1].y * (uv2_bottom - uv2_top);
+
+		parent = NULL;
+	}
+
 	void Vertex::read(File *file, VertexFormat *vformat) {
 		size_t header_address=file->getCurrentAddress();
 

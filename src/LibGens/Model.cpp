@@ -478,6 +478,20 @@ namespace LibGens {
 		}
 	}
 
+	void Model::mergeModel(Model *model, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom) {
+		vector<Mesh *> merge_meshes = model->getMeshes();
+		for (std::vector<Mesh *>::iterator it=merge_meshes.begin(); it!=merge_meshes.end(); it++) {
+			cloneMesh(*it, transform, uv2_left, uv2_right, uv2_top, uv2_bottom);
+		}
+
+		buildAABB();
+	}
+
+	void Model::cloneMesh(Mesh *mesh, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom) {
+		Mesh *clone_mesh = new Mesh(mesh, transform, uv2_left, uv2_right, uv2_top, uv2_bottom);
+		meshes.push_back(clone_mesh);
+	}
+
 	Model::~Model() {
 		for (vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
 			delete (*it);

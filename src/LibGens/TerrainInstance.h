@@ -121,6 +121,10 @@ namespace LibGens {
 				return model;
 			}
 
+			string getModelName() {
+				return model_name;
+			}
+
 			string getFilename() {
 				return filename;
 			}

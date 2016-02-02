@@ -93,6 +93,11 @@ namespace LibGens {
 		}
 	}
 
+	VertexFormat::VertexFormat(VertexFormat *clone) {
+		elements = clone->elements;
+		size = clone->size;
+	}
+
 	void VertexFormat::addElement(VertexFormatElement vfe) {
 		elements.push_back(vfe);
 	}

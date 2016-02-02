@@ -63,11 +63,14 @@ namespace LibGens {
 	};
 
 	class VertexFormat {
+		friend class VertexFormat;
+
 		protected:
 			list<VertexFormatElement> elements;
 			unsigned int size;
 		public:
 			VertexFormat();
+			VertexFormat(VertexFormat *clone);
 			VertexFormat(unsigned int type);
 			void addElement(VertexFormatElement vfe);
 			list<VertexFormatElement> getElements();

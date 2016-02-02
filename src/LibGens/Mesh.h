@@ -28,6 +28,8 @@ namespace LibGens {
 	class VRMapSample;
 
 	class Mesh {
+		friend class Mesh;
+
 		protected:
 			vector<Submesh *> submeshes[LIBGENS_MODEL_SUBMESH_SLOTS];
 			AABB aabb;
@@ -35,6 +37,7 @@ namespace LibGens {
 			string water_slot_string;
 		public:
 			Mesh();
+			Mesh(Mesh *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
 			~Mesh();
 
 			void write(File *file, bool unleashed2_mode=false);

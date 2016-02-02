@@ -32,6 +32,8 @@ namespace LibGens {
 	class VRMapSample;
 
 	class Submesh {
+		friend class Submesh;
+
 		protected:
 			vector<Vertex *> vertices;
 			vector<unsigned short> faces;
@@ -47,6 +49,8 @@ namespace LibGens {
 			vector<Vector3> points;
 		public:
 			Submesh();
+			Submesh(Submesh *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
+
 			void write(File *file);
 			void read(File *file);
 			list<Vertex *> getVertexList();
