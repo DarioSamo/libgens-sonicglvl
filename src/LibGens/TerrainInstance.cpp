@@ -22,6 +22,12 @@
 #include "Vertex.h"
 
 namespace LibGens {
+	TerrainInstance::TerrainInstance() {
+		name = "";
+		model = NULL;
+		filename = "";
+	}
+
 	TerrainInstance::TerrainInstance(string name_p, Model *model_p, Matrix4 matrix_p) {
 		name = name_p;
 		model = model_p;

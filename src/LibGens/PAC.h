@@ -160,6 +160,7 @@ namespace LibGens {
 			bool isEmpty();
 			bool isSpecialExtension();
 			void hashInput(SHA1Context &sha1_context);
+			list<string> getFileList();
 	};
 
 	class PacProxyEntry {
@@ -204,6 +205,7 @@ namespace LibGens {
 			void setName(string v);
 			string getName();
 			size_t getInternalSize();
+			list<string> getFileList();
 			void hashInput(SHA1Context &sha1_context);
 	};
 
@@ -223,6 +225,7 @@ namespace LibGens {
 			void save(string filename);
 			void openDependFile(PacFile *file);
 			void extract(string target_folder, bool convert_textures=false, void (*callback)(string)=NULL);
+			list<string> getFileList();
 			int getSHA1Hash(int i);
 	};
 };

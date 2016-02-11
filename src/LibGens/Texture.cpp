@@ -29,6 +29,18 @@ namespace LibGens {
 		name = name_p;
 	}
 
+	void Texture::setName(string v) {
+		name = v;
+	}
+
+	void Texture::setUnit(string v) {
+		unit = v;
+	}
+
+	void Texture::setInternalName(string v) {
+		internal_name = v;
+	}
+
 	string Texture::getName() {
 		return name;
 	}

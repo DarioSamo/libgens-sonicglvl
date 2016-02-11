@@ -269,6 +269,10 @@ namespace LibGens {
 		return (extra.size() > 0);
 	}
 
+	void Mesh::setWaterSlotString(string v) {
+		water_slot_string=v;
+	}
+
 	std::vector<Submesh *> Mesh::getSubmeshes() {
 		std::vector<Submesh *> ret;
 
@@ -279,6 +283,10 @@ namespace LibGens {
 		}
 
 		return ret;
+	}
+
+	std::vector<Submesh *> Mesh::getSubmeshes(size_t slot) {
+		return submeshes[slot];
 	}
 
 	std::vector<Submesh *> *Mesh::getSubmeshSlots() {
@@ -338,6 +346,16 @@ namespace LibGens {
 		}
 	}
 
+	void Mesh::removeSubmesh(Submesh *submesh, size_t slot) {
+		if (slot < LIBGENS_MODEL_SUBMESH_SLOTS) {
+			for (std::vector<Submesh *>::iterator it=submeshes[slot].begin(); it!=submeshes[slot].end(); it++) {
+				if (*it == submesh) {
+					submeshes[slot].erase(it);
+					break;
+				}
+			}
+		}
+	}
 	
 	list<string> Mesh::getMaterialNames() {
 		list<string> material_names;

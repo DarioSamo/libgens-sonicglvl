@@ -789,5 +789,15 @@ namespace LibGens {
 				end.y   += v;
 				end.z   += v;
 			}
+
+			void transform(Matrix4 mat) {
+				Vector3 corners[8];
+				for (int c = 0; c < 8; c++)
+					corners[c] = mat * corner(c);
+
+				reset();
+				for (int c = 0; c < 8; c++)
+					addPoint(corners[c]);
+			}
 	};
 };

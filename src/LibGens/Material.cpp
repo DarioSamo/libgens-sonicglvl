@@ -26,8 +26,10 @@ namespace LibGens {
 		shader = "Common_d";
 		sub_shader = "Common_d";
 		no_culling = false;
+		color_blend = false;
 		extra="";
 		gi_extra="";
+		material_flag = 0x80;
 	}
 
 	Material::Material(string filename) {
@@ -50,6 +52,7 @@ namespace LibGens {
 		extra="";
 		gi_extra="";
 		no_culling = false;
+		color_blend = false;
 		material_flag = 0x80;
 
 		if (file.valid()) {
@@ -275,12 +278,20 @@ namespace LibGens {
 		return textures;
 	}
 
+	int Material::getTextureUnitsSize() {
+		return textures.size();
+	}
+
 	void Material::addTextureUnit(Texture *texture) {
 		textures.push_back(texture);
 	}
 
 	void Material::addParameter(Parameter *parameter) {
 		parameters.push_back(parameter);
+	}
+
+	void Material::setName(string v) {
+		name = v;
 	}
 
 	string Material::getName() {
@@ -321,5 +332,13 @@ namespace LibGens {
 
 	bool Material::hasColorBlend() {
 		return color_blend;
+	}
+
+	void Material::setNoCulling(bool v) {
+		no_culling = v;
+	}
+
+	void Material::setColorBlend(bool v) {
+		color_blend = v;
 	}
 };

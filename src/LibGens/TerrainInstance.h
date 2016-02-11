@@ -96,6 +96,7 @@ namespace LibGens {
 			list<VRMapSample *> samples;
 			vector<vector<vector<vector<VRMapSample *> > > > grid;
 		public:
+			TerrainInstance();
 			TerrainInstance(string name_p, Model *model_p, Matrix4 matrix_p);
 			TerrainInstance(string filename_p, string nm="", vector<Model *> *models=NULL);
 			TerrainInstance(File *file, vector<Model *> *models);
@@ -105,6 +106,15 @@ namespace LibGens {
 			void write(File *file);
 
 			list<Vertex *> getVertexList();
+
+			void setAABB(AABB v) {
+				aabb = v;
+			}
+
+			void setMatrix(Matrix4 v) {
+				matrix = v;
+			}
+
 			Matrix4 getMatrix() {
 				return matrix;
 			}
@@ -113,12 +123,20 @@ namespace LibGens {
 				return aabb;
 			}
 
+			void setName(string v) {
+				name = v;
+			}
+
 			string getName() {
 				return name;
 			}
 
 			Model *getModel() {
 				return model;
+			}
+
+			void setModelName(string v) {
+				model_name = v;
 			}
 
 			string getModelName() {

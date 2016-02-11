@@ -827,7 +827,7 @@ void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneMana
 				
 				// Get LibGens Data
 				vector<LibGens::Vertex *> submesh_vertices = submesh->getVertices();
-				vector<LibGens::Vector3> submesh_faces = submesh->getFaces();
+				vector<LibGens::Polygon> submesh_faces = submesh->getFaces();
 
 				// Create Ogre Submesh
 				Ogre::SubMesh* sub = msh->createSubMesh();
@@ -878,9 +878,9 @@ void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneMana
 				unsigned short *faces = (unsigned short *) malloc(sizeof(unsigned short) * ibufCount);
 
 				for (size_t i=0; i<submesh_faces.size(); i++) {
-					faces[i*3]   = submesh_faces[i].x;
-					faces[i*3+1] = submesh_faces[i].y;
-					faces[i*3+2] = submesh_faces[i].z;
+					faces[i*3]   = submesh_faces[i].a;
+					faces[i*3+1] = submesh_faces[i].b;
+					faces[i*3+2] = submesh_faces[i].c;
 				}
 
 				sub->vertexData = new Ogre::VertexData();

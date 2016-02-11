@@ -123,7 +123,7 @@ namespace LibGens {
 	
 		if (add) {
 			vector<Vertex *> new_vertices;
-			vector<Vector3> new_faces;
+			vector<Polygon> new_faces;
 
 			int control_points_count=lMesh->GetControlPointsCount();
 			FbxVector4 *control_points=lMesh->GetControlPoints();
@@ -137,7 +137,7 @@ namespace LibGens {
 
 				int polygon_size=lMesh->GetPolygonSize(lPolygonIndex);
 				if (polygon_size == 3) {
-					Vector3 face;
+					Polygon face;
 
 					for (int j=0; j<polygon_size; j++) {
 						Vertex *vertex=new Vertex();
@@ -189,9 +189,9 @@ namespace LibGens {
 
 						vertex->setColor(Color(vtx_c.mRed, vtx_c.mGreen, vtx_c.mBlue, vtx_c.mAlpha));
 						
-						if (j == 0) face.x=new_vertices.size();
-						if (j == 1) face.y=new_vertices.size();
-						if (j == 2) face.z=new_vertices.size();
+						if (j == 0) face.a=new_vertices.size();
+						if (j == 1) face.b=new_vertices.size();
+						if (j == 2) face.c=new_vertices.size();
 
 						new_vertices.push_back(vertex);
 						vertex_index++;

@@ -30,6 +30,9 @@ namespace LibGens {
 			Texture(string internal_name_p, string unit_p, string name_p);
 			void read(File *file, string id);
 			void write(File *file);
+			void setName(string v);
+			void setUnit(string v);
+			void setInternalName(string v);
 			string getName();
 			string getUnit();
 			string getTexset();

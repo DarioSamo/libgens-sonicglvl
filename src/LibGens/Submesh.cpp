@@ -117,11 +117,11 @@ namespace LibGens {
 				face_2 = face_1;
 				face_1 = t;
 				if (new_strip==0) {
-					Vector3 vect(0, 0, 0);
-					vect = ((new_index%2) == 0 ? Vector3(face_1, face_2, face_3) : Vector3(face_3, face_2, face_1));
+					Polygon poly = {face_1, face_2, face_3};
+					Polygon inv_poly = {face_3, face_2, face_1};
 
 					if ((face_1 != face_2) && (face_2 != face_3) && (face_1 != face_3)) {
-						faces_vectors.push_back(vect);
+						faces_vectors.push_back((new_index % 2) ? inv_poly : poly);
 					}
 					new_strip = 1;
 					new_index++;
@@ -286,15 +286,15 @@ namespace LibGens {
 	list<unsigned int> Submesh::getFaceList() {
 		list<unsigned int> new_faces;
 		for (size_t i=0; i<faces_vectors.size(); i++) {
-			new_faces.push_back((unsigned int) faces_vectors[i].x);
-			new_faces.push_back((unsigned int) faces_vectors[i].y);
-			new_faces.push_back((unsigned int) faces_vectors[i].z);
+			new_faces.push_back((unsigned int) faces_vectors[i].a);
+			new_faces.push_back((unsigned int) faces_vectors[i].b);
+			new_faces.push_back((unsigned int) faces_vectors[i].c);
 		}
 		return new_faces;
 	}
 
 
-	void Submesh::build(vector<Vertex *> vertices_p, vector<Vector3> faces_vectors_p) {
+	void Submesh::build(vector<Vertex *> vertices_p, vector<Polygon> faces_vectors_p) {
 		vertices = vertices_p;
 		faces_vectors = faces_vectors_p;
 
@@ -326,17 +326,17 @@ namespace LibGens {
 		vertices = new_vertices;
 
 		for (size_t i=0; i<faces_vectors.size(); i++) {
-			faces_vectors[i].x = new_face_map[(int)faces_vectors[i].x];
-			faces_vectors[i].y = new_face_map[(int)faces_vectors[i].y];
-			faces_vectors[i].z = new_face_map[(int)faces_vectors[i].z];
+			faces_vectors[i].a = new_face_map[(int)faces_vectors[i].a];
+			faces_vectors[i].b = new_face_map[(int)faces_vectors[i].b];
+			faces_vectors[i].c = new_face_map[(int)faces_vectors[i].c];
 		}
 
 		
 		triangle_stripper::indices tri_indices;
 		for (size_t i=0; i<faces_vectors.size(); i++) {
-			tri_indices.push_back((int)faces_vectors[i].x);
-			tri_indices.push_back((int)faces_vectors[i].y);
-			tri_indices.push_back((int)faces_vectors[i].z);
+			tri_indices.push_back((int)faces_vectors[i].a);
+			tri_indices.push_back((int)faces_vectors[i].b);
+			tri_indices.push_back((int)faces_vectors[i].c);
 		}
 
 		triangle_stripper::tri_stripper stripper(tri_indices);
@@ -370,9 +370,9 @@ namespace LibGens {
 	
 	void Submesh::createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size, float saturation_multiplier, float brightness_offset) {
 		for (size_t i=0; i<faces_vectors.size(); i++) {
-			Vertex *va=vertices[(size_t)faces_vectors[i].x];
-			Vertex *vb=vertices[(size_t)faces_vectors[i].y];
-			Vertex *vc=vertices[(size_t)faces_vectors[i].z];
+			Vertex *va=vertices[(size_t)faces_vectors[i].a];
+			Vertex *vb=vertices[(size_t)faces_vectors[i].b];
+			Vertex *vc=vertices[(size_t)faces_vectors[i].c];
 			Vector3 a=va->getTPosition(matrix);
 			Vector3 b=vb->getTPosition(matrix);
 			Vector3 c=vc->getTPosition(matrix);
@@ -423,8 +423,12 @@ namespace LibGens {
 		return faces;
 	}
 
-	vector<Vector3> Submesh::getFaces() {
+	vector<Polygon> Submesh::getFaces() {
 		return faces_vectors;
+	}
+
+	size_t Submesh::getFacesSize() {
+		return faces_vectors.size();
 	}
 
 	void Submesh::buildAABB() {
@@ -480,5 +484,13 @@ namespace LibGens {
 
 	vector<unsigned char> Submesh::getBoneTable() {
 		return bone_table;
+	}
+
+	void Submesh::addTextureUnit(string v) {
+		texture_units.push_back(v);
+	}
+
+	void Submesh::addTextureID(unsigned int v) {
+		texture_ids.push_back(v);
 	}
 };

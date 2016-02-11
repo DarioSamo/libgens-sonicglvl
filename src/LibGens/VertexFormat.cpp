@@ -91,6 +91,25 @@ namespace LibGens {
 
 			size = 104;
 		}
+		else if (type == LIBGENS_VERTEX_FORMAT_PC_TERRAIN) {
+			VertexFormatElement position(0, VECTOR3, POSITION, 0);
+			VertexFormatElement normal(12, VECTOR3, NORMAL, 0);
+			VertexFormatElement tangent(24, VECTOR3, TANGENT, 0);
+			VertexFormatElement binormal(36, VECTOR3, BINORMAL, 0);
+			VertexFormatElement uv_1(48, VECTOR2, UV, 0);
+			VertexFormatElement uv_2(56, VECTOR2, UV, 1);
+			VertexFormatElement color(64, VECTOR4, RGBA, 0);
+			
+			addElement(position);
+			addElement(normal);
+			addElement(binormal);
+			addElement(tangent);
+			addElement(uv_1);
+			addElement(uv_2);
+			addElement(color);
+
+			size = 80;
+		}
 	}
 
 	VertexFormat::VertexFormat(VertexFormat *clone) {

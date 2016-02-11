@@ -64,8 +64,10 @@ namespace LibGens {
 			Parameter *getParameterByIndex(size_t i);
 			vector<Parameter *> getParameters();
 			vector<Texture *> getTextureUnits();
+			int getTextureUnitsSize();
 			void addTextureUnit(Texture *texture);
 			void addParameter(Parameter *parameter);
+			void setName(string v);
 			string getName();
 			string getFolder();
 			void setExtra(string v);
@@ -74,7 +76,9 @@ namespace LibGens {
 			void setExtraGI(string v);
 			string getExtraGI();
 			bool hasExtraGI();
+			void setNoCulling(bool v);
 			bool hasNoCulling();
+			void setColorBlend(bool v);
 			bool hasColorBlend();
 	};
 };

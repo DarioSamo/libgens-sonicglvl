@@ -48,7 +48,9 @@ namespace LibGens {
 			string getExtra();
 			bool hasExtra();
 			void addSubmesh(Submesh *submesh, size_t slot);
+			void removeSubmesh(Submesh *submesh, size_t slot);
 			std::vector<Submesh *> getSubmeshes();
+			std::vector<Submesh *> getSubmeshes(size_t slot);
 			std::vector<Submesh *> *getSubmeshSlots();
 			list<Vertex *> getVertexList();
 			list<unsigned int> getFaceList();
@@ -56,5 +58,6 @@ namespace LibGens {
 			vector<unsigned int> getMaterialMappings(list<string> &material_names);
 			void fixVertexFormatForPC();
 			void createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
+			void setWaterSlotString(string v);
 	};
 };

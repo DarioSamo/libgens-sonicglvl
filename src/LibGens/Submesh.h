@@ -31,13 +31,17 @@ namespace LibGens {
 	class VertexFormat;
 	class VRMapSample;
 
+	struct Polygon {
+		unsigned int a, b, c;
+	};
+
 	class Submesh {
 		friend class Submesh;
 
 		protected:
 			vector<Vertex *> vertices;
 			vector<unsigned short> faces;
-			vector<Vector3> faces_vectors;
+			vector<Polygon> faces_vectors;
 			vector<unsigned char> bone_table;
 			vector<string> texture_units;
 			vector<unsigned int> texture_ids;
@@ -57,8 +61,9 @@ namespace LibGens {
 			list<unsigned int> getFaceList();
 			vector<Vertex *> getVertices();
 			size_t getVerticesSize();
+			size_t getFacesSize();
 			vector<unsigned short> getFacesIndices();
-			vector<Vector3> getFaces();
+			vector<Polygon> getFaces();
 			void buildAABB();
 			AABB getAABB();
 			void setExtra(string v);
@@ -73,8 +78,10 @@ namespace LibGens {
 			void addBone(unsigned char bone);
 			unsigned char getBone(unsigned int index);
 			vector<unsigned char> getBoneTable();
-			void build(vector<Vertex *> vertices_p, vector<Vector3> faces_vectors_p);
+			void build(vector<Vertex *> vertices_p, vector<Polygon> faces_vectors_p);
 			void fixVertexFormatForPC();
+			void addTextureUnit(string v);
+			void addTextureID(unsigned int v);
 			~Submesh();
 	};
 };

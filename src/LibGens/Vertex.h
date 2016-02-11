@@ -23,6 +23,7 @@
 #define LIBGENS_MAX_VERTEX_FORMAT_ENTRIES    256
 
 #define LIBGENS_VERTEX_FORMAT_PC             1
+#define LIBGENS_VERTEX_FORMAT_PC_TERRAIN     2
 
 namespace LibGens {
 	// Model Vertex Declaration

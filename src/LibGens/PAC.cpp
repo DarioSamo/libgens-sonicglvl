@@ -887,6 +887,22 @@ namespace LibGens {
 		}
 	}
 
+	list<string> PacExtension::getFileList() {
+		// Get file extension
+		string file_extension = name;
+		size_t double_dots=file_extension.find_first_of(":");
+		if (double_dots != string::npos) {
+			file_extension.resize(double_dots);
+		}
+
+		// Fill file list afterwards
+		list<string> file_list;
+		for (size_t i=0; i < files.size(); i++) {
+			file_list.push_back(files[i]->getName() + "." + file_extension);
+		}
+		return file_list;
+	}
+
 	/** PacPack */
 
 	PacPack::PacPack() {
@@ -1029,6 +1045,8 @@ namespace LibGens {
 			file.writeInt32(&proxy_table_size);
 			file.writeInt32(&string_table_data_size);
 			file.writeInt32(&offset_table_size);
+			
+			file.close();
 		}
 	}
 
@@ -1063,6 +1081,15 @@ namespace LibGens {
 		}
 	}
 
+	list<string> PacPack::getFileList() {
+		list<string> file_list;
+		for (size_t i = 0; i < extensions.size(); i++) {
+			file_list.splice(file_list.end(), extensions[i]->getFileList());
+		}
+		return file_list;
+	}
+
+	/** PacSet */
 
 	PacSet::PacSet() {
 		name = folder = "";
@@ -1266,5 +1293,14 @@ namespace LibGens {
 		}
 
 		packs[0]->save(filename);
+	}
+
+	list<string> PacSet::getFileList() {
+		// First pack is guaranteed to have all the file entries, even if some of them are proxies
+		if (packs.size()) {
+			return packs[0]->getFileList();
+		}
+
+		return list<string>();
 	}
 };
