@@ -102,6 +102,8 @@ namespace LibGens {
 				instances_to_organize.merge(v);
 			}
 
+			void addGroupInfo(TerrainGroupInfo *group_info);
+
 			MaterialLibrary *getMaterialLibrary() {
 				return material_library;
 			}

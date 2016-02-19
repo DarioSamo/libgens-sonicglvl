@@ -49,7 +49,6 @@ namespace LibGens {
 			VertexFormat *vertex_format;
 			AABB aabb;
 			string extra;
-			size_t mesh_slot;
 			vector<Vector3> points;
 		public:
 			Submesh();
@@ -63,6 +62,7 @@ namespace LibGens {
 			size_t getVerticesSize();
 			size_t getFacesSize();
 			vector<unsigned short> getFacesIndices();
+			size_t getFacesIndicesSize();
 			vector<Polygon> getFaces();
 			void buildAABB();
 			AABB getAABB();
@@ -73,8 +73,6 @@ namespace LibGens {
 			void setMaterialName(string v);
 			void setVertexFormat(VertexFormat *v);
 			void createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
-			void setMeshSlot(size_t v);
-			size_t getMeshSlot();
 			void addBone(unsigned char bone);
 			unsigned char getBone(unsigned int index);
 			vector<unsigned char> getBoneTable();
@@ -82,6 +80,7 @@ namespace LibGens {
 			void fixVertexFormatForPC();
 			void addTextureUnit(string v);
 			void addTextureID(unsigned int v);
+			unsigned int getEstimatedMemorySize();
 			~Submesh();
 	};
 };

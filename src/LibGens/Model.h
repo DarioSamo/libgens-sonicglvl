@@ -74,6 +74,7 @@ namespace LibGens {
 			void addMesh(Mesh *mesh);
 			void cloneMesh(Mesh *mesh, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
 			void mergeModel(Model *model, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
+			unsigned int getEstimatedMemorySize();
 			~Model();
 	};
 }

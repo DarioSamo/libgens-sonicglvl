@@ -24,8 +24,8 @@
 
 namespace LibGens {
 	TerrainGroupInfo::TerrainGroupInfo(TerrainGroup *group) {
-		filename=group->getName();
-		subset_id = 0;
+		filename = group->getName();
+		subset_id = group->getSubsetID();
 		folder_size = 0;
 
 		AABB group_aabb;
@@ -47,6 +47,7 @@ namespace LibGens {
 		filename=filename_p;
 		terrain_folder=terrain_folder_p;
 		name=group_filename;
+		subset_id = 0;
 
 		loaded = false;
 	}
@@ -184,6 +185,12 @@ namespace LibGens {
 		}
 	}
 
+	void TerrainGroup::addFakeModel(std::string name) {
+		Model *model=new Model();
+		model->setTerrainMode(true);
+		model->setName(name);
+		models.push_back(model);
+	}
 	
 	void TerrainGroup::write(File *file) {
 		size_t header_address=file->getCurrentAddress();
@@ -286,6 +293,18 @@ namespace LibGens {
 		return sub_instances;
 	}
 
+	vector< vector<TerrainInstance *> > TerrainGroup::getInstanceVectors() {
+		return instances;
+	}
+
+	vector<float> TerrainGroup::getInstanceRadiuses() {
+		return instance_radius;
+	}
+
+	vector<Vector3> TerrainGroup::getInstanceCenters() {
+		return instance_centers;
+	}
+
 	bool TerrainGroup::checkDistance(Vector3 position_to_check, float extra_range) {
 		current_distance = position_to_check.distance(center);
 		return (current_distance < extra_range);
@@ -343,5 +362,13 @@ namespace LibGens {
 			delete (*it);
 		}
 		models.clear();
+	}
+
+	void TerrainGroup::setSubsetID(int v) {
+		subset_id = v;
+	}
+
+	int TerrainGroup::getSubsetID() {
+		return subset_id;
 	}
 };

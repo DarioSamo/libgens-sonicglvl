@@ -31,14 +31,19 @@ namespace LibGens {
 			Vector3 center;
 			float radius;
 			unsigned int type;
-			unsigned int indentifier_a;
-			unsigned int indentifier_b;
+			unsigned int identifier_a;
+			unsigned int identifier_b;
 		public:
 			TerrainBlockInstance() {
 			}
 
 			void read(File *file);
 			void write(File *file);
+			void setType(unsigned int v);
+			void setIdentifierA(unsigned int v);
+			void setIdentifierB(unsigned int v);
+			void setCenter(Vector3 v);
+			void setRadius(float v);
 	};
 
 	class TerrainBlock {
@@ -53,6 +58,7 @@ namespace LibGens {
 
 			void read(File *file);
 			void write(File *file);
+			void addBlockInstance(TerrainBlockInstance *instance);
 
 			void clean() {
 				for (vector<TerrainBlockInstance *>::iterator it=blocks.begin(); it!=blocks.end(); it++) {

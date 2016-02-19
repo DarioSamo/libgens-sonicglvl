@@ -180,6 +180,9 @@
     <ClCompile Include="LostWorldObjectSet.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="Tags.cpp">
+      <Filter>Tags</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -358,6 +361,9 @@
     <ClInclude Include="LostWorldObjectSet.h">
       <Filter>Object</Filter>
     </ClInclude>
+    <ClInclude Include="Tags.h">
+      <Filter>Tags</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BIXF">
@@ -401,6 +407,9 @@
     </Filter>
     <Filter Include="Shader">
       <UniqueIdentifier>{7dabb93b-cf36-4f61-a3b1-dba6f0c5eaa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tags">
+      <UniqueIdentifier>{149b0a3d-bb3a-4a0b-b900-a04bb3ab79b5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -45,6 +45,7 @@ namespace LibGens {
 			string name;
 			bool loaded;
 			float current_distance;
+			int subset_id;
 		public:
 			TerrainGroup() {
 				loaded = false;
@@ -65,6 +66,9 @@ namespace LibGens {
 			}
 
 			list<TerrainInstance *> getInstances();
+			vector< vector<TerrainInstance *> > getInstanceVectors();
+			vector<float> getInstanceRadiuses();
+			vector<Vector3> getInstanceCenters();
 			bool checkDistance(Vector3 position_to_check, float extra_range);
 			float getDistance(Vector3 position_to_check);
 
@@ -79,6 +83,11 @@ namespace LibGens {
 			void addModel(Model *model) {
 				if (model) models.push_back(model);
 			}
+
+			void addFakeModel(std::string name);
+
+			void setSubsetID(int v);
+			int getSubsetID();
 
 			void addInstances(vector<TerrainInstance *> instances_p) {
 				instances.push_back(instances_p);
@@ -127,6 +136,9 @@ namespace LibGens {
 
 			void read(File *file);
 			void write(File *file);
+
+			void setFolderSize(unsigned int v);
+			unsigned int getFolderSize();
 
 			string getName() {
 				return filename;

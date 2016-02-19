@@ -48,10 +48,15 @@ namespace LibGens {
 			string sub_shader;
 			string extra;
 			string gi_extra;
+			string layer;
 			unsigned char material_flag;
 			bool no_culling;
 			bool color_blend;
 		public:
+			static const string LayerOpaq;
+			static const string LayerTrans;
+			static const string LayerPunch;
+
 			Material();
 			Material(string filename);
 			void read(File *file);
@@ -59,6 +64,8 @@ namespace LibGens {
 			void save(string filename);
 			void setShader(string v);
 			string getShader();
+			void setLayer(string v);
+			string getLayer();
 			Texture *getTextureByUnit(string unit, size_t offset_count=0);
 			Parameter *getParameterByName(string unit);
 			Parameter *getParameterByIndex(size_t i);
@@ -67,6 +74,7 @@ namespace LibGens {
 			int getTextureUnitsSize();
 			void addTextureUnit(Texture *texture);
 			void addParameter(Parameter *parameter);
+			void setParameter(string parameter_name, Color color);
 			void setName(string v);
 			string getName();
 			string getFolder();

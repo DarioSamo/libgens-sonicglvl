@@ -157,6 +157,13 @@ namespace LibGens {
 		file->goToEnd();
 	}
 
+	void TerrainGroupInfo::setFolderSize(unsigned int v) {
+		folder_size = v;
+	}
+
+	unsigned int TerrainGroupInfo::getFolderSize() {
+		return folder_size;
+	}
 	
 	void Terrain::read(File *file, string groups_folder, string terrain_folder, bool load_groups) {
 		size_t header_address=file->getCurrentAddress();
@@ -187,7 +194,7 @@ namespace LibGens {
 	void Terrain::write(File *file) {
 		size_t header_address=file->getCurrentAddress();
 
-		unsigned int group_count=groups.size();
+		unsigned int group_count=groups_info.size();
 		size_t group_table_address=32;
 
 		file->writeInt32BE(&group_count);
@@ -304,5 +311,9 @@ namespace LibGens {
 
 
 		groups_info.clear();
+	}
+
+	void Terrain::addGroupInfo(TerrainGroupInfo *group_info) {
+		groups_info.push_back(group_info);
 	}
 };

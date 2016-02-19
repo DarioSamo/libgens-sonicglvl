@@ -763,6 +763,7 @@ namespace LibGens {
 
 			bool intersects(const AABB& aabb);
 			bool intersects(const Vector3& v);
+			AABB intersection(const AABB& aabb);
 			void merge(const AABB& aabb);
 
 			

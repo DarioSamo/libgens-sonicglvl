@@ -47,8 +47,8 @@ namespace LibGens {
 		size_t header_address=file->getCurrentAddress();
 
 		file->readInt32BE(&type);
-		file->readInt32BE(&indentifier_a);
-		file->readInt32BE(&indentifier_b);
+		file->readInt32BE(&identifier_a);
+		file->readInt32BE(&identifier_b);
 
 		size_t sphere_address=0;
 		file->readInt32BEA(&sphere_address);
@@ -62,8 +62,8 @@ namespace LibGens {
 		size_t header_address=file->getCurrentAddress();
 
 		file->writeInt32BE(&type);
-		file->writeInt32BE(&indentifier_a);
-		file->writeInt32BE(&indentifier_b);
+		file->writeInt32BE(&identifier_a);
+		file->writeInt32BE(&identifier_b);
 
 		size_t sphere_address=file->getCurrentAddress()+4;
 		file->writeInt32BEA(&sphere_address);
@@ -73,6 +73,25 @@ namespace LibGens {
 		file->goToEnd();
 	}
 
+	void TerrainBlockInstance::setType(unsigned int v) {
+		type = v;
+	}
+
+	void TerrainBlockInstance::setIdentifierA(unsigned int v) {
+		identifier_a = v;
+	}
+
+	void TerrainBlockInstance::setIdentifierB(unsigned int v) {
+		identifier_b = v;
+	}
+
+	void TerrainBlockInstance::setCenter(Vector3 v) {
+		center = v;
+	}
+
+	void TerrainBlockInstance::setRadius(float v) {
+		radius = v;
+	}
 	
 	void TerrainBlock::read(File *file) {
 		size_t header_address=file->getCurrentAddress();
@@ -118,5 +137,9 @@ namespace LibGens {
 		}
 
 		file->goToEnd();
+	}
+
+	void TerrainBlock::addBlockInstance(TerrainBlockInstance *instance) {
+		blocks.push_back(instance);
 	}
 };

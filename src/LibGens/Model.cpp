@@ -603,5 +603,13 @@ namespace LibGens {
 	string Model::getFilename() {
 		return filename;
 	}
+
+	unsigned int Model::getEstimatedMemorySize() {
+		unsigned int memory_size = 0;
+		for (vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
+			memory_size += (*it)->getEstimatedMemorySize();
+		}
+		return memory_size;
+	}
 };
 

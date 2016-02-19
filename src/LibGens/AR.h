@@ -24,7 +24,7 @@
 #define LIBGENS_AR_PFI_ERROR_MESSAGE_WRITE_NULL_FILE   "Trying to write PFI data to an unreferenced file."
 #define LIBGENS_AR_PFI_ROOT_GENERATIONS                0
 #define LIBGENS_AR_MULTIPLE_START                      ".ar.00"
-#define LIBGENS_AR_MAX_SEARCH                          99
+#define LIBGENS_AR_MAX_SEARCH                          999
 #define LIBGENS_AR_MAX_SPLIT_FILE_BYTES                10485760
 #define LIBGENS_ARL_HEADER                             "ARL2"
 

@@ -824,6 +824,24 @@ namespace LibGens {
 		return ((v.x >= start.x)  &&  (v.x <= end.x)  && (v.y >= start.y)  &&  (v.y <= end.y)  && (v.z >= start.z)  &&  (v.z <= end.z));
 	}
 
+	AABB AABB::intersection(const AABB& aabb) {
+		AABB inter;
+		inter.start.x = max(start.x, aabb.start.x);
+		inter.start.y = max(start.y, aabb.start.y);
+		inter.start.z = max(start.z, aabb.start.z);
+
+		inter.end.x = min(end.x, aabb.end.x);
+		inter.end.y = min(end.y, aabb.end.y);
+		inter.end.z = min(end.z, aabb.end.z);
+
+		// No valid intersection was found
+		if ((inter.end.x < inter.start.x) || (inter.end.y < inter.start.y) || (inter.end.z < inter.start.z)) {
+			inter.start = inter.end = Vector3(0.0, 0.0, 0.0);
+		}
+
+		return inter;
+	}
+
 	void AABB::merge(const AABB& aabb) {
 		if (aabb.start.x < start.x) start.x = aabb.start.x;
 		if (aabb.start.y < start.y) start.y = aabb.start.y;

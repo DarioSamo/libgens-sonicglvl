@@ -179,8 +179,11 @@ void EditorApplication::openLevel(string filename) {
 
 	current_level = new EditorLevel(folder, slot_name, geometry_name, merge_name, game_name);
 	current_level->unpackData();
+	printf("Unpacked data...\n");
 	current_level->unpackResources();
+	printf("Unpacked resources...\n");
 	current_level->unpackTerrain();
+	printf("Unpacked terrain...\n");
 	current_level->saveHashes();
 
 	object_node_manager->setSlotIdName(slot_id_name);

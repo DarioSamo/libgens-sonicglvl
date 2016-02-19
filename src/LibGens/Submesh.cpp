@@ -44,7 +44,6 @@ namespace LibGens {
 		texture_ids = clone->texture_ids;
 		material_name = clone->material_name;
 		vertex_format = new VertexFormat(clone->vertex_format);
-		mesh_slot = clone->mesh_slot;
 		buildAABB();
 	}
 
@@ -423,6 +422,10 @@ namespace LibGens {
 		return faces;
 	}
 
+	size_t Submesh::getFacesIndicesSize() {
+		return faces.size();
+	}
+
 	vector<Polygon> Submesh::getFaces() {
 		return faces_vectors;
 	}
@@ -466,14 +469,6 @@ namespace LibGens {
 		vertex_format = v;
 	}
 
-	void Submesh::setMeshSlot(size_t v) {
-		mesh_slot = v;
-	}
-
-	size_t Submesh::getMeshSlot() {
-		return mesh_slot;
-	}
-
 	void Submesh::addBone(unsigned char bone) {
 		bone_table.push_back(bone);
 	}
@@ -492,5 +487,9 @@ namespace LibGens {
 
 	void Submesh::addTextureID(unsigned int v) {
 		texture_ids.push_back(v);
+	}
+
+	unsigned int Submesh::getEstimatedMemorySize() {
+		return vertex_format->getSize() * vertices.size() + faces.size() * 2;
 	}
 };

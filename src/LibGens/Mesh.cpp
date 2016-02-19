@@ -104,7 +104,6 @@ namespace LibGens {
 
 					Submesh *submesh = new Submesh();
 					submesh->read(file);
-					submesh->setMeshSlot(slot);
 					submesh->buildAABB();
 					submeshes[slot].push_back(submesh);
 				}
@@ -118,7 +117,6 @@ namespace LibGens {
 
 					Submesh *submesh = new Submesh();
 					submesh->read(file);
-					submesh->setMeshSlot(slot);
 					submesh->buildAABB();
 
 					submeshes[slot].push_back(submesh);
@@ -283,6 +281,16 @@ namespace LibGens {
 		}
 
 		return ret;
+	}
+
+	unsigned int Mesh::getEstimatedMemorySize() {
+		int memory_size = 0;
+		for (size_t slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
+			for (std::vector<Submesh *>::iterator it=submeshes[slot].begin(); it!=submeshes[slot].end(); it++) {
+				memory_size += (*it)->getEstimatedMemorySize();
+			}
+		}
+		return memory_size;
 	}
 
 	std::vector<Submesh *> Mesh::getSubmeshes(size_t slot) {

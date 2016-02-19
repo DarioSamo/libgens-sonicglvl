@@ -122,6 +122,7 @@
     </ClCompile>
     <ClCompile Include="StringTable.cpp" />
     <ClCompile Include="Submesh.cpp" />
+    <ClCompile Include="Tags.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainBlock.cpp" />
     <ClCompile Include="TerrainGroup.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="StringTable.h" />
     <ClInclude Include="Submesh.h" />
+    <ClInclude Include="Tags.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainBlock.h" />
     <ClInclude Include="TerrainGroup.h" />

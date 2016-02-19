@@ -285,8 +285,11 @@ void EditorLevel::unpackTerrain() {
 	string main_add_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE_ADD;
 
 	LibGens::ArPack *stage_data_ar_pack=new LibGens::ArPack(main_filename);
+	printf("Opened %s\n", main_filename.c_str());
 	LibGens::ArPack *stage_add_data_ar_pack=new LibGens::ArPack(main_add_filename);
+	printf("Opened %s\n", main_add_filename.c_str());
 	stage_data_ar_pack->merge(stage_add_data_ar_pack);
+	printf("Merged AR Packs\n");
 
 	bool unpack=false;
 	for (size_t i=0; i<5; i++) {

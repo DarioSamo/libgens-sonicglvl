@@ -22,6 +22,10 @@
 #include "Texture.h"
 
 namespace LibGens {
+	const string Material::LayerOpaq = "opaq";
+	const string Material::LayerTrans = "trans";
+	const string Material::LayerPunch = "punch";
+
 	Material::Material() {
 		shader = "Common_d";
 		sub_shader = "Common_d";
@@ -30,6 +34,7 @@ namespace LibGens {
 		extra="";
 		gi_extra="";
 		material_flag = 0x80;
+		layer = LayerOpaq;
 	}
 
 	Material::Material(string filename) {
@@ -37,6 +42,7 @@ namespace LibGens {
 
 		name = filename;
 		folder = "";
+		layer = LayerOpaq;
 
 		size_t sep = name.find_last_of("\\/");
 		if (sep != std::string::npos) {
@@ -116,6 +122,9 @@ namespace LibGens {
 		file->goToAddress(sub_shader_address);
 		file->readString(&sub_shader);
 
+		// HACK: We read the layer string if it's available right after the sub-shader one.
+		file->readString(&layer);
+
 		for (size_t i=0; i<(size_t)parameter_count; i++) {
 			file->goToAddress(parameters_address+i*4);
 			file->readInt32BEA(&address);
@@ -175,6 +184,11 @@ namespace LibGens {
 		file->writeString(&shader);
 		sub_shader_address = file->getCurrentAddress();
 		file->writeString(&sub_shader);
+
+		// HACK: We store our own layer information right after the sub shader string. Does not affect game at all.
+		file->writeString(&layer);
+		file->writeNull(1);
+
 		file->fixPadding();
 
 		// Parameters
@@ -243,6 +257,14 @@ namespace LibGens {
 		return shader;
 	}
 
+	void Material::setLayer(string v) {
+		layer = v;
+	}
+
+	string Material::getLayer() {
+		return layer;
+	}
+
 	Texture *Material::getTextureByUnit(string unit, size_t offset_count) {
 		for (vector<Texture *>::iterator it=textures.begin(); it!=textures.end(); it++) {
 			if ((*it)->getUnit() == unit) {
@@ -288,6 +310,17 @@ namespace LibGens {
 
 	void Material::addParameter(Parameter *parameter) {
 		parameters.push_back(parameter);
+	}
+
+	void Material::setParameter(string parameter_name, Color color) {
+		Parameter *parameter = getParameterByName(parameter_name);
+		if (parameter) {
+			parameter->color = color;
+		}
+		else {
+			parameter = new Parameter(parameter_name, color);
+			parameters.push_back(parameter);
+		}
 	}
 
 	void Material::setName(string v) {
