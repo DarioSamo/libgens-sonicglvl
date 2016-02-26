@@ -182,7 +182,7 @@ namespace LibGens {
 			groups_info.push_back(group_info);
 
 			string group_filename = group_info->getName();
-			TerrainGroup *group=new TerrainGroup(group_filename, groups_folder + group_filename + LIBGENS_TERRAIN_GROUP_EXTENSION, terrain_folder + group_filename + LIBGENS_TERRAIN_GROUP_FOLDER_EXTENSION + "/");
+			TerrainGroup *group=new TerrainGroup(group_filename, groups_folder + group_filename + LIBGENS_TERRAIN_GROUP_EXTENSION, terrain_folder.size() ? (terrain_folder + group_filename + LIBGENS_TERRAIN_GROUP_FOLDER_EXTENSION + "/") : "");
 			if (load_groups) group->load();
 			group->setCenter(group_info->getCenter());
 			group->setRadius(group_info->getRadius());

@@ -98,8 +98,8 @@ namespace LibGens {
 		public:
 			TerrainInstance();
 			TerrainInstance(string name_p, Model *model_p, Matrix4 matrix_p);
-			TerrainInstance(string filename_p, string nm="", vector<Model *> *models=NULL);
-			TerrainInstance(File *file, vector<Model *> *models);
+			TerrainInstance(string filename_p, string nm="", vector<Model *> *models = NULL);
+			TerrainInstance(File *file, vector<Model *> *models = NULL);
 			void save(string filename_p);
 
 			void read(File *file, vector<Model *> *models);

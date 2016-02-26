@@ -131,7 +131,7 @@ namespace LibGens {
 		if (!readSafeCheck(dest)) return;
 		unsigned char v=0;
 		fread(&v, sizeof(char), 1, file_ptr);
-		*dest = v / 256.0f;
+		*dest = v / 255.0f;
 	}
 
 	void File::readFloat16(float *dest) {
@@ -312,6 +312,12 @@ namespace LibGens {
 		unsigned int target=(*dest) - root_node_address;
 		Endian::swap(target);
 		fwrite(&target, sizeof(int), 1, file_ptr);
+	}
+
+	void File::writeFloat8(float *dest) {
+		if (!readSafeCheck(dest)) return;
+		unsigned char v = (int)((*dest) * 255.0f);
+		writeUChar(&v);
 	}
 
 	void File::writeFloat32(float *dest) {

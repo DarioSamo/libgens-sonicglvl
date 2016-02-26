@@ -20,9 +20,18 @@
 #include "AR.h"
 #include "GITextureGroup.h"
 #include "Material.h"
+#include <map>
 
 namespace LibGens {
 	GISubtexture::GISubtexture() {
+	}
+
+	void GISubtexture::setPixelSize(unsigned int v) {
+		pixel_size = v;
+	}
+
+	unsigned int GISubtexture::getPixelSize() {
+		return pixel_size;
 	}
 
 	string GISubtexture::getName() {
@@ -84,6 +93,9 @@ namespace LibGens {
 		h = v;
 	}
 
+	GITexture::GITexture() {
+
+	}
 
 	GITexture::GITexture(string folder_p) {
 		folder = folder_p;
@@ -113,7 +125,6 @@ namespace LibGens {
 		return folder + "/" + texture_name + LIBGENS_TEXTURE_FILE_EXTENSION;
 	}
 
-
 	GITextureGroupInfo::GITextureGroupInfo(string filename, string terrain_folder) {
 		File file(filename, LIBGENS_FILE_READ_BINARY);
 
@@ -135,13 +146,21 @@ namespace LibGens {
 		}
 	}
 
+	GITextureGroupInfo::GITextureGroupInfo() {
+
+	}
+
+	void GITextureGroupInfo::addInstance(string name, Vector3 center, float radius) {
+		instance_names.push_back(name);
+		instance_centers.push_back(center);
+		instance_radius.push_back(radius);
+	}
+
 	void GISubtexture::read(File *file) {
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_NULL_FILE);
 			return;
 		}
-
-		size_t header_address=file->getCurrentAddress();
 
 		unsigned char texture_name_size=0;
 		file->readUChar(&texture_name_size);
@@ -159,14 +178,29 @@ namespace LibGens {
 		else h = 1.0f;
 	}
 
+	void GISubtexture::write(File *file) {
+		if (!file) {
+			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_NULL_FILE);
+			return;
+		}
+
+		unsigned char texture_name_size = name.size();
+		file->writeUChar(&texture_name_size);
+		file->writeString(name.c_str());
+
+		unsigned char w_c = (int)(log(1.0f / w) / log(2.0f));
+		unsigned char h_c = (int)(log(1.0f / h) / log(2.0f));
+		file->writeUChar(&w_c);
+		file->writeUChar(&h_c);
+		file->writeFloat8(&x);
+		file->writeFloat8(&y);
+	}
 	
 	void GITexture::read(File *file) {
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_NULL_FILE);
 			return;
 		}
-
-		size_t header_address=file->getCurrentAddress();
 		
 		unsigned char texture_name_size=0;
 		unsigned char subtexture_count=0;
@@ -183,7 +217,134 @@ namespace LibGens {
 		}
 	}
 
+	void GITexture::write(File *file) {
+		if (!file) {
+			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_NULL_FILE);
+			return;
+		}
 
+		unsigned char texture_name_size = texture_name.size();
+		size_t subtexture_count_sz = subtextures.size();
+		unsigned char subtexture_count = subtexture_count_sz;
+		file->writeUChar(&texture_name_size);
+		file->writeString(texture_name.c_str());
+		file->writeUChar(&subtexture_count);
+		file->writeNull(1);
+
+		for (list<GISubtexture *>::iterator it = subtextures.begin(); it != subtextures.end(); it++) {
+			(*it)->write(file);
+		}
+	}
+
+	void GITexture::setWidth(unsigned int v) {
+		width = v;
+	}
+
+	void GITexture::setHeight(unsigned int v) {
+		height = v;
+	}
+
+	int GITexture::getWidth() {
+		return width;
+	}
+
+	int GITexture::getHeight() {
+		return height;
+	}
+
+	GITextureTree::GITextureTree() {
+		width = height = 0;
+		node_type = -1;
+		left = right = NULL;
+		subtexture = NULL;
+	}
+
+	GITextureTree::~GITextureTree() {
+		delete left;
+		delete right;
+	}
+
+	bool GITextureTree::fitTexture(GISubtexture *subt) {
+		// Bigger than current node, split to either left or right of this. Create children if necessary.
+		if (((width > subt->getPixelSize()) || (height > subt->getPixelSize())) && ((node_type == 0) || (node_type == 1))) {
+			if (!left && !right) {
+				left = new GITextureTree();
+				right = new GITextureTree();
+
+				if (node_type == 0) {
+					left->x = x;
+					left->y = y;
+					left->width = width / 2;
+					left->height = height;
+					left->node_type = 1;
+
+					right->x = x + width / 2;
+					right->y = y;
+					right->width = width / 2;
+					right->height = height;
+					right->node_type = 1;
+				}
+				else if (node_type == 1) {
+					left->x = x;
+					left->y = y;
+					left->width = width;
+					left->height = height / 2;
+					left->node_type = 0;
+
+					right->x = x;
+					right->y = y + height / 2;
+					right->width = width;
+					right->height = height / 2;
+					right->node_type = 0;
+				}
+			}
+
+			if (left && left->fitTexture(subt))
+				return true;
+
+			if (right && right->fitTexture(subt))
+				return true;
+		}
+		// If width and height match, this node is not occupied, and it has no children
+		else if ((width == subt->getPixelSize()) && (height == subt->getPixelSize()) && (node_type != 2) && !left && !right && !subtexture) {
+			subtexture = subt;
+			node_type = 2;
+			return true;
+		}
+
+		return false;
+	}
+
+	void GITextureTree::setSubtextures(unsigned int texture_width, unsigned int texture_height) {
+		if (subtexture) {
+			subtexture->setX((float) x / (float) texture_width);
+			subtexture->setY((float) y / (float) texture_height);
+			subtexture->setWidth((float) width / (float) texture_width);
+			subtexture->setHeight((float) height / (float) texture_height);
+		}
+
+		if (left)
+			left->setSubtextures(texture_width, texture_height);
+
+		if (right)
+			right->setSubtextures(texture_width, texture_height);
+	}
+
+	void GITexture::organizeSubtextures() {
+		GITextureTree texture_tree;
+		texture_tree.x = 0;
+		texture_tree.y = 0;
+		texture_tree.width = getWidth();
+		texture_tree.height = getHeight();
+		texture_tree.node_type = (texture_tree.height > texture_tree.width) ? 1 : 0;
+
+		// Fit subtextures as best as possible on the current pixel size
+		for (list<GISubtexture *>::iterator it = subtextures.begin(); it != subtextures.end(); it++) {
+			texture_tree.fitTexture(*it);
+		}
+
+		texture_tree.setSubtextures(getWidth(), getHeight());
+	}
 
 	void GITextureGroup::readAtlasinfo(File *file, string terrain_folder, vector<string> instance_names) {
 		if (!file) {
@@ -191,9 +352,6 @@ namespace LibGens {
 			return;
 		}
 
-		size_t header_address=file->getCurrentAddress();
-
-		
 		unsigned short texture_count=0;
 		file->readInt16BE(&texture_count);
 		file->moveAddress(1);
@@ -206,7 +364,7 @@ namespace LibGens {
 
 		if (instance_names.size() != texture_count) {
 			for (size_t i=0; i<instance_names.size(); i++) {
-				string tex_name=instance_names[i]+LIBGENS_GI_TEXTURE_GROUP_SUBTEXTURE_LEVEL+ToString(quality_level);
+				string tex_name=instance_names[i] + LIBGENS_GI_TEXTURE_GROUP_SUBTEXTURE_LEVEL + ToString(quality_level);
 
 				bool found=false;
 				for (list<GITexture *>::iterator it=textures.begin(); it!=textures.end(); it++) {
@@ -235,6 +393,24 @@ namespace LibGens {
 		}
 	}
 
+	void GITextureGroup::saveAtlasinfo(string atlasinfo_filename) {
+		File file(atlasinfo_filename, LIBGENS_FILE_WRITE_BINARY);
+		if (file.valid()) {
+			writeAtlasinfo(&file);
+			file.close();
+		}
+	}
+
+	void GITextureGroup::writeAtlasinfo(File *file) {
+		unsigned short texture_count=textures.size();
+		file->writeInt16BE(&texture_count);
+		file->writeNull(1);
+
+		for (list<GITexture *>::iterator it = textures.begin(); it != textures.end(); it++) {
+			(*it)->write(file);
+		}
+	}
+
 	void GITextureGroup::read(File *file, string terrain_folder, string group_folder, vector<string> &global_instance_names) {
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_NULL_FILE);
@@ -242,8 +418,6 @@ namespace LibGens {
 		}
 		filename=group_folder;
 
-		size_t header_address=file->getCurrentAddress();
-		
 		unsigned int instance_count=0;
 		size_t index_table_address;
         size_t bounding_sphere_address;
@@ -260,11 +434,13 @@ namespace LibGens {
 			unsigned int instance_index=0;
 			file->readInt32BE(&instance_index);
 
-			if (instance_index < global_instance_names.size()) {
-				instance_names.push_back(global_instance_names[instance_index]);
-			}
-			else {
-				Error::addMessage(Error::EXCEPTION, "GITextureGroup::read: Instance Index " + ToString(instance_index) + " is bigger than the Global Instance Names list.");
+			if (quality_level == 0) {
+				if (instance_index < global_instance_names.size()) {
+					instance_names.push_back(global_instance_names[instance_index]);
+				}
+				else {
+					Error::addMessage(Error::EXCEPTION, "GITextureGroup::read: Instance Index " + ToString(instance_index) + " is bigger than the Global Instance Names list.");
+				}
 			}
 
 			instance_indices.push_back(instance_index);
@@ -308,6 +484,10 @@ namespace LibGens {
 		return textures;
 	}
 
+	void GITextureGroup::setQualityLevel(unsigned int v) {
+		quality_level = v;
+	}
+
 	unsigned int GITextureGroup::getQualityLevel() {
 		return quality_level;
 	}
@@ -322,6 +502,14 @@ namespace LibGens {
 
 	vector<string> GITextureGroupInfo::getInstanceNames() {
 		return instance_names;
+	}
+
+	GITextureGroup *GITextureGroupInfo::getGroupByIndex(size_t index) {
+		if (index < groups.size()) {
+			return groups[index];
+		}
+
+		return NULL;
 	}
 
 	vector<GITextureGroup *> GITextureGroupInfo::getGroups() {
@@ -360,8 +548,86 @@ namespace LibGens {
 		file->goToEnd();
 	}
 
+	void GITextureGroup::fixIndices(std::map<int, int> index_map) {
+		size_t sz = instance_indices.size();
+		for (size_t i = 0; i < sz; i++) {
+			instance_indices[i] = index_map[instance_indices[i]];
+		}
+	}
 
-	
+	void GITextureGroup::organizeSubtextures(unsigned int max_texture_size) {
+		// Sort from biggest to smallest subtextures
+		list<GISubtexture *> sorted_subtextures;
+		for (list<GISubtexture *>::iterator it = subtextures_to_organize.begin(); it != subtextures_to_organize.end(); it++) {
+			(*it)->setName((*it)->getName() + "-level" + ToString(quality_level));
+
+			bool added = false;
+			for (list<GISubtexture *>::iterator it2 = sorted_subtextures.begin(); it2 != sorted_subtextures.end(); it2++) {
+				if ((*it2)->getPixelSize() < (*it)->getPixelSize()) {
+					sorted_subtextures.insert(it2, *it);
+					added = true;
+					break;
+				}
+			}
+
+			if (!added)
+				sorted_subtextures.push_back(*it);
+		}
+
+		subtextures_to_organize.clear();
+
+		// Keep generating textures until there's no more subtextures to go through
+		const int max_pixels = max_texture_size * max_texture_size;
+		while (sorted_subtextures.size()) {
+			LibGens::GITexture *gi_texture = new LibGens::GITexture();
+			char gi_texture_name[256];
+			sprintf(gi_texture_name, "a%04d", textures.size());
+			gi_texture->setName(gi_texture_name);
+
+			// Remove all used subtextures from list
+			list<GISubtexture *> subtextures_used;
+			list<GISubtexture *> new_sorted_subtextures;
+			int filled_pixels = 0;
+			size_t subtextures_used_count = 0;
+			for (list<GISubtexture *>::iterator it = sorted_subtextures.begin(); it != sorted_subtextures.end(); it++) {
+				int texture_pixels = (*it)->getPixelSize() * (*it)->getPixelSize();
+				if ((filled_pixels + texture_pixels) <= max_pixels) {
+					filled_pixels += texture_pixels;
+					subtextures_used.push_back(*it);
+					subtextures_used_count++;
+				}
+				else {
+					new_sorted_subtextures.push_back(*it);
+				}
+			}
+
+			sorted_subtextures = new_sorted_subtextures;
+
+			// Add all used subtextures to the GI texture. Detect the maximum width and height needed.
+			int width = 4;
+			int height = 4;
+			bool increased_axis = false;
+			while (((width * height) < filled_pixels) && (width <= max_texture_size) && (height <= max_texture_size)) {
+				if (increased_axis)
+					height *= 2;
+				else
+					width *= 2;
+
+				increased_axis = !increased_axis;
+			}
+
+			gi_texture->setWidth(width);
+			gi_texture->setHeight(height);
+
+			// Organize all the subtextures that were used
+			for (list<GISubtexture *>::iterator it = subtextures_used.begin(); it != subtextures_used.end(); it++) {
+				gi_texture->addSubtexture(*it);
+			}
+			gi_texture->organizeSubtextures();
+
+			textures.push_back(gi_texture);
+		}
+	}
 	
 	void GITextureGroupInfo::read(File *file, string terrain_folder) {
 		if (!file) {
@@ -565,6 +831,56 @@ namespace LibGens {
 		return false;
 	}
 
+	void GITextureGroup::addInstanceIndex(unsigned int instance_index) {
+		instance_indices.push_back(instance_index);
+	}
+
+	void GITextureGroup::addSubtextureToOrganize(GISubtexture *subtexture) {
+		subtextures_to_organize.push_back(subtexture);
+	}
+
+	void GITextureGroup::addSubtextureToOrganize(GITextureGroup *clone_group, float downscale_factor) {
+		list<GISubtexture *> clone_subtextures = clone_group->getSubtexturesToOrganize();
+		for (list<GISubtexture *>::iterator it=clone_subtextures.begin(); it!=clone_subtextures.end(); it++) {
+			GISubtexture *clone = new GISubtexture();
+			clone->setName((*it)->getName());
+			clone->setPixelSize(max((*it)->getPixelSize() * downscale_factor, 4.0f));
+			subtextures_to_organize.push_back(clone);
+		}
+	}
+
+	list<GISubtexture *> GITextureGroup::getSubtexturesToOrganize() {
+		return subtextures_to_organize;
+	}
+
+	size_t GITextureGroup::getInstanceIndexCount() {
+		return instance_indices.size();
+	}
+
+	void GITextureGroup::setCenter(Vector3 v) {
+		center = v;
+	}
+
+	Vector3 GITextureGroup::getCenter() {
+		return center;
+	}
+
+	void GITextureGroup::setRadius(float v) {
+		radius = v;
+	}
+
+	float GITextureGroup::getRadius() {
+		return radius;
+	}
+
+	void GITextureGroup::setFolderSize(unsigned int v) {
+		folder_size = v;
+	}
+
+	int GITextureGroup::getFolderSize() {
+		return folder_size;
+	}
+
 	GISubtexture *GITextureGroupInfo::getTextureByInstance(string instance, size_t quality_level) {
 		size_t instance_index=0;
 		bool found=false;
@@ -611,5 +927,56 @@ namespace LibGens {
 		instance_names.clear();
 		instance_centers.clear();
 		instance_radius.clear();
+	}
+
+	GITextureGroup *GITextureGroupInfo::createGroup() {
+		GITextureGroup *group = new GITextureGroup();
+		groups.push_back(group);
+		return group;
+	}
+
+	int GITextureGroupInfo::getGroupIndex(GITextureGroup *group) {
+		int groups_size = groups.size();
+		for (int i = 0; i < groups_size; i++) {
+			if (groups[i] == group) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	int GITextureGroupInfo::getInstanceIndex(string instance_name) {
+		int instances_size = instance_names.size();
+		for (int i = 0; i < instances_size; i++) {
+			if (instance_names[i] == instance_name) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	void GITextureGroupInfo::sortGroupsByQualityLevel() {
+		std::map<int, int> index_map;
+		vector<GITextureGroup *> sorted_groups;
+		int groups_size = groups.size();
+		for (int level = 0; level < 3; level++) {
+			for (int i = 0; i < groups_size; i++) {
+				if (groups[i]->getQualityLevel() == level) {
+					index_map[i] = sorted_groups.size();
+					sorted_groups.push_back(groups[i]);
+				}
+			}
+		}
+
+		// Fix the group indices to point to the new ones if over quality level 0
+		for (int i = 0; i < groups_size; i++) {
+			if (sorted_groups[i]->getQualityLevel() != 0) {
+				sorted_groups[i]->fixIndices(index_map);
+			}
+		}
+
+		groups = sorted_groups;
 	}
 };

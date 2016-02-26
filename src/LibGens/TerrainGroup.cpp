@@ -35,12 +35,12 @@ namespace LibGens {
 		for (list<TerrainInstance *>::iterator it=instances.begin(); it!=instances.end(); it++) {
 			AABB aabb=(*it)->getAABB();
 			instance_centers.push_back(aabb.center());
-			instance_radius.push_back(aabb.sizeMax());
+			instance_radius.push_back(aabb.sizeMax() / 2.0f);
 			group_aabb.merge(aabb);
 		}
 
 		center = group_aabb.center();
-		radius = group_aabb.sizeMax();
+		radius = group_aabb.sizeMax() / 2.0f;
 	}
 
 	TerrainGroup::TerrainGroup(string group_filename, string filename_p, string terrain_folder_p) {
@@ -324,7 +324,7 @@ namespace LibGens {
 				instance_group_aabb.merge((*it2)->getAABB());
 			}
 			instance_centers.push_back(instance_group_aabb.center());
-			instance_radius.push_back(instance_group_aabb.sizeMax());
+			instance_radius.push_back(instance_group_aabb.sizeMax() / 2.0f);
 		}
 	}
 
