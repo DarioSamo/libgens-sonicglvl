@@ -74,7 +74,17 @@ namespace LibGens {
 		file->goToEnd();
 	}
 
+	void Light::setType(unsigned int v) {
+		type = v;
+	}
 
+	void Light::setPosition(Vector3 v) {
+		position = v;
+	}
+
+	void Light::setColor(Vector3 v) {
+		color = v;
+	}
 
 	LightList::LightList(string filename) {
 		File file(filename, LIBGENS_FILE_READ_BINARY);
@@ -89,6 +99,12 @@ namespace LibGens {
 			file.readHeader();
 			read(&file);
 			file.close();
+		}
+	}
+
+	LightList::~LightList() {
+		for (vector<Light *>::iterator it=lights.begin(); it!=lights.end(); it++) {
+			delete *it;
 		}
 	}
 
@@ -172,5 +188,14 @@ namespace LibGens {
 		}
 
 		return omni_lights;
+	}
+
+	void LightList::addLight(Light *light) {
+		names.push_back(light->getName());
+		lights.push_back(light);
+	}
+
+	int LightList::getLightCount() {
+		return lights.size();
 	}
 };

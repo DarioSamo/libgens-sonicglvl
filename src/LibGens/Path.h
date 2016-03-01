@@ -303,6 +303,9 @@ namespace LibGens {
 			}
 	};
 
+	typedef pair<Node *, Spline *> PathNodePair;
+	typedef list<PathNodePair> PathNodeList;
+
 	class Path {
 		protected:
 			Library *library;
@@ -320,5 +323,8 @@ namespace LibGens {
 			Scene *getScene() {
 				return scene;
 			}
+
+			/** Returns a list of pairs with the nodes and splines matched. */
+			PathNodeList getNodes();
 	};
 };

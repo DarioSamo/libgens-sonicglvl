@@ -49,6 +49,10 @@ namespace LibGens {
 			void read(File *file);
 			void write(File *file);
 
+			void setType(unsigned int v);
+			void setPosition(Vector3 v);
+			void setColor(Vector3 v);
+
 			unsigned int getType() {
 				return type;
 			}
@@ -88,8 +92,12 @@ namespace LibGens {
 			}
 
 			LightList(string filename);
+			~LightList();
+
 			void save(string filename);
 
+			void addLight(Light *light);
+			int getLightCount();
 			Light *getLight(string name);
 			vector<Light *> getOmniLights();
 

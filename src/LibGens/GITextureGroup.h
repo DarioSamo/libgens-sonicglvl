@@ -41,7 +41,7 @@ namespace LibGens {
 	class GISubtexture {
 		protected:
 			float x, y, w, h;
-			unsigned int pixel_size;
+			unsigned int pixel_w, pixel_h;
 			string name;
 			GITexture *parent;
 			string full_path;
@@ -63,21 +63,23 @@ namespace LibGens {
 			void setY(float v);
 			void setWidth(float v);
 			void setHeight(float v);
-			void setPixelSize(unsigned int v);
-			unsigned int getPixelSize();
+			void setPixelWidth(unsigned int v);
+			void setPixelHeight(unsigned int v);
+			unsigned int getPixelWidth();
+			unsigned int getPixelHeight();
+			unsigned int getBiggestPixelSize();
 	};
 
 	class GITextureTree {
 	public:
-		unsigned short node_type; // -1 is undefined, 0 is a split in X, 1 is a split in Y, 2 is occupied.
-		unsigned int x, y, width, height;
+		unsigned int x, y, w, h;
 		GITextureTree *left;
 		GITextureTree *right;
 		GISubtexture *subtexture;
 
 		GITextureTree();
 		~GITextureTree();
-		bool fitTexture(GISubtexture *subt);
+		GITextureTree *insertSubtexture(GISubtexture *subtexture);
 		void setSubtextures(unsigned int texture_width, unsigned int texture_height);
 	};
 
@@ -90,6 +92,7 @@ namespace LibGens {
 		public:
 			GITexture();
 			GITexture(string folder_p);
+			~GITexture();
 			void read(File *file);
 			void write(File *file);
 			GISubtexture *getTextureByInstance(string instance);
@@ -99,12 +102,13 @@ namespace LibGens {
 			void addSubtexture(GISubtexture *v);
 			list<GISubtexture *> getSubtextures();
 			string getFilename();
-			~GITexture();
 			void setWidth(unsigned int v);
 			void setHeight(unsigned int v);
 			int getWidth();
 			int getHeight();
-			void organizeSubtextures();
+
+			/** NOTE: Returns all textures that could not be fit properly. These textures are no longer owned by the texture, so you have to manage their deletion yourself. */
+			list<GISubtexture *> organizeSubtextures(unsigned int max_texture_size);
 	};
 
 	class GITextureGroup {
@@ -124,7 +128,7 @@ namespace LibGens {
 			~GITextureGroup();
 			void read(File *file, string terrain_folder, string group_folder, vector<string> &global_instance_names);
 			void write(File *file);
-			void readAtlasinfo(File *file, string terrain_folder, vector<string> instance_names);
+			void readAtlasinfo(File *file, string terrain_folder = "", vector<string> instance_names = vector<string>());
 			void saveAtlasinfo(string atlasinfo_filename);
 			void writeAtlasinfo(File *file);
 			GISubtexture *getTextureByInstance(size_t instance_index, string instance, size_t quality_level_p, vector<GITextureGroup *> &groups);
@@ -147,6 +151,8 @@ namespace LibGens {
 			int getFolderSize();
 			void organizeSubtextures(unsigned int max_texture_size);
 			void fixIndices(std::map<int, int> index_map);
+			void addTexture(GITexture *texture);
+			void deleteTextures();
 	};
 
 	class GITextureGroupInfo {
@@ -157,7 +163,7 @@ namespace LibGens {
 			vector<float> instance_radius;
 		public:
 			GITextureGroupInfo();
-			GITextureGroupInfo(string filename, string terrain_folder);
+			GITextureGroupInfo(string filename, string terrain_folder = "");
 			void save(string filename);
 			void read(File *file, string terrain_folder);
 			void write(File *file);

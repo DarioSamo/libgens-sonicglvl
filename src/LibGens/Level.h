@@ -28,6 +28,7 @@
 #define LIBGENS_LEVEL_DATA_TERRAIN                   "Terrain.stg.xml"
 #define LIBGENS_LEVEL_DATA_SCENE_EFFECT              "SceneEffect.prm.xml"
 
+#define LIBGENS_LEVEL_STAGE_GUIDE_PATH               "StageGuidePath"
 #define LIBGENS_LEVEL_XML_PATH                       "Path"
 #define LIBGENS_LEVEL_XML_CONTAINER                  "Container"
 #define LIBGENS_LEVEL_XML_TERRAIN                    "Terrain"

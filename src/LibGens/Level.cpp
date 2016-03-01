@@ -122,6 +122,13 @@ namespace LibGens {
 				}
 			}
 		}
+
+		// Load StageGuidePath since it won't show up in any of the XMLs if the file exists.
+		string path_filename = folder + LIBGENS_LEVEL_STAGE_GUIDE_PATH + LIBGENS_PATH_FULL_GENERATIONS_EXTENSION;
+		if (File::check(path_filename)) {
+			Path *path = new Path(path_filename);
+			paths.push_back(path);
+		}
 	}
 
 	void Level::loadSpawn(TiXmlElement *root) {

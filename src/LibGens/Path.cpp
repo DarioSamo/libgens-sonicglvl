@@ -698,4 +698,29 @@ namespace LibGens {
 
 		return closest_point;
 	}
+
+	PathNodeList Path::getNodes() {
+		PathNodeList node_list;
+
+		if (scene && library) {
+			list<Node *> path_scene_nodes = scene->getNodes();
+			for (list<LibGens::Node *>::iterator it = path_scene_nodes.begin(); it != path_scene_nodes.end(); it++) {
+				string instance_name = (*it)->getInstanceName();
+
+				// Delete first # if found.
+				if (instance_name.size() && instance_name[0]=='#')
+					instance_name.erase(instance_name.begin());
+
+				// If spline is found, push to node pair list.
+				PathNodePair pair;
+				pair.first = *it;
+				pair.second = library->getSpline(instance_name);
+				if (pair.second) {
+					node_list.push_back(pair);
+				}
+			}
+		}
+
+		return node_list;
+	}
 };

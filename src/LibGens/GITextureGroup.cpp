@@ -26,12 +26,24 @@ namespace LibGens {
 	GISubtexture::GISubtexture() {
 	}
 
-	void GISubtexture::setPixelSize(unsigned int v) {
-		pixel_size = v;
+	void GISubtexture::setPixelWidth(unsigned int v) {
+		pixel_w = v;
 	}
 
-	unsigned int GISubtexture::getPixelSize() {
-		return pixel_size;
+	unsigned int GISubtexture::getPixelWidth() {
+		return pixel_w;
+	}
+
+	void GISubtexture::setPixelHeight(unsigned int v) {
+		pixel_h = v;
+	}
+
+	unsigned int GISubtexture::getPixelHeight() {
+		return pixel_h;
+	}
+
+	unsigned int GISubtexture::getBiggestPixelSize() {
+		return max(pixel_w, pixel_h);
 	}
 
 	string GISubtexture::getName() {
@@ -203,11 +215,10 @@ namespace LibGens {
 		}
 		
 		unsigned char texture_name_size=0;
-		unsigned char subtexture_count=0;
+		unsigned short subtexture_count=0;
 		file->readUChar(&texture_name_size);
 		file->readString(&texture_name, texture_name_size);
-		file->readUChar(&subtexture_count);
-		file->moveAddress(1);
+		file->readInt16(&subtexture_count);
 
 		for (size_t i=0; i<subtexture_count; i++) {
 			GISubtexture *subtexture=new GISubtexture();
@@ -225,11 +236,10 @@ namespace LibGens {
 
 		unsigned char texture_name_size = texture_name.size();
 		size_t subtexture_count_sz = subtextures.size();
-		unsigned char subtexture_count = subtexture_count_sz;
+		unsigned short subtexture_count = subtexture_count_sz;
 		file->writeUChar(&texture_name_size);
 		file->writeString(texture_name.c_str());
-		file->writeUChar(&subtexture_count);
-		file->writeNull(1);
+		file->writeInt16(&subtexture_count);
 
 		for (list<GISubtexture *>::iterator it = subtextures.begin(); it != subtextures.end(); it++) {
 			(*it)->write(file);
@@ -253,8 +263,7 @@ namespace LibGens {
 	}
 
 	GITextureTree::GITextureTree() {
-		width = height = 0;
-		node_type = -1;
+		x = y = w = h = 0;
 		left = right = NULL;
 		subtexture = NULL;
 	}
@@ -264,63 +273,61 @@ namespace LibGens {
 		delete right;
 	}
 
-	bool GITextureTree::fitTexture(GISubtexture *subt) {
-		// Bigger than current node, split to either left or right of this. Create children if necessary.
-		if (((width > subt->getPixelSize()) || (height > subt->getPixelSize())) && ((node_type == 0) || (node_type == 1))) {
-			if (!left && !right) {
-				left = new GITextureTree();
-				right = new GITextureTree();
+	GITextureTree *GITextureTree::insertSubtexture(GISubtexture *subt) {
+		// Not a leaf node.
+		if (left || right) {
+			// Try inserting to left child.
+			GITextureTree *new_node = left->insertSubtexture(subt);
+			if (new_node) 
+				return new_node;
 
-				if (node_type == 0) {
-					left->x = x;
-					left->y = y;
-					left->width = width / 2;
-					left->height = height;
-					left->node_type = 1;
+			// Otherwise insert to right child.
+			return right->insertSubtexture(subt);
+		}
+		else {
+			// Already occupied.
+			if (subtexture)
+				return NULL;
 
-					right->x = x + width / 2;
-					right->y = y;
-					right->width = width / 2;
-					right->height = height;
-					right->node_type = 1;
-				}
-				else if (node_type == 1) {
-					left->x = x;
-					left->y = y;
-					left->width = width;
-					left->height = height / 2;
-					left->node_type = 0;
-
-					right->x = x;
-					right->y = y + height / 2;
-					right->width = width;
-					right->height = height / 2;
-					right->node_type = 0;
-				}
+			// If texture doesn't fit because node is too small.
+			if ((subt->getPixelWidth() > w) || (subt->getPixelHeight() > h)) {
+				return NULL;
 			}
 
-			if (left && left->fitTexture(subt))
-				return true;
+			// If texture fits perfectly.
+			if ((subt->getPixelWidth() == w) && (subt->getPixelHeight() == h)) {
+				subtexture = subt;
+				return this;
+			}
 
-			if (right && right->fitTexture(subt))
-				return true;
-		}
-		// If width and height match, this node is not occupied, and it has no children
-		else if ((width == subt->getPixelSize()) && (height == subt->getPixelSize()) && (node_type != 2) && !left && !right && !subtexture) {
-			subtexture = subt;
-			node_type = 2;
-			return true;
-		}
+			// Create left and right childs.
+			left = new GITextureTree();
+			right = new GITextureTree();
 
-		return false;
+			// Split in which direction.
+			unsigned int dw = w - subt->getPixelWidth();
+			unsigned int dh = h - subt->getPixelHeight();
+        
+			if (dw > dh) {
+				left->x = x; left->y = y; left->w = subt->getPixelWidth(); left->h = h;
+				right->x = x + subt->getPixelWidth(); right->y = y; right->w = w - subt->getPixelWidth(); right->h = h;
+			}
+			else {
+				left->x = x; left->y = y; left->w = w; left->h = subt->getPixelHeight();
+				right->x = x; right->y = y + subt->getPixelHeight(); right->w = w; right->h = h - subt->getPixelHeight();
+			}
+
+			// And insert into left child.
+			return left->insertSubtexture(subt);
+		}
 	}
 
 	void GITextureTree::setSubtextures(unsigned int texture_width, unsigned int texture_height) {
 		if (subtexture) {
 			subtexture->setX((float) x / (float) texture_width);
 			subtexture->setY((float) y / (float) texture_height);
-			subtexture->setWidth((float) width / (float) texture_width);
-			subtexture->setHeight((float) height / (float) texture_height);
+			subtexture->setWidth((float) w / (float) texture_width);
+			subtexture->setHeight((float) h / (float) texture_height);
 		}
 
 		if (left)
@@ -330,20 +337,73 @@ namespace LibGens {
 			right->setSubtextures(texture_width, texture_height);
 	}
 
-	void GITexture::organizeSubtextures() {
-		GITextureTree texture_tree;
-		texture_tree.x = 0;
-		texture_tree.y = 0;
-		texture_tree.width = getWidth();
-		texture_tree.height = getHeight();
-		texture_tree.node_type = (texture_tree.height > texture_tree.width) ? 1 : 0;
-
-		// Fit subtextures as best as possible on the current pixel size
+	list<GISubtexture *> GITexture::organizeSubtextures(unsigned int max_texture_size) {
+		// Quick organization case: A subtexture fits the max atlas case.
+		GISubtexture *perfect_fit_case = NULL;
 		for (list<GISubtexture *>::iterator it = subtextures.begin(); it != subtextures.end(); it++) {
-			texture_tree.fitTexture(*it);
+			if (((*it)->getPixelWidth() == max_texture_size) && ((*it)->getPixelHeight() == max_texture_size)) {
+				perfect_fit_case = *it;
+				break;
+			}
 		}
 
-		texture_tree.setSubtextures(getWidth(), getHeight());
+		if (perfect_fit_case) {
+			list<GISubtexture *> unfit_subtextures = subtextures;
+			unfit_subtextures.remove(perfect_fit_case);
+			subtextures.clear();
+			subtextures.push_back(perfect_fit_case);
+			width = height = max_texture_size;
+			perfect_fit_case->setX(0.0f);
+			perfect_fit_case->setY(0.0f);
+			perfect_fit_case->setWidth(1.0f);
+			perfect_fit_case->setHeight(1.0f);
+			return unfit_subtextures;
+		}
+
+		bool all_packed = false;
+		while (!all_packed) {
+			GITextureTree texture_tree;
+			texture_tree.x = 0;
+			texture_tree.y = 0;
+			texture_tree.w = width;
+			texture_tree.h = height;
+			texture_tree.subtexture = NULL;
+
+			// Fit subtextures as best as possible on the current texture
+			all_packed = true;
+
+			list<GISubtexture *> unfit_subtextures;
+			for (list<GISubtexture *>::iterator it = subtextures.begin(); it != subtextures.end(); it++) {
+				if (!texture_tree.insertSubtexture(*it)) {
+					all_packed = false;
+					unfit_subtextures.push_back(*it);
+				}
+			}
+
+			// If all subtextures could be packed properly, set the values and return.
+			if (all_packed) {
+				texture_tree.setSubtextures(width, height);
+			}
+			else {
+				// If some subtextures couldn't be packed, try to increase either the width or the height of the texture.
+				if ((width < max_texture_size) || (height < max_texture_size)) {
+					if (height < width)
+						height *= 2;
+					else
+						width *= 2;
+				}
+				// If the width and height can no longer be increased, just return the subtextures that could not be fit so they're thrown into another texture.
+				else {
+					// Remove the unfit subtextures from the texture's list.
+					for (list<GISubtexture *>::iterator it = unfit_subtextures.begin(); it != unfit_subtextures.end(); it++) {
+						subtextures.remove(*it);
+					}
+					return unfit_subtextures;
+				}
+			}
+		}
+
+		return list<GISubtexture *>();
 	}
 
 	void GITextureGroup::readAtlasinfo(File *file, string terrain_folder, vector<string> instance_names) {
@@ -555,75 +615,145 @@ namespace LibGens {
 		}
 	}
 
+	void GITextureGroup::addTexture(GITexture *texture) {
+		textures.push_back(texture);
+	}
+
+	void GITextureGroup::deleteTextures() {
+		for (list<GITexture *>::iterator it = textures.begin(); it != textures.end(); it++) {
+			delete (*it);
+		}
+		textures.clear();
+	}
+
 	void GITextureGroup::organizeSubtextures(unsigned int max_texture_size) {
 		// Sort from biggest to smallest subtextures
-		list<GISubtexture *> sorted_subtextures;
 		for (list<GISubtexture *>::iterator it = subtextures_to_organize.begin(); it != subtextures_to_organize.end(); it++) {
-			(*it)->setName((*it)->getName() + "-level" + ToString(quality_level));
-
-			bool added = false;
-			for (list<GISubtexture *>::iterator it2 = sorted_subtextures.begin(); it2 != sorted_subtextures.end(); it2++) {
-				if ((*it2)->getPixelSize() < (*it)->getPixelSize()) {
-					sorted_subtextures.insert(it2, *it);
-					added = true;
-					break;
-				}
-			}
-
-			if (!added)
-				sorted_subtextures.push_back(*it);
+			if ((*it)->getName().find("-level") == string::npos)
+				(*it)->setName((*it)->getName() + "-level" + ToString(quality_level));
 		}
 
-		subtextures_to_organize.clear();
-
-		// Keep generating textures until there's no more subtextures to go through
-		const int max_pixels = max_texture_size * max_texture_size;
-		while (sorted_subtextures.size()) {
+		// The algorithm evaluates if the remaining subtextures are enough to justify a size increase to the next power of two.
+		// If the remaining subtextures do not fill at least half of the extension, then they're separated into a new, smaller atlas texture.
+		// This allows to efficiently pack into big textures while keeping support for smaller atlas textures.
+		while (subtextures_to_organize.size()) {
 			LibGens::GITexture *gi_texture = new LibGens::GITexture();
-			char gi_texture_name[256];
-			sprintf(gi_texture_name, "a%04d", textures.size());
-			gi_texture->setName(gi_texture_name);
+			unsigned int filled_pixels = 0;
+			unsigned int evaluated_pixels = 0;
+			list<GISubtexture *> evaluated_subtextures;
+			list<GISubtexture *> failed_subtextures;
+			unsigned int texture_width = 4;
+			unsigned int texture_height = 4;
+			unsigned int texture_pixel_count = texture_width * texture_height;
+			unsigned int next_texture_width = texture_width * 2;
+			unsigned int next_texture_height = texture_height;
+			unsigned int next_texture_pixel_count = next_texture_width * next_texture_height;
+			unsigned int next_extra_pixels = next_texture_pixel_count - texture_pixel_count;
 
-			// Remove all used subtextures from list
-			list<GISubtexture *> subtextures_used;
-			list<GISubtexture *> new_sorted_subtextures;
-			int filled_pixels = 0;
-			size_t subtextures_used_count = 0;
+			// Sort the subtextures to organize before adding them to the current texture.
+			list<GISubtexture *> sorted_subtextures;
+			for (list<GISubtexture *>::iterator it = subtextures_to_organize.begin(); it != subtextures_to_organize.end(); it++) {
+				bool added = false;
+				for (list<GISubtexture *>::iterator it2 = sorted_subtextures.begin(); it2 != sorted_subtextures.end(); it2++) {
+					if (((*it2)->getPixelWidth() * (*it2)->getPixelHeight()) < ((*it)->getPixelWidth() * (*it)->getPixelHeight())) {
+						sorted_subtextures.insert(it2, *it);
+						added = true;
+						break;
+					}
+				}
+
+				if (!added)
+					sorted_subtextures.push_back(*it);
+			}
+
+			// Analyze the sorted subtextures.
 			for (list<GISubtexture *>::iterator it = sorted_subtextures.begin(); it != sorted_subtextures.end(); it++) {
-				int texture_pixels = (*it)->getPixelSize() * (*it)->getPixelSize();
-				if ((filled_pixels + texture_pixels) <= max_pixels) {
-					filled_pixels += texture_pixels;
-					subtextures_used.push_back(*it);
-					subtextures_used_count++;
+				unsigned int subtexture_width = (*it)->getPixelWidth();
+				unsigned int subtexture_height = (*it)->getPixelHeight();
+				unsigned int subtexture_pixels = subtexture_width * subtexture_height;
+
+				// If the currently filled pixels and the evaluated pixels is less than the pixel count, add the subtexture to the evaluated textures.
+				bool adding = true;
+				while (adding) {
+					if ((filled_pixels + evaluated_pixels + subtexture_pixels) <= next_texture_pixel_count) {
+						evaluated_pixels += subtexture_pixels;
+						evaluated_subtextures.push_back(*it);
+						adding = false;
+					}
+					else {
+						texture_width = next_texture_width;
+						texture_height = next_texture_height;
+						texture_pixel_count = next_texture_pixel_count;
+
+						// Increase to the next power of two on one side.
+						if ((texture_width < max_texture_size) || (texture_height < max_texture_size)) {
+							if (next_texture_height < next_texture_width)
+								next_texture_height = next_texture_height * 2;
+							else
+								next_texture_width = next_texture_width * 2;
+
+							next_texture_pixel_count = next_texture_width * next_texture_height;
+							next_extra_pixels = next_texture_pixel_count - texture_pixel_count;
+
+							// Add the evaluated subtextures to the texture.
+							for (list<GISubtexture *>::iterator it2 = evaluated_subtextures.begin(); it2 != evaluated_subtextures.end(); it2++) {
+								gi_texture->addSubtexture(*it2);
+							}
+
+							filled_pixels += evaluated_pixels;
+							evaluated_pixels = 0;
+							evaluated_subtextures.clear();
+						}
+						// If we reached the maximum possible texture size and it's still not enough, skip this subtexture.
+						else {
+							break;
+						}
+					}
 				}
-				else {
-					new_sorted_subtextures.push_back(*it);
+
+				// Algorithm was trying to add subtexture, add it back to the sorted subtextures list later.
+				if (adding) {
+					failed_subtextures.push_back(*it);
 				}
 			}
 
-			sorted_subtextures = new_sorted_subtextures;
+			subtextures_to_organize.clear();
+			
+			// Add all failed subtextures back to the organization list.
+			for (list<GISubtexture *>::iterator it = failed_subtextures.begin(); it != failed_subtextures.end(); it++) {
+				subtextures_to_organize.push_back(*it);
+			}
+			
+			// Analyze if the remaining subtextures fill enough pixels to justify the size extension. If not push them back to the sorted subtextures list.
+			if (evaluated_subtextures.size()) {
+				bool success_condition = evaluated_pixels > (next_extra_pixels / 2);
+				for (list<GISubtexture *>::iterator it = evaluated_subtextures.begin(); it != evaluated_subtextures.end(); it++) {
+					if (success_condition)
+						gi_texture->addSubtexture(*it);
+					else
+						subtextures_to_organize.push_back(*it);
+				}
 
-			// Add all used subtextures to the GI texture. Detect the maximum width and height needed.
-			int width = 4;
-			int height = 4;
-			bool increased_axis = false;
-			while (((width * height) < filled_pixels) && (width <= max_texture_size) && (height <= max_texture_size)) {
-				if (increased_axis)
-					height *= 2;
-				else
-					width *= 2;
-
-				increased_axis = !increased_axis;
+				// Set the new texture width and height if this succeeded
+				if (success_condition) {
+					texture_width = next_texture_width;
+					texture_height = next_texture_height;
+				}
 			}
 
-			gi_texture->setWidth(width);
-			gi_texture->setHeight(height);
+			char texture_name[16];
+			sprintf(texture_name, "a%04d", textures.size());
+			gi_texture->setName(texture_name);
+			gi_texture->setWidth(texture_width);
+			gi_texture->setHeight(texture_height);
 
-			// Organize all the subtextures that were used
-			for (list<GISubtexture *>::iterator it = subtextures_used.begin(); it != subtextures_used.end(); it++) {
-				gi_texture->addSubtexture(*it);
+			// Attempt to organize all the subtextures into the atlas map.
+			list<GISubtexture *> unorganized_subtextures = gi_texture->organizeSubtextures(max_texture_size);
+
+			// If it was not possible to fit all the subtextures, just push them back to the organization list.
+			for (list<GISubtexture *>::iterator it = unorganized_subtextures.begin(); it != unorganized_subtextures.end(); it++) {
+				subtextures_to_organize.push_back(*it);
 			}
-			gi_texture->organizeSubtextures();
 
 			textures.push_back(gi_texture);
 		}
@@ -689,7 +819,7 @@ namespace LibGens {
 
 			string group_folder=LIBGENS_GI_TEXTURE_GROUP_FOLDER_BEFORE + ToString(i) + LIBGENS_GI_TEXTURE_GROUP_FOLDER_AFTER;
 			GITextureGroup *group=new GITextureGroup();
-			group->read(file, terrain_folder + group_folder, group_folder, instance_names);
+			group->read(file, terrain_folder.size() ? (terrain_folder + group_folder) : "", group_folder, instance_names);
 			groups.push_back(group);
 		}
 	}
@@ -844,7 +974,8 @@ namespace LibGens {
 		for (list<GISubtexture *>::iterator it=clone_subtextures.begin(); it!=clone_subtextures.end(); it++) {
 			GISubtexture *clone = new GISubtexture();
 			clone->setName((*it)->getName());
-			clone->setPixelSize(max((*it)->getPixelSize() * downscale_factor, 4.0f));
+			clone->setPixelWidth(max((*it)->getPixelWidth() * downscale_factor, 4.0f));
+			clone->setPixelHeight(max((*it)->getPixelHeight() * downscale_factor, 4.0f));
 			subtextures_to_organize.push_back(clone);
 		}
 	}
@@ -913,10 +1044,7 @@ namespace LibGens {
 
 
 	GITextureGroup::~GITextureGroup() {
-		for (list<GITexture *>::iterator it=textures.begin(); it!=textures.end(); it++) {
-			delete (*it);
-		}
-		textures.clear();
+		deleteTextures();
 	}
 
 	void GITextureGroupInfo::clean() {
