@@ -182,12 +182,16 @@ namespace LibGens {
 		vector<Light *> omni_lights;
 
 		for (vector<Light *>::iterator it=lights.begin(); it!=lights.end(); it++) {
-			if ((*it)->getType() == 1) {
+			if ((*it)->getType() == LIBGENS_LIGHT_TYPE_OMNI) {
 				omni_lights.push_back(*it);
 			}
 		}
 
 		return omni_lights;
+	}
+
+	vector<Light *> LightList::getLights() {
+		return lights;
 	}
 
 	void LightList::addLight(Light *light) {

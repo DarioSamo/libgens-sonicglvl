@@ -19,6 +19,7 @@
 
 #include "EditorNode.h"
 #include "Object.h"
+#include "ObjectSet.h"
 #include "ObjectProduction.h"
 #include "ModelLibrary.h"
 
@@ -202,6 +203,7 @@ class ObjectNodeManager {
 
 		void showAll();
 		void hideAll();
+		void updateSetVisibility(LibGens::ObjectSet *current_set, bool v);
 
 		void addTime(float time_s);
 };

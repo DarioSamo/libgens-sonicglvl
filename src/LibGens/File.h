@@ -144,6 +144,8 @@ namespace LibGens {
 			static string nameFromFilename(string filename);
 			static string nameFromFilenameNoExtension(string filename);
 			static string folderFromFilename(string filename);
+			static void rename(string old_filename, string new_filename);
+			static void remove(string filename);
 	};
 
 	

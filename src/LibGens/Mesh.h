@@ -60,5 +60,6 @@ namespace LibGens {
 			void createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
 			void setWaterSlotString(string v);
 			unsigned int getEstimatedMemorySize();
+			void changeVertexFormat(int format);
 	};
 };

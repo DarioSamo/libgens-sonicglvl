@@ -659,7 +659,6 @@ void EditorLevel::saveTerrain() {
 
 	vector<string> stage_files;
 	vector<string> stage_add_files;
-
 	vector<LibGens::TerrainGroup *> terrain_groups = terrain->getGroups();
 	for (vector<LibGens::TerrainGroup *>::iterator it=terrain_groups.begin(); it!=terrain_groups.end(); it++) {
 		string filename=terrain_cache_folder + "/" + (*it)->getName() + LIBGENS_TERRAIN_GROUP_FOLDER_EXTENSION;

@@ -97,3 +97,17 @@ void ObjectNodeManager::hideAll() {
 	}
 }
 
+void ObjectNodeManager::updateSetVisibility(LibGens::ObjectSet *current_set, bool v) {
+	for (list<ObjectNode *>::iterator it=object_nodes.begin(); it!=object_nodes.end(); it++) {
+		if (((*it)->getObject()->getParentSet() == current_set) && current_set->hasObject((*it)->getObject())) {
+			if (v) {
+				(*it)->show();
+				(*it)->setForceHide(false);
+			}
+			else {
+				(*it)->hide();
+				(*it)->setForceHide(true);
+			}
+		}
+	}
+}

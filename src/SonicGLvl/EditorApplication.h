@@ -46,6 +46,7 @@
 #include "Level.h"
 #include "Object.h"
 #include "ObjectCategory.h"
+#include "ObjectSet.h"
 
 #ifndef EDITOR_APPLICATION_H_INCLUDED
 #define EDITOR_APPLICATION_H_INCLUDED
@@ -138,6 +139,8 @@ class EditorApplication : public BaseApplication {
 		EditorLevelDatabase *level_database;
 		EditorLevel *current_level;
 		string current_level_filename;
+		map<LibGens::ObjectSet *, int> set_indices;
+		map<LibGens::ObjectSet *, bool> set_visibility;
 		
 		// Ogre
 		Ogre::Light *global_directional_light;
@@ -234,6 +237,7 @@ class EditorApplication : public BaseApplication {
 		vector<VectorNode *> property_vector_nodes;
 		History *property_vector_history;
 
+
 		// Material Editor
 		size_t material_editor_mode;
 		int material_editor_list_selection;
@@ -282,6 +286,7 @@ class EditorApplication : public BaseApplication {
 		void deleteSelection();
 		void clearSelection();
 		void cloneSelection();
+		void showSelectionNames();
 		void selectAll();
 		void translateSelection(Ogre::Vector3 v);
 		void rotateSelection(Ogre::Quaternion q);
@@ -338,6 +343,14 @@ class EditorApplication : public BaseApplication {
 		void saveXNAnimation();
 
 		void updateBottomSelectionGUI();
+		void updateSetsGUI();
+		void updateSelectedSetGUI();
+		void newCurrentSet();
+		void deleteCurrentSet();
+		void updateCurrentSetVisible(bool v);
+		void changeCurrentSet(string change_set);
+		void renameCurrentSet(string rename_set);
+
 
 		void openPhysicsEditorGUI();
 		void clearPhysicsEditorGUI();
@@ -444,6 +457,10 @@ class EditorApplication : public BaseApplication {
 
 		EditorLevel *getCurrentLevel() {
 			return current_level;
+		}
+
+		LibGens::ObjectSet *getCurrentSet() {
+			return current_set;
 		}
 
 		EditorAnimationsList *getAnimationsList() {

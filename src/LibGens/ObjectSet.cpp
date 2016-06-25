@@ -138,6 +138,10 @@ namespace LibGens {
 		name=nm;
 	}
 
+	void ObjectSet::setFilename(string nm) {
+		filename = nm;
+	}
+
 	string ObjectSet::getName() {
 		return name;
 	}
@@ -152,6 +156,10 @@ namespace LibGens {
 			objects.push_back(obj);
 			obj->setParentSet(this);
 		}
+	}
+
+	bool ObjectSet::hasObject(Object *obj) {
+		return std::find(objects.begin(), objects.end(), obj) != objects.end();
 	}
 
 	void ObjectSet::eraseObject(Object *obj) {

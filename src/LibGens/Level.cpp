@@ -625,6 +625,10 @@ namespace LibGens {
 		return slot;
 	}
 
+	string Level::getFolder() {
+		return folder;
+	}
+
 	string Level::getTerrainInfo() {
 		return terrain_info_file;
 	}
@@ -643,6 +647,10 @@ namespace LibGens {
 
 	void Level::addSet(ObjectSet *set) {
 		sets.push_back(set);
+	}
+
+	void Level::removeSet(ObjectSet *set) {
+		sets.remove(set);
 	}
 
 	list<ObjectSet *> Level::getSets() {

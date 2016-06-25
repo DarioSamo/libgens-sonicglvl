@@ -611,5 +611,11 @@ namespace LibGens {
 		}
 		return memory_size;
 	}
+
+	void Model::changeVertexFormat(int format) {
+		for (vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
+			(*it)->changeVertexFormat(format);
+		}
+	}
 };
 

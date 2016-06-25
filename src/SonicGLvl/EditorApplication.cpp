@@ -135,6 +135,20 @@ void EditorApplication::clearSelection() {
 	axis->setVisible(false);
 }
 
+void EditorApplication::showSelectionNames() {
+	string message = "";
+	for (list<EditorNode *>::iterator it=selected_nodes.begin(); it!=selected_nodes.end(); it++) {
+		if ((*it)->isSelected()) {
+			if ((*it)->getType() == EDITOR_NODE_TERRAIN) {
+				TerrainNode *terrain_node = (TerrainNode *) (*it);
+				message += terrain_node->getTerrainInstance()->getName() + "\n";
+			}
+		}
+	}
+
+	SHOW_MSG(message.c_str());
+}
+
 void EditorApplication::selectAll() {
 	bool stuff_selected = false;
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
@@ -668,6 +682,10 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			if(arg.key == OIS::KC_T) {
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_TERRAIN ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_TERRAIN);
+			}
+
+			if(arg.key == OIS::KC_I) {
+				showSelectionNames();
 			}
 
 			if(arg.key == OIS::KC_G) {

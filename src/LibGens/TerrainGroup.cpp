@@ -21,6 +21,7 @@
 #include "AR.h"
 #include "Model.h"
 #include "TerrainInstance.h"
+#include "Vertex.h"
 
 namespace LibGens {
 	TerrainGroupInfo::TerrainGroupInfo(TerrainGroup *group) {
@@ -307,7 +308,7 @@ namespace LibGens {
 
 	bool TerrainGroup::checkDistance(Vector3 position_to_check, float extra_range) {
 		current_distance = position_to_check.distance(center);
-		return (current_distance < extra_range);
+		return (current_distance < (radius + extra_range));
 	}
 
 	float TerrainGroup::getDistance(Vector3 position_to_check) {
@@ -340,6 +341,7 @@ namespace LibGens {
 		}
 
 		for (vector<Model *>::iterator it=models.begin(); it!=models.end(); it++) {
+			//(*it)->changeVertexFormat(LIBGENS_VERTEX_FORMAT_PC_TERRAIN);
 			(*it)->save("temp.bin");
 			ar_pack->addFile("temp.bin", (*it)->getName() + LIBGENS_TERRAIN_MODEL_EXTENSION);
 		}
@@ -350,6 +352,21 @@ namespace LibGens {
 
 
 	TerrainGroup::~TerrainGroup() {
+		unload();
+	}
+
+	void TerrainGroup::setSubsetID(int v) {
+		subset_id = v;
+	}
+
+	int TerrainGroup::getSubsetID() {
+		return subset_id;
+	}
+
+	void TerrainGroup::unload() {
+		instance_centers.clear();
+		instance_radius.clear();
+
 		for (vector< vector<TerrainInstance *> >::iterator it=instances.begin(); it!=instances.end(); it++) {
 			for (vector<TerrainInstance *>::iterator it2=(*it).begin(); it2!=(*it).end(); it2++) {
 				delete (*it2);
@@ -362,13 +379,5 @@ namespace LibGens {
 			delete (*it);
 		}
 		models.clear();
-	}
-
-	void TerrainGroup::setSubsetID(int v) {
-		subset_id = v;
-	}
-
-	int TerrainGroup::getSubsetID() {
-		return subset_id;
 	}
 };

@@ -27,6 +27,7 @@
 #define LIBGENS_LIGHT_LIST_FILENAME                  "light-list.light-list"
 
 #define LIBGENS_LIGHT_TYPE_DIRECTIONAL               0
+#define LIBGENS_LIGHT_TYPE_OMNI		                 1
 
 namespace LibGens {
 	class Light {
@@ -100,6 +101,7 @@ namespace LibGens {
 			int getLightCount();
 			Light *getLight(string name);
 			vector<Light *> getOmniLights();
+			vector<Light *> getLights();
 
 			void read(File *file);
 			void write(File *file);

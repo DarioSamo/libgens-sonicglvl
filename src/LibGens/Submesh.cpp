@@ -492,4 +492,9 @@ namespace LibGens {
 	unsigned int Submesh::getEstimatedMemorySize() {
 		return vertex_format->getSize() * vertices.size() + faces.size() * 2;
 	}
+
+	void Submesh::changeVertexFormat(int format) {
+		delete vertex_format;
+		setVertexFormat(new VertexFormat(format));
+	}
 };

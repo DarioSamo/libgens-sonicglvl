@@ -344,11 +344,6 @@ namespace LibGens {
 				}
 			}
 		}
-
-		if (!model) {
-			Error::addMessage(Error::NULL_REFERENCE, ToString(LIBGENS_TERRAIN_INSTANCE_ERROR_MESSAGE_NULL_MODEL_FILE) + " Model Name: " + model_name + ", Instance Name: " + name);
-			return;
-		}
 	}
 
 	

@@ -21,6 +21,7 @@
 #include "EditorNodeHistory.h"
 #include "ObjectNodeHistory.h"
 #include "ObjectLibrary.h"
+#include "ObjectSet.h"
 
 INT_PTR CALLBACK EditBoolCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK EditIntCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -110,7 +111,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		if (selected_objects.size() == 1) {
 			LibGens::Object *first_object = (*selected_objects.begin());
 			if (first_object) {
-				group_text += " (ID:" + ToString(first_object->getID()) + ")";
+				group_text += " (ID:" + ToString(first_object->getID()) + ", " + first_object->getParentSet()->getName() + ")";
 			}
 		}
 

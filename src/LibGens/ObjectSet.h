@@ -19,6 +19,8 @@
 
 #pragma once
 
+#define LIBGENS_OBJECT_SET_BASE "base"
+
 namespace LibGens {
 	class Object;
 	class ObjectLibrary;
@@ -33,9 +35,11 @@ namespace LibGens {
 			ObjectSet(string filename_p);
 			ObjectSet();
 			void setName(string nm);
+			void setFilename(string nm);
 			string getName();
 			string getFilename();
 			void addObject(Object *obj);
+			bool hasObject(Object *obj);
 
 			// Doesn't delete the object, only removes it from the list
 			void eraseObject(Object *obj);

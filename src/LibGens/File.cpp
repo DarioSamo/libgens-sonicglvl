@@ -666,6 +666,14 @@ namespace LibGens {
 		return "";
 	}
 
+	void File::rename(string old_filename, string new_filename) {
+		std::rename(old_filename.c_str(), new_filename.c_str());
+	}
+
+	void File::remove(string filename) {
+		std::remove(filename.c_str());
+	}
+
 	void File::setGlobalOffset(size_t v) {
 		global_offset = v;
 		goToAddress(0);

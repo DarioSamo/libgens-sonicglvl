@@ -19,6 +19,7 @@
 
 #include "EditorApplication.h"
 #include "ObjectLibrary.h"
+#include "ObjectSet.h"
 
 EditorLevelDatabase::EditorLevelDatabase(string filename) {
 	TiXmlDocument doc(filename);
@@ -190,6 +191,8 @@ void EditorApplication::openLevel(string filename) {
 	current_level->loadData(library, object_node_manager);
 
 	current_set = current_level->getLevel()->getSet("base");
+	updateSetsGUI();
+	updateSelectedSetGUI();
 
 	if (!current_set) {
 		current_set = current_level->getLevel()->getSet("Base");
@@ -254,6 +257,67 @@ void EditorApplication::openLevel(string filename) {
 	updateNodeVisibility();
 }
 
+void EditorApplication::newCurrentSet() {
+	if (current_level->getLevel()->getSet("rename_me")) {
+		MessageBox(NULL, "Rename the object set called \"rename_me\" first before creating a new object set.", "SonicGLvl", MB_OK);
+	}
+	else {
+		LibGens::ObjectSet *set = new LibGens::ObjectSet();
+		set->setName("rename_me");
+		set->setFilename(current_level->getLevel()->getFolder() + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+		current_level->getLevel()->addSet(set);
+		current_set = set;
+		updateSetsGUI();
+		updateSelectedSetGUI();
+	}
+}
+
+void EditorApplication::deleteCurrentSet() {
+	if (current_set) {
+		if (current_set->getName() != LIBGENS_OBJECT_SET_BASE) {
+			current_level->getLevel()->removeSet(current_set);
+			delete current_set;
+			current_set = current_level->getLevel()->getSet(LIBGENS_OBJECT_SET_BASE);
+			updateSetsGUI();
+			updateSelectedSetGUI();
+		}
+		else
+			MessageBox(NULL, "You can't delete the base object set.", "SonicGLvl", MB_OK);
+	}
+}
+
+void EditorApplication::changeCurrentSet(string change_set) {
+	LibGens::ObjectSet *set = current_level->getLevel()->getSet(change_set);
+	if (set) {
+		current_set = set;
+		updateSelectedSetGUI();
+	}
+	else
+		MessageBox(NULL, "Could not change to that set because no set with that name exists on the level.", "SonicGLvl", MB_OK);
+}
+
+void EditorApplication::renameCurrentSet(string rename_set) {
+	if (current_set && !current_level->getLevel()->getSet(rename_set)) {
+		string folder = LibGens::File::folderFromFilename(current_set->getFilename());
+		string new_filename = folder + LIBGENS_OBJECT_SET_NAME + rename_set + LIBGENS_OBJECT_SET_EXTENSION;
+		LibGens::File::remove(current_set->getFilename());
+		current_set->setFilename(new_filename);
+		current_set->setName(rename_set);
+		current_set->saveXML(new_filename);
+	}
+	else {
+		MessageBox(NULL, "A set with that name already exists!", "SonicGLvl", MB_OK);
+		updateSetsGUI();
+		updateSelectedSetGUI();
+	}
+}
+
+void EditorApplication::updateCurrentSetVisible(bool v) {
+	if (current_set) {
+		set_visibility[current_set] = v;
+		object_node_manager->updateSetVisibility(current_set, v);
+	}
+}
 
 void EditorApplication::createDirectionalLight(LibGens::Light *direct_light) {
 	LibGens::Vector3 light_direction=direct_light->getPosition();

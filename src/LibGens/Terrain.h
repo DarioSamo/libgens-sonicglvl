@@ -65,7 +65,7 @@ namespace LibGens {
 				material_library = NULL;
 			}
 
-			Terrain(string filename, string groups_folder, string resources_folder_p, string terrain_folder, string gia="", bool load_groups=true);
+			Terrain(string filename, string groups_folder, string resources_folder_p, string terrain_folder="", string gia="", bool load_groups=true);
 			void save(string filename);
 
 			void read(File *file, string groups_folder, string terrain_folder, bool load_groups);

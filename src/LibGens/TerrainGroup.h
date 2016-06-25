@@ -71,6 +71,7 @@ namespace LibGens {
 			vector<Vector3> getInstanceCenters();
 			bool checkDistance(Vector3 position_to_check, float extra_range);
 			float getDistance(Vector3 position_to_check);
+			void unload();
 
 			void setCenter(Vector3 center_p) {
 				center = center_p;

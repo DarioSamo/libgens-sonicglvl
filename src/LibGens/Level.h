@@ -169,7 +169,9 @@ namespace LibGens {
 			string getTerrainInfo();
 			string getDirectLight();
 			string getSkybox();
+			string getFolder();
 			void addSet(ObjectSet *set);
+			void removeSet(ObjectSet *set);
 			list<ObjectSet *> getSets();
 			list<Path *> getPaths();
 			Object *getObjectByID(size_t id);

@@ -423,4 +423,12 @@ namespace LibGens {
 			}
 		}
 	}
+
+	void Mesh::changeVertexFormat(int format) {
+		for (size_t slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
+			for (vector<Submesh *>::iterator it=submeshes[slot].begin(); it!=submeshes[slot].end(); it++) {
+				(*it)->changeVertexFormat(format);
+			}
+		}
+	}
 };
