@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <Range type="float" default="300" description="object culling range" />
-  <Direction type="enum" description="the rotation of orientation" />
-  <DelayTime type="float" description="phase" />
-  <Extra type="model" name="w4_obj_candy01.model" />
-</Template>
