@@ -3,7 +3,6 @@
 
 EditorCamera::EditorCamera(Ogre::SceneManager *scene_manager, Ogre::Camera *camera) {
 	this->camera = camera;
-	camera->setFixedYawAxis(false);
 }
 
 void EditorCamera::mousePressEvent(Qt::MouseButton button, float rx, float ry) {

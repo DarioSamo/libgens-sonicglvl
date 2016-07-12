@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="QtMocs.cpp" />
+    <ClCompile Include="HCWindow.cpp" />
+    <ClCompile Include="HCWindowConvert.cpp" />
+    <ClCompile Include="HCMaterialDialog.cpp" />
+    <ClCompile Include="HCWindowConvertGroup.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="HCWindow.ui" />
+    <CustomBuild Include="HCWindow.h" />
+    <CustomBuild Include="HCMaterialDialog.ui" />
+    <CustomBuild Include="HCMaterialDialog.h" />
+    <CustomBuild Include="HCResource.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+</Project>

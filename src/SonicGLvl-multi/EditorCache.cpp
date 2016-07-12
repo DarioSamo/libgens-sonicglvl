@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor
 //    for the PC version of Sonic Generations.
@@ -21,6 +21,7 @@
 #include "EditorCache.h"
 #include "LibGens.h"
 #include "PAC.h"
+#include "AR.h"
 
 /** EditorHash */
 
@@ -129,6 +130,16 @@ const QString EditorCache::ObjPath = "obj";
 const QString EditorCache::SkyPath = "sky";
 const QString EditorCache::TrrCmnPath = "trr_cmn";
 const QString EditorCache::PacExtension = ".pac";
+#elif SONICGLVL_GENERATIONS
+const QString EditorCache::PackedPath = "Packed";
+const QString EditorCache::DataPath = "data";
+const QString EditorCache::ResourcesPath = "resources";
+const QString EditorCache::TerrainPath = "terrain";
+const QString EditorCache::TerrainAddPath = "terrain_add";
+const QString EditorCache::StagePath = "Stage";
+const QString EditorCache::StageAddPath = "Stage-Add";
+const QString EditorCache::ArExtension = ".ar.00";
+const QString EditorCache::PfdExtension = ".pfd";
 #endif
 
 EditorCache::EditorCache(QString program_path) {
@@ -201,7 +212,7 @@ QString EditorCache::absolutePath() {
 	return path;
 }
 
-void EditorCache::unpackFileSafe(QString stage_name, QString filename, QString logic_name, QProgressDialog &progress) {
+void EditorCache::unpackFileSafe(QString stage_name, QString filename, QString logic_name, QProgressDialog &progress, QString suffix) {
 	progress.setLabelText(QString("Verifying %1").arg(logic_name));
 
 	// Check if it already exists in cache
@@ -209,6 +220,9 @@ void EditorCache::unpackFileSafe(QString stage_name, QString filename, QString l
 #ifdef SONICGLVL_LOST_WORLD
 	LibGens::PacSet set(filename.toStdString());
 	for (int i=0; i<5; i++) sha1_hash[i] = set.getSHA1Hash(i);
+#elif SONICGLVL_GENERATIONS
+	LibGens::ArPack pack(filename.toStdString());
+	for (int i=0; i<5; i++) sha1_hash[i] = pack.getHash()[i];
 #endif
 
 	EditorHash file_hash(sha1_hash);
@@ -227,7 +241,6 @@ void EditorCache::unpackFileSafe(QString stage_name, QString filename, QString l
 		QDir dir(file_directory);
 		dir.setNameFilters(QStringList() << "*.*");
 		dir.setFilter(QDir::Files);
-
 		QStringList file_list = dir.entryList();
 		foreach(QString file, file_list) {
 			dir.remove(file);
@@ -236,6 +249,8 @@ void EditorCache::unpackFileSafe(QString stage_name, QString filename, QString l
 		// Extract files to directory
 #ifdef SONICGLVL_LOST_WORLD
 		set.extract(file_directory.toStdString() + "/");
+#elif SONICGLVL_GENERATIONS
+		pack.extract(file_directory.toStdString() + "/", suffix.toStdString());
 #endif
 
 		hash.addFileHash(logic_name, file_hash);
@@ -264,7 +279,10 @@ bool EditorCache::unpackStage(QString stage_name, QString path, QWidget *parent)
 		int current_progress = 0;
 #ifdef SONICGLVL_LOST_WORLD
 		int max_progress_count = 5;
+#elif SONICGLVL_GENERATIONS
+		int max_progress_count = 4;
 #endif
+
 		QProgressDialog progress(QString(), QString(), 0, max_progress_count, parent);
 		progress.setWindowTitle("Unpacking Stage to Cache...");
 		progress.setWindowModality(Qt::WindowModal);
@@ -280,6 +298,18 @@ bool EditorCache::unpackStage(QString stage_name, QString path, QWidget *parent)
 		unpackFileSafe(stage_name, dir_base_name + "/" + stage_name + "_" + SkyPath + PacExtension, SkyPath, progress);
 		progress.setValue(current_progress++);
 		unpackFileSafe(stage_name, dir_base_name + "/" + stage_name + "_" + TrrCmnPath + PacExtension, TrrCmnPath, progress);
+		progress.setValue(current_progress++);
+#elif SONICGLVL_GENERATIONS
+		unpackFileSafe(stage_name, dir_base_name + "/#" + stage_name + ArExtension, DataPath, progress);
+		progress.setValue(current_progress++);
+
+		unpackFileSafe(stage_name, dir_base_name + "/" + PackedPath + "/" + stage_name + "/" + stage_name + ArExtension, ResourcesPath, progress);
+		progress.setValue(current_progress++);
+
+		unpackFileSafe(stage_name, dir_base_name + "/" + PackedPath + "/" + stage_name + "/" + StagePath + PfdExtension, TerrainPath, progress, ".cab");
+		progress.setValue(current_progress++);
+
+		unpackFileSafe(stage_name, dir_base_name + "/" + PackedPath + "/" + stage_name + "/" + StageAddPath + PfdExtension, TerrainAddPath, progress, ".cab");
 		progress.setValue(current_progress++);
 #endif
 
@@ -311,4 +341,21 @@ QString EditorCache::farPath(QString stage_name) {
 QString EditorCache::terrainCommonPath(QString stage_name) {
 	return stagePath(stage_name) + "/" + TrrCmnPath;
 }
+#elif SONICGLVL_GENERATIONS
+QString EditorCache::dataPath(QString stage_name) {
+	return stagePath(stage_name) + "/" + DataPath;
+}
+
+QString EditorCache::resourcesPath(QString stage_name) {
+	return stagePath(stage_name) + "/" + ResourcesPath;
+}
+
+QString EditorCache::terrainPath(QString stage_name) {
+	return stagePath(stage_name) + "/" + TerrainPath;
+}
+
+QString EditorCache::terrainAddPath(QString stage_name) {
+	return stagePath(stage_name) + "/" + TerrainAddPath;
+}
+
 #endif

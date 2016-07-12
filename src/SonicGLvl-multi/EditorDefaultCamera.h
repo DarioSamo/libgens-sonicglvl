@@ -26,4 +26,6 @@ public:
 	virtual bool keyReleaseEvent(int key);
 	virtual bool wheelEvent(int z);
 	virtual void timerEvent(Ogre::Real time);
+	Ogre::Vector3 getPosition();
+	Ogre::Quaternion getOrientation();
 };

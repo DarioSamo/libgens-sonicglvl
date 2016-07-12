@@ -22,6 +22,8 @@
     <ClCompile Include="EditorCamera.cpp" />
     <ClCompile Include="EditorDefaultCamera.cpp" />
     <ClCompile Include="EditorObjects.cpp" />
+    <ClCompile Include="EditorTerrainStreamer.cpp" />
+    <ClCompile Include="EditorLightNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OgreSystem.h" />
@@ -39,6 +41,7 @@
     <ClInclude Include="EditorCamera.h" />
     <ClInclude Include="EditorDefaultCamera.h" />
     <ClInclude Include="EditorObjects.h" />
+    <ClInclude Include="EditorLightNode.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="EditorWindow.ui" />
@@ -47,5 +50,6 @@
     <CustomBuild Include="EditorViewport.h" />
     <CustomBuild Include="OgreViewportWidget.h" />
     <CustomBuild Include="EditorResource.qrc" />
+    <CustomBuild Include="EditorTerrainStreamer.h" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="Icon">
+    <file>Icon.ico</file>
+  </qresource>
+  <qresource prefix="Button">
+    <file>down.png</file>
+    <file>up.png</file>
+    <file>minus.png</file>
+    <file>plus.png</file>
+  </qresource>
+</RCC>

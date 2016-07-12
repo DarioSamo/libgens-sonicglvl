@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor
 //    for the PC version of Sonic Generations.
@@ -24,21 +24,32 @@ OgreSystem::OgreSystem() {
     root = new Ogre::Root();
     render_system = NULL;
 
-    Ogre::RenderSystem* Direct3D9RenderSystem = loadRenderSystem("Direct3D9");
-    Ogre::RenderSystem* OpenGLRenderSystem = NULL;
+    Ogre::RenderSystem* Direct3D9RenderSystem = NULL;
+
+    try {
+        root->loadPlugin("RenderSystem_Direct3D9");
+    }
+    catch (...) {
+        qWarning("Failed to load Direct3D9 plugin");
+    }
+
+    Ogre::RenderSystemList list = root->getAvailableRenderers();
+    Ogre::RenderSystemList::iterator i = list.begin();
+
+    while (i != list.end()) {
+        if ((*i)->getName() == "Direct3D9 Rendering Subsystem") {
+            Direct3D9RenderSystem = *i;
+        }
+        i++;
+    }
 
     if (!Direct3D9RenderSystem) {
-        OpenGLRenderSystem = loadRenderSystem("OpenGL");
-        if (!OpenGLRenderSystem) {
-            qCritical("No rendering subsystems found");
-            exit(0);
-        }
+        qCritical("No rendering subsystems found");
+        exit(0);
     }
 
     if (Direct3D9RenderSystem != 0) {
         render_system = Direct3D9RenderSystem;
-    } else if (OpenGLRenderSystem != 0) {
-        render_system = OpenGLRenderSystem;
     }
 
     root->setRenderSystem(render_system);
@@ -47,30 +58,6 @@ OgreSystem::OgreSystem() {
 
 OgreSystem::~OgreSystem() {
 
-}
-
-Ogre::RenderSystem* OgreSystem::loadRenderSystem(const std::string systemName) {
-    try {
-        if (systemName == "OpenGL") {
-            root->loadPlugin("RenderSystem_GL");
-        } else {
-            root->loadPlugin("RenderSystem_" + systemName);
-        }
-    }
-    catch (...) {
-        qWarning(("Failed to load " + systemName + std::string(" plugin")).c_str());
-    }
-
-    Ogre::RenderSystemList list = root->getAvailableRenderers();
-    Ogre::RenderSystemList::iterator i = list.begin();
-
-    while (i != list.end()) {
-        if ((*i)->getName() == systemName + " Rendering Subsystem") {
-            return *i;
-        }
-        i++;
-    }
-    return NULL;
 }
 
 Ogre::Root *OgreSystem::getRoot() {
@@ -82,8 +69,5 @@ Ogre::SceneManager *OgreSystem::createSceneManager() {
 }
 
 void OgreSystem::setupResources() {
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("database/resources", "FileSystem");
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation("database/shaders", "FileSystem");
     Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
 }

@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor
 //    for the PC version of Sonic Generations.
@@ -26,6 +26,7 @@ namespace Ui {
 namespace LibGens {
 	class ShaderLibrary;
 	class ObjectLibrary;
+	class Terrain;
 }
 
 class EditorDefaultCamera;
@@ -36,6 +37,7 @@ class EditorTerrain;
 class EditorGIListener;
 class EditorSky;
 class EditorObjects;
+class EditorTerrainStreamer;
 class OgreSystem;
 class OgreViewportWidget;
 
@@ -45,9 +47,12 @@ class EditorWindow : public QMainWindow
 
 public:
     static const int UpdateTimerMs;
+	static const QString DatabasePath;
 	static const QString ObjectDatabasePath;
 	static const QString ObjectDatabaseFilename;
 	static const QString ShaderDatabasePath;
+	static const QString ShaderParameterDatabaseFilename;
+	static const QString OgreResourcesPath;
 
     explicit EditorWindow(QWidget *parent = 0);
     ~EditorWindow();
@@ -66,11 +71,14 @@ private:
 	EditorSky *editor_sky;
 	EditorObjects *editor_objects;
 	EditorDefaultCamera *editor_fps_camera;
+	EditorTerrainStreamer *terrain_streamer;
 	LibGens::ShaderLibrary *shader_library;
 	LibGens::ObjectLibrary *object_library;
+	LibGens::Terrain *terrain;
     int timer_index;
     QElapsedTimer timer_elapsed;
 
+	void updateStreamer();
 	void setupWindowTitle();
 	void setupObjectLibrary();
 	QString programPath();

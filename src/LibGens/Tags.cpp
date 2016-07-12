@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor 
 //    for the PC version of Sonic Generations.
@@ -70,6 +70,11 @@ namespace LibGens {
 				// Add all other characters otherwise
 				value += str[c];
 			}
+		}
+
+		// If this tag has no parameters, we assign the key as the entire string.
+		if (!reading_values) {
+			key = str;
 		}
 	}
 

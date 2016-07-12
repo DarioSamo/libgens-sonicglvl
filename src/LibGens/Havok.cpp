@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor 
 //    for the PC version of Sonic Generations.
@@ -37,7 +37,6 @@
 #define HK_CLASSES_FILE <Common/Serialize/Classlist/hkClasses.h>
 #define HK_EXCLUDE_FEATURE_MemoryTracker
 #define HK_EXCLUDE_FEATURE_RegisterVersionPatches 
-#define HK_EXCLUDE_LIBRARY_hkGeometryUtilities
 
 namespace LibGens {
 };

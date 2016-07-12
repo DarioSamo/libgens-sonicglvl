@@ -5,7 +5,7 @@
 #include "Submesh.h"
 #include "Vertex.h"
 
-QList<Ogre::String> EditorModelConverter::convertModel(LibGens::Model *model) {
+QList<Ogre::String> EditorModelConverter::convertModel(LibGens::Model *model, Ogre::String resource_group_name) {
 	QList<Ogre::String> mesh_names;
 
 	if (model) {
@@ -14,7 +14,7 @@ QList<Ogre::String> EditorModelConverter::convertModel(LibGens::Model *model) {
 			vector<LibGens::Submesh *> *submeshes = meshes[m]->getSubmeshSlots();
 			for (size_t slot = 0; slot < LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
 				Ogre::String mesh_name = model->getName() + "_" + ToString(m) + "_" + ToString(slot);
-				Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().createManual(mesh_name, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+				Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().createManual(mesh_name, resource_group_name);
 				Ogre::AxisAlignedBox mesh_aabb;
 				mesh_aabb.setNull();
 
@@ -22,7 +22,7 @@ QList<Ogre::String> EditorModelConverter::convertModel(LibGens::Model *model) {
 					// Get LibGens Data
 					LibGens::Submesh *submesh=submeshes[slot][s];
 					vector<LibGens::Vertex *> submesh_vertices = submesh->getVertices();
-					vector<LibGens::Vector3> submesh_faces = submesh->getFaces();
+					vector<LibGens::Polygon> submesh_faces = submesh->getFaces();
 
 					const size_t nVertices = submesh_vertices.size();
 					const size_t nVertCount = 24;
@@ -58,9 +58,9 @@ QList<Ogre::String> EditorModelConverter::convertModel(LibGens::Model *model) {
 					unsigned short *faces = (unsigned short *) malloc(sizeof(unsigned short) * ibufCount);
 
 					for (size_t i = 0; i < submesh_faces.size(); i++) {
-						faces[i*3]   = submesh_faces[i].x;
-						faces[i*3+1] = submesh_faces[i].y;
-						faces[i*3+2] = submesh_faces[i].z;
+						faces[i*3]   = submesh_faces[i].a;
+						faces[i*3+1] = submesh_faces[i].b;
+						faces[i*3+2] = submesh_faces[i].c;
 					}
 
 					Ogre::SubMesh* sub = mesh->createSubMesh();

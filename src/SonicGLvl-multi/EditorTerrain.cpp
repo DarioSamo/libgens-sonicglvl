@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor
 //    for the PC version of Sonic Generations.
@@ -139,6 +139,36 @@ void EditorTerrain::load(QString directory, QWidget *parent) {
 	}
 
 	progress.setValue(progress_max_count);
+#elif SONICGLVL_GENERATIONS
+	LibGens::LightList *light_list = new LibGens::LightList(directory.toStdString() + "/" + LIBGENS_LIGHT_LIST_FILENAME);
+	vector<LibGens::Light *> lights = light_list->getLights();
+	size_t sz = lights.size();
+	bool directional_created = false;
+	for (size_t l = 0; l < sz; l++) {
+		LibGens::Light *light = lights[l];
+
+		if ((light->getType() == LIBGENS_LIGHT_TYPE_DIRECTIONAL) && !directional_created) {
+			LibGens::Vector3 light_direction = light->getPosition();
+			LibGens::Vector3 light_color = light->getColor();
+
+			Ogre::Light *ogre_light = scene_manager->createLight(light->getName());
+			ogre_light->setSpecularColour(Ogre::ColourValue::White);
+			ogre_light->setDiffuseColour(Ogre::ColourValue(light_color.x, light_color.y, light_color.z));
+			ogre_light->setType(Ogre::Light::LT_DIRECTIONAL);
+			ogre_light->setDirection(Ogre::Vector3(-light_direction.x, -light_direction.y, -light_direction.z));
+			directional_created = true;
+		}
+		else if (light->getType() == LIBGENS_LIGHT_TYPE_OMNI) {
+			LibGens::Vector3 light_position = light->getPosition();
+			LibGens::Vector3 light_color = light->getColor();
+
+			Ogre::Light *ogre_light = scene_manager->createLight(light->getName());
+			ogre_light->setDiffuseColour(Ogre::ColourValue(light_color.x, light_color.y, light_color.z));
+			ogre_light->setType(Ogre::Light::LT_POINT);
+			ogre_light->setPosition(Ogre::Vector3(light_position.x, light_position.y, light_position.z));
+			ogre_light->setAttenuation(light->getOuterRange() * 2.0f, 0, light->getInnerRange(), light->getOuterRange());
+		}
+	}
 #endif
 }
 

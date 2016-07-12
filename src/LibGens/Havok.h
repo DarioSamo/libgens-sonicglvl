@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor 
 //    for the PC version of Sonic Generations.
@@ -36,6 +36,7 @@
 #include <Common/Serialize/Util/hkSerializeUtil.h>
 #include <Common/Serialize/Packfile/Binary/hkBinaryPackfileWriter.h>
 #include <Physics/Utilities/Serialize/hkpPhysicsData.h>
+#include <Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h>
 #include <Physics/Dynamics/hkpDynamics.h>
 #include <Physics/Dynamics/Entity/hkpRigidBody.h>
 #include <Physics/Dynamics/Entity/hkpRigidBodyCinfo.h>
@@ -44,6 +45,10 @@
 #include <Physics/Collide/Shape/hkpShapeBuffer.h>
 #include <Physics/Collide/Shape/hkpShapeContainer.h>
 #include <Physics/Collide/Shape/hkpShapeType.h>
+#include <Physics/Collide/Shape/Convex/Box/hkpBoxShape.h>
+#include <Physics/Collide/Shape/Compound/Collection/StorageExtendedMesh/hkpStorageExtendedMeshShape.h>
+#include <Physics/Collide/Util/Welding/hkpMeshWeldingUtility.h>
+
 #include <Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppBvTreeShape.h>
 #include <Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppCompilerInput.h>
 #include <Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppUtility.h>

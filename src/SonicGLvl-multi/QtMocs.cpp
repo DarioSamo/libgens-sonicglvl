@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "moc_EditorTerrainStreamer.cpp"
 #include "moc_EditorViewport.cpp"
 #include "moc_EditorViewportsWidget.cpp"
 #include "moc_EditorWindow.cpp"

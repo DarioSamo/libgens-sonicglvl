@@ -18,6 +18,10 @@ EditorDefaultCamera::EditorDefaultCamera(Ogre::SceneManager *scene_manager, Ogre
 	roll_left = roll_right = false;
 	rotating = panning = rolling = false;
 	pitch_angle = 0.0F;
+
+#ifdef SONICGLVL_LOST_WORLD
+	camera->setFixedYawAxis(false);
+#endif
 }
 
 void EditorDefaultCamera::mousePressEvent(Qt::MouseButton button, float rx, float ry) {
@@ -74,8 +78,10 @@ bool EditorDefaultCamera::keyPressEvent(int key) {
 	else if (key == Qt::Key_S) down = true;
 	else if (key == Qt::Key_A) left = true;
 	else if (key == Qt::Key_D) right = true;
+#ifdef SONICGLVL_LOST_WORLD
 	else if (key == Qt::Key_Q) roll_left = true;
 	else if (key == Qt::Key_E) roll_right = true;
+#endif
 	else if (key == Qt::Key_Shift) shift = true;
 	else if (key == Qt::Key_Alt) alt = true;
 	else return false;
@@ -105,4 +111,12 @@ void EditorDefaultCamera::timerEvent(Ogre::Real time_since_last) {
 	if (right) moveCameraRelative(Ogre::Vector3::UNIT_X * multiplier);
 	if (roll_left) rollCamera(Ogre::Radian(MoveRollMultiplier * time_since_last));
 	if (roll_right) rollCamera(Ogre::Radian(-MoveRollMultiplier * time_since_last));
+}
+
+Ogre::Vector3 EditorDefaultCamera::getPosition() {
+	return camera->getPosition();
+}
+
+Ogre::Quaternion EditorDefaultCamera::getOrientation() {
+	return camera->getOrientation();
 }

@@ -11,7 +11,7 @@ public:
 	EditorStage();
 	QString stageName();
 	bool load(QString filename, QString &error);
-	static QString extension();
+	static QString extensionFilter();
 	QString filename();
 #ifdef SONICGLVL_LOST_WORLD
 	QString setsDirectory();

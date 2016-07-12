@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="QtMocs.cpp" />
+    <ClCompile Include="HKWindow.cpp" />
+    <ClCompile Include="HKWindowConvert.cpp" />
+    <ClCompile Include="HKPropertyDialog.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="HKWindow.h" />
+    <CustomBuild Include="HKWindow.ui" />
+    <CustomBuild Include="HKResource.qrc" />
+    <CustomBuild Include="HKPropertyDialog.h" />
+    <CustomBuild Include="HKPropertyDialog.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HKPropertyTag.h" />
+  </ItemGroup>
+</Project>

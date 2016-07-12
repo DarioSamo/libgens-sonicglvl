@@ -1,0 +1,96 @@
+//=========================================================================
+//	  Copyright (c) 2015 SonicGLvl
+//
+//    This file is part of SonicGLvl, a community-created free level editor 
+//    for the PC version of Sonic Generations.
+//
+//    SonicGLvl is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    SonicGLvl is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//    
+//
+//    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
+//=========================================================================
+
+#include "LibGens.h"
+#include "PAC.h"
+#include "FreeImage.h"
+#include "GITextureGroup.h"
+
+int main(int argc, char** argv) {
+	if (argc < 2) {
+        printf("Usage: gia-extractor atlasinfo_file\n");
+		getchar();
+        return 1;
+    }
+
+	string atlasinfo_filename = ToString(argv[1]);
+	string atlasinfo_folder = LibGens::File::folderFromFilename(atlasinfo_filename);
+
+	LibGens::initialize();
+	LibGens::Error::setLogging(true);
+
+	FreeImage_Initialise();
+
+	LibGens::File atlasinfo_file(atlasinfo_filename, LIBGENS_FILE_READ_BINARY);
+	if (atlasinfo_file.valid()) {
+		LibGens::GITextureGroup *texture_group = new LibGens::GITextureGroup();
+		texture_group->readAtlasinfo(&atlasinfo_file, "", vector<string>());
+		atlasinfo_file.close();
+
+		list<LibGens::GITexture *> textures = texture_group->getTextures();
+		for (list<LibGens::GITexture *>::iterator it=textures.begin(); it!=textures.end(); it++) {
+			LibGens::GITexture *tex = *it;
+			string tex_name = tex->getName();
+			FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+			FIBITMAP* bitmap = NULL;
+			string texture_filename = (atlasinfo_folder + tex_name + ".dds");
+			fif = FreeImage_GetFileType(texture_filename.c_str());
+			if (fif == FIF_UNKNOWN)
+				fif = FreeImage_GetFIFFromFilename(texture_filename.c_str());
+
+			if (fif != FIF_UNKNOWN) {
+				bitmap = FreeImage_Load(fif, texture_filename.c_str());
+
+				if (bitmap) {
+					int width = FreeImage_GetWidth(bitmap);
+					int height = FreeImage_GetHeight(bitmap);
+
+					list<LibGens::GISubtexture *> subtextures = tex->getSubtextures();
+					for (list<LibGens::GISubtexture *>::iterator it2=subtextures.begin(); it2!=subtextures.end(); it2++) {
+						int crop_x = (*it2)->getX() * width;
+						int crop_y = (*it2)->getY() * height;
+						int crop_w = (*it2)->getWidth() * width;
+						int crop_h = (*it2)->getHeight() * height;
+						FIBITMAP *crop_bitmap = FreeImage_Copy(bitmap, crop_x, crop_y, crop_x + crop_w, crop_y + crop_h);
+						char output_filename_png[8096] = "";
+						char output_filename_dds[8096] = "";
+						sprintf(output_filename_png, "%s%s.png", atlasinfo_folder.c_str(), (*it2)->getName().c_str());
+						sprintf(output_filename_dds, "%s%s.dds", atlasinfo_folder.c_str(), (*it2)->getName().c_str());
+						if (FreeImage_Save(FIF_PNG, crop_bitmap, output_filename_png)) {
+							char command[8096]="";
+							sprintf(command, "nvdxt -file \"%s\" -output \"%s\"", output_filename_png, output_filename_dds);
+							system(command);
+
+							std::remove(output_filename_png);
+						}
+
+						FreeImage_Unload(crop_bitmap);
+					}
+
+					FreeImage_Unload(bitmap);	
+				}
+			}
+		}
+	}
+	else {
+		printf("Couldn't open %s\n", atlasinfo_filename.c_str());
+	}
+
+    return 0;
+}

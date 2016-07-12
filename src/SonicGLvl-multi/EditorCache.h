@@ -46,6 +46,16 @@ public:
 	static const QString SkyPath;
 	static const QString TrrCmnPath;
 	static const QString PacExtension;
+#elif SONICGLVL_GENERATIONS
+	static const QString PackedPath;
+	static const QString DataPath;
+	static const QString ResourcesPath;
+	static const QString TerrainPath;
+	static const QString TerrainAddPath;
+	static const QString StagePath;
+	static const QString StageAddPath;
+	static const QString ArExtension;
+	static const QString PfdExtension;
 #endif
 
 	EditorCache(QString program_path);
@@ -59,7 +69,7 @@ public:
 		@param filename Full filename to be unpacked.
 		@param logic_name Logical name of the file to be stored inside the hashes.
 	*/
-	void unpackFileSafe(QString stage_name, QString filename, QString logic_name, QProgressDialog &progress);
+	void unpackFileSafe(QString stage_name, QString filename, QString logic_name, QProgressDialog &progress, QString suffix = QString());
 	bool unpackStage(QString stage_name, QString path, QWidget *parent);
 	bool packStage(QString stage_name, QString path);
 	QString hashFilename();
@@ -71,5 +81,10 @@ public:
 	QString skyPath(QString stage_name);
 	QString farPath(QString stage_name);
 	QString terrainCommonPath(QString stage_name);
+#elif SONICGLVL_GENERATIONS
+	QString dataPath(QString stage_name);
+	QString resourcesPath(QString stage_name);
+	QString terrainPath(QString stage_name);
+	QString terrainAddPath(QString stage_name);
 #endif
 };

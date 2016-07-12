@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor
 //    for the PC version of Sonic Generations.
@@ -51,5 +51,8 @@ void EditorViewportsWidget::createResources() {
 }
 
 EditorViewport *EditorViewportsWidget::getMainViewport() {
-	return viewports.first();
+	if (viewports.isEmpty())
+		return NULL;
+	else
+		return viewports.first();
 }

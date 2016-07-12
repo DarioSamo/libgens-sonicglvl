@@ -1,5 +1,5 @@
 //=========================================================================
-//	  Copyright (c) 2015 SonicGLvl
+//	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor
 //    for the PC version of Sonic Generations.
@@ -31,9 +31,9 @@ QString EditorStage::stageName() {
 bool EditorStage::load(QString filename, QString &error) {
 	stage_filename = filename;
 
+	QFileInfo info(filename);
 #ifdef SONICGLVL_LOST_WORLD
 	// Point to LUA file, figure out the stage directory from that
-	QFileInfo info(filename);
 	QDir directory = info.dir();
 	stage_name = directory.dirName();
 	directory.cdUp();
@@ -46,14 +46,26 @@ bool EditorStage::load(QString filename, QString &error) {
 	else {
 		error = "Couldn't detect a valid stage name from the directory where this file is stored.";
 	}
+#elif SONICGLVL_GENERATIONS
+	stage_name = info.baseName();
+	stage_name.remove("#");
+
+	if (!stage_name.isEmpty()) {
+		return true;
+	}
+	else {
+		error = "Couldn't detect a valid stage name from the filename.";
+	}
 #endif
 
 	return false;
 }
 
-QString EditorStage::extension() {
+QString EditorStage::extensionFilter() {
 #ifdef SONICGLVL_LOST_WORLD
-	return ".lua";
+	return "*.lua";
+#elif SONICGLVL_GENERATIONS
+	return "#*.ar.00";
 #endif
 }
 
