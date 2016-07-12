@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<LevelDatabase>
+  <Entry name="Common" folder="common" />
+  <Entry name="Mission Common" folder="mission" />
+  <Entry name="Cameras" folder="cameras" />
+  <Entry name="Enemies" folder="enemies" />
+  <Entry name="Mode Changers" folder="mode_changers" />
+  <Entry name="Collision Triggers" folder="collision" />
+  <Entry name="Terrain Controllers" folder="terrain" />
+  <Entry name="Sounds" folder="sounds" />
+  <Entry name="Green Hill Zone" folder="ghz" />
+  <Entry name="Chemical Plant Zone" folder="cpz" />
+  <Entry name="Sky Sanctuary Zone" folder="ssz" />
+  <Entry name="Speed Highway" folder="sph" />
+  <Entry name="City Escape" folder="cte" />
+  <Entry name="Seaside Hill" folder="ssh" />
+  <Entry name="Crisis City" folder="csc" />
+  <Entry name="Rooftop Run" folder="euc" />
+  <Entry name="Planet Wisp" folder="pla" />
+  <Entry name="Sonic Unleashed (Generations Compatible)" folder="unleashed_compatible" />
+  <Entry name="Sonic Unleashed" folder="unleashed" />
+  <Entry name="Unassigned" folder="unassigned" />
+</LevelDatabase>

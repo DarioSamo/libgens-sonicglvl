@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="20" description="" />
+  <Collision_Width type="float" default="20" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <m_GIEnable type="bool" default="true" description="" />
+  <m_MinGIMipLevel type="float" default="2" description="" />
+  <m_TargetRadius type="float" default="101" description="" />
+  <m_TerrainEnable type="bool" default="true" description="" />
+</Template>

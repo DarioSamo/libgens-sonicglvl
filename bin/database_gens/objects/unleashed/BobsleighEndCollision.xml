@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="25" description="" />
+  <Collision_Width type="float" default="20" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <JumpAngle type="float" default="45" description="" />
+  <LeaveType type="float" default="0" description="" />
+  <UncontrollableTime type="float" default="3" description="" />
+  <Velocity type="float" default="40" description="" />
+</Template>
