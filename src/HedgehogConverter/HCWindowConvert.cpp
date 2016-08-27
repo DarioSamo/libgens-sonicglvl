@@ -46,6 +46,10 @@
 
 const int HCWindow::BaseUnassignedGroupIndex = 0x800000;
 
+QString HCWindow::temporaryDirTemplate() {
+	return converter_settings.terrain_output_path + "/HedgehogConverter-temp-XXXXXX";
+}
+
 bool HCWindow::convert() {
 	QMap<string, bool> overwrite_materials;
 	HCMaterialDialog dialog(&overwrite_materials, this);
@@ -55,8 +59,8 @@ bool HCWindow::convert() {
 	QString texture_source_path = converter_settings.texture_source_path;
 	QString terrain_output_path = converter_settings.terrain_output_path;
 
-	QTemporaryDir dir;
-	QTemporaryDir temp_texture_dir;
+	QTemporaryDir dir(temporaryDirTemplate());
+	QTemporaryDir temp_texture_dir(temporaryDirTemplate());
     if (!dir.isValid()) {
 		logProgress(ProgressFatal, "Cannot create temporal directory on System!");
 		return false;
@@ -1138,7 +1142,7 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 	if (terrain_groups.size()) {
 		logProgress(ProgressNormal, "Saving terrain groups for Stage.pfd...");
 
-		QTemporaryDir stage_pfd_dir;
+		QTemporaryDir stage_pfd_dir(temporaryDirTemplate());
 		QString stage_pfd_path = stage_pfd_dir.path();
 		LibGens::ArPack stage_pfd_pack;
 		string output_stage_pfd_path = output_path.toStdString() + "/Stage.pfd";

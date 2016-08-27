@@ -1,12 +1,8 @@
 /*
-TO DO:
--fixing default values menu
--fixing calculate good proportion
--fixing slow down in calculate good proportion
+	Script heavily modified from http://www.proun-game.com/. Originally written by Joost "Oogst" van Dongen.
 */
 
-lightmapPath = undefined
-
+renderPath = undefined
 
 --This function checks whether a new unwrap should be created for channel 2 and does so if necessary.
 --	Param obj: the object to work on.
@@ -51,13 +47,28 @@ function handleUnwrapping obj createUnwrap collapseAfterUnwrap =
 	)
 )
 
+function resetMap bakeobject map resolutionInPixels applyColorMapping =
+(
+	map.autoSzOn = false
+	map.enabled = true
+	map.filenameUnique = true
+	map.filterOn = true
+	map.outputSzX = resolutionInPixels
+	map.outputSzY = resolutionInPixels
+	map.targetMapSlotName = ""
+	map.fileName = filenameFromPath map.fileType
+	
+	local param_index = bakeobject.findParam map "Apply color mapping"
+	if (param_index != 0) then (
+		bakeobject.setParamValue map param_index applyColorMapping
+	)
+)
+
 --The function that actually performs the generation of the lightmaps.
---	Param proportionMultiplier: a multiplier that can be used to alter the proportion between resolution and scale of the scene.
---	Param forceAllToMaximumResolution: used to turn of adaptive resolution calculation for the texture.
 --	Param createUnwrap: whether to add a new unwrap modifier.
 --	Param collapseAfterUnwrap: whether to collapse the modifier-stack after adding the unwrap modifier.
 --	Param highestResolutionPower: the highest resolution lightmap a large object can get.
-function generateLightMaps resolutionMode createUnwrap collapseAfterUnwrap highestResolutionPower appendix_id =
+function generateLightMaps resolutionMode createUnwrap collapseAfterUnwrap highestResolutionPower resolutionMultiplier skipExisting =
 (
 	max modify mode
 	
@@ -83,18 +94,9 @@ function generateLightMaps resolutionMode createUnwrap collapseAfterUnwrap highe
 		)
 	)
 	
-	lightmapPath = getSavePath caption:"Select the folder to save to"
-	if (lightmapPath == undefined) then return 0
-
-	--This will be reused for all lightmaps to be generated.
-	local map = VRayLightingMap()
-
-	--While having its lightmap generated, each object temporarily gets this white material.
-	--This is necessary, because VRay does not fully support texture baking and cannot ignore
-	--the standard material.
-	local whiteMaterial = standardMaterial()
-	whiteMaterial.diffuse = color 255 255 255
-
+	renderPath = getSavePath caption:"Select the folder to save to"
+	if (renderPath == undefined) then return 0
+	
 	--These are the objects to be processed.
 	local selectedObjects = copy ($selection as array) #noMap
 	
@@ -112,59 +114,70 @@ function generateLightMaps resolutionMode createUnwrap collapseAfterUnwrap highe
 		(
 			--Select the object.
 			select obj
-
-			--Create an unwrap in channel 2 if requested or necessary.
-			handleUnwrapping obj createUnwrap collapseAfterUnwrap
 			
-			--Calculate the resolution in pixels to be used for this object.
-			local resolutionInPixels = pow 2 highestResolutionPower
-			for RenderItem = 1 to renderFileSize do (
-				if (obj.name == renderFileNames[RenderItem]) then (
-					resolutionInPixels = renderFileSizes[RenderItem]
-					exit
+			local lightmapFilePath = renderPath + "\\" + obj.name + "_lightmap.png"
+			local shadowmapFilePath = renderPath + "\\" + obj.name + "_shadowmap.png"
+			local renderFiles = true
+			
+			if (skipExisting) then (
+				local lightmapExists = doesFileExist lightmapFilePath
+				local shadowmapExists = doesFileExist shadowmapFilePath
+				if (lightmapExists AND shadowmapExists) then (
+					renderFiles = false
 				)
 			)
-
-			--Change the material to the white material and store the original material.
-			local originalMaterial = obj.material
-			if (appendix_id != 3) then obj.material = whiteMaterial
-
-			--Settings for the baking of this object.
-			map.autoSzOn = false
-			--map.directOn = true
-			map.elementName = "baked"
-			map.enabled = true
 			
-			if (appendix_id == 1) then appendix = "_lightmap"
-			if (appendix_id == 2) then appendix = "_shadowmap"
-			if (appendix_id == 3) then appendix = "_completemap"
+			if (renderFiles) then (
+				--Create an unwrap in channel 2 if requested or necessary.
+				handleUnwrapping obj createUnwrap collapseAfterUnwrap
+				
+				--Calculate the resolution in pixels to be used for this object.
+				local resolutionInPixels = pow 2 highestResolutionPower
+				for RenderItem = 1 to renderFileSize do (
+					if (obj.name == renderFileNames[RenderItem]) then (
+						resolutionInPixels = renderFileSizes[RenderItem]
+						exit
+					)
+				)
+				
+				if (resolutionMode == 1) then (
+					resolutionInPixels *= pow 2 (resolutionMultiplier - 1)
+				)
+
+				--Settings for the baking of this object.
+				local bakeobject = obj.INodeBakeProperties
+				local lmap = VRayRawGlobalIlluminationMap()
+				local smap = VRayMatteShadowMap()
+				--local cmap = VRayCompleteMap()
+
+				lmap.elementName = "bakedLightmap"
+				lmap.filetype = lightmapFilePath
+				resetMap bakeobject lmap resolutionInPixels 1
 			
-			map.filename = (lightmapPath + "\\" + obj.name + appendix + ".png")
-			map.filenameUnique = false
-			map.filetype = "PNG"
-			map.filterOn = true
-			--map.inDirectOn = true
-			map.outputSzX = resolutionInPixels
-			map.outputSzY = resolutionInPixels
-			--map.shadowsOn = true
-			map.targetMapSlotName = ""
+				smap.elementName = "bakedShadowmap"
+				smap.filetype = shadowmapFilePath
+				resetMap bakeobject smap resolutionInPixels 0
+				
+				--cmap.elementName = "bakedCompletemap"
+				--cmap.filetype = renderPath + "\\" + obj.name + "_completemap.png"
+				--resetMap bakeobject cmap resolutionInPixels 0
 
-			--Attach the baking to this object.
-			local bakeobject = obj.INodeBakeProperties
-			bakeobject.removeAllBakeElements()
-			bakeobject.addBakeElement map
-			bakeobject.nDilations = 64
-			bakeObject.bakeEnabled = true
-			bakeObject.bakeChannel = 2
+				--Attach the baking to this object.
+				bakeobject.removeAllBakeElements()
+				bakeobject.addBakeElement lmap
+				bakeobject.addBakeElement smap
+				--bakeobject.addBakeElement cmap
+				bakeobject.nDilations = 4
+				bakeObject.bakeEnabled = true
+				bakeObject.bakeChannel = 2
 
-			--let the currently selected object be baked.
-			render rendertype:#BakeSelected outputwidth:map.outputSzX outputheight:map.outputSzY vfb:true outputfile:map.filename
-			
-			--Baking is finished for this object, so reset the baking settings for this object.
-			bakeobject.removeAllBakeElements()
-
-			--Restore the original material of this object.
-			obj.material = originalMaterial
+				--let the currently selected object be baked.
+				vfb = render rendertype:#BakeSelected outputwidth:resolutionInPixels outputheight:resolutionInPixels vfb:true
+				close vfb
+				
+				--Baking is finished for this object, so reset the baking settings for this object.
+				bakeobject.removeAllBakeElements()
+			)
 		)
 	)
 	
@@ -173,36 +186,47 @@ function generateLightMaps resolutionMode createUnwrap collapseAfterUnwrap highe
 )
 
 
-
-
-
 --The user interface for the lightmap generator.
 rollout lightmapGenerator "Lightmap Generator"
 (
-	Group "Resolution:"
+	Group "Resolution"
 	(
-		RadioButtons resolutionModeRadioButtons "Resolution Mode:" labels:#("Render File", "Manual") default:1
+		RadioButtons resolutionModeRadioButtons "Resolution mode:" labels:#("Render file", "Manual") default:2
 		RadioButtons resolutionRadioButtons "Resolution:" labels:#("32", "64", "128", "256", "512", "1024", "2048", "4096") default:5
-		RadioButtons texnameRadioButtons "Texture Appendix:" labels:#("_lightmap", "_shadowmap","_completemap") default:1
+		RadioButtons resolutionMultiplierButtons "Multiplier:" labels:#("1", "2", "4") default:1 enabled:false
 	)
+	
 	Group "Channel 2 unwrap"
 	(
 		CheckBox unwrapCheckBox "Create new unwrap" checked:false
 		CheckBox collapseCheckBox "Collapse modifiers" checked:false enabled:false
 	)
+	
+	Group "Files"
+	(
+		CheckBox skipExistingCheckBox "Skip existing files" checked:false
+	)
+	
 	Button executeButton "Start lightmap generation"
 	
 	on unwrapCheckBox changed newState do
 	(
 		collapseCheckBox.enabled = newState
 	)
+	
+	on resolutionModeRadioButtons changed newState do
+	(
+		resolutionMultiplierButtons.enabled = newState == 1
+	)
+	
 	on executeButton pressed do
 	(
 		generateLightMaps resolutionModeRadioButtons.state \
 						  unwrapCheckBox.checked \
 						  collapseCheckBox.checked \
 						  (resolutionRadioButtons.state + 4) \
-						  texnameRadioButtons.state
+						  resolutionMultiplierButtons.state \
+						  skipExistingCheckBox.state
 	)
 )
 

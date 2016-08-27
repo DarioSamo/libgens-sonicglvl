@@ -42,6 +42,7 @@ public:
 	static const QString DefaultSettingsPath;
 	static const QString LogPath;
 	static const QString CommunityGuideURL;
+	static const int MinimumTextureSize;
 
 	explicit GIWindow(QWidget *parent = 0);
     ~GIWindow();
@@ -107,6 +108,7 @@ private:
 	void expandFileCAB(QString filename, QString new_filename);
 	unsigned int nextPowerOfTwo(unsigned int v);
 	QColor debugColor(int quality_level, int size);
+	QString temporaryDirTemplate();
 private slots:
 	void aboutTriggered();
 	void close();

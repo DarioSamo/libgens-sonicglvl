@@ -25,6 +25,7 @@ using namespace std;
 #include <iterator>
 #include <vector>
 #include <string>
+#include <map>
 #include <algorithm>
 #include <ctype.h>
 #include <pthread.h>

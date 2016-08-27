@@ -513,7 +513,12 @@ namespace LibGens {
 				if (material_library) {
 					Material *material = material_library->getMaterial(*it);
 					if (material) {
-						FbxSurfacePhong *lMaterial=addMaterial(material);
+						FbxSurfacePhong *lMaterial = material_map[material];
+						if (!lMaterial) {
+							lMaterial = addMaterial(material);
+							material_map[material] = lMaterial;
+						}
+						
 						if (lMaterial) {
 							lMeshNode->AddMaterial(lMaterial);
 						}

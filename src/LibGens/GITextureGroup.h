@@ -140,7 +140,7 @@ namespace LibGens {
 			bool hasInstanceIndex(size_t instance_index, vector<GITextureGroup *> &groups);
 			void addInstanceIndex(unsigned int instance_index);
 			void addSubtextureToOrganize(GISubtexture *subtexture);
-			void addSubtextureToOrganize(GITextureGroup *clone_group, float downscale_factor);
+			void addSubtextureToOrganize(GITextureGroup *clone_group, float downscale_factor, float minimum_texture_size);
 			list<GISubtexture *> getSubtexturesToOrganize();
 			size_t getInstanceIndexCount();
 			void setCenter(Vector3 v);

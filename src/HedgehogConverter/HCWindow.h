@@ -101,6 +101,7 @@ private:
 	void messageBox(QString text);
 	void logProgress(ProgressType progress_type, QString message);
 	void beep();
+	QString temporaryDirTemplate();
 private slots:
 	void aboutTriggered();
 	void addSourceModelsTriggered();

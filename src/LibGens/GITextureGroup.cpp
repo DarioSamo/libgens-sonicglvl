@@ -969,13 +969,13 @@ namespace LibGens {
 		subtextures_to_organize.push_back(subtexture);
 	}
 
-	void GITextureGroup::addSubtextureToOrganize(GITextureGroup *clone_group, float downscale_factor) {
+	void GITextureGroup::addSubtextureToOrganize(GITextureGroup *clone_group, float downscale_factor, float minimum_texture_size) {
 		list<GISubtexture *> clone_subtextures = clone_group->getSubtexturesToOrganize();
 		for (list<GISubtexture *>::iterator it=clone_subtextures.begin(); it!=clone_subtextures.end(); it++) {
 			GISubtexture *clone = new GISubtexture();
 			clone->setName((*it)->getName());
-			clone->setPixelWidth(max((*it)->getPixelWidth() * downscale_factor, 4.0f));
-			clone->setPixelHeight(max((*it)->getPixelHeight() * downscale_factor, 4.0f));
+			clone->setPixelWidth(max((*it)->getPixelWidth() * downscale_factor, minimum_texture_size));
+			clone->setPixelHeight(max((*it)->getPixelHeight() * downscale_factor, minimum_texture_size));
 			subtextures_to_organize.push_back(clone);
 		}
 	}

@@ -31,6 +31,12 @@
 #include "FreeImage.h"
 #include "Path.h"
 
+const int GIWindow::MinimumTextureSize = 4;
+
+QString GIWindow::temporaryDirTemplate() {
+	return converter_settings.terrain_directory + "/GIAtlasConverter-temp-XXXXXX";
+}
+
 bool GIWindow::convert() {
 	if (converter_settings.game_engine == Generations) {
 		logProgress(ProgressNormal, "Starting conversion for Generations engine...");
@@ -67,12 +73,17 @@ bool GIWindow::convert() {
 		}
 	}
 
-	QTemporaryDir temp_dir;
+	QDir terrain_dir(converter_settings.terrain_directory);
+	if (!terrain_dir.exists()) {
+		logProgress(ProgressFatal, "Terrain directory does not exist!");
+		return false;
+	}
+
+	QString slot_name = terrain_dir.dirName();
+	QTemporaryDir temp_dir(temporaryDirTemplate());
 	QString temp_path = temp_dir.path();
 	logProgress(ProgressNormal, "Storing temporary terrain files in " + temp_path + ".");
 
-	QDir terrain_dir(converter_settings.terrain_directory);
-	QString slot_name = terrain_dir.dirName();
 	QString terrain_resources_filename = converter_settings.terrain_directory + "/" + slot_name + ".ar.00";
 	if (QFileInfo(terrain_resources_filename).exists()) {
 		LibGens::ArPack terrain_ar(terrain_resources_filename.toStdString());
@@ -85,8 +96,8 @@ bool GIWindow::convert() {
 	}
 
 	vector<LibGens::GITextureGroup *> gi_groups;
-	QTemporaryDir stage_temp_dir;
-	QTemporaryDir stage_add_temp_dir;
+	QTemporaryDir stage_temp_dir(temporaryDirTemplate());
+	QTemporaryDir stage_add_temp_dir(temporaryDirTemplate());
 	QString stage_temp_path = stage_temp_dir.path();
 	QString stage_add_temp_path = stage_add_temp_dir.path();
 
@@ -274,7 +285,7 @@ bool GIWindow::convert() {
 		logProgress(ProgressNormal, QString("Generated %1 GI Groups.").arg(gi_groups_size));
 
 		for (size_t g = 0; g < gi_groups_size; g++) {
-			QTemporaryDir gi_temp_dir;
+			QTemporaryDir gi_temp_dir(temporaryDirTemplate());
 			QString gi_temp_path = gi_temp_dir.path();
 			QDir gi_group_dir(gi_temp_path);
 
@@ -442,7 +453,7 @@ bool GIWindow::convert() {
 			//********************************************************************************
 			// Clone all the subtextures, delete the textures, and organize the subtextures.
 			//********************************************************************************
-			QTemporaryDir group_temp_dir;
+			QTemporaryDir group_temp_dir(temporaryDirTemplate());
 			QString group_temp_path = group_temp_dir.path();
 			group_ar_pack->extract(group_temp_path.toStdString() + "/");
 
@@ -682,7 +693,7 @@ bool GIWindow::convert() {
 				group->deleteTextures();
 				group->organizeSubtextures(max_atlas_texture_size);
 
-				QTemporaryDir new_group_dir;
+				QTemporaryDir new_group_dir(temporaryDirTemplate());
 				QString new_group_temp_path = new_group_dir.path();
 
 				logProgress(ProgressNormal, QString("Saving textures and atlasinfo file..."));
@@ -879,7 +890,7 @@ QList<GIWindow::GIGroup> GIWindow::createGroups(LibGens::AABB current_aabb, QLis
 				texture_size = nextPowerOfTwo(texture_size);
 				texture_size = texture_size >> 1;
 				texture_size = min(converter_settings.max_texture_size, texture_size);
-				texture_size = max(texture_size, 4);
+				texture_size = max(texture_size, MinimumTextureSize);
 				gi_group->addInstanceIndex(instance_index);
 
 				LibGens::GISubtexture *subtexture = new LibGens::GISubtexture();
@@ -983,7 +994,7 @@ QList<GIWindow::GIGroup> GIWindow::createGroups(LibGens::AABB current_aabb, QLis
 							if ((group.instance_count + group_in_level.instance_count) <= 65535) {
 								LibGens::GITextureGroup *sub_group = gi_group_info->getGroupByIndex(group_in_level.index);
 								if (sub_group)
-									gi_group->addSubtextureToOrganize(sub_group, 0.5);
+									gi_group->addSubtextureToOrganize(sub_group, 0.5, (float) MinimumTextureSize);
 
 								gi_group->addInstanceIndex(group_in_level.index);
 								group.instance_count += group_in_level.instance_count;
@@ -1029,12 +1040,13 @@ unsigned int GIWindow::nextPowerOfTwo(unsigned int v) {
 }
 
 void GIWindow::compressFileCAB(QString filename) {
+	logProgress(ProgressNormal, "Compressing " + filename + "...");
 	QStringList arguments;
 	arguments << filename << filename;
-	QProcess conversion_process;
-	conversion_process.start("makecab", arguments);
-	conversion_process.waitForFinished();
-	QString conversion_output = conversion_process.readAllStandardOutput();
+	QProcess compression_process;
+	compression_process.start("makecab", arguments);
+	compression_process.waitForFinished();
+	QString conversion_output = compression_process.readAllStandardOutput();
 	logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
 }
 
@@ -1042,11 +1054,11 @@ void GIWindow::expandFileCAB(QString filename, QString new_filename) {
 	logProgress(ProgressNormal, "Decompressing " + filename + "...");
 	QStringList arguments;
 	arguments << filename << new_filename;
-	QProcess decompression_process;
-	decompression_process.start("expand", arguments);
-	decompression_process.waitForFinished();
-	QString decompression_output = decompression_process.readAllStandardOutput();
-	logProgress(ProgressNormal, QString("Expand Cabinet Output: " + decompression_output));
+	QProcess expand_process;
+	expand_process.start("expand", arguments);
+	expand_process.waitForFinished();
+	QString expand_output = expand_process.readAllStandardOutput();
+	logProgress(ProgressNormal, QString("Expand Output: " + expand_output));
 	QFile::remove(filename);
 }
 

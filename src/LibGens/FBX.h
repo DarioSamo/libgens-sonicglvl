@@ -40,6 +40,7 @@ namespace LibGens {
 		protected:
 			list<Model *> models;
 			list<TerrainInstance *> instances;
+			map<Material *, FbxSurfacePhong *> material_map;
 			MaterialLibrary *material_library;
 			FbxScene *scene;
 		public:
