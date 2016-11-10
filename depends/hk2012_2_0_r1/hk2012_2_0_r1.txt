@@ -1,0 +1,3 @@
+Havok 2012 2.0 SDK (For compatibility with Lost World)
+
+Copy distribution here.
