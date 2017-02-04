@@ -568,11 +568,11 @@ bool HCWindow::convert() {
 				// Add parameters from tags
 				vector<LibGens::Tag> parameter_tags = tags.getTagsByKey(LibGens::Tag::KeyMaterialParameter);
 				for (size_t t = 0; t < parameter_tags.size(); t++) {
-					string parameter_name = texture_tags[t].getValue(0);
-					LibGens::Color color(texture_tags[t].getValueFloat(1, 1.0f), 
-										 texture_tags[t].getValueFloat(2, 1.0f), 
-										 texture_tags[t].getValueFloat(3, 1.0f), 
-										 texture_tags[t].getValueFloat(4, 0.0f));
+					string parameter_name = parameter_tags[t].getValue(0);
+					LibGens::Color color(parameter_tags[t].getValueFloat(1, 1.0f), 
+										 parameter_tags[t].getValueFloat(2, 1.0f), 
+										 parameter_tags[t].getValueFloat(3, 1.0f), 
+										 parameter_tags[t].getValueFloat(4, 0.0f));
 
 					if (parameter_name.size()) {
 						material->setParameter(parameter_name, color);
@@ -829,7 +829,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 		LibGens::Matrix4 instance_matrix;
 		for (int x = 0; x < 4; x++)
 			for (int y = 0; y < 4; y++)
-				instance_matrix[x][y] = node_matrix.m[x][y];
+				instance_matrix[x][y] = node_matrix[x][y];
 
 		instance_matrix = global_transform * instance_matrix;
 
