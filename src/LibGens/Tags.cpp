@@ -222,13 +222,10 @@ namespace LibGens {
 
 	bool Tags::getTagValueBool(string key, int value_index, bool default_value) {
 		string value = getTagValue(key, value_index);
-		if (value.size()) {
-			if ((value[0] == '1') || (value[0] == 't') || (value[0] == 'T') || (value[0] == 'y') || (value[0] == 'Y')) {
-				return true;
-			}
-		}
-
-		return default_value;
+		if (value.size())
+			return (value[0] == '1') || (value[0] == 't') || (value[0] == 'T') || (value[0] == 'y') || (value[0] == 'Y');
+		else
+			return default_value;
 	}
 
 	vector<Tag> Tags::getTagsByKey(string key) {
