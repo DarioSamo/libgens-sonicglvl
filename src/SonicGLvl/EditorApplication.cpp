@@ -689,6 +689,16 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			}
 
 			if(arg.key == OIS::KC_G) {
+				if (!ghost_node && !camera_manager) {
+					camera_manager = new CameraManager();
+					camera_manager->addCamera(viewport->getCamera());
+					camera_manager->addCamera(viewport->getCameraOverlay());
+					camera_manager->setLevel(current_level->getLevel());
+
+					loadGhostAnimations();
+					ghost_node = new GhostNode(NULL, scene_manager, model_library, material_library);
+				}
+
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
 			}
