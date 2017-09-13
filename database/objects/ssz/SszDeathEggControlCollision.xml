@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Length type="float" default="10" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <CommandType type="float" default="1" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <MoveTarget type="vector" description="" />
+  <MoveTime type="float" default="50" description="" />
+  <Range type="float" default="100" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <TargetDeathEggID type="id" description="" />
+  <TurnDegree type="float" default="250" description="" />
+</Template>

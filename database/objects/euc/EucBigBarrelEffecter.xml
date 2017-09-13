@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="1.1" description="" />
+  <Collision_Length type="float" default="10" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="200" description="" />
+  <ShakeDir type="float" default="0" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <m_EnableShake type="bool" default="true" description="" />
+  <m_EnableSound type="bool" default="false" description="" />
+  <m_IgnoreTime type="float" default="1" description="" />
+  <m_ShakeAttenuation type="float" default="0.1" description="" />
+  <m_ShakeNum type="float" default="3" description="" />
+  <m_ShakeSize type="float" default="0.3" description="" />
+  <m_ShakeSizeDistance type="float" default="10" description="" />
+  <m_ShakeTime type="float" default="0.6" description="" />
+</Template>

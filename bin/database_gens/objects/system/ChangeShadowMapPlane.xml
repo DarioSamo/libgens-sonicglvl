@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="50" description="" />
+  <Collision_Width type="float" default="50" description="" />
+  <EaseTimeb type="float" default="1" description="" />
+  <EaseTimef type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="5000" description="" />
+  <ShadowMapSizeWb type="float" default="10" description="" />
+  <ShadowMapSizeWf type="float" default="10" description="" />
+  <ShadowMapSizeXb type="float" default="50" description="" />
+  <ShadowMapSizeXf type="float" default="100" description="" />
+  <ShadowMapSizeYb type="float" default="50" description="" />
+  <ShadowMapSizeYf type="float" default="200" description="" />
+  <ShadowMapSizeZb type="float" default="30" description="" />
+  <ShadowMapSizeZf type="float" default="200" description="" />
+</Template>

@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <PositionList type="vector_list" description="" />
+  <Range type="float" default="10000" description="" />
+  <m_IsEnableTriggerAR type="bool" default="false" description="" />
+  <m_IsEnableTriggerBG type="bool" default="false" description="" />
+  <m_IsEnableTriggerHP type="bool" default="false" description="" />
+  <m_TriggerMaxAR type="float" default="1" description="" />
+  <m_TriggerMaxBG type="float" default="100" description="" />
+  <m_TriggerMaxHP type="float" default="100" description="" />
+  <m_TriggerMinAR type="float" default="0" description="" />
+  <m_TriggerMinBG type="float" default="0" description="" />
+  <m_TriggerMinHP type="float" default="0" description="" />
+</Template>

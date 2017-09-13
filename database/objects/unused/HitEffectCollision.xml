@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <Extra type="description" name="Unused in Generations" />
+  <!-- Used for passing through waterfall effect in proto -->
+</Template>

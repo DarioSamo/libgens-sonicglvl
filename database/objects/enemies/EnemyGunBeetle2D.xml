@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<Template>
+  <ActionRange type="float" default="10" description="" />
+  <AttackRange type="float" default="6" description="" />
+  <DebugPointClear type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAimTarget type="bool" default="false" description="" />
+  <IsArrivalEffect type="bool" default="false" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsDamageFromOnlyPlayer type="bool" default="true" description="" />
+  <IsPatrol type="bool" default="true" description="" />
+  <IsPlayFindMotion type="bool" default="true" description="" />
+  <IsRebirth type="bool" default="false" description="" />
+  <PathIsAccel type="float" default="0" description="" />
+  <PathIsBezier type="float" default="1" description="" />
+  <PathPointMoveRelative type="bool" default="true" description="" />
+  <Path_IsLoop type="bool" default="true" description="" />
+  <PositionList type="undefined" description="" />
+  <Range type="float" default="30" description="" />
+  <ShotInterval type="float" default="3" description="" />
+  <ShotReadyTime type="float" default="2" description="" />
+  <ShotSpeed type="float" default="0" description="" />
+  <Target type="vector" description="" />
+  <ToRebirthTime type="float" default="3" description="" />
+  <Vel1D type="float" default="10" description="" />
+</Template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="23.1" description="" />
+  <Collision_Length type="float" default="20.1" description="" />
+  <Collision_Width type="float" default="21" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="300" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <m_DebugCylinderHeight type="float" default="280" description="" />
+  <m_Range type="float" default="7" description="" />
+</Template>

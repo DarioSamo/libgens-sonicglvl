@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<Template>
+  <ActionRange type="float" default="100" description="" />
+  <AppearType type="float" default="0" description="" />
+  <AttackInterval type="float" default="4" description="" />
+  <AttackRange type="float" default="10" description="" />
+  <DebugPointClear type="bool" default="false" description="" />
+  <DebugPointClearMove type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAimTarget type="bool" default="false" description="" />
+  <IsArrivalEffect type="bool" default="false" description="" />
+  <IsAttack type="bool" default="true" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsDamageFromOnlyPlayer type="bool" default="true" description="" />
+  <IsMessageOn type="bool" default="false" description="" />
+  <IsPlayFindMotion type="bool" default="true" description="" />
+  <IsReturn type="bool" default="false" description="" />
+  <IsShotAim type="bool" default="true" description="" />
+  <IsThrowDown type="bool" default="false" description="" />
+  <IsTurnToPlayer type="bool" default="true" description="" />
+  <MoveSpeed type="float" default="5" description="" />
+  <MoveType type="float" default="0" description="" />
+  <PathIsAccel type="float" default="0" description="" />
+  <PathIsAccelMove type="float" default="0" description="" />
+  <PathIsBezier type="float" default="1" description="" />
+  <PathIsBezierMove type="float" default="1" description="" />
+  <PathPointMoveRelative type="bool" default="true" description="" />
+  <PathPointMoveRelativeMove type="bool" default="true" description="" />
+  <Path_IsLoop type="bool" default="false" description="" />
+  <Path_IsLoopMove type="bool" default="true" description="" />
+  <PositionList type="vector_list" description="" />
+  <PositionListMove type="vector_list" description="" />
+  <Range type="float" default="30" description="" />
+  <ReadyTime type="float" default="2.5" description="" />
+  <ReviveTime type="float" default="5" description="" />
+  <ReviveType type="float" default="0" description="" />
+  <ShotLength type="float" default="3" description="" />
+  <ShotSpeed type="float" default="8" description="" />
+  <Target type="vector" description="" />
+  <TurnAccel type="float" default="4" description="" />
+  <TurnTime type="float" default="1" description="" />
+  <TurnToPlayerRate type="float" default="0.1" description="" />
+  <Vel1D type="float" default="10" description="" />
+  <Vel1DMove type="float" default="10" description="" />
+  <WayPointA type="vector" description="" />
+  <WayPointB type="vector" description="" />
+</Template>

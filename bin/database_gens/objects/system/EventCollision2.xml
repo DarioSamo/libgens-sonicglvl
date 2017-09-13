@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="9.1" description="" />
+  <Collision_Length type="float" default="3.1" description="" />
+  <Collision_Width type="float" default="3" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <EventEnter type="float" default="6" description="" />
+  <EventLeave type="float" default="7" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Range type="float" default="10" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <TargetListEnter type="id" description="" />
+  <TargetListLeave type="id" description="" />
+  <TimerEnter type="float" default="0" description="" />
+  <TimerLeave type="float" default="0" description="" />
+</Template>
