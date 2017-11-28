@@ -9,4 +9,5 @@
   <IsCastShadow type="bool" default="true" description="" />
   <PoleLen type="float" default="9" description="" />
   <Range type="float" default="100" description="" />
+  <Extra type="model" name="cmn_obj_pole_svA.model" />
 </Template>

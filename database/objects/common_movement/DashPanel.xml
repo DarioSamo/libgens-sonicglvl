@@ -13,7 +13,6 @@
   <Speed type="float" default="100" description="" />
   <SpeedMax type="float" default="60" description="" />
   <SpeedMin type="float" default="30" description="" />
-  <IsStartVelocityConstant type="bool" default="true" description="" />
   <Extra type="model" name="cmn_obj_dashpanel_HD.model" />
   <Extra type="offset_rotation_y" name="180" />
 </Template>

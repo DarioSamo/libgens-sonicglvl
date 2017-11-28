@@ -20,4 +20,7 @@
   <Range type="float" default="30" description="" />
   <ResultDegree type="float" default="0" description="" />
   <ResultPosition type="vector" description="" />
+  <Extra type="model" name="cmn_obj_c_goalplate_egg_HD.model" />
+  <Extra type="skeleton" name="cmn_obj_c_goalplate_egg_HD.skl.hkx" />
+  <Extra type="animation" name="cmn_obj_c_goalplate_egg_HD_loop.anm.hkx" />
 </Template>

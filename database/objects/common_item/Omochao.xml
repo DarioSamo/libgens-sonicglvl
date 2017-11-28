@@ -57,4 +57,7 @@
   <UseVoiceTimeS type="bool" default="true" description="" />
   <WaitType type="float" default="1" description="" />
   <For2D type="bool" default="true" description="" />
+  <Extra type="model" name="chr_omochao_HD.model" />
+  <Extra type="skeleton" name="chr_omochao_HD.skl.hkx" />
+  <Extra type="animation" name="omc_idle_ground_loop.anm.hkx" />
 </Template>

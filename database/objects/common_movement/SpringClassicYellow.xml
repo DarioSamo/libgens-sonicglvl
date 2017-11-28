@@ -24,4 +24,5 @@
   <m_IsStopBoost type="bool" default="false" description="" />
   <m_IsTo3D type="bool" default="false" description="" />
   <m_MonkeyTarget type="vector" description="" />
+  <Extra type="model" name="cmn_obj_c_springY_HD.model" />
 </Template>

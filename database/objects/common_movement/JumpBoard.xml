@@ -12,6 +12,5 @@
   <RigidBody type="bool" default="true" description="" />
   <Extra type="model" name="cmn_obj_jumppanel15S_HD.model" condition="AngleType == 0" />
   <Extra type="model" name="cmn_obj_jumppanel30S_HD.model" condition="AngleType == 1" />
-  <Extra type="model" name="cmn_obj_jumppanel30M_HD.model" condition="AngleType == 2" />
-  <Extra type="model" name="cmn_obj_jumppanel30L_HD.model" condition="AngleType == 3" />
+  <Extra type="model" name="cmn_obj_jumppanel30S_HD.model" condition="AngleType == 2" />
 </Template>

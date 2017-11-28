@@ -11,4 +11,5 @@
   <Range type="float" default="30" description="" />
   <Scl type="float" default="3" description="" />
   <StopTime type="float" default="0" description="" />
+  <Extra type="model" name="cmn_obj_blade_HD.model" />
 </Template>

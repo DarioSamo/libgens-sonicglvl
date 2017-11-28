@@ -12,4 +12,5 @@
   <Length type="float" default="10" description="" />
   <Phase type="float" default="0" description="" />
   <Type type="float" default="1" description="" />
+  <Extra type="model" name="cmn_obj_damagepanel_HD.model" />
 </Template>

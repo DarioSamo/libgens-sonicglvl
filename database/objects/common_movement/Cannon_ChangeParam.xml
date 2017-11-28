@@ -9,4 +9,5 @@
   <Range type="float" default="100" description="" />
   <StaticPercent type="float" default="50" description="" />
   <VelRatio type="float" default="3" description="" />
+  <Extra type="model" name="cmn_obj_canon_FV_barrel.model" />
 </Template>

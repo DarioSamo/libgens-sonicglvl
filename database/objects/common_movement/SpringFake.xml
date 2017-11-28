@@ -25,4 +25,5 @@
   <m_MonkeyTarget type="vector" description="" />
   <HasBase type="bool" default="false" description="" />
   <m_IsMonkeyHuntingLowAngle type="bool" default="true" description="" />
+  <Extra type="model" name="cmn_obj_springegg_HD.model" />
 </Template>

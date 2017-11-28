@@ -4,4 +4,5 @@
   <IsCastShadow type="bool" default="false" description="" />
   <MedalID type="float" default="1" description="" />
   <Range type="float" default="100" description="" />
+  <Extra type="model" name="cmn_obj_spcialring_HD.model" />
 </Template>
