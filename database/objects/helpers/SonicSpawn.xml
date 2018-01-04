@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <Template>
-  <Active type="bool" default="false" description="" />
-  <Mode type="string" default="Stand" description="" />
+  <Active type="bool" default="false" description="Set to True to set as the current start point on next save, changes will be applied to Stage.stg.xml" />
+  <Mode type="string" default="Stand" description="Affects the animation and camera." />
   <CameraView type="string" default="Forward" description="Forward for 3D Mode. Side for 2D Mode." />
   <Speed type="float" default="0" description="" />
   <Time type="float" default="0" description="" />
