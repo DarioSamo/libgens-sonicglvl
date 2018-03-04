@@ -203,6 +203,8 @@ namespace LibGens {
 		if (name == LIBGENS_PAC_EXTENSION_PAC_PHY_HKX_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_PAC_LUA_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_TTF_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_OTF_FULL) return false;
+		if (name == LIBGENS_PAC_EXTENSION_KERN_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_MATERIAL_FULL) return true;
 		if (name == LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO_FULL) return false;
 		if (name == LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO_FULL) return false;
@@ -571,6 +573,8 @@ namespace LibGens {
 		getExtension(LIBGENS_PAC_EXTENSION_PAC_PHY_HKX);
 		getExtension(LIBGENS_PAC_EXTENSION_LUA);
 		getExtension(LIBGENS_PAC_EXTENSION_TTF);
+		getExtension(LIBGENS_PAC_EXTENSION_OTF);
+		getExtension(LIBGENS_PAC_EXTENSION_KERN);
 		getExtension(LIBGENS_PAC_EXTENSION_MATERIAL);
 		getExtension(LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO);
 		getExtension(LIBGENS_PAC_EXTENSION_MODEL_INSTANCEINFO);
@@ -635,6 +639,12 @@ namespace LibGens {
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_TTF) {
 			return LIBGENS_PAC_EXTENSION_TTF_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_OTF) {
+			return LIBGENS_PAC_EXTENSION_OTF_FULL;
+		}
+		else if (ext == LIBGENS_PAC_EXTENSION_KERN) {
+			return LIBGENS_PAC_EXTENSION_KERN_FULL;
 		}
 		else if (ext == LIBGENS_PAC_EXTENSION_MATERIAL) {
 			return LIBGENS_PAC_EXTENSION_MATERIAL_FULL;
