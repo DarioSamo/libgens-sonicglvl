@@ -36,6 +36,8 @@
 #define LIBGENS_PAC_EXTENSION_PAC_PHY_HKX_FULL         "phy.hkx:ResHavokMesh"
 #define LIBGENS_PAC_EXTENSION_LUA		               "lua"
 #define LIBGENS_PAC_EXTENSION_PAC_LUA_FULL             "lua:ResLuaData"
+#define LIBGENS_PAC_EXTENSION_TTF                      "ttf"
+#define LIBGENS_PAC_EXTENSION_TTF_FULL                 "ttf:ResTTFData"
 #define LIBGENS_PAC_EXTENSION_MATERIAL                 "material"
 #define LIBGENS_PAC_EXTENSION_MATERIAL_FULL            "material:ResMirageMaterial"
 #define LIBGENS_PAC_EXTENSION_TERRAIN_INSTANCEINFO      "terrain-instanceinfo"
