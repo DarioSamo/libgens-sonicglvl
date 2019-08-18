@@ -244,6 +244,7 @@ class EditorApplication : public BaseApplication {
 		int last_material_editor_list_selection;
 		LibGens::Model *material_editor_model;
 		string material_editor_model_filename;
+		string material_editor_library_folder;
 		vector<LibGens::Material *> material_editor_materials;
 		Ogre::RenderWindow *material_editor_preview_window;
 		Ogre::Viewport *material_editor_preview_viewport;
@@ -366,6 +367,9 @@ class EditorApplication : public BaseApplication {
 		void loadMaterialEditorSkeletonGUI();
 		void loadMaterialEditorAnimationGUI();
 		void rebuildMaterialPreviewNodes();
+
+		void saveMaterialEditorModelGUI();
+		void saveMaterialEditorMaterial();
 
 		void cleanMaterialEditorModelGUI();
 		void clearSelectionMaterialEditorGUI();
