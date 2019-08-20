@@ -240,6 +240,7 @@ class EditorApplication : public BaseApplication {
 
 		// Material Editor
 		size_t material_editor_mode;
+		string material_editor_mesh_group;
 		int material_editor_list_selection;
 		int last_material_editor_list_selection;
 		LibGens::Model *material_editor_model;
@@ -367,7 +368,8 @@ class EditorApplication : public BaseApplication {
 		void loadMaterialEditorSkeletonGUI();
 		void loadMaterialEditorAnimationGUI();
 		void rebuildMaterialPreviewNodes();
-
+		void materialEditorTerrainMode();
+		void materialEditorModelMode();
 		void saveMaterialEditorModelGUI();
 		void saveMaterialEditorMaterial();
 

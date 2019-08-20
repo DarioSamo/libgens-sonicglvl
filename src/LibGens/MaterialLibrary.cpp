@@ -56,6 +56,10 @@ namespace LibGens {
 	}
 
 
+	list<Material*> MaterialLibrary::getMaterials() {
+		return materials;
+	}
+
 	void MaterialLibrary::merge(MaterialLibrary *library, bool overwrite) {
 		list<Material *> to_push;
 

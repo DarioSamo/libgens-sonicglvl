@@ -32,6 +32,7 @@ namespace LibGens {
 			MaterialLibrary(string folder_p);
 			void addMaterial(Material *material);
 			Material *getMaterial(string id);
+			list<Material*> getMaterials();
 			bool checkMaterial(string id);
 			void merge(MaterialLibrary *library, bool overwrite=false);
 			void save(string folder_target);

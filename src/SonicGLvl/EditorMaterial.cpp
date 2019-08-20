@@ -44,6 +44,7 @@ void EditorApplication::openMaterialEditorGUI() {
 	material_editor_animation_name = "";
 	material_editor_animation_state = NULL;
 	material_editor_scene_node = NULL;
+	material_editor_mesh_group = PREVIEW_MESH_GROUP;
 
 	clearSelectionMaterialEditorGUI();
 	enableMaterialEditorListGUI();
@@ -52,9 +53,11 @@ void EditorApplication::openMaterialEditorGUI() {
 	HWND hMaterialTextureUnitsList = GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
 	ListView_SetExtendedListViewStyleEx(hMaterialTextureUnitsList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
 
+	// Only enable terrain mode if theres a level
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE), current_level != NULL);
+
 	// Disable non-functional modes for now
 	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE), false);
-	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE), false);
 }
 
 void EditorApplication::enableMaterialEditorGUI(bool enable) {
@@ -255,10 +258,36 @@ void EditorApplication::updateMaterialEditorInfo() {
 		SetDlgItemText(hMaterialEditorDlg, b, parameter_b.c_str());
 		SetDlgItemText(hMaterialEditorDlg, a, parameter_a.c_str());
 	}
-
-	
 }
 
+
+void EditorApplication::materialEditorTerrainMode() {
+	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL;
+	material_editor_mesh_group = GENERAL_MESH_GROUP;
+	if (material_editor_model) {
+		cleanMaterialEditorModelGUI();
+	}
+
+	clearSelectionMaterialEditorGUI();
+	enableMaterialEditorListGUI();
+	material_editor_materials.clear();
+
+	material_editor_material_library = current_level->getTerrain()->getMaterialLibrary();
+	material_editor_library_folder = current_level->getTerrain()->getResourcesFolder();
+	for each (LibGens::Material* mat in material_editor_material_library->getMaterials())
+	{
+		material_editor_materials.push_back(mat);
+	}
+	rebuildListMaterialEditorGUI();
+}
+
+void EditorApplication::materialEditorModelMode() {
+	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MODEL;
+	material_editor_mesh_group = PREVIEW_MESH_GROUP;
+	material_editor_materials.clear();
+	clearSelectionMaterialEditorGUI();
+	rebuildListMaterialEditorGUI();
+}
 
 void EditorApplication::clearMaterialEditorGUI() {
 	cleanMaterialEditorModelGUI();
@@ -628,10 +657,10 @@ void EditorApplication::updateEditParameterMaterialEditor(size_t i, LibGens::Col
 	}
 	else return;
 
-	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), PREVIEW_MESH_GROUP).getPointer();
+	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, true, NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
 	}
 }
 
@@ -640,10 +669,10 @@ void EditorApplication::updateEditShaderMaterialEditor(string shader_name) {
 	if (!material_editor_material) return;
 
 	material_editor_material->setShader(shader_name);
-	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), PREVIEW_MESH_GROUP).getPointer();
+	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, true, NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
 	}
 }
 
@@ -715,6 +744,7 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 				break;
 			}
 
+
 			switch(LOWORD(wParam)) {
 				case IDCANCEL:
 					SendMessage(hDlg, WM_CLOSE, 0, 0);
@@ -738,6 +768,14 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 
 				case IDB_MATERIAL_SAVE_MATERIAL:
 					editor_application->saveMaterialEditorMaterial();
+					return true;
+
+				case IDR_MATERIAL_TERRAIN_MODE:
+					editor_application->materialEditorTerrainMode();
+					return true;
+
+				case IDR_MATERIAL_MODEL_MODE:
+					editor_application->materialEditorModelMode();
 					return true;
 			}
 
