@@ -608,6 +608,8 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 					}
 				}
 
+				// get rid of old textures to refresh units
+				pass->getTextureUnitState((size_t)index)->setTextureName("");
 				LibGens::Texture *material_texture = material->getTextureByUnit(texture_unit, texture_unit_used_count);
 				if (material_texture) {
 					pass->getTextureUnitState((size_t)index)->setTextureName(material_texture->getName()+LIBGENS_TEXTURE_FILE_EXTENSION);

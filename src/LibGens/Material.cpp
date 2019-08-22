@@ -276,6 +276,14 @@ namespace LibGens {
 		return NULL;
 	}
 
+	Texture* Material::getTextureByIndex(size_t i) {
+		if (i < textures.size()) {
+			return textures[i];
+		}
+
+		return NULL;
+	}
+
 	Parameter *Material::getParameterByName(string unit) {
 		for (vector<Parameter *>::iterator it=parameters.begin(); it!=parameters.end(); it++) {
 			if ((*it)->getName() == unit) return (*it);
@@ -306,6 +314,21 @@ namespace LibGens {
 
 	void Material::addTextureUnit(Texture *texture) {
 		textures.push_back(texture);
+	}
+
+	void Material::removeTextureUnit(string unit) {
+		for (vector<Texture*>::iterator it = textures.begin(); it != textures.end(); it++) {
+			if ((*it)->getUnit() == unit) {
+				textures.erase(it);
+			}
+		}
+	}
+
+	void Material::removeTextureUnitByIndex(size_t i) {
+		if (i > textures.size())
+			return;
+
+		textures.erase(textures.begin() + i);
 	}
 
 	void Material::addParameter(Parameter *parameter) {
