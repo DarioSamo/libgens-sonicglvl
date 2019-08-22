@@ -274,6 +274,10 @@ void EditorApplication::updateMaterialEditorInfo() {
 	}
 }
 
+void EditorApplication::loadMaterialDefaultParams() {
+	/* TODO */
+}
+
 void EditorApplication::removeMaterialEditorTexture() {
 	if (!material_editor_texture)
 		return;
@@ -537,6 +541,9 @@ void EditorApplication::saveMaterialEditorModelGUI(){
 }
 
 void EditorApplication::saveMaterialEditorMaterial() {
+	if (!material_editor_material)
+		return;
+
 	material_editor_material->save(material_editor_library_folder + "\\" + material_editor_material->getName() + ".material");
 }
 
@@ -616,11 +623,13 @@ void EditorApplication::pickMaterialEditorTextureGUI() {
 				OFN_ENABLESIZING;
 
 	if (GetOpenFileName(&ofn)) {
+		chdir(exe_path.c_str());
 		string file = ToString(ofn.lpstrFile);
 		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
 		CopyFile(ofn.lpstrFile, name, false);
 		updateEditTextureMaterialEditor(LibGens::File::nameFromFilenameNoExtension(file), true);
 	}
+	chdir(exe_path.c_str());
 	free(filename);
 }
 
@@ -644,6 +653,7 @@ void EditorApplication::addMaterialEditorTextureGUI() {
 		OFN_ENABLESIZING;
 
 	if (GetOpenFileName(&ofn)) {
+		chdir(exe_path.c_str());
 		string file = ToString(ofn.lpstrFile);
 		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
 		string internal_name = LibGens::File::nameFromFilenameNoExtension(name); 
@@ -660,6 +670,7 @@ void EditorApplication::addMaterialEditorTextureGUI() {
 		CopyFile(ofn.lpstrFile, name, false);
 		updateMaterialEditorTextureList();
 	}
+	chdir(exe_path.c_str());
 	free(filename);
 }
 
@@ -875,6 +886,7 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 					char value_str[1024] = "";
 					GetDlgItemText(hDlg, IDE_MATERIAL_TEXTURE_FILENAME, value_str, 1024);
 					editor_application->updateEditTextureMaterialEditor(ToString(value_str));
+					ListView_SetItemText(GetDlgItem(hDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST), texture_index, 0, (LPSTR)value_str);
 				}
 				else {
 					for (size_t i = 0; i < 10; i++) {
@@ -952,6 +964,10 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 				case IDB_MATERIAL_DELETE_TEXTURE_UNIT:
 					editor_application->removeMaterialEditorTexture();
 					return true;
+
+				case IDB_MATERIAL_DEFAULTS:
+					editor_application->loadMaterialDefaultParams();
+					return true;
 			}
 
 			break;
@@ -965,7 +981,7 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			}
 			*/
 
-			return true;
+			return false;
 	}
 	
 	return false;

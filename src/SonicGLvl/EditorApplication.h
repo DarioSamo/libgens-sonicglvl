@@ -393,6 +393,7 @@ class EditorApplication : public BaseApplication {
 		void updateEditTextureUnitMaterialEditor(string unit_name);
 		void updateEditTextureMaterialEditor(string texture_name, bool update_ui = false);
 		void removeMaterialEditorTexture();
+		void loadMaterialDefaultParams();
 
 		void createObjectsPropertiesGUI();
 		void updateObjectsPropertiesGUI();
