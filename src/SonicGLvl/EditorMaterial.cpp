@@ -283,6 +283,26 @@ void EditorApplication::updateMaterialEditorInfo() {
 		SetDlgItemText(hMaterialEditorDlg, b, parameter_b.c_str());
 		SetDlgItemText(hMaterialEditorDlg, a, parameter_a.c_str());
 	}
+
+	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_RESETCONTENT, NULL, NULL);
+
+	string shader_name = mat->getShader();
+	LibGens::Shader* vertex_shader = NULL;
+	LibGens::Shader* pixel_shader = NULL;
+	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !mat->hasExtraGI(), false);
+
+	if (pixel_shader) {
+		vector<string> names = pixel_shader->getShaderParameterFilenames();
+		for (size_t i = 0; i < names.size(); i++) {
+			LibGens::ShaderParams* params = SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(names[i]);
+			if (params->getName() == "global")
+				continue;
+			vector<LibGens::ShaderParam*> paramList = params->getParameterList(3);
+			for (size_t i2 = 0; i2 < paramList.size(); i2++) {
+				SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_ADDSTRING, NULL, (LPARAM)paramList[i2]->getName().c_str());
+			}
+		}
+	}
 }
 
 void EditorApplication::loadMaterialDefaultParams() {
@@ -899,6 +919,9 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 
 				if (LOWORD(wParam) == IDC_MATERIAL_SHADER)  {
 					editor_application->updateEditShaderMaterialEditor(ToString(value_str));
+				}
+				else if (LOWORD(wParam) == IDC_MATERIAL_TEXTURE_UNIT_SLOT) {
+					editor_application->updateEditTextureUnitMaterialEditor(ToString(value_str));
 				}
 				break;
 			}
