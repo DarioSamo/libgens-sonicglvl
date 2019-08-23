@@ -275,7 +275,31 @@ void EditorApplication::updateMaterialEditorInfo() {
 }
 
 void EditorApplication::loadMaterialDefaultParams() {
-	/* TODO */
+	if (!material_editor_material)
+		return;
+
+	LibGens::Material* material = material_editor_material;
+	material->removeAllParameters();
+	string shader_name = material->getShader();
+	LibGens::Shader* vertex_shader = NULL;
+	LibGens::Shader* pixel_shader = NULL;
+	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !material->hasExtraGI(), false);
+
+	if (pixel_shader) {
+		vector<string> names = pixel_shader->getShaderParameterFilenames();
+		for (size_t i = 0; i < names.size(); i++) {
+			LibGens::ShaderParams* params = SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(names[i]);
+			vector<LibGens::ShaderParam*> paramList = params->getParameterList(0);
+			for (size_t i2 = 0; i2 < paramList.size(); i2++) {
+				if (paramList[i2]->getName().rfind("g_", 0) == -1 && paramList[i2]->getName().rfind("mrg", 0) == -1)
+				{
+					material->addParameter(new LibGens::Parameter(paramList[i2]->getName(), LibGens::Color(1, 1, 1, 1)));
+				}
+			}
+		}
+		updateMaterialEditorInfo();
+		updateEditShaderMaterialEditor(shader_name);
+	}
 }
 
 void EditorApplication::removeMaterialEditorTexture() {

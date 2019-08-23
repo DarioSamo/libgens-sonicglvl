@@ -316,6 +316,25 @@ namespace LibGens {
 		textures.push_back(texture);
 	}
 
+	void Material::removeAllParameters() {
+		parameters.clear();
+	}
+
+	void Material::removeParameterByIndex(size_t i) {
+		if (i > parameters.size())
+			return;
+
+		parameters.erase(parameters.begin() + i);
+	}
+
+	void Material::removeParameter(string name) {
+		for (vector<Parameter*>::iterator it = parameters.begin(); it != parameters.end(); it++) {
+			if ((*it)->getName() == name) {
+				parameters.erase(it);
+			}
+		}
+	}
+
 	void Material::removeTextureUnit(string unit) {
 		for (vector<Texture*>::iterator it = textures.begin(); it != textures.end(); it++) {
 			if ((*it)->getUnit() == unit) {

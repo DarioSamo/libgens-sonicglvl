@@ -72,6 +72,9 @@ namespace LibGens {
 			Parameter *getParameterByIndex(size_t i);
 			vector<Parameter *> getParameters();
 			vector<Texture *> getTextureUnits();
+			void removeParameter(string name);
+			void removeParameterByIndex(size_t i);
+			void removeAllParameters();
 			void removeTextureUnit(string unit);
 			void removeTextureUnitByIndex(size_t i);
 			int getTextureUnitsSize();
