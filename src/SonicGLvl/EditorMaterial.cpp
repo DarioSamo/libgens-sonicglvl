@@ -29,35 +29,46 @@ bool hasScene;
 void EditorApplication::openMaterialEditorGUI() {
 	if (!hMaterialEditorDlg) {
 		hMaterialEditorDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_MATERIAL_EDITOR), NULL, MaterialEditorCallback);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MODEL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL), 0);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL), 0);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN), 0);
+
+		material_editor_model = NULL;
+		material_editor_model_filename = "";
+		material_editor_material = NULL;
+		material_editor_skeleton_name = "";
+		material_editor_animation_name = "";
+		material_editor_animation_state = NULL;
+		material_editor_scene_node = NULL;
+		material_editor_mesh_group = PREVIEW_MESH_GROUP;
+
+		clearSelectionMaterialEditorGUI();
+		enableMaterialEditorListGUI();
+
+		// Create Texture Units List
+		HWND hMaterialTextureUnitsList = GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
+		ListView_SetExtendedListViewStyleEx(hMaterialTextureUnitsList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+
+		// Only enable terrain mode if theres a level
+		EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE), current_level != NULL);
+
+		// Disable non-functional modes for now
+		EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE), false);
+
+		// Populate the shader list
+		WIN32_FIND_DATA FindFileData;
+		HANDLE hFind;
+		hFind = FindFirstFile((string(SONICGLVL_SHADERS_PATH) + "*.shader-list").c_str(), &FindFileData);
+		if (hFind != INVALID_HANDLE_VALUE) {
+			do {
+				SendMessage(GetDlgItem(hMaterialEditorDlg, IDC_MATERIAL_SHADER)
+					, CB_ADDSTRING, NULL, (LPARAM)LibGens::File::nameFromFilenameNoExtension(string(FindFileData.cFileName)).c_str());
+			} while (FindNextFile(hFind, &FindFileData) != 0);
+		}
+		FindClose(hFind);
 	}
 
 	SetFocus(hMaterialEditorDlg);
-
-	SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MODEL_MODE, BM_SETCHECK, (WPARAM) (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL), 0);
-	SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE, BM_SETCHECK, (WPARAM) (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL), 0);
-	SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE, BM_SETCHECK, (WPARAM) (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN), 0);
-	
-	material_editor_model = NULL;
-	material_editor_model_filename = "";
-	material_editor_material = NULL;
-	material_editor_skeleton_name = "";
-	material_editor_animation_name = "";
-	material_editor_animation_state = NULL;
-	material_editor_scene_node = NULL;
-	material_editor_mesh_group = PREVIEW_MESH_GROUP;
-
-	clearSelectionMaterialEditorGUI();
-	enableMaterialEditorListGUI();
-
-	// Create Texture Units List
-	HWND hMaterialTextureUnitsList = GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
-	ListView_SetExtendedListViewStyleEx(hMaterialTextureUnitsList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
-
-	// Only enable terrain mode if theres a level
-	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE), current_level != NULL);
-
-	// Disable non-functional modes for now
-	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE), false);
 }
 
 void EditorApplication::enableMaterialEditorGUI(bool enable) {
