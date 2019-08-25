@@ -29,9 +29,6 @@ bool hasScene;
 void EditorApplication::openMaterialEditorGUI() {
 	if (!hMaterialEditorDlg) {
 		hMaterialEditorDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_MATERIAL_EDITOR), NULL, MaterialEditorCallback);
-		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MODEL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL), 0);
-		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL), 0);
-		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN), 0);
 
 		material_editor_model = NULL;
 		material_editor_model_filename = "";
@@ -41,6 +38,11 @@ void EditorApplication::openMaterialEditorGUI() {
 		material_editor_animation_state = NULL;
 		material_editor_scene_node = NULL;
 		material_editor_mesh_group = PREVIEW_MESH_GROUP;
+		material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MODEL;
+
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MODEL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL), 0);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL), 0);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN), 0);
 
 		clearSelectionMaterialEditorGUI();
 		enableMaterialEditorListGUI();
@@ -348,7 +350,7 @@ void EditorApplication::removeMaterialEditorTexture() {
 }
 
 void EditorApplication::materialEditorTerrainMode() {
-	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL;
+	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN;
 	material_editor_mesh_group = GENERAL_MESH_GROUP;
 	if (material_editor_model) {
 		cleanMaterialEditorModelGUI();
@@ -365,9 +367,15 @@ void EditorApplication::materialEditorTerrainMode() {
 		material_editor_materials.push_back(mat);
 	}
 	rebuildListMaterialEditorGUI();
+
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_MODEL), false);
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_SAVE_MODEL), false);
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_SKELETON), false);
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_ANIMATION), false);
 }
 
 void EditorApplication::materialEditorModelMode() {
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_MODEL), true);
 	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MODEL;
 	material_editor_mesh_group = PREVIEW_MESH_GROUP;
 	material_editor_materials.clear();
@@ -711,9 +719,25 @@ void EditorApplication::addMaterialEditorTextureGUI() {
 		chdir(exe_path.c_str());
 		string file = ToString(ofn.lpstrFile);
 		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
-		string internal_name = LibGens::File::nameFromFilenameNoExtension(name); 
-		LibGens::Texture* tex = new LibGens::Texture(material_editor_material->getName() + "-000" + ToString(material_editor_material->getTextureUnitsSize())
-			, "diffuse",internal_name);
+		string internal_name = LibGens::File::nameFromFilenameNoExtension(name);
+		char buffer[8];
+		sprintf(buffer, "-%04d", material_editor_material->getTextureUnitsSize());
+		string unitName = material_editor_material->getName() + ToString(buffer);
+		string unit = "diffuse";
+		if (internal_name.size() > 3) {
+			string fileUnit = internal_name.substr(internal_name.size() - 3, 3);
+			if (fileUnit == "spc" || fileUnit == "pec")
+				unit = "specular";
+			else if (fileUnit == "pow")
+				unit = "gloss";
+			else if (fileUnit == "nrm")
+				unit = "normal";
+			else if (fileUnit == "fal")
+				unit = "displacement";
+			else if (fileUnit == "env" || fileUnit == "ref")
+				unit = "reflection";
+		}
+		LibGens::Texture* tex = new LibGens::Texture(unitName, unit,internal_name);
 		material_editor_material->addTextureUnit(tex);
 
 		Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
