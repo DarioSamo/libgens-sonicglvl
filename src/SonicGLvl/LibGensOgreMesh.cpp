@@ -608,6 +608,8 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 					}
 				}
 
+				// get rid of old textures to refresh units
+				pass->getTextureUnitState((size_t)index)->setTextureName("");
 				LibGens::Texture *material_texture = material->getTextureByUnit(texture_unit, texture_unit_used_count);
 				if (material_texture) {
 					pass->getTextureUnitState((size_t)index)->setTextureName(material_texture->getName()+LIBGENS_TEXTURE_FILE_EXTENSION);
@@ -759,6 +761,7 @@ void updateMaterialShaderParameters(Ogre::Material *ogre_material, LibGens::Mate
 
 
 void buildMaterial(LibGens::Material *material, string material_name, string resource_group, size_t mesh_slot, bool no_gi) {
+	material->setExtra(material_name);
 	LibGens::Texture *texture=material->getTextureByUnit(LIBGENS_MATERIAL_TEXTURE_UNIT_DIFFUSE);
 
 	Ogre::Material *compilematerial = Ogre::MaterialManager::getSingleton().create(material_name, resource_group).getPointer();

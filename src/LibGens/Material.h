@@ -67,10 +67,16 @@ namespace LibGens {
 			void setLayer(string v);
 			string getLayer();
 			Texture *getTextureByUnit(string unit, size_t offset_count=0);
+			Texture* Material::getTextureByIndex(size_t i);
 			Parameter *getParameterByName(string unit);
 			Parameter *getParameterByIndex(size_t i);
 			vector<Parameter *> getParameters();
 			vector<Texture *> getTextureUnits();
+			void removeParameter(string name);
+			void removeParameterByIndex(size_t i);
+			void removeAllParameters();
+			void removeTextureUnit(string unit);
+			void removeTextureUnitByIndex(size_t i);
 			int getTextureUnitsSize();
 			void addTextureUnit(Texture *texture);
 			void addParameter(Parameter *parameter);

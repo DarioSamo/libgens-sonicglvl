@@ -240,10 +240,14 @@ class EditorApplication : public BaseApplication {
 
 		// Material Editor
 		size_t material_editor_mode;
+		string material_editor_mesh_group;
 		int material_editor_list_selection;
 		int last_material_editor_list_selection;
+		int texture_list_selection;
+		int last_texture_list_selection;
 		LibGens::Model *material_editor_model;
 		string material_editor_model_filename;
+		string material_editor_library_folder;
 		vector<LibGens::Material *> material_editor_materials;
 		Ogre::RenderWindow *material_editor_preview_window;
 		Ogre::Viewport *material_editor_preview_viewport;
@@ -251,6 +255,7 @@ class EditorApplication : public BaseApplication {
 		Ogre::SceneManager *material_editor_preview_scene_manager;
 		LibGens::MaterialLibrary *material_editor_material_library;
 		LibGens::Material *material_editor_material;
+		LibGens::Texture *material_editor_texture;
 		string material_editor_skeleton_name;
 		string material_editor_animation_name;
 		Ogre::AnimationState *material_editor_animation_state;
@@ -366,15 +371,29 @@ class EditorApplication : public BaseApplication {
 		void loadMaterialEditorSkeletonGUI();
 		void loadMaterialEditorAnimationGUI();
 		void rebuildMaterialPreviewNodes();
+		void materialEditorTerrainMode();
+		void materialEditorModelMode();
+		void saveMaterialEditorModelGUI();
+		void saveMaterialEditorMaterial();
+		void pickMaterialEditorTextureGUI();
+		void addMaterialEditorTextureGUI();
 
 		void cleanMaterialEditorModelGUI();
 		void clearSelectionMaterialEditorGUI();
+		void clearTextureInfo();
 		void rebuildListMaterialEditorGUI();
 		void createPreviewMaterialEditorGUI();
 		void updateMaterialEditorIndex(int selection_index);
+		void updateMaterialEditorTextureIndex(int selection_index);
 		void updateMaterialEditorInfo();
+		void updateMaterialEditorTextureList();
+		void updateMaterialTextureInfo();
 		void updateEditParameterMaterialEditor(size_t i, LibGens::Color parameter_color);
 		void updateEditShaderMaterialEditor(string shader_name);
+		void updateEditTextureUnitMaterialEditor(string unit_name);
+		void updateEditTextureMaterialEditor(string texture_name, bool update_ui = false);
+		void removeMaterialEditorTexture();
+		void loadMaterialDefaultParams();
 
 		void createObjectsPropertiesGUI();
 		void updateObjectsPropertiesGUI();

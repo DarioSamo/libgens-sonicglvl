@@ -24,37 +24,53 @@
 
 INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK MaterialEditorPreviewCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
-
+bool hasScene;
 
 void EditorApplication::openMaterialEditorGUI() {
 	if (!hMaterialEditorDlg) {
 		hMaterialEditorDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_MATERIAL_EDITOR), NULL, MaterialEditorCallback);
+
+		material_editor_model = NULL;
+		material_editor_model_filename = "";
+		material_editor_material = NULL;
+		material_editor_skeleton_name = "";
+		material_editor_animation_name = "";
+		material_editor_animation_state = NULL;
+		material_editor_scene_node = NULL;
+		material_editor_mesh_group = PREVIEW_MESH_GROUP;
+		material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MODEL;
+
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MODEL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL), 0);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL), 0);
+		SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE, BM_SETCHECK, (WPARAM)(material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN), 0);
+
+		clearSelectionMaterialEditorGUI();
+		enableMaterialEditorListGUI();
+
+		// Create Texture Units List
+		HWND hMaterialTextureUnitsList = GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
+		ListView_SetExtendedListViewStyleEx(hMaterialTextureUnitsList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+
+		// Only enable terrain mode if theres a level
+		EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE), current_level != NULL);
+
+		// Disable non-functional modes for now
+		EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE), false);
+
+		// Populate the shader list
+		WIN32_FIND_DATA FindFileData;
+		HANDLE hFind;
+		hFind = FindFirstFile((string(SONICGLVL_SHADERS_PATH) + "*.shader-list").c_str(), &FindFileData);
+		if (hFind != INVALID_HANDLE_VALUE) {
+			do {
+				SendMessage(GetDlgItem(hMaterialEditorDlg, IDC_MATERIAL_SHADER)
+					, CB_ADDSTRING, NULL, (LPARAM)LibGens::File::nameFromFilenameNoExtension(string(FindFileData.cFileName)).c_str());
+			} while (FindNextFile(hFind, &FindFileData) != 0);
+		}
+		FindClose(hFind);
 	}
 
 	SetFocus(hMaterialEditorDlg);
-
-	SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MODEL_MODE, BM_SETCHECK, (WPARAM) (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL), 0);
-	SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE, BM_SETCHECK, (WPARAM) (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MATERIAL), 0);
-	SendDlgItemMessage(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE, BM_SETCHECK, (WPARAM) (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN), 0);
-	
-	material_editor_model = NULL;
-	material_editor_model_filename = "";
-	material_editor_material = NULL;
-	material_editor_skeleton_name = "";
-	material_editor_animation_name = "";
-	material_editor_animation_state = NULL;
-	material_editor_scene_node = NULL;
-
-	clearSelectionMaterialEditorGUI();
-	enableMaterialEditorListGUI();
-
-	// Create Texture Units List
-	HWND hMaterialTextureUnitsList = GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
-	ListView_SetExtendedListViewStyleEx(hMaterialTextureUnitsList, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
-
-	// Disable non-functional modes for now
-	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE), false);
-	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_TERRAIN_MODE), false);
 }
 
 void EditorApplication::enableMaterialEditorGUI(bool enable) {
@@ -144,6 +160,8 @@ void EditorApplication::enableMaterialEditorGUI(bool enable) {
 	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDE_MATERIAL_PARAMETER_8_A), enable);
 	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDE_MATERIAL_PARAMETER_9_A), enable);
 	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDE_MATERIAL_PARAMETER_10_A), enable);
+
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_SAVE_MATERIAL), enable);
 }
 
 
@@ -162,27 +180,19 @@ void EditorApplication::enableMaterialEditorListGUI() {
 	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_SAVE_MODEL), material_list_flag);
 }
 
-
-void EditorApplication::updateMaterialEditorInfo() {
-	LibGens::Material *mat = material_editor_material;
+void EditorApplication::updateMaterialEditorTextureList() {
+	LibGens::Material* mat = material_editor_material;
 	if (!material_editor_material) return;
 
-	// Update Info
-	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_NAME, mat->getName().c_str());
-	SetDlgItemText(hMaterialEditorDlg, IDC_MATERIAL_SHADER, mat->getShader().c_str());
-	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_BACKFACE_CULLING, BM_SETCHECK, (WPARAM) mat->hasNoCulling(), 0);
-	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_ADDITIVE, BM_SETCHECK, (WPARAM) mat->hasColorBlend(), 0);
-
-	
 	// Update Texture Units
-	HWND hMaterialTextureList=GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
-	if (ListView_GetItemCount(hMaterialTextureList)!=0) {
+	HWND hMaterialTextureList = GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST);
+	if (ListView_GetItemCount(hMaterialTextureList) != 0) {
 		ListView_DeleteAllItems(hMaterialTextureList);
 		while (ListView_DeleteColumn(hMaterialTextureList, 0) > 0);
 		ListView_SetItemCount(hMaterialTextureList, 0);
 	}
-	
-	LVCOLUMN Col;                                   
+
+	LVCOLUMN Col;
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
 	Col.cx = 151;
 	Col.pszText = "DDS";
@@ -194,10 +204,10 @@ void EditorApplication::updateMaterialEditorInfo() {
 	Col.pszText = "Slot";
 	Col.cchTextMax = strlen(Col.pszText);
 	ListView_InsertColumn(hMaterialTextureList, 1, &Col);
-	
-	
-	vector<LibGens::Texture *> texture_units = mat->getTextureUnits();
-	for (size_t i=0; i<texture_units.size(); i++) {
+
+
+	vector<LibGens::Texture*> texture_units = mat->getTextureUnits();
+	for (size_t i = 0; i < texture_units.size(); i++) {
 		char dds_str[256];
 		char slot_str[256];
 
@@ -207,14 +217,36 @@ void EditorApplication::updateMaterialEditorInfo() {
 		strcpy(slot_str, texture_units[i]->getUnit().c_str());
 
 		Item.pszText = dds_str;
-		Item.cchTextMax = strlen(dds_str);            
-		Item.iSubItem = 0;                           
-		Item.lParam = (LPARAM) NULL;                   
-		Item.iItem = i; 
+		Item.cchTextMax = strlen(dds_str);
+		Item.iSubItem = 0;
+		Item.lParam = (LPARAM)NULL;
+		Item.iItem = i;
 		ListView_InsertItem(hMaterialTextureList, &Item);
 		ListView_SetItemText(hMaterialTextureList, i, 1, slot_str);
 	}
+}
 
+void EditorApplication::updateMaterialTextureInfo() {
+	LibGens::Texture* tex = material_editor_texture;
+	if (!material_editor_material) return;
+
+	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_FILENAME, tex->getName().c_str());
+	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_UNIT, tex->getTexset().c_str());
+	SetDlgItemText(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, tex->getUnit().c_str());
+}
+
+void EditorApplication::updateMaterialEditorInfo() {
+	LibGens::Material *mat = material_editor_material;
+	if (!material_editor_material) return;
+
+	// Update Info
+	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_NAME, mat->getName().c_str());
+	SetDlgItemText(hMaterialEditorDlg, IDC_MATERIAL_SHADER, mat->getShader().c_str());
+	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_BACKFACE_CULLING, BM_SETCHECK, (WPARAM) mat->hasNoCulling(), 0);
+	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_ADDITIVE, BM_SETCHECK, (WPARAM) mat->hasColorBlend(), 0);
+	
+	updateMaterialEditorTextureList();
+	
 	// Update Parameters
 	vector<LibGens::Parameter *> parameters = mat->getParameters();
 
@@ -254,9 +286,102 @@ void EditorApplication::updateMaterialEditorInfo() {
 		SetDlgItemText(hMaterialEditorDlg, a, parameter_a.c_str());
 	}
 
-	
+	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_RESETCONTENT, NULL, NULL);
+
+	string shader_name = mat->getShader();
+	LibGens::Shader* vertex_shader = NULL;
+	LibGens::Shader* pixel_shader = NULL;
+	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !mat->hasExtraGI(), false);
+
+	if (pixel_shader) {
+		vector<string> names = pixel_shader->getShaderParameterFilenames();
+		for (size_t i = 0; i < names.size(); i++) {
+			LibGens::ShaderParams* params = SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(names[i]);
+			if (params->getName() == "global")
+				continue;
+			vector<LibGens::ShaderParam*> paramList = params->getParameterList(3);
+			for (size_t i2 = 0; i2 < paramList.size(); i2++) {
+				SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_ADDSTRING, NULL, (LPARAM)paramList[i2]->getName().c_str());
+			}
+		}
+	}
 }
 
+void EditorApplication::loadMaterialDefaultParams() {
+	if (!material_editor_material)
+		return;
+
+	LibGens::Material* material = material_editor_material;
+	material->removeAllParameters();
+	string shader_name = material->getShader();
+	LibGens::Shader* vertex_shader = NULL;
+	LibGens::Shader* pixel_shader = NULL;
+	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !material->hasExtraGI(), false);
+
+	if (pixel_shader) {
+		vector<string> names = pixel_shader->getShaderParameterFilenames();
+		for (size_t i = 0; i < names.size(); i++) {
+			LibGens::ShaderParams* params = SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(names[i]);
+			vector<LibGens::ShaderParam*> paramList = params->getParameterList(0);
+			for (size_t i2 = 0; i2 < paramList.size(); i2++) {
+				if (paramList[i2]->getName().rfind("g_", 0) == -1 && paramList[i2]->getName().rfind("mrg", 0) == -1)
+				{
+					material->addParameter(new LibGens::Parameter(paramList[i2]->getName(), LibGens::Color(1, 1, 1, 1)));
+				}
+			}
+		}
+		updateMaterialEditorInfo();
+		updateEditShaderMaterialEditor(shader_name);
+	}
+}
+
+void EditorApplication::removeMaterialEditorTexture() {
+	if (!material_editor_texture)
+		return;
+
+	material_editor_material->removeTextureUnitByIndex(texture_list_selection);
+	updateMaterialEditorTextureList();
+
+	Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
+
+	if (ogre_material) {
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+	}
+}
+
+void EditorApplication::materialEditorTerrainMode() {
+	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN;
+	material_editor_mesh_group = GENERAL_MESH_GROUP;
+	if (material_editor_model) {
+		cleanMaterialEditorModelGUI();
+	}
+
+	clearSelectionMaterialEditorGUI();
+	enableMaterialEditorListGUI();
+	material_editor_materials.clear();
+
+	material_editor_material_library = current_level->getTerrain()->getMaterialLibrary();
+	material_editor_library_folder = current_level->getTerrain()->getResourcesFolder();
+	for each (LibGens::Material* mat in material_editor_material_library->getMaterials())
+	{
+		material_editor_materials.push_back(mat);
+	}
+	rebuildListMaterialEditorGUI();
+
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_MODEL), false);
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_SAVE_MODEL), false);
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_SKELETON), false);
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_ANIMATION), false);
+}
+
+void EditorApplication::materialEditorModelMode() {
+	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_MODEL), true);
+	material_editor_mode = SONICGLVL_MATERIAL_EDITOR_MODE_MODEL;
+	material_editor_mesh_group = PREVIEW_MESH_GROUP;
+	material_editor_materials.clear();
+	clearSelectionMaterialEditorGUI();
+	rebuildListMaterialEditorGUI();
+}
 
 void EditorApplication::clearMaterialEditorGUI() {
 	cleanMaterialEditorModelGUI();
@@ -274,9 +399,17 @@ void EditorApplication::cleanMaterialEditorModelGUI() {
 void EditorApplication::clearSelectionMaterialEditorGUI() {
 	material_editor_list_selection = -1;
 	last_material_editor_list_selection = -1;
+	texture_list_selection = -1;
+	last_texture_list_selection = -1;
 	enableMaterialEditorGUI(false);
 }
 
+void EditorApplication::clearTextureInfo() {
+	material_editor_texture = NULL;
+	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_FILENAME, "");
+	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_UNIT, "");
+	SetDlgItemText(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, "");
+}
 
 void EditorApplication::createPreviewMaterialEditorGUI() {
 	/*
@@ -288,72 +421,74 @@ void EditorApplication::createPreviewMaterialEditorGUI() {
 	*/
 
 	// Create Scene for Preview
-	material_editor_preview_scene_manager = root->createSceneManager("DefaultSceneManager");
-	material_editor_preview_scene_manager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+	if (!hasScene) {
+		material_editor_preview_scene_manager = root->createSceneManager("DefaultSceneManager");
+		material_editor_preview_scene_manager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
 
-	// FIXME: Implement properly
-	Ogre::SceneManager *bogus_manager = root->createSceneManager("DefaultSceneManager");
+		// FIXME: Implement properly
+		Ogre::SceneManager* bogus_manager = root->createSceneManager("DefaultSceneManager");
 
-	Ogre::Light *dir_light = material_editor_preview_scene_manager->createLight("Preview Directional Light");
-	dir_light->setSpecularColour(Ogre::ColourValue::White);
-	dir_light->setDiffuseColour(Ogre::ColourValue(1.0, 1.0, 1.0));
-	dir_light->setType(Ogre::Light::LT_DIRECTIONAL);
-	dir_light->setDirection(Ogre::Vector3(1, 1, 1).normalisedCopy());
+		Ogre::Light* dir_light = material_editor_preview_scene_manager->createLight("Preview Directional Light");
+		dir_light->setSpecularColour(Ogre::ColourValue::White);
+		dir_light->setDiffuseColour(Ogre::ColourValue(1.0, 1.0, 1.0));
+		dir_light->setType(Ogre::Light::LT_DIRECTIONAL);
+		dir_light->setDirection(Ogre::Vector3(1, 1, 1).normalisedCopy());
 
-	// Create Render Window
-	Ogre::NameValuePairList misc;
-	//misc["externalWindowHandle"] = Ogre::StringConverter::toString((int)hMaterialEditorPreviewDlg);
-	misc["FSAA"] = Ogre::StringConverter::toString((int)8);
-	misc["vsync"] = Ogre::StringConverter::toString((bool)true);
-	material_editor_preview_window = root->createRenderWindow("Preview Window", 640, 480, false, &misc);
-	material_editor_preview_window->setDeactivateOnFocusChange(false);
+		// Create Render Window
+		Ogre::NameValuePairList misc;
+		//misc["externalWindowHandle"] = Ogre::StringConverter::toString((int)hMaterialEditorPreviewDlg);
+		misc["FSAA"] = Ogre::StringConverter::toString((int)8);
+		misc["vsync"] = Ogre::StringConverter::toString((bool)true);
+		material_editor_preview_window = root->createRenderWindow("Preview Window", 640, 480, false, &misc);
+		material_editor_preview_window->setDeactivateOnFocusChange(false);
 
-	material_editor_preview_window->setAutoUpdated(true);
+		material_editor_preview_window->setAutoUpdated(true);
 
-	
-	// Create Viewport for Preview
-	material_editor_viewport = new EditorViewport(material_editor_preview_scene_manager, bogus_manager, material_editor_preview_window, SONICGLVL_CAMERA_PREVIEW_NAME);
-	material_editor_viewport->setPanningMultiplier(0.005);
-	material_editor_viewport->setZoomingMultiplier(0.04);
-	
-	// Create Listener for Window
-	material_editor_preview_listener = new MaterialEditorPreviewListener();
-	material_editor_preview_listener->setEditorViewport(material_editor_viewport);
-	material_editor_preview_listener->setEditorWindow(material_editor_preview_window);
 
-	// Create Input Manager for new Window and set the listener
-	OIS::ParamList pl;
-    size_t windowHnd = 0;
-    std::ostringstream windowHndStr;
-    material_editor_preview_window->getCustomAttribute("WINDOW", &windowHnd);
-    windowHndStr << windowHnd;
-    pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
-	pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND" )));
-    pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
-    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
-    pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
-    material_editor_input_manager = OIS::InputManager::createInputSystem( pl );
-    material_editor_keyboard = static_cast<OIS::Keyboard*>(material_editor_input_manager->createInputObject(OIS::OISKeyboard, true));
-    material_editor_mouse = static_cast<OIS::Mouse*>(material_editor_input_manager->createInputObject(OIS::OISMouse, true));
+		// Create Viewport for Preview
+		material_editor_viewport = new EditorViewport(material_editor_preview_scene_manager, bogus_manager, material_editor_preview_window, SONICGLVL_CAMERA_PREVIEW_NAME);
+		material_editor_viewport->setPanningMultiplier(0.005);
+		material_editor_viewport->setZoomingMultiplier(0.04);
 
-    material_editor_mouse->setEventCallback(material_editor_preview_listener);
-    material_editor_keyboard->setEventCallback(material_editor_preview_listener);
-    Ogre::WindowEventUtilities::addWindowEventListener(material_editor_preview_window, material_editor_preview_listener);
-	root->addFrameListener(material_editor_preview_listener);
+		// Create Listener for Window
+		material_editor_preview_listener = new MaterialEditorPreviewListener();
+		material_editor_preview_listener->setEditorViewport(material_editor_viewport);
+		material_editor_preview_listener->setEditorWindow(material_editor_preview_window);
 
-	material_editor_preview_listener->setMouse(material_editor_mouse);
-	material_editor_preview_listener->setKeyboard(material_editor_keyboard);
+		// Create Input Manager for new Window and set the listener
+		OIS::ParamList pl;
+		size_t windowHnd = 0;
+		std::ostringstream windowHndStr;
+		material_editor_preview_window->getCustomAttribute("WINDOW", &windowHnd);
+		windowHndStr << windowHnd;
+		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
+		pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
+		pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
+		pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
+		material_editor_input_manager = OIS::InputManager::createInputSystem(pl);
+		material_editor_keyboard = static_cast<OIS::Keyboard*>(material_editor_input_manager->createInputObject(OIS::OISKeyboard, true));
+		material_editor_mouse = static_cast<OIS::Mouse*>(material_editor_input_manager->createInputObject(OIS::OISMouse, true));
 
-	//mouse->setEventCallback(material_editor_preview_listener);
-    //keyboard->setEventCallback(material_editor_preview_listener);
-	
-	
-	unsigned int width, height, depth;
-    int left, top;
-	material_editor_preview_window->getMetrics(width, height, depth, left, top);
-    const OIS::MouseState &ms = material_editor_mouse->getMouseState();
-    ms.width = width;
-    ms.height = height;
+		material_editor_mouse->setEventCallback(material_editor_preview_listener);
+		material_editor_keyboard->setEventCallback(material_editor_preview_listener);
+		Ogre::WindowEventUtilities::addWindowEventListener(material_editor_preview_window, material_editor_preview_listener);
+		root->addFrameListener(material_editor_preview_listener);
+
+		material_editor_preview_listener->setMouse(material_editor_mouse);
+		material_editor_preview_listener->setKeyboard(material_editor_keyboard);
+
+		//mouse->setEventCallback(material_editor_preview_listener);
+		//keyboard->setEventCallback(material_editor_preview_listener);
+
+
+		unsigned int width, height, depth;
+		int left, top;
+		material_editor_preview_window->getMetrics(width, height, depth, left, top);
+		const OIS::MouseState& ms = material_editor_mouse->getMouseState();
+		ms.width = width;
+		ms.height = height;
+	}
 
 	rebuildMaterialPreviewNodes();
 	
@@ -367,6 +502,7 @@ void EditorApplication::createPreviewMaterialEditorGUI() {
 	camera->setPosition(camera_center);
 	camera->setDirection(Ogre::Vector3(0, 0, -1).normalisedCopy());
 	camera->moveRelative(Ogre::Vector3::UNIT_Z * size_max*1.5);
+	hasScene = true;
 }
 
 
@@ -436,6 +572,44 @@ void EditorApplication::rebuildListMaterialEditorGUI() {
 }
 
 
+void EditorApplication::saveMaterialEditorModelGUI(){
+	char* filename = (char*)malloc(1024);
+	strcpy(filename, "");
+
+	OPENFILENAME    ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize		= sizeof(ofn);
+	ofn.lpstrFilter		= "Model File(.model)\0*.model";
+	ofn.nFilterIndex	= 1;
+	ofn.lpstrFile		= filename;
+	ofn.nMaxFile		= 1024;
+	ofn.lpstrTitle		= "Choose where you would like save the model";
+	ofn.lpstrFile		= (LPSTR)material_editor_model_filename.c_str();
+	ofn.Flags			= OFN_EXPLORER | OFN_PATHMUSTEXIST | 
+						  OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT |
+						  OFN_ENABLESIZING;
+
+	if (GetSaveFileName(&ofn))
+	{
+		string folder = LibGens::File::folderFromFilename(ofn.lpstrFile);
+		material_editor_model->save(ToString(ofn.lpstrFile));
+
+		for each (LibGens::Material* mat in material_editor_materials)
+		{
+			mat->save(folder + "\\" + mat->getName() + ".material");
+		}
+	}
+
+	free(filename);
+}
+
+void EditorApplication::saveMaterialEditorMaterial() {
+	if (!material_editor_material)
+		return;
+
+	material_editor_material->save(material_editor_library_folder + "\\" + material_editor_material->getName() + ".material");
+}
+
 void EditorApplication::loadMaterialEditorModelGUI() {
 	char *filename = (char *) malloc(1024);
 	strcpy(filename, "");
@@ -465,10 +639,10 @@ void EditorApplication::loadMaterialEditorModelGUI() {
 		list<string> material_names = material_editor_model->getMaterialNames();
 
 		// Build material library
-		string material_library_folder = LibGens::File::folderFromFilename(material_editor_model_filename);
-		material_editor_material_library = new LibGens::MaterialLibrary(material_library_folder);
+		material_editor_library_folder = LibGens::File::folderFromFilename(material_editor_model_filename);
+		material_editor_material_library = new LibGens::MaterialLibrary(material_editor_library_folder);
 
-		Ogre::ResourceGroupManager::getSingleton().addResourceLocation(material_library_folder, "FileSystem");
+		Ogre::ResourceGroupManager::getSingleton().addResourceLocation(material_editor_library_folder, "FileSystem");
 
 		// Enable the List UI
 		enableMaterialEditorListGUI();
@@ -492,7 +666,92 @@ void EditorApplication::loadMaterialEditorModelGUI() {
     free(filename);
 }
 
+void EditorApplication::pickMaterialEditorTextureGUI() {
+	if (!material_editor_texture)
+		return;
 
+	char* filename = (char*)malloc(1024);
+	strcpy(filename, "");
+
+	OPENFILENAME    ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "DirectX Texture File(.dds)\0*.dds\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = 1024;
+	ofn.lpstrTitle = "Choose the Texture File you want to use";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST |
+				OFN_LONGNAMES | OFN_EXPLORER |
+				OFN_ENABLESIZING;
+
+	if (GetOpenFileName(&ofn)) {
+		chdir(exe_path.c_str());
+		string file = ToString(ofn.lpstrFile);
+		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
+		CopyFile(ofn.lpstrFile, name, false);
+		updateEditTextureMaterialEditor(LibGens::File::nameFromFilenameNoExtension(file), true);
+	}
+	chdir(exe_path.c_str());
+	free(filename);
+}
+
+void EditorApplication::addMaterialEditorTextureGUI() {
+	if (!material_editor_material)
+		return;
+
+	char* filename = (char*)malloc(1024);
+	strcpy(filename, "");
+
+	OPENFILENAME    ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "DirectX Texture File(.dds)\0*.dds\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = 1024;
+	ofn.lpstrTitle = "Choose the Texture File you want to use";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST |
+		OFN_LONGNAMES | OFN_EXPLORER |
+		OFN_ENABLESIZING;
+
+	if (GetOpenFileName(&ofn)) {
+		chdir(exe_path.c_str());
+		string file = ToString(ofn.lpstrFile);
+		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
+		string internal_name = LibGens::File::nameFromFilenameNoExtension(name);
+		char buffer[8];
+		sprintf(buffer, "-%04d", material_editor_material->getTextureUnitsSize());
+		string unitName = material_editor_material->getName() + ToString(buffer);
+		string unit = "diffuse";
+		if (internal_name.size() > 3) {
+			string fileUnit = internal_name.substr(internal_name.size() - 3, 3);
+			if (fileUnit == "spc" || fileUnit == "pec")
+				unit = "specular";
+			else if (fileUnit == "pow")
+				unit = "gloss";
+			else if (fileUnit == "nrm")
+				unit = "normal";
+			else if (fileUnit == "fal")
+				unit = "displacement";
+			else if (fileUnit == "env" || fileUnit == "ref")
+				unit = "reflection";
+		}
+		LibGens::Texture* tex = new LibGens::Texture(unitName, unit,internal_name);
+		material_editor_material->addTextureUnit(tex);
+
+		Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
+
+		if (ogre_material) {
+			updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+		}
+
+		CopyFile(ofn.lpstrFile, name, false);
+		updateMaterialEditorTextureList();
+	}
+	chdir(exe_path.c_str());
+	free(filename);
+}
 
 void EditorApplication::loadMaterialEditorSkeletonGUI() {
 	char *filename = (char *) malloc(1024);
@@ -579,6 +838,25 @@ void EditorApplication::updateMaterialEditorIndex(int selection_index) {
 }
 
 
+void EditorApplication::updateMaterialEditorTextureIndex(int selection_index) {
+	texture_list_selection = selection_index;
+
+	if (texture_list_selection != last_texture_list_selection) {
+		last_texture_list_selection = texture_list_selection;
+
+		if (texture_list_selection != -1)
+		{
+			if (material_editor_material && material_editor_materials.size()) {
+				material_editor_texture = material_editor_material->getTextureByIndex(texture_list_selection);
+				updateMaterialTextureInfo();
+			}
+		}
+		else {
+			clearTextureInfo();
+		}
+	}
+}
+
 void EditorApplication::updateEditParameterMaterialEditor(size_t i, LibGens::Color parameter_color) {
 	if (!material_editor_material) return;
 
@@ -588,10 +866,10 @@ void EditorApplication::updateEditParameterMaterialEditor(size_t i, LibGens::Col
 	}
 	else return;
 
-	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), PREVIEW_MESH_GROUP).getPointer();
+	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, true, NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
 	}
 }
 
@@ -600,17 +878,52 @@ void EditorApplication::updateEditShaderMaterialEditor(string shader_name) {
 	if (!material_editor_material) return;
 
 	material_editor_material->setShader(shader_name);
-	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), PREVIEW_MESH_GROUP).getPointer();
+	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, true, NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
 	}
 }
 
+void EditorApplication::updateEditTextureMaterialEditor(string texture_name, bool update_ui) {
+	if (!material_editor_texture)
+		return;
+
+	material_editor_texture->setName(texture_name);
+	Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
+
+	if (ogre_material) {
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+	}
+
+	if (update_ui) {
+		SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_FILENAME, material_editor_texture->getName().c_str());
+		SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_UNIT, material_editor_texture->getTexset().c_str());
+		SetDlgItemText(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, material_editor_texture->getUnit().c_str());
+		ListView_SetItemText(GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST), texture_list_selection, 0, (LPSTR)texture_name.c_str());
+	}
+}
+
+void EditorApplication::updateEditTextureUnitMaterialEditor(string unit_name) {
+	if (!material_editor_texture)
+		return;
+
+	ListView_SetItemText(GetDlgItem(hMaterialEditorDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST), texture_list_selection, 1, (LPSTR)unit_name.c_str());
+	material_editor_texture->setUnit(unit_name);
+
+	Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
+
+	if (ogre_material) {
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+	}
+}
 
 INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	int list_view_index = ListView_GetNextItem(GetDlgItem(hDlg, IDL_MATERIAL_MATERIAL_LIST), -1, LVIS_SELECTED | LVIS_FOCUSED);
 	editor_application->updateMaterialEditorIndex(list_view_index);
+	int texture_index = ListView_GetNextItem(GetDlgItem(hDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST), -1, LVIS_SELECTED | LVIS_FOCUSED);
+	editor_application->updateMaterialEditorTextureIndex(texture_index);
+
 	int n,r,g,b,a;
 
 	switch(msg) {
@@ -631,6 +944,9 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 				if (LOWORD(wParam) == IDC_MATERIAL_SHADER)  {
 					editor_application->updateEditShaderMaterialEditor(ToString(value_str));
 				}
+				else if (LOWORD(wParam) == IDC_MATERIAL_TEXTURE_UNIT_SLOT) {
+					editor_application->updateEditTextureUnitMaterialEditor(ToString(value_str));
+				}
 				break;
 			}
 
@@ -641,39 +957,51 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 				if (LOWORD(wParam) == IDC_MATERIAL_SHADER)  {
 					editor_application->updateEditShaderMaterialEditor(ToString(value_str));
 				}
+				else if (LOWORD(wParam) == IDC_MATERIAL_TEXTURE_UNIT_SLOT) {
+					editor_application->updateEditTextureUnitMaterialEditor(ToString(value_str));
+				}
 				break;
 			}
 
 			if (HIWORD(wParam) == EN_CHANGE) {
-				for (size_t i=0; i<10; i++) {
-					if (i == 0) { n = IDE_MATERIAL_PARAMETER_1_N; r = IDE_MATERIAL_PARAMETER_1_R; g = IDE_MATERIAL_PARAMETER_1_G; b = IDE_MATERIAL_PARAMETER_1_B; a = IDE_MATERIAL_PARAMETER_1_A; }
-					if (i == 1) { n = IDE_MATERIAL_PARAMETER_2_N; r = IDE_MATERIAL_PARAMETER_2_R; g = IDE_MATERIAL_PARAMETER_2_G; b = IDE_MATERIAL_PARAMETER_2_B; a = IDE_MATERIAL_PARAMETER_2_A; }
-					if (i == 2) { n = IDE_MATERIAL_PARAMETER_3_N; r = IDE_MATERIAL_PARAMETER_3_R; g = IDE_MATERIAL_PARAMETER_3_G; b = IDE_MATERIAL_PARAMETER_3_B; a = IDE_MATERIAL_PARAMETER_3_A; }
-					if (i == 3) { n = IDE_MATERIAL_PARAMETER_4_N; r = IDE_MATERIAL_PARAMETER_4_R; g = IDE_MATERIAL_PARAMETER_4_G; b = IDE_MATERIAL_PARAMETER_4_B; a = IDE_MATERIAL_PARAMETER_4_A; }
-					if (i == 4) { n = IDE_MATERIAL_PARAMETER_5_N; r = IDE_MATERIAL_PARAMETER_5_R; g = IDE_MATERIAL_PARAMETER_5_G; b = IDE_MATERIAL_PARAMETER_5_B; a = IDE_MATERIAL_PARAMETER_5_A; }
-					if (i == 5) { n = IDE_MATERIAL_PARAMETER_6_N; r = IDE_MATERIAL_PARAMETER_6_R; g = IDE_MATERIAL_PARAMETER_6_G; b = IDE_MATERIAL_PARAMETER_6_B; a = IDE_MATERIAL_PARAMETER_6_A; }
-					if (i == 6) { n = IDE_MATERIAL_PARAMETER_7_N; r = IDE_MATERIAL_PARAMETER_7_R; g = IDE_MATERIAL_PARAMETER_7_G; b = IDE_MATERIAL_PARAMETER_7_B; a = IDE_MATERIAL_PARAMETER_7_A; }
-					if (i == 7) { n = IDE_MATERIAL_PARAMETER_8_N; r = IDE_MATERIAL_PARAMETER_8_R; g = IDE_MATERIAL_PARAMETER_8_G; b = IDE_MATERIAL_PARAMETER_8_B; a = IDE_MATERIAL_PARAMETER_8_A; }
-					if (i == 8) { n = IDE_MATERIAL_PARAMETER_9_N; r = IDE_MATERIAL_PARAMETER_9_R; g = IDE_MATERIAL_PARAMETER_9_G; b = IDE_MATERIAL_PARAMETER_9_B; a = IDE_MATERIAL_PARAMETER_9_A; }
-					if (i == 9) { n = IDE_MATERIAL_PARAMETER_10_N; r = IDE_MATERIAL_PARAMETER_10_R; g = IDE_MATERIAL_PARAMETER_10_G; b = IDE_MATERIAL_PARAMETER_10_B; a = IDE_MATERIAL_PARAMETER_10_A; }
+				if (LOWORD(wParam) == IDE_MATERIAL_TEXTURE_FILENAME) {
+					char value_str[1024] = "";
+					GetDlgItemText(hDlg, IDE_MATERIAL_TEXTURE_FILENAME, value_str, 1024);
+					editor_application->updateEditTextureMaterialEditor(ToString(value_str));
+					ListView_SetItemText(GetDlgItem(hDlg, IDL_MATERIAL_TEXTURE_UNIT_LIST), texture_index, 0, (LPSTR)value_str);
+				}
+				else {
+					for (size_t i = 0; i < 10; i++) {
+						if (i == 0) { n = IDE_MATERIAL_PARAMETER_1_N; r = IDE_MATERIAL_PARAMETER_1_R; g = IDE_MATERIAL_PARAMETER_1_G; b = IDE_MATERIAL_PARAMETER_1_B; a = IDE_MATERIAL_PARAMETER_1_A; }
+						if (i == 1) { n = IDE_MATERIAL_PARAMETER_2_N; r = IDE_MATERIAL_PARAMETER_2_R; g = IDE_MATERIAL_PARAMETER_2_G; b = IDE_MATERIAL_PARAMETER_2_B; a = IDE_MATERIAL_PARAMETER_2_A; }
+						if (i == 2) { n = IDE_MATERIAL_PARAMETER_3_N; r = IDE_MATERIAL_PARAMETER_3_R; g = IDE_MATERIAL_PARAMETER_3_G; b = IDE_MATERIAL_PARAMETER_3_B; a = IDE_MATERIAL_PARAMETER_3_A; }
+						if (i == 3) { n = IDE_MATERIAL_PARAMETER_4_N; r = IDE_MATERIAL_PARAMETER_4_R; g = IDE_MATERIAL_PARAMETER_4_G; b = IDE_MATERIAL_PARAMETER_4_B; a = IDE_MATERIAL_PARAMETER_4_A; }
+						if (i == 4) { n = IDE_MATERIAL_PARAMETER_5_N; r = IDE_MATERIAL_PARAMETER_5_R; g = IDE_MATERIAL_PARAMETER_5_G; b = IDE_MATERIAL_PARAMETER_5_B; a = IDE_MATERIAL_PARAMETER_5_A; }
+						if (i == 5) { n = IDE_MATERIAL_PARAMETER_6_N; r = IDE_MATERIAL_PARAMETER_6_R; g = IDE_MATERIAL_PARAMETER_6_G; b = IDE_MATERIAL_PARAMETER_6_B; a = IDE_MATERIAL_PARAMETER_6_A; }
+						if (i == 6) { n = IDE_MATERIAL_PARAMETER_7_N; r = IDE_MATERIAL_PARAMETER_7_R; g = IDE_MATERIAL_PARAMETER_7_G; b = IDE_MATERIAL_PARAMETER_7_B; a = IDE_MATERIAL_PARAMETER_7_A; }
+						if (i == 7) { n = IDE_MATERIAL_PARAMETER_8_N; r = IDE_MATERIAL_PARAMETER_8_R; g = IDE_MATERIAL_PARAMETER_8_G; b = IDE_MATERIAL_PARAMETER_8_B; a = IDE_MATERIAL_PARAMETER_8_A; }
+						if (i == 8) { n = IDE_MATERIAL_PARAMETER_9_N; r = IDE_MATERIAL_PARAMETER_9_R; g = IDE_MATERIAL_PARAMETER_9_G; b = IDE_MATERIAL_PARAMETER_9_B; a = IDE_MATERIAL_PARAMETER_9_A; }
+						if (i == 9) { n = IDE_MATERIAL_PARAMETER_10_N; r = IDE_MATERIAL_PARAMETER_10_R; g = IDE_MATERIAL_PARAMETER_10_G; b = IDE_MATERIAL_PARAMETER_10_B; a = IDE_MATERIAL_PARAMETER_10_A; }
 
-					if ((LOWORD(wParam) == r) || (LOWORD(wParam) == g) || (LOWORD(wParam) == b) || (LOWORD(wParam) == a)) {
-						float value_r = 0.0f;
-						float value_g = 0.0f;
-						float value_b = 0.0f;
-						float value_a = 0.0f;
+						if ((LOWORD(wParam) == r) || (LOWORD(wParam) == g) || (LOWORD(wParam) == b) || (LOWORD(wParam) == a)) {
+							float value_r = 0.0f;
+							float value_g = 0.0f;
+							float value_b = 0.0f;
+							float value_a = 0.0f;
 
-						value_r = GetDlgItemFloat(hDlg, r);
-						value_g = GetDlgItemFloat(hDlg, g);
-						value_b = GetDlgItemFloat(hDlg, b);
-						value_a = GetDlgItemFloat(hDlg, a);
+							value_r = GetDlgItemFloat(hDlg, r);
+							value_g = GetDlgItemFloat(hDlg, g);
+							value_b = GetDlgItemFloat(hDlg, b);
+							value_a = GetDlgItemFloat(hDlg, a);
 
-						editor_application->updateEditParameterMaterialEditor(i, LibGens::Color(value_r, value_g, value_b, value_a));
-						break;
+							editor_application->updateEditParameterMaterialEditor(i, LibGens::Color(value_r, value_g, value_b, value_a));
+							break;
+						}
 					}
 				}
 				break;
 			}
+
 
 			switch(LOWORD(wParam)) {
 				case IDCANCEL:
@@ -691,6 +1019,37 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 				case IDB_MATERIAL_LOAD_ANIMATION:
 					editor_application->loadMaterialEditorAnimationGUI();
 					return true;
+
+				case IDB_MATERIAL_SAVE_MODEL:
+					editor_application->saveMaterialEditorModelGUI();
+					return true;
+
+				case IDB_MATERIAL_SAVE_MATERIAL:
+					editor_application->saveMaterialEditorMaterial();
+					return true;
+
+				case IDR_MATERIAL_TERRAIN_MODE:
+					editor_application->materialEditorTerrainMode();
+					return true;
+
+				case IDR_MATERIAL_MODEL_MODE:
+					editor_application->materialEditorModelMode();
+					return true;
+				case IDB_MATERIAL_OPEN_TEXTURE_FILENAME:
+					editor_application->pickMaterialEditorTextureGUI();
+					return true;
+
+				case IDB_MATERIAL_NEW_TEXTURE_UNIT:
+					editor_application->addMaterialEditorTextureGUI();
+					return true;
+
+				case IDB_MATERIAL_DELETE_TEXTURE_UNIT:
+					editor_application->removeMaterialEditorTexture();
+					return true;
+
+				case IDB_MATERIAL_DEFAULTS:
+					editor_application->loadMaterialDefaultParams();
+					return true;
 			}
 
 			break;
@@ -704,7 +1063,7 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			}
 			*/
 
-			return true;
+			return false;
 	}
 	
 	return false;
