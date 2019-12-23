@@ -28,6 +28,10 @@
 class hkpShape;
 class hkpRigidBody;
 class hkpWorld;
+class hkpStaticCompoundShape;
+class hkQsTransform;
+class hkpBvCompressedMeshShape;
+class hkVector4;
 
 namespace LibGens {
 	class HavokEnviroment;
@@ -45,6 +49,7 @@ public:
 	};
 
 	static const QString AppName;
+	static const QString WindowTitle;
 	static const QString VersionNumber;
 	static const QString DefaultSettingsPath;
 	static const QString LogPath;
@@ -85,6 +90,12 @@ private:
 	hkpShape *convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale);
 	QList<hkpRigidBody *> convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform);
 	void convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world);
+#ifdef HAVOKCONVERTER_LOST_WORLD
+	hkpShape* convertMeshToCompressedShape(aiMesh* mesh, int userdata);
+	hkQsTransform createHKTransform(LibGens::Matrix4 transform);
+	hkpStaticCompoundShape* convertNodeTreeCompoundShape(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform);
+	void convertNodeToCompressedShape(const aiScene* scene, aiNode* node, LibGens::Matrix4 parent_transform, hkpStaticCompoundShape* compound);
+#endif
 private slots:
 	void aboutTriggered();
 	void addSourceModelsTriggered();

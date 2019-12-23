@@ -31,6 +31,7 @@
 #include <Common/Base/Reflection/Registry/hkTypeInfoRegistry.h>
 #include <Common/SceneData/Graph/hkxNode.h>
 #include <Common/SceneData/Scene/hkxScene.h>
+
 #include <Common/Serialize/Util/hkStructureLayout.h>
 #include <Common/Serialize/Util/hkRootLevelContainer.h>
 #include <Common/Serialize/Util/hkSerializeUtil.h>
@@ -52,6 +53,15 @@
 #include <Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppBvTreeShape.h>
 #include <Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppCompilerInput.h>
 #include <Physics/Collide/Shape/Compound/Tree/Mopp/hkpMoppUtility.h>
+
+#ifdef Release2012
+#include <Physics/Internal/Collide/StaticCompound/hkpStaticCompoundShape.h>
+#include <Physics/Internal/Collide/BvCompressedMesh/hkpBvCompressedMeshShape.h>
+#include <Physics/Internal/Collide/BvCompressedMesh/hkpBvCompressedMeshShapeCinfo.h>
+#include <Physics/Collide/Shape/Convex/ConvexTranslate/hkpConvexTranslateShape.h>
+#include <Physics/Collide/Shape/Compound/Collection/List/hkpListShape.h>
+#include <Physics/Collide/Shape/Convex/ConvexVertices/hkpConvexVerticesShape.h>
+#endif
 
 #include <Physics/Collide/Shape/Compound/Collection/SimpleMesh/hkpSimpleMeshShape.h>
 #include <Physics/Collide/Shape/Compound/Collection/StorageExtendedMesh/hkpStorageExtendedMeshShape.h>
