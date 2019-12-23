@@ -29,6 +29,7 @@
 #include "assimp/config.h"
 #include "HavokEnviroment.h"
 #include "Tags.h"
+#include "Havok.h"
 
 const float HKWindow::TriangleAbsoluteTolerance = 0.01f;
 const int HKWindow::HavokBufferSizeMB = 256;
@@ -81,13 +82,21 @@ bool HKWindow::convert() {
 	if (!havok_enviroment)
 		havok_enviroment = new LibGens::HavokEnviroment(HavokBufferSizeMB * 1024 * 1024);
 
+#ifdef HAVOKCONVERTER_LOST_WORLD
+	hkArray<hkRootLevelContainer::NamedVariant> shapes;
+#else
 	hkpWorldCinfo info;
 	info.m_convexListFilter = HK_NULL;
 	info.m_minDesiredIslandSize = 64;
+#ifndef Release2012
 	info.m_autoUpdateKdTree = false;
+#endif
 	info.m_maxConstraintViolation = FLT_MAX;
-	hkpWorld *world = new hkpWorld(info);
+	hkpWorld* world = new hkpWorld(info);
 	world->lock();
+#endif // HAVOKCONVERTER_LOST_WORLD
+
+
 
 	//*************************
 	//  Load Assimp Scene
@@ -114,27 +123,42 @@ bool HKWindow::convert() {
 		logProgress(ProgressNormal, QString("* Meshes: %1").arg(scene->mNumMeshes));
 		logProgress(ProgressNormal, QString("* Node Tree:"));
 		logNodeTree(scene->mRootNode, "**");
+		
+#ifdef HAVOKCONVERTER_LOST_WORLD
+		hkpStaticCompoundShape* shape = convertNodeTreeCompoundShape(scene, scene->mRootNode, global_transform);
+		shapes.pushBack(hkRootLevelContainer::NamedVariant("shape",shape, &hkcdStaticTreeDefaultTreeStorage6Class));
+#else
 		convertNodeTree(scene, scene->mRootNode, global_transform, world);
+#endif
 	}
-
+	
+#ifndef HAVOKCONVERTER_LOST_WORLD
 	world->unlock();
+#endif // !HAVOKCONVERTER_LOST_WORLD
 
 	hkOstream outfile(output_file.toStdString().c_str());
 	if (outfile.isOk()) {
-		// Create physics data.
-		hkpPhysicsData *physics_data = new hkpPhysicsData();
-		
-		// Populate physics data with the world we created.
-		world->lock();
-		hkpPhysicsSystem *system = world->getWorldAsOneSystem();
-		system->setName("Default Physics System");
-		physics_data->addPhysicsSystem(system);
-		logProgress(ProgressNormal, QString("Physics system with %1 rigid bodies.").arg(system->getRigidBodies().getSize()));
-
 		// Create root level container and push the physics data on to it.
 		hkRootLevelContainer *root_level_container = new hkRootLevelContainer();
+
+#ifdef HAVOKCONVERTER_LOST_WORLD
+		root_level_container->m_namedVariants.append(shapes);
+		logProgress(ProgressNormal, QString("Conversion finished with %1 compressed shapes.").arg(shapes.getSize()));
+#else
+		// Create physics data.
+		hkpPhysicsData* physics_data = new hkpPhysicsData();
+
+		// Populate physics data with the world we created.
+		world->lock();
+		hkpPhysicsSystem* system = world->getWorldAsOneSystem();
+		system->setName("Default Physics System");
+		physics_data->addPhysicsSystem(system);
+
+		logProgress(ProgressNormal, QString("Physics system with %1 rigid bodies.").arg(system->getRigidBodies().getSize()));
+
 		root_level_container->m_namedVariants.pushBack(hkRootLevelContainer::NamedVariant("Physics Data", physics_data, &hkpPhysicsDataClass));
 		physics_data->removeReference();
+#endif
 
 		// Serialize root level container to a binary packfile.
 		hkPackfileWriter::Options pack_options;
@@ -151,16 +175,18 @@ bool HKWindow::convert() {
 			return false;
 		}
 
+#ifndef HAVOKCONVERTER_LOST_WORLD
 		system->removeReference();
 		world->unlock();
+		delete world;
+#endif // !HAVOKCONVERTER_LOST_WORLD
+
 		delete root_level_container;
 	}
 	else {
 		logProgress(ProgressFatal, "Could not open output file for writing!");
 		return false;
 	}
-
-	delete world;
 }
 
 void HKWindow::logNodeTree(aiNode *node, QString prefix) {
@@ -321,3 +347,118 @@ void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matr
 		convertNodeTree(scene, node->mChildren[i], transform, world);
 	}
 }
+
+#ifdef HAVOKCONVERTER_LOST_WORLD
+
+hkpShape* HKWindow::convertMeshToCompressedShape(aiMesh* mesh, int userdata = 0)
+{
+	hkArray<hkGeometry::Triangle> triangle_buffer;
+	hkArray<hkVector4> vertex_buffer;
+
+	for (unsigned int f = 0; f < mesh->mNumFaces; f++)
+	{
+		if (mesh->mFaces[f].mNumIndices == 3)
+		{
+			hkGeometry::Triangle triangle;
+			triangle.m_a = mesh->mFaces[f].mIndices[0];
+			triangle.m_b = mesh->mFaces[f].mIndices[1];
+			triangle.m_c = mesh->mFaces[f].mIndices[2];
+			triangle.m_material = userdata;
+			triangle_buffer.pushBack(triangle);
+		}
+	}
+
+	for (unsigned int v = 0; v < mesh->mNumVertices; v++)
+	{
+		hkVector4 vert = hkVector4(mesh->mVertices[v].x, mesh->mVertices[v].y, mesh->mVertices[v].z);
+		vertex_buffer.pushBack(vert);
+	}
+
+	hkGeometry geometry;
+	geometry.m_triangles = triangle_buffer;
+	geometry.m_vertices = vertex_buffer;
+
+	hkpDefaultBvCompressedMeshShapeCinfo cinfo(&geometry);
+	cinfo.m_collisionFilterInfoMode = hkpBvCompressedMeshShape::PerPrimitiveDataMode::PER_PRIMITIVE_DATA_PALETTE;
+	cinfo.m_userDataMode = hkpBvCompressedMeshShape::PerPrimitiveDataMode::PER_PRIMITIVE_DATA_PALETTE;
+	
+	hkpShape* shape = new hkpBvCompressedMeshShape(cinfo);
+	shape->setUserData(userdata);
+	return shape;
+}
+
+hkQsTransform HKWindow::createHKTransform(LibGens::Matrix4 transform)
+{
+	hkQsTransform trans(hkQsTransform::IDENTITY);
+	LibGens::Vector3 pos, scale;
+	LibGens::Quaternion rot;
+	transform.decomposition(pos, scale, rot);
+
+	trans.setTranslation(hkVector4(pos.x, pos.y, pos.z));
+	trans.setRotation(hkQuaternion(rot.x, rot.y, rot.z, rot.w));
+	trans.setScale(hkVector4(scale.x, scale.y, scale.z, 1));
+
+	trans.m_translation.mul(10);
+	trans.m_scale.mul(10);
+	return trans;
+}
+
+void HKWindow::convertNodeToCompressedShape(const aiScene* scene, aiNode* node, LibGens::Matrix4 parent_transform, hkpStaticCompoundShape* compound)
+{
+	LibGens::Matrix4 local_transform;
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			local_transform[i][j] = node->mTransformation[i][j];
+
+	LibGens::Matrix4 transform = parent_transform * local_transform;
+	hkGeometry geometry;
+	
+	for (unsigned int m = 0; m < node->mNumMeshes; m++)
+	{
+		hkQsTransform trans = createHKTransform(transform);
+		int userdata = 0;
+
+		LibGens::Tags tags(node->mName.C_Str());
+		for (int i = 0; i < tags.getTagCount(); i++) {
+			QString tag_match = tags.getTag(i).getKey().c_str();
+
+			// Search for tag in existing properties. We only use it if it matches the bitwise operation.
+			for (int bitwise = 0; bitwise < 2; bitwise++) {
+				foreach(const HKPropertyTag & tag, converter_settings.property_tags) {
+					if (tag.tag == tag_match) {
+						foreach(const HKPropertyValue & value, tag.values) {
+							if (value.bitwise == bitwise) {
+								if (value.bitwise == HKBitwise_SET)
+									userdata = value.value;
+								else if (value.bitwise == HKBitwise_OR)
+									userdata |= value.value;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		hkpShape* shape = convertMeshToCompressedShape(scene->mMeshes[node->mMeshes[m]], userdata);
+		int instance = compound->addInstance(shape, trans);
+		compound->setInstanceUserData(instance, 1042652845 + compound->getInstances().getSize() - 1);
+		compound->setInstanceFilterInfo(instance, 11);
+		logProgress(ProgressNormal, QString("Adding instance with user data %1").arg(compound->getInstanceUserData(instance)));
+	}
+
+	for (unsigned int i = 0; i < node->mNumChildren; i++) {
+		convertNodeToCompressedShape(scene, node->mChildren[i], transform, compound);
+	}
+}
+
+hkpStaticCompoundShape* HKWindow::convertNodeTreeCompoundShape(const aiScene* scene, aiNode* node, LibGens::Matrix4 parent_transform)
+{
+	hkpStaticCompoundShape* shapeContainer = new hkpStaticCompoundShape();
+
+	convertNodeToCompressedShape(scene, node, parent_transform, shapeContainer);
+
+	shapeContainer->bake();
+	return shapeContainer;
+}
+
+#endif

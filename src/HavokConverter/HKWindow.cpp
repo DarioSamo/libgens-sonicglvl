@@ -35,10 +35,18 @@
 #include "assimp/importerdesc.h"
 
 const QString HKWindow::AppName = "Havok Converter";
-const QString HKWindow::VersionNumber = "0.1";
+#ifdef HAVOKCONVERTER_LOST_WORLD
+const QString HKWindow::WindowTitle = "Havok Converter - Lost World";
+const QString HKWindow::DefaultSettingsPath = "HavokConverter_LW.ini";
+const QString HKWindow::CommunityGuideURL = "https://info.sonicretro.org/SCHG:Sonic_Lost_World";
+#else
+const QString HKWindow::WindowTitle = HKWindow::AppName;
 const QString HKWindow::DefaultSettingsPath = "HavokConverter.ini";
-const QString HKWindow::LogPath = "HavokConverter.log";
 const QString HKWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Sonic_Generations";
+#endif
+
+const QString HKWindow::VersionNumber = "0.1";
+const QString HKWindow::LogPath = "HavokConverter.log";
 
 HKWindow::HKWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);
@@ -91,6 +99,7 @@ HKWindow::HKWindow(QWidget *parent) : QMainWindow(parent) {
 	}
 
 	updateUiFromSettings();
+	setWindowTitle(WindowTitle);
 }
 
 HKWindow::~HKWindow() {
@@ -229,7 +238,11 @@ void HKWindow::aboutTriggered() {
 	"<li><b>LibGens</b>: <a href=\"https://github.com/DarioSamo/libgens-sonicglvl\">Github Repository</a></li>"
 	"<li><b>Qt 5.5.0</b>: <a href=\"http://qt-project.org/\">Homepage</a></li>"
 	"<li><b>Assimp 3.2</b>: <a href=\"http://www.assimp.org/\">Homepage</a></li>"
-	"<li><b>Havok 2010 2.0 SDK</b></li>"
+#ifdef Release2012
+			"<li><b>Havok 2012 2.0 SDK</b></li>"
+#else
+			"<li><b>Havok 2010 2.0 SDK</b></li>"
+#endif
 	"</ul>");
 }
 
