@@ -118,7 +118,6 @@
 #define IDC_MATERIAL_BACKFACE_CULLING           40012
 #define IDR_MULTISETPARAM_MSP_ADD               40012
 #define IMD_IMPORT_TERRAIN_FBX                  40012
-#define IDB_BOTTOM_MANAGE_OBJECT_SETS           40013
 #define IDB_MULTISETPARAM_CLEAR                 40013
 #define IDC_MATERIAL_ADDITIVE                   40013
 #define IMD_GENERATE_TERRAIN_GROUPS             40013
@@ -128,10 +127,10 @@
 #define IDS_MATERIAL_TEXTURE_UNIT_LIST          40015
 #define IDS_MULTISETPARAM_SPACING               40015
 #define IMD_SAVE_TEMPLATES_DATABASE             40015
-#define IDB_MULTISETPARAM_SPACING               40016
 #define IDL_MATERIAL_TEXTURE_UNIT_LIST          40016
 #define IMD_GAME_SHADERS                        40016
 #define IDB_MATERIAL_NEW_TEXTURE_UNIT           40017
+#define IDB_MULTISETPARAM_FROM_OBJECT           40017
 #define IMD_FRAMEBUFFER                         40017
 #define IDB_MATERIAL_DELETE_TEXTURE_UNIT        40018
 #define IMD_UV_ANIMATIONS                       40018
@@ -158,7 +157,6 @@
 #define IDE_MATERIAL_PARAMETER_3_N              40029
 #define IMD_OPEN_PHYSICS_EDITOR                 40029
 #define IDE_MATERIAL_PARAMETER_4_N              40030
-#define IMD_OPEN_LOST_WORLD_LEVEL               40030
 #define IDE_MATERIAL_PARAMETER_5_N              40031
 #define IDE_MATERIAL_PARAMETER_6_N              40032
 #define IDE_MATERIAL_PARAMETER_7_N              40033
@@ -225,4 +223,4 @@
 #define IDT_MATERIAL_ANIMATION_OPEN             40093
 #define IDT_MATERIAL_SKELETON_OPEN              40094
 #define IDC_BOTTOM_CURRENT_OBJECT_SET_VISIBLE   40095
-#define IDB_MATERIAL_SAVE_MATERIAL				40096
+#define IDB_MATERIAL_SAVE_MATERIAL              40096

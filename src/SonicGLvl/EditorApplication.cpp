@@ -33,12 +33,13 @@ EditorApplication::EditorApplication(void)
 {
 	hLeftDlg = NULL;
 	hBottomDlg = NULL;
+	hMultiSetParamDlg = NULL;
+	cloning_mode = SONICGLVL_MULTISETPARAM_MODE_CLONE;
 }
 
 EditorApplication::~EditorApplication(void) {
 
 }
-
 
 void EditorApplication::updateSelection() {
 	Ogre::Vector3 center=Ogre::Vector3::ZERO;
@@ -70,6 +71,8 @@ void EditorApplication::updateSelection() {
 void EditorApplication::deleteSelection() {
 	if (!selected_nodes.size()) return;
 
+	bool msp_deleted = false;
+
 	if (editor_mode == EDITOR_NODE_QUERY_OBJECT) {
 		HistoryActionWrapper *wrapper = new HistoryActionWrapper();
 
@@ -95,12 +98,13 @@ void EditorApplication::deleteSelection() {
 				}
 			}
 			else if ((*it)->getType() == EDITOR_NODE_OBJECT_MSP) {
-				ObjectMultiSetNode *object_msp_node=static_cast<ObjectMultiSetNode *>(*it);
-				HistoryActionSelectNode *action_select = new HistoryActionSelectNode((*it), true, false, &selected_nodes);
+				ObjectMultiSetNode* object_msp_node = static_cast<ObjectMultiSetNode*>(*it);
+				HistoryActionSelectNode* action_select = new HistoryActionSelectNode((*it), true, false, &selected_nodes);
 				object_msp_node->setSelect(false);
 				wrapper->push(action_select);
 			}
 		}
+
 		selected_nodes.clear();
 		axis->setVisible(false);
 
@@ -174,6 +178,15 @@ void EditorApplication::selectAll() {
 	}
 
 	updateSelection();
+}
+
+void EditorApplication::rememberCloningNodes()
+{
+	for (list<EditorNode*>::iterator it = selected_nodes.begin(); it != selected_nodes.end(); ++it)
+	{
+		if ((*it)->getType() == EDITOR_NODE_OBJECT)
+			cloning_nodes.push_back(*it);
+	}
 }
 
 void EditorApplication::cloneSelection() {
@@ -815,8 +828,10 @@ bool EditorApplication::mouseMoved(const OIS::MouseEvent &arg) {
 		if (current_node) current_node->setHighlight(true);
 	
 		if (axis->mouseMoved(viewport, arg)) {
-			if (!axis->getMode()) translateSelection(axis->getTranslate());
-			else rotateSelection(axis->getRotate());
+			if (!axis->getMode())
+				translateSelection(axis->getTranslate());
+			else
+				rotateSelection(axis->getRotate());
 
 			updateBottomSelectionGUI();
 		}
@@ -860,6 +875,8 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 
 				if (keyboard->isModifierDown(OIS::Keyboard::Shift)) {
 					dragging_mode = 1;
+					rememberCloningNodes();
+					cloneSelection();
 				}
 
 				if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
@@ -934,6 +951,33 @@ bool EditorApplication::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButt
 	if (id == OIS::MB_Left) {
 		if (axis->mouseReleased(arg, id)) {
 			makeHistorySelection(axis->getMode());
+		}
+
+		if (dragging_mode == 1)
+		{
+			if (cloning_nodes.size())
+			{
+				openMultiSetParamDlg();
+				setVectorAndSpacing();
+
+				// save temporary clones to delete them when cloning is done
+				list<EditorNode*>::iterator it;
+				for (it = selected_nodes.begin(); it != selected_nodes.end(); ++it)
+				{
+					temporary_nodes.push_back((*it));
+					(*it)->setSelect(false);
+				}
+				selected_nodes.clear();
+
+				for (it = cloning_nodes.begin(); it != cloning_nodes.end(); ++it)
+				{
+					(*it)->setSelect(true);
+					selected_nodes.push_back(*it);
+				}
+
+				cloning_nodes.clear();
+				updateSelection();
+			}
 		}
 	}
 

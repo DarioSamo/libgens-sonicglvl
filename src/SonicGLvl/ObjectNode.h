@@ -64,6 +64,8 @@ class ObjectMultiSetNode : public EditorNode {
 		LibGens::MultiSetNode *multi_set_node;
 		LibGens::Object *object;
 
+		ObjectNode* object_node;
+
 		Ogre::Radian offset_rotation_x;
 		Ogre::Radian offset_rotation_y;
 		Ogre::Radian offset_rotation_z;
@@ -92,6 +94,21 @@ class ObjectMultiSetNode : public EditorNode {
 		}
 
 		void addTime(float time_s);
+
+		LibGens::Object* getObject()
+		{
+			return object;
+		}
+
+		LibGens::MultiSetNode* getMultiSetNode()
+		{
+			return multi_set_node;
+		}
+
+		ObjectNode* getObjectNode()
+		{
+			return object_node;
+		}
 };
 
 
@@ -144,6 +161,8 @@ class ObjectNode : public EditorNode {
 		LibGens::Object *getObject() {
 			return object;
 		}
+
+		void removeObjectMultiSetNode(ObjectMultiSetNode* msNode);
 
 		void addTime(float time_s);
 		void createAnimationState(string animation_id);

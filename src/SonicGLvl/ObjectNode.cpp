@@ -98,6 +98,8 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 
 		object_msp_node->offset_rotation_animation_enabled = offset_rotation_animation_enabled;
 
+		object_msp_node->object_node = this;
+
 		// Update rotation with offset
 		object_msp_node->setRotation(object_msp_node->getRotation());
 		object_msp_nodes.push_back(object_msp_node);
@@ -107,8 +109,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	reloadEntities(scene_manager, model_library, material_library, object_production, slot_id_name);
 
 	preview_box_node->setVisible(false);
-
-	
 }
 
 
@@ -400,6 +400,16 @@ void ObjectNode::setSelect(bool v) {
 	EditorNode::setSelect(v);
 
 	preview_box_node->setVisible(v);
+}
+
+void ObjectNode::removeObjectMultiSetNode(ObjectMultiSetNode* msNode)
+{
+	for (list<ObjectMultiSetNode*>::iterator it = object_msp_nodes.begin(); it != object_msp_nodes.end(); ++it)
+		if ((*it) == msNode)
+		{
+			object_msp_nodes.erase(it);
+			return;
+		}
 }
 
 

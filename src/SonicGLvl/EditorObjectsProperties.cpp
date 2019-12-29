@@ -34,8 +34,10 @@ WNDPROC globalEditControlOldProc;
 
 void EditorApplication::updateObjectsPropertiesGUI() {
 	list<LibGens::Object *> selected_objects;
+	list<LibGens::MultiSetNode*> selected_msp;
 	string object_name = "";
 	bool multiple_object_types = false;
+	bool multiple_multiset_types = false;
 	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
 
 	if (current_single_property_object) {
@@ -62,6 +64,29 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 					else {
 						object_name = object->getName();
 					}
+				}
+			}
+		}
+		else if ((*it)->getType() == EDITOR_NODE_OBJECT_MSP)
+		{
+			ObjectMultiSetNode* object_msp_node = static_cast<ObjectMultiSetNode*>(*it);
+			LibGens::MultiSetNode * msp_node = object_msp_node->getMultiSetNode();
+
+			LibGens::Object* object = object_msp_node->getObject();
+			if (object)
+			{
+				selected_msp.push_back(msp_node);
+				if (object_name.size())
+				{
+					if (object_name != object->getName())
+					{
+						multiple_object_types = true;
+						multiple_multiset_types = true;
+					}
+				}
+				else
+				{
+					object_name = "MultiSetParamObject (" + object->getName() + ")";
 				}
 			}
 		}
@@ -102,7 +127,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 	updateHelpWithObjectGUI(NULL);
 
 	string group_text = "";
-	if (multiple_object_types) {
+	if (multiple_object_types || multiple_multiset_types) {
 		group_text = "Multiple Objects";
 	}
 	else if (object_name.size()) {
