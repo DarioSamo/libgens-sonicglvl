@@ -152,6 +152,22 @@ namespace LibGens {
 				nodes.push_back(node);
 			}
 
+			void removeNode(MultiSetNode* node)
+			{
+				for (list<MultiSetNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+					if ((*it) == node)
+					{
+						nodes.erase(it);
+						delete (*it);
+						return;
+					}
+			}
+
+			void removeAllNodes()
+			{
+				nodes.clear();
+			}
+
 			list<MultiSetNode *> getNodes() {
 				return nodes;
 			}
@@ -163,6 +179,11 @@ namespace LibGens {
 			void readORC(File *file, unsigned int count);
 
 			void recalcTransform(Object *parent);
+
+			void setDirection(float direction);
+			void setInterval(float interval);
+			void setPositionBase(float positionBase);
+			void setRotationBase(float rotationBase);
 
 			size_t getSize() {
 				return nodes.size();
@@ -233,3 +254,4 @@ namespace LibGens {
 			void recalcTransform(Level *level);
 	};
 };
+
