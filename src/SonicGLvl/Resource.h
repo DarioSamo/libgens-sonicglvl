@@ -30,7 +30,6 @@
 #define IDT_EDIT_ID_POINT                       40000
 #define IMD_OPEN_LEVEL                          40000
 #define IDB_DELETE_PHYSICS                      40001
-#define IDB_EDIT_ID_SELECT_FROM_VIEWPORT        40001
 #define IDC_EDIT_STRING_VALUE                   40001
 #define IDE_BOTTOM_SELECTION_POS_Y              40001
 #define IDE_EDIT_VECTOR_Y                       40001
@@ -62,6 +61,7 @@
 #define IMD_CLOSE                               40003
 #define IDB_EDIT_ID_LIST_MOVE_UP                40004
 #define IDB_MATERIAL_LOAD_MODEL                 40004
+#define IDC_EDIT_ID_SELECT_FROM_VIEWPORT        40004
 #define IDE_BOTTOM_SELECTION_ROT_Y              40004
 #define IDE_EDIT_VECTOR_LIST_Z                  40004
 #define IDE_MULTISETPARAM_COUNT                 40004

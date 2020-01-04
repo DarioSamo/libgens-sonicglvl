@@ -80,6 +80,7 @@
     <ClCompile Include="EditorApplicationLevel.cpp" />
     <ClCompile Include="EditorAxis.cpp" />
     <ClCompile Include="EditorBottom.cpp" />
+    <ClCompile Include="EditorClone.cpp" />
     <ClCompile Include="EditorConfiguration.cpp" />
     <ClCompile Include="EditorGhost.cpp" />
     <ClCompile Include="EditorGlobalIllumination.cpp" />

@@ -41,9 +41,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_OPEN_LEVEL :
 					editor_application->openLevelGUI();
 					break;
-				case IMD_OPEN_LOST_WORLD_LEVEL :
-					editor_application->openLostWorldLevelGUI();
-					break;
+				//case IMD_OPEN_LOST_WORLD_LEVEL :
+					//editor_application->openLostWorldLevelGUI();
+					//break;
 				case IMD_SAVE_LEVEL_DATA :
 					editor_application->saveLevelDataGUI();
 					break;

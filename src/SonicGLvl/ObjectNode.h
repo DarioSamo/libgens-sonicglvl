@@ -220,6 +220,8 @@ class ObjectNodeManager {
 			return object_nodes;
 		}
 
+		ObjectNode* findObjectNode(LibGens::Object* object);
+
 		void showAll();
 		void hideAll();
 		void updateSetVisibility(LibGens::ObjectSet *current_set, bool v);

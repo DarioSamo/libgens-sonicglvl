@@ -33,12 +33,24 @@ EditorApplication::EditorApplication(void)
 {
 	hLeftDlg = NULL;
 	hBottomDlg = NULL;
-	hMultiSetParamDlg = NULL;
-	cloning_mode = SONICGLVL_MULTISETPARAM_MODE_CLONE;
 }
 
 EditorApplication::~EditorApplication(void) {
 
+}
+
+ObjectNodeManager* EditorApplication::getObjectNodeManager()
+{
+	return object_node_manager;
+}
+
+void EditorApplication::selectNode(EditorNode* node)
+{
+	if (node)
+	{
+		node->setSelect(true);
+		selected_nodes.push_back(node);
+	}
 }
 
 void EditorApplication::updateSelection() {
@@ -414,6 +426,7 @@ void EditorApplication::createScene(void) {
 	hEditPropertyDlg = NULL;
 	hMaterialEditorDlg = NULL;
 	hPhysicsEditorDlg = NULL;
+	hMultiSetParamDlg = NULL;
 	
 	updateVisibilityGUI();
 	updateObjectCategoriesGUI();
@@ -428,6 +441,7 @@ void EditorApplication::createScene(void) {
 	current_set                = NULL;
 	current_single_property_object = NULL;
 	history_edit_property_wrapper = NULL;
+	cloning_mode = SONICGLVL_MULTISETPARAM_MODE_CLONE;
 
 	// Set up Scene Managers
 	scene_manager = root->createSceneManager("OctreeSceneManager");
@@ -887,8 +901,9 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 				rememberSelection(axis->getMode());
 			}
 			else if (id == OIS::MB_Left) {
+				bool pick_target = (hEditPropertyDlg) && IsDlgButtonChecked(hEditPropertyDlg, IDC_EDIT_ID_SELECT_FROM_VIEWPORT);
 				if (current_node) {
-					if (!current_node->isSelected()) {
+					if (!current_node->isSelected() && editor_mode != pick_target) {
 						if (!keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
 							clearSelection();
 						}
@@ -899,6 +914,17 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 						pushHistory(action_select);
 						
 						updateSelection();
+					}
+					else if (!current_node->isSelected() && editor_mode == pick_target)
+					{
+						if (current_node->getType() == EDITOR_NODE_OBJECT)
+						{
+							ObjectNode* object_node = static_cast<ObjectNode*>(current_node);
+							size_t id = object_node->getObject()->getID();
+
+							SetDlgItemText(hEditPropertyDlg, IDC_EDIT_ID_VALUE, ToString<size_t>(id).c_str());
+							setTargetName(id);
+						}
 					}
 				}
 				else if (!current_node) {

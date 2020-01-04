@@ -440,9 +440,14 @@ class EditorApplication : public BaseApplication {
 		void updateEditPropertyVectorMode(bool mode_state);
 		void updateEditPropertyVectorList(vector<LibGens::Vector3> v);
 		void updateEditPropertyVectorListFocus();
+		void selectNode(EditorNode* node);
+		void openQueryTargetMode(bool mode);
+		void setTargetName(size_t);
+		ObjectNodeManager* getObjectNodeManager();
 
 
 		void closeVectorQueryMode();
+		void closeTargetQueryMode();
 
 		void verifySonicSpawnChange();
 		void confirmEditProperty();

@@ -158,8 +158,8 @@ CAPTION "Change Property Value"
 FONT 8, "Ms Shell Dlg"
 {
     LTEXT           "Points to: (none)", IDT_EDIT_ID_POINT, 6, 37, 142, 8, SS_LEFT, WS_EX_LEFT
-    PUSHBUTTON      "Select from Viewport", IDB_EDIT_ID_SELECT_FROM_VIEWPORT, 9, 52, 76, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Go to Target", IDB_EDIT_ID_GO_TO_TARGET, 86, 52, 59, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Select From Viewport", IDC_EDIT_ID_SELECT_FROM_VIEWPORT, 6, 52, 80, 14, BS_PUSHLIKE, WS_EX_LEFT
+    PUSHBUTTON      "Go to Target", IDB_EDIT_ID_GO_TO_TARGET, 90, 52, 59, 14, 0, WS_EX_LEFT
     COMBOBOX        IDC_EDIT_ID_VALUE, 6, 19, 142, 20, WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS, WS_EX_LEFT
     LTEXT           "New Value (Object ID)", 0, 41, 7, 72, 8, SS_LEFT, WS_EX_LEFT
     PUSHBUTTON      "Cancel", IDCANCEL, 82, 72, 50, 14, 0, WS_EX_LEFT

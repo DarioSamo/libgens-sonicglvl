@@ -7,7 +7,7 @@ void EditorApplication::openMultiSetParamDlg()
 {
 	if (!hMultiSetParamDlg)
 	{
-		hMultiSetParamDlg = CreateDialog(NULL, MAKEINTRESOURCE(131), NULL, MultiSetParamCallback);
+		hMultiSetParamDlg = CreateDialog(NULL, MAKEINTRESOURCE(131), hwnd, MultiSetParamCallback);
 
 		SendDlgItemMessage(hMultiSetParamDlg, IDR_MULTISETPARAM_MSP, BM_SETCHECK, (WPARAM)(cloning_mode == SONICGLVL_MULTISETPARAM_MODE_MSP), 0);
 		SendDlgItemMessage(hMultiSetParamDlg, IDR_MULTISETPARAM_CLONE, BM_SETCHECK, (WPARAM)(cloning_mode == SONICGLVL_MULTISETPARAM_MODE_CLONE), 0);
