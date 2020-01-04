@@ -1387,6 +1387,7 @@ INT_PTR CALLBACK EditIdCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPara
 		{
 			size_t value = GetDlgItemFloat(hDlg, IDC_EDIT_ID_VALUE);
 			editor_application->updateEditPropertyID(value);
+			editor_application->confirmEditProperty();
 			SendMessage(hDlg, WM_CLOSE, 0, 0);
 			return true;
 		}
