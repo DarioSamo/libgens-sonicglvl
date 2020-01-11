@@ -55,6 +55,9 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 	viewport = window->addViewport(camera, zOrder, left, top, width, height);
     viewport->setBackgroundColour(bg_color);
     camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));    
+    if (camera->aspectRatio < (16.0 / 9.0)) {
+	camera->setFieldOfView(std::atan(std::tan(camera->fieldOfView * (float)M_PI / 360.0) / camera->aspectRatio * (16.0 / 9.0)) / 360.0 / (float)M_PI);
+    }
 
 	camera_overlay = axis_scene_manager->createCamera(camera_name);
     camera_overlay->setPosition(Ogre::Vector3(0,1,0));
@@ -65,7 +68,10 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 	
 	viewport_overlay = window->addViewport(camera_overlay, zOrder+1, left, top, width, height);
     viewport_overlay->setBackgroundColour(Ogre::ColourValue(0,0,0));
-	camera_overlay->setAspectRatio(Ogre::Real(viewport_overlay->getActualWidth()) / Ogre::Real(viewport_overlay->getActualHeight()));    
+	camera_overlay->setAspectRatio(Ogre::Real(viewport_overlay->getActualWidth()) / Ogre::Real(viewport_overlay->getActualHeight()));
+	if (camera_overlay->aspectRatio < (16.0 / 9.0)) {
+		camera_overlay->setFieldOfView(std::atan(std::tan(camera_overlay->fieldOfView * (float)M_PI / 360.0) / camera_overlay->aspectRatio * (16.0 / 9.0)) / 360.0 / (float)M_PI);
+	}
 	viewport_overlay->setClearEveryFrame(true, Ogre::FBT_DEPTH);
 	viewport_overlay->setSkiesEnabled(false);
 
@@ -79,10 +85,16 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 
 void EditorViewport::resize(float left, float top, float width, float height) {
 	viewport->setDimensions(left, top, width, height);
-    camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));    
+    camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));  
+    if (camera->aspectRatio < (16.0 / 9.0)) {
+	camera->setFieldOfView(std::atan(std::tan(camera->fieldOfView * (float)M_PI / 360.0) / camera->aspectRatio * (16.0 / 9.0)) / 360.0 / (float)M_PI);
+    }
 
 	viewport_overlay->setDimensions(left, top, width, height);
 	camera_overlay->setAspectRatio(Ogre::Real(viewport_overlay->getActualWidth()) / Ogre::Real(viewport_overlay->getActualHeight()));
+	if (camera_overlay->aspectRatio < (16.0 / 9.0)) {
+		camera_overlay->setFieldOfView(std::atan(std::tan(camera_overlay->fieldOfView * (float)M_PI / 360.0) / camera_overlay->aspectRatio * (16.0 / 9.0)) / 360.0 / (float)M_PI);
+	}
 }
 
 
