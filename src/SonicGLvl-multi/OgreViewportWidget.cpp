@@ -78,8 +78,8 @@ void OgreViewportWidget::moveAndResize() {
     window->resize(width(), height());
     window->windowMovedOrResized();
     camera->setAspectRatio(static_cast<Ogre::Real>(viewport->getActualWidth()) / static_cast<Ogre::Real>(viewport->getActualHeight()));
-    if (camera->aspectRatio < (16.0 / 9.0)) {
-	camera->setFieldOfView(std::atan(std::tan(camera->fieldOfView() * (float)M_PI / 360.0) / camera->aspectRatio * (16.0 / 9.0)) / 360.0 / (float)M_PI);
+    if (camera->aspectRatio() < (16.0 / 9.0)) {
+	camera->setFieldOfView(std::atan(std::tan(camera->fieldOfView() * (float)M_PI / 360.0) / camera->aspectRatio() * (16.0 / 9.0)) / 360.0 / (float)M_PI);
     }
 }
 
@@ -93,8 +93,8 @@ void OgreViewportWidget::createViewport() {
     viewport = window->addViewport(camera);
     viewport->setBackgroundColour(BackgroundColour);
     camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(viewport->getActualHeight()));
-    if (camera->aspectRatio < (16.0 / 9.0)) {
-	camera->setFieldOfView(std::atan(std::tan(camera->fieldOfView() * (float)M_PI / 360.0) / camera->aspectRatio * (16.0 / 9.0)) / 360.0 / (float)M_PI);
+    if (camera->aspectRatio() < (16.0 / 9.0)) {
+	camera->setFieldOfView(std::atan(std::tan(camera->fieldOfView() * (float)M_PI / 360.0) / camera->aspectRatio() * (16.0 / 9.0)) / 360.0 / (float)M_PI);
     }
 }
 
