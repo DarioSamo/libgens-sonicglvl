@@ -41,18 +41,21 @@ void EditorApplication::clearMultiSetParamDlg()
 
 void EditorApplication::createMultiSetParamObjects()
 {
-	if (selected_nodes.size() < 1)
+	float spacing = 0, count = 0;
+	float vec_x = 0, vec_y = 0, vec_z = 0;
+
+	spacing = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_SPACING);
+	count = GetDlgItemInt(hMultiSetParamDlg, IDE_MULTISETPARAM_COUNT, NULL, TRUE);
+
+	if (count < 1 || selected_nodes.size() < 1)
+	{
+		deleteTemporaryNodes();
 		return;
+	}
 
-	float spacing = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_SPACING);
-	int count = GetDlgItemInt(hMultiSetParamDlg, IDE_MULTISETPARAM_COUNT, NULL, TRUE);
-
-	if (count < 1)
-		return;
-
-	float vec_x = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_X);
-	float vec_y = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_Y);
-	float vec_z = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_Z);
+	vec_x = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_X);
+	vec_y = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_Y);
+	vec_z = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_Z);
 
 	LibGens::Vector3 pos_vector(vec_x, vec_y, vec_z);
 
@@ -245,6 +248,25 @@ INT_PTR CALLBACK MultiSetParamCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARA
 		case IDB_MULTISETPARAM_CLEAR:
 			editor_application->clearMultiSetParamDlg();
 			break;
+		}
+		break;
+		
+	case WM_NOTIFY:
+		if (LOWORD(wParam) == IDS_MULTISETPARAM_COUNT)
+		{
+			if (((LPNMUPDOWN)lParam)->hdr.code == UDN_DELTAPOS)
+			{
+				int delta = (LPNMUPDOWN(lParam))->iDelta;
+				int count = GetDlgItemFloat(hDlg, IDE_MULTISETPARAM_COUNT);
+
+				if (delta > 1) delta = 1;
+				if (delta < -1) delta = -1;
+
+				count += -delta;
+				if (count < 1) 	count = 0;
+
+				SetDlgItemText(hDlg, IDE_MULTISETPARAM_COUNT, ToString<int>(count).c_str());
+			}
 		}
 		break;
 	}

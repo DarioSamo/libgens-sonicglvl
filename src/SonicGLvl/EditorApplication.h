@@ -146,6 +146,10 @@ class EditorApplication : public BaseApplication {
 		string current_level_filename;
 		map<LibGens::ObjectSet *, int> set_indices;
 		map<LibGens::ObjectSet *, bool> set_visibility;
+
+		int current_vector_list_selection;
+		int last_vector_list_selection;
+		bool is_update_vector_list;
 		
 		// Ogre
 		Ogre::Light *global_directional_light;
@@ -234,6 +238,7 @@ class EditorApplication : public BaseApplication {
 		list<LibGens::Object *> current_object_list_properties;
 		vector<string> current_properties_names;
 		vector<LibGens::ObjectElementType> current_properties_types;
+		vector<LibGens::Vector3> temp_property_vector_list;
 		int current_property_index;
 		LibGens::Object *current_single_property_object;
 
@@ -435,14 +440,21 @@ class EditorApplication : public BaseApplication {
 		void updateEditPropertyID(size_t v);
 		void updateEditPropertyIDList(vector<size_t> v);
 		void updateEditPropertyVector(LibGens::Vector3 v);
-		void updateEditPropertyVectorFocus();
-		void updateEditPropertyVectorGUI();
-		void updateEditPropertyVectorMode(bool mode_state);
+		void updateEditPropertyVectorFocus(int index = 0);
+		void updateEditPropertyVectorGUI(int index = 0, bool is_list = false);
+		void updateEditPropertyVectorMode(bool mode_state, bool is_list = false, int index = 0);
 		void updateEditPropertyVectorList(vector<LibGens::Vector3> v);
-		void updateEditPropertyVectorListFocus();
 		void selectNode(EditorNode* node);
 		void openQueryTargetMode(bool mode);
 		void setTargetName(size_t);
+		void addVectorToList(LibGens::Vector3 = LibGens::Vector3(0, 0, 0));
+		void updateVectorListSelection(int index);
+		void removeVectorFromList(int index);
+		void moveVector(int index, bool up);
+		bool isVectorListSelectionValid();
+		bool isUpdateVectorList();
+		std::vector<LibGens::Vector3>& getCurrentPropertyVectorList();
+		std::vector<VectorNode*>& getPropertyVectorNodes();
 		ObjectNodeManager* getObjectNodeManager();
 
 

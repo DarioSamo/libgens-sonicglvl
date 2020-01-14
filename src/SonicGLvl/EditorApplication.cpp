@@ -50,6 +50,7 @@ void EditorApplication::selectNode(EditorNode* node)
 	{
 		node->setSelect(true);
 		selected_nodes.push_back(node);
+		viewport->focusOnPoint(node->getPosition());
 	}
 }
 
@@ -172,7 +173,7 @@ void EditorApplication::selectAll() {
 	if (editor_mode == EDITOR_NODE_QUERY_OBJECT) {
 		list<ObjectNode *> object_nodes = object_node_manager->getObjectNodes();
 		for (list<ObjectNode *>::iterator it=object_nodes.begin(); it!=object_nodes.end(); it++) {
-			if (!(*it)->isSelected()) {
+			if (!(*it)->isSelected() && !(*it)->isForceHidden()) {
 				stuff_selected = true;
 				HistoryActionSelectNode *action_select = new HistoryActionSelectNode((*it), false, true, &selected_nodes);
 				(*it)->setSelect(true);
@@ -297,13 +298,18 @@ void EditorApplication::rememberSelection(bool mode) {
 
 void EditorApplication::makeHistorySelection(bool mode) {
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
+	int index = 0;
+	bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
 	for (list<EditorNode *>::iterator it=selected_nodes.begin(); it!=selected_nodes.end(); it++) {
 		if (!mode) {
 			HistoryActionMoveNode *action = new HistoryActionMoveNode((*it), (*it)->getLastPosition(), (*it)->getPosition());
 			wrapper->push(action);
-
 			if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
-				updateEditPropertyVectorGUI();
+				VectorNode* vector_node = static_cast<VectorNode*>(*it);
+				while (property_vector_nodes[index] != vector_node)
+					++index;
+
+				updateEditPropertyVectorGUI(index, is_list);
 			}
 		}
 		else {
@@ -325,6 +331,19 @@ void EditorApplication::makeHistorySelection(bool mode) {
 				wrapper->push(sub_wrapper);
 			}
 		}
+		index = 0;
+	}
+
+	if (is_list && editor_mode == EDITOR_NODE_QUERY_VECTOR)
+	{
+		updateEditPropertyVectorList(temp_property_vector_list);
+		if (hEditPropertyDlg && isVectorListSelectionValid())
+		{
+			Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+		}
 	}
 	pushHistory(wrapper);
 }
@@ -333,17 +352,44 @@ void EditorApplication::makeHistorySelection(bool mode) {
 void EditorApplication::undoHistory() {
 	if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
 		property_vector_history->undo();
-		updateEditPropertyVectorGUI();
+		bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
+
+		for (int index = 0; index < property_vector_nodes.size(); ++index)
+			updateEditPropertyVectorGUI(index, is_list);
+		if (is_list)
+		{
+			updateEditPropertyVectorList(temp_property_vector_list);
+			if (hEditPropertyDlg && isVectorListSelectionValid())
+			{
+				Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+			}
+		}
 	}
 	else history->undo();
-	
 }
 
 
 void EditorApplication::redoHistory() {
 	if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
 		property_vector_history->redo();
-		updateEditPropertyVectorGUI();
+		bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
+
+		for (int index = 0; index < property_vector_nodes.size(); ++index)
+			updateEditPropertyVectorGUI(index, is_list);
+		if (is_list)
+		{
+			updateEditPropertyVectorList(temp_property_vector_list);
+			if (hEditPropertyDlg && isVectorListSelectionValid())
+			{
+				Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+			}
+		}
 	}
 	else history->redo();
 }
@@ -903,19 +949,23 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 			else if (id == OIS::MB_Left) {
 				bool pick_target = (hEditPropertyDlg) && IsDlgButtonChecked(hEditPropertyDlg, IDC_EDIT_ID_SELECT_FROM_VIEWPORT);
 				if (current_node) {
-					if (!current_node->isSelected() && editor_mode != pick_target) {
+					if (editor_mode != pick_target) {
 						if (!keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
 							clearSelection();
 						}
 
-						HistoryActionSelectNode *action_select = new HistoryActionSelectNode(current_node, false, true, &selected_nodes);
-						current_node->setSelect(true);
-						selected_nodes.push_back(current_node);
-						pushHistory(action_select);
-						
+						if (!current_node->isSelected())
+						{
+							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, false, true, &selected_nodes);
+							current_node->setSelect(true);
+							selected_nodes.push_back(current_node);
+							pushHistory(action_select);
+
+						}
+
 						updateSelection();
 					}
-					else if (!current_node->isSelected() && editor_mode == pick_target)
+					else if (editor_mode == pick_target)
 					{
 						if (current_node->getType() == EDITOR_NODE_OBJECT)
 						{
