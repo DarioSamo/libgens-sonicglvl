@@ -80,6 +80,8 @@ void EditorApplication::updateBottomSelectionGUI() {
 		Ogre::Real pDeg = pRad.valueDegrees();
 		Ogre::Real rDeg = rRad.valueDegrees();
 
+		is_update_pos_rot = false;
+
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_POS_X, ToString((float)axis_position.x).c_str());
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_POS_Y, ToString((float)axis_position.y).c_str());
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_POS_Z, ToString((float)axis_position.z).c_str());
@@ -87,6 +89,8 @@ void EditorApplication::updateBottomSelectionGUI() {
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_ROT_X, ToString((float)pDeg).c_str());
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_ROT_Y, ToString((float)yDeg).c_str());
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_ROT_Z, ToString((float)rDeg).c_str());
+
+		is_update_pos_rot = true;
 	}
 	else {
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_POS_X, "");
@@ -122,6 +126,10 @@ void EditorApplication::updateBottomSelectionRotation(float value_x, float value
 	}
 }
 
+bool EditorApplication::isUpdatePosRot()
+{
+	return is_update_pos_rot;
+}
 
 INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch(msg) {
@@ -146,7 +154,7 @@ INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 				editor_application->updateCurrentSetVisible(current_set_visible);
 			}
 			else if (HIWORD(wParam) == EN_CHANGE) {
-				if (!editor_application->getEditorAxis()->isHolding()) {
+				if (!editor_application->getEditorAxis()->isHolding() && editor_application->isUpdatePosRot()) {
 					if ((LOWORD(wParam) == IDE_BOTTOM_SELECTION_POS_X) || (LOWORD(wParam) == IDE_BOTTOM_SELECTION_POS_Y) || (LOWORD(wParam) == IDE_BOTTOM_SELECTION_POS_Z)) {
 						float value_x = GetDlgItemFloat(hDlg, IDE_BOTTOM_SELECTION_POS_X);
 						float value_y = GetDlgItemFloat(hDlg, IDE_BOTTOM_SELECTION_POS_Y);

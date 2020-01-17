@@ -149,7 +149,12 @@ class EditorApplication : public BaseApplication {
 
 		int current_vector_list_selection;
 		int last_vector_list_selection;
+		int current_id_list_selection;
+		int last_id_list_selection;
+		bool is_update_id_list;
 		bool is_update_vector_list;
+		bool is_pick_target;
+		bool is_update_pos_rot;
 		
 		// Ogre
 		Ogre::Light *global_directional_light;
@@ -239,6 +244,7 @@ class EditorApplication : public BaseApplication {
 		vector<string> current_properties_names;
 		vector<LibGens::ObjectElementType> current_properties_types;
 		vector<LibGens::Vector3> temp_property_vector_list;
+		vector<unsigned int> temp_property_id_list;
 		int current_property_index;
 		LibGens::Object *current_single_property_object;
 
@@ -320,6 +326,7 @@ class EditorApplication : public BaseApplication {
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
 		void rememberCloningNodes();
+		bool isUpdatePosRot();
 
 		void copySelection();
 		void pasteSelection();
@@ -446,15 +453,22 @@ class EditorApplication : public BaseApplication {
 		void updateEditPropertyVectorList(vector<LibGens::Vector3> v);
 		void selectNode(EditorNode* node);
 		void openQueryTargetMode(bool mode);
-		void setTargetName(size_t);
+		void setTargetName(size_t id, bool is_list = false);
 		void addVectorToList(LibGens::Vector3 = LibGens::Vector3(0, 0, 0));
 		void updateVectorListSelection(int index);
 		void removeVectorFromList(int index);
 		void moveVector(int index, bool up);
 		bool isVectorListSelectionValid();
 		bool isUpdateVectorList();
-		std::vector<LibGens::Vector3>& getCurrentPropertyVectorList();
-		std::vector<VectorNode*>& getPropertyVectorNodes();
+		void addIDToList(size_t id);
+		void updateIDListSelection(int index);
+		void removeIDFromList(int index);
+		void moveID(int index, bool up);
+		bool isIDListSelectionValid();
+		bool isUpdateIDList();
+		vector<size_t>& getCurrentPropertyIDList();
+		vector<LibGens::Vector3>& getCurrentPropertyVectorList();
+		vector<VectorNode*>& getPropertyVectorNodes();
 		ObjectNodeManager* getObjectNodeManager();
 
 

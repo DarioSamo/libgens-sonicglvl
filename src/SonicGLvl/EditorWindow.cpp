@@ -54,6 +54,31 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					editor_application->exportSceneFBXGUI();
 					break;
 
+				// Edit
+				case IMD_UNDO:
+					editor_application->undoHistory();
+					break;
+				case IMD_REDO:
+					editor_application->redoHistory();
+					break;
+				case IMD_CUT:
+					editor_application->copySelection();
+					editor_application->deleteSelection();
+					break;
+				case IMD_COPY:
+					editor_application->copySelection();
+					break;
+				case IMD_PASTE:
+					editor_application->pasteSelection();
+					break;
+				case IMD_DELETE:
+					editor_application->deleteSelection();
+					break;
+				case IMD_SELECT_ALL:
+					editor_application->selectAll();
+					break;
+
+
 				// Physics
 				case IMD_OPEN_PHYSICS_EDITOR :
 					editor_application->openPhysicsEditorGUI();

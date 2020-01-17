@@ -488,6 +488,7 @@ void EditorApplication::createScene(void) {
 	current_single_property_object = NULL;
 	history_edit_property_wrapper = NULL;
 	cloning_mode = SONICGLVL_MULTISETPARAM_MODE_CLONE;
+	is_pick_target = false;
 
 	// Set up Scene Managers
 	scene_manager = root->createSceneManager("OctreeSceneManager");
@@ -686,6 +687,11 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 		if (editor_mode == EDITOR_NODE_QUERY_NODE) {
 			closeVectorQueryMode();
+		}
+
+		if (is_pick_target)
+		{
+			openQueryTargetMode(false);
 		}
 	}
 
@@ -947,9 +953,8 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 				rememberSelection(axis->getMode());
 			}
 			else if (id == OIS::MB_Left) {
-				bool pick_target = (hEditPropertyDlg) && IsDlgButtonChecked(hEditPropertyDlg, IDC_EDIT_ID_SELECT_FROM_VIEWPORT);
 				if (current_node) {
-					if (editor_mode != pick_target) {
+					if (!is_pick_target) {
 						if (!keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
 							clearSelection();
 						}
@@ -965,15 +970,18 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 
 						updateSelection();
 					}
-					else if (editor_mode == pick_target)
+					else
 					{
 						if (current_node->getType() == EDITOR_NODE_OBJECT)
 						{
 							ObjectNode* object_node = static_cast<ObjectNode*>(current_node);
 							size_t id = object_node->getObject()->getID();
 
-							SetDlgItemText(hEditPropertyDlg, IDC_EDIT_ID_VALUE, ToString<size_t>(id).c_str());
-							setTargetName(id);
+							bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_ID_LIST;
+							int combo_box = is_list ? IDE_EDIT_ID_LIST_VALUE : IDC_EDIT_ID_VALUE;
+							SetDlgItemText(hEditPropertyDlg, combo_box, ToString<size_t>(id).c_str());
+
+							setTargetName(id, is_list);
 						}
 					}
 				}
