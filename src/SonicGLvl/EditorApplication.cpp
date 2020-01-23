@@ -257,9 +257,10 @@ void EditorApplication::translateSelection(Ogre::Vector3 v) {
 
 
 void EditorApplication::rotateSelection(Ogre::Quaternion q) {
-	if (selected_nodes.size() == 1) {
-		EditorNode *node = *selected_nodes.begin();
-		node->rotate(q);
+	if (selected_nodes.size() == 1 || local_rotation) {
+		for (list<EditorNode*>::iterator it = selected_nodes.begin(); it != selected_nodes.end(); ++it) {
+			(*it)->rotate(q);
+		}
 		//node->setRotation(q);
 	}
 	else {
@@ -431,6 +432,17 @@ void EditorApplication::togglePlacementSnap() {
 	}
 }
 
+void EditorApplication::toggleLocalRotation() {
+	local_rotation = !local_rotation;
+
+	const int viewMenuPos = 2;
+	HMENU hViewSubMenu = GetSubMenu(hMenu, viewMenuPos);
+
+	if (hViewSubMenu) {
+		CheckMenuItem(hViewSubMenu, IMD_LOCAL_ROTATION, (local_rotation ? MF_CHECKED : MF_UNCHECKED));
+	}
+}
+
 
 void EditorApplication::createScene(void) {
 	// Initialize LibGens Managers
@@ -473,6 +485,7 @@ void EditorApplication::createScene(void) {
 	hMaterialEditorDlg = NULL;
 	hPhysicsEditorDlg = NULL;
 	hMultiSetParamDlg = NULL;
+	hFindObjectDlg = NULL;
 	
 	updateVisibilityGUI();
 	updateObjectCategoriesGUI();

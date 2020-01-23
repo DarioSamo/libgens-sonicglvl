@@ -77,6 +77,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_SELECT_ALL:
 					editor_application->selectAll();
 					break;
+				case IMD_FIND:
+					editor_application->openFindGUI();
+					break;
 
 
 				// Physics
@@ -132,6 +135,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					break;
 				case IMD_PLACEMENT_SNAP:
 					editor_application->togglePlacementSnap();
+					break;
+				case IMD_LOCAL_ROTATION:
+					editor_application->toggleLocalRotation();
 					break;
 			}
 			break;

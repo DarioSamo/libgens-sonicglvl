@@ -18,10 +18,12 @@
 #define IDD_MATERIAL_EDITOR                     133
 #define IDD_MATERIAL_EDITOR_PREVIEW             135
 #define IDD_PHYSICS_EDITOR                      137
+#define IDD_FIND_DIALOG                         139
 #define IDC_EDIT_FLOAT_VALUE                    40000
 #define IDC_PALETTE_CATEGORY                    40000
 #define IDE_BOTTOM_SELECTION_POS_X              40000
 #define IDE_EDIT_VECTOR_X                       40000
+#define IDE_FIND_VALUE                          40000
 #define IDE_MULTISETPARAM_X                     40000
 #define IDL_COLLISION_LIST                      40000
 #define IDR_MATERIAL_MODEL_MODE                 40000
@@ -33,6 +35,7 @@
 #define IDC_EDIT_STRING_VALUE                   40001
 #define IDE_BOTTOM_SELECTION_POS_Y              40001
 #define IDE_EDIT_VECTOR_Y                       40001
+#define IDE_FIND_PROPERTY_VALUE                 40001
 #define IDE_MULTISETPARAM_Y                     40001
 #define IDL_EDIT_ID_LIST_LIST                   40001
 #define IDL_PALETTE_LIST                        40001
@@ -44,6 +47,7 @@
 #define IDC_EDIT_ID_VALUE                       40002
 #define IDE_BOTTOM_SELECTION_POS_Z              40002
 #define IDE_EDIT_VECTOR_Z                       40002
+#define IDE_FIND_VALUE_VALUE                    40002
 #define IDE_MULTISETPARAM_Z                     40002
 #define IDL_PROPERTIES_LIST                     40002
 #define IDR_MATERIAL_TERRAIN_MODE               40002
@@ -52,6 +56,7 @@
 #define IDB_EDIT_ID_GO_TO_TARGET                40003
 #define IDB_EDIT_ID_LIST_DELETE                 40003
 #define IDC_EDIT_BOOL_VALUE                     40003
+#define IDC_FIND_EXACTLY                        40003
 #define IDE_BOTTOM_SELECTION_ROT_X              40003
 #define IDE_EDIT_VECTOR_LIST_Y                  40003
 #define IDG_STAGE_INFORMATION                   40003
@@ -60,6 +65,7 @@
 #define IDT_MATERIAL_MODEL_OPEN                 40003
 #define IMD_CLOSE                               40003
 #define IDB_EDIT_ID_LIST_MOVE_UP                40004
+#define IDB_FIND                                40004
 #define IDB_MATERIAL_LOAD_MODEL                 40004
 #define IDC_EDIT_ID_SELECT_FROM_VIEWPORT        40004
 #define IDE_BOTTOM_SELECTION_ROT_Y              40004
@@ -71,6 +77,7 @@
 #define IDB_EDIT_ID_LIST_MOVE_DOWN              40005
 #define IDB_EDIT_VECTOR_LIST_CREATE             40005
 #define IDB_MATERIAL_SAVE_MODEL                 40005
+#define IDC_FIND_ALL                            40005
 #define IDE_BOTTOM_SELECTION_ROT_Z              40005
 #define IDG_PROPERTIES_GROUP                    40005
 #define IDS_EDIT_VECTOR_Z                       40005
@@ -79,6 +86,7 @@
 #define IDB_EDIT_ID_LIST_GO_TO_TARGET           40006
 #define IDB_EDIT_VECTOR_LIST_FOCUS              40006
 #define IDC_EDIT_VECTOR_EDITING                 40006
+#define IDC_FIND_FILTERED                       40006
 #define IDE_MULTISETPARAM_SPACING               40006
 #define IDG_HELP_GROUP                          40006
 #define IDL_MATERIAL_MATERIAL_LIST              40006
@@ -89,17 +97,20 @@
 #define IDC_MULTISETPARAM_SNAP_PATH_EDGES       40007
 #define IDE_EDIT_VECTOR_LIST_X                  40007
 #define IDS_BOTTOM_SELECTION_POS_Y              40007
+#define IDT_FIND_OBJECT_NAME                    40007
 #define IDT_HELP_DESCRIPTION                    40007
 #define IMD_COPY                                40007
 #define IDB_MATERIAL_DELETE_MATERIAL            40008
 #define IDB_MULTISETPARAM_CREATE                40008
 #define IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT      40008
+#define IDG_FIND_BASIC                          40008
 #define IDL_EDIT_VECTOR_LIST_LIST               40008
 #define IDS_BOTTOM_SELECTION_POS_Z              40008
 #define IMD_PASTE                               40008
 #define IDC_EDIT_VECTOR_LIST_EDITING            40009
 #define IDE_EDIT_ID_LIST_VALUE                  40009
 #define IDE_MATERIAL_NAME                       40009
+#define IDG_FIND_ADVANCED                       40009
 #define IDS_BOTTOM_SELECTION_ROT_X              40009
 #define IDS_MULTISETPARAM_COUNT                 40009
 #define IMD_DELETE                              40009
@@ -159,7 +170,9 @@
 #define IDE_MATERIAL_PARAMETER_4_N              40030
 #define IMD_LOCAL_ROTATION                      40030
 #define IDE_MATERIAL_PARAMETER_5_N              40031
+#define IMD_LOOK_AT_EACH_OTHER                  40031
 #define IDE_MATERIAL_PARAMETER_6_N              40032
+#define IMD_FIND                                40032
 #define IDE_MATERIAL_PARAMETER_7_N              40033
 #define IDE_MATERIAL_PARAMETER_8_N              40034
 #define IMD_EXPORT_SCENE_FBX                    40034

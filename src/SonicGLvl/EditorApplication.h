@@ -138,6 +138,7 @@ class EditorApplication : public BaseApplication {
 		// General Editor Variables
 		Ogre::uint32 editor_mode;
 		bool world_transform;
+		bool local_rotation;
 		size_t dragging_mode;
 		size_t cloning_mode;
 		Ogre::AnimationState *animation_state;
@@ -151,10 +152,12 @@ class EditorApplication : public BaseApplication {
 		int last_vector_list_selection;
 		int current_id_list_selection;
 		int last_id_list_selection;
-		bool is_update_id_list;
 		bool is_update_vector_list;
 		bool is_pick_target;
 		bool is_update_pos_rot;
+
+		// Finder
+		list<ObjectNode*>::iterator find_position;
 		
 		// Ogre
 		Ogre::Light *global_directional_light;
@@ -230,7 +233,7 @@ class EditorApplication : public BaseApplication {
 		HWND hPhysicsEditorDlg;
 		HWND hMaterialEditorPreviewDlg;
 		HWND hMultiSetParamDlg;
-
+		HWND hFindObjectDlg;
 		// Object Palette
 		int current_category_index;
 		LibGens::Object *last_palette_selection;
@@ -322,11 +325,18 @@ class EditorApplication : public BaseApplication {
 		void makeHistorySelection(bool mode);
 		void toggleWorldTransform();
 		void togglePlacementSnap();
+		void toggleLocalRotation();
 		void updateNodeVisibility();
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
 		void rememberCloningNodes();
 		bool isUpdatePosRot();
+
+		void openFindGUI();
+		void closeFindGUI();
+		void findNext(string obj_name, string param, string value);
+		void findAll(string obj_name, string param, string value);
+		bool matchesPropertyAndValue(ObjectNode *object_node, string param, string value);
 
 		void copySelection();
 		void pasteSelection();
@@ -465,7 +475,6 @@ class EditorApplication : public BaseApplication {
 		void removeIDFromList(int index);
 		void moveID(int index, bool up);
 		bool isIDListSelectionValid();
-		bool isUpdateIDList();
 		vector<size_t>& getCurrentPropertyIDList();
 		vector<LibGens::Vector3>& getCurrentPropertyVectorList();
 		vector<VectorNode*>& getPropertyVectorNodes();

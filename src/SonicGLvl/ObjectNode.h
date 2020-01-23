@@ -216,7 +216,7 @@ class ObjectNodeManager {
 		void hideObjectNode(LibGens::Object *object, bool permanent=false);
 		void reloadObjectNode(LibGens::Object *object);
 
-		list<ObjectNode *> getObjectNodes() {
+		list<ObjectNode *>& getObjectNodes() {
 			return object_nodes;
 		}
 

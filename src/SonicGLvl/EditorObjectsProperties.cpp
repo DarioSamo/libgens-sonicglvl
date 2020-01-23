@@ -1923,6 +1923,7 @@ void EditorApplication::updateIDListSelection(int index)
 	HWND list_move_up = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_LIST_MOVE_UP);
 	HWND list_move_down = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_LIST_MOVE_DOWN);
 	HWND list_add = GetDlgItem(hEditPropertyDlg, IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT);
+	HWND list_text = GetDlgItem(hEditPropertyDlg, IDE_EDIT_ID_LIST_VALUE);
 
 	current_id_list_selection = index;
 	if (current_id_list_selection != last_id_list_selection)
@@ -1930,8 +1931,6 @@ void EditorApplication::updateIDListSelection(int index)
 		last_id_list_selection = current_id_list_selection;
 		if (isIDListSelectionValid())
 		{
-			is_update_id_list = false;
-
 			size_t id = temp_property_id_list[index];
 			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_ID_LIST_VALUE, ToString<size_t>(id).c_str());
 		}
@@ -1941,6 +1940,7 @@ void EditorApplication::updateIDListSelection(int index)
 	{
 		EnableWindow(list_delete, true);
 		EnableWindow(list_add, true);
+		EnableWindow(list_text, true);
 
 		// Enable or disable buttons based on current selection in the list view
 		if (temp_property_id_list.size() > 1)
@@ -1970,9 +1970,8 @@ void EditorApplication::updateIDListSelection(int index)
 		EnableWindow(list_move_up, false);
 		EnableWindow(list_move_down, false);
 		EnableWindow(list_add, false);
+		EnableWindow(list_text, false);
 	}
-
-	is_update_id_list = true;
 }
 
 vector<size_t>& EditorApplication::getCurrentPropertyIDList()
