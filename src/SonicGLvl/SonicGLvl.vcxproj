@@ -81,6 +81,7 @@
     <ClCompile Include="EditorAxis.cpp" />
     <ClCompile Include="EditorBottom.cpp" />
     <ClCompile Include="EditorConfiguration.cpp" />
+    <ClCompile Include="EditorFind.cpp" />
     <ClCompile Include="EditorGhost.cpp" />
     <ClCompile Include="EditorGlobalIllumination.cpp" />
     <ClCompile Include="EditorGUI.cpp" />
