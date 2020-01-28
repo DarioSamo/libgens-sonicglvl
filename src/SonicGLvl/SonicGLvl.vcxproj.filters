@@ -129,9 +129,6 @@
     <ClCompile Include="EditorClone.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="EditorFind.cpp">
-      <Filter>Editor</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
