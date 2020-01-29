@@ -174,9 +174,11 @@
 #define IDE_MATERIAL_PARAMETER_6_N              40032
 #define IMD_FIND                                40032
 #define IDE_MATERIAL_PARAMETER_7_N              40033
+#define IMD_ROTATION_SNAP                       40033
 #define IDE_MATERIAL_PARAMETER_8_N              40034
 #define IMD_EXPORT_SCENE_FBX                    40034
 #define IDE_MATERIAL_PARAMETER_9_N              40035
+#define IMD_TRANSLATION_SNAP                    40035
 #define IDE_MATERIAL_PARAMETER_10_N             40036
 #define IDE_MATERIAL_PARAMETER_1_R              40037
 #define IDE_MATERIAL_PARAMETER_1_G              40038

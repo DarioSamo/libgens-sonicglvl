@@ -2,37 +2,81 @@
 
 INT_PTR CALLBACK findCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
-bool matchesQuery(string object_name, string q_string, bool exactly)
+bool matchesQuery(string str1, string str2, bool exactly)
 {
 	// convert search query string and current object's name to lowercase
 	// for case insensetive comparison
 
-	size_t object_name_length = object_name.size();
-	char* object_name_lower = new char[object_name_length + 1];
+	for (size_t i = 0; i < str1.size(); ++i)
+		str1[i] = tolower(str1[i]);
 
-	size_t obj_name_length = q_string.size();
-	char* obj_name_lower = new char[obj_name_length];
-
-	for (size_t i = 0; i < object_name_length; ++i)
-		object_name_lower[i] = tolower(object_name[i]);
-
-	object_name_lower[object_name_length] = '\0';
-
-	for (size_t i = 0; i < obj_name_length; ++i)
-		obj_name_lower[i] = tolower(q_string[i]);
-
-	obj_name_lower[obj_name_length] = '\0';
-
-	string object_name_string(object_name_lower);
-	string obj_name_string(obj_name_lower);
-
-	delete[] object_name_lower;
-	delete[] obj_name_lower;
+	for (size_t i = 0; i < str2.size(); ++i)
+		str2[i] = tolower(str2[i]);
 
 	if (exactly)
-		return (!strcmp(object_name_string.c_str(), obj_name_string.c_str()));
+		return (!strcmp(str1.c_str(), str2.c_str()));
 	else
-		return object_name_string.find(obj_name_string, 0) != string::npos;
+		return str1.find(str2, 0) != string::npos;
+}
+
+bool valueMatches(LibGens::Object *object, string element_name, string value_string)
+{
+	LibGens::ObjectElement *element = object->getElement(element_name);
+	
+	if (!element)
+		return false;
+
+	LibGens::ObjectElementType element_type = element->getType();
+	string element_value = "";
+
+	// cast the object element to the appropriate type
+
+	switch (element_type)
+	{
+	case LibGens::OBJECT_ELEMENT_BOOL:
+	{
+		LibGens::ObjectElementBool* element_bool = static_cast<LibGens::ObjectElementBool*>(element);
+		bool value = element_bool->value;
+		element_value = ToString<bool>(value);
+		break;
+	}
+
+	case LibGens::OBJECT_ELEMENT_FLOAT:
+	{
+		LibGens::ObjectElementFloat* element_float = static_cast<LibGens::ObjectElementFloat*>(element);
+		float value = element_float->value;
+		element_value = ToString<float>(value);
+		break;
+	}
+
+	case LibGens::OBJECT_ELEMENT_ID:
+	{
+		LibGens::ObjectElementID* element_id = static_cast<LibGens::ObjectElementID*>(element);
+		size_t value = element_id->value;
+		element_value = ToString<size_t>(value);
+		break;
+	}
+
+	case LibGens::OBJECT_ELEMENT_INTEGER:
+	{
+		LibGens::ObjectElementInteger* element_int = static_cast<LibGens::ObjectElementInteger*>(element);
+		unsigned int value = element_int->value;
+		element_value = ToString<unsigned int>(value);
+		break;
+	}
+
+	case LibGens::OBJECT_ELEMENT_STRING:
+	{
+		LibGens::ObjectElementString* element_string = static_cast<LibGens::ObjectElementString*>(element);
+		element_value = element_string->value;
+		break;
+	}
+
+	default:
+		break;
+	}
+
+	return matchesQuery(element_value, value_string, true);
 }
 
 void EditorApplication::openFindGUI()
@@ -44,6 +88,7 @@ void EditorApplication::openFindGUI()
 		hFindObjectDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_FIND_DIALOG), hwnd, findCallback);
 		SetFocus(hFindObjectDlg);
 
+		// disable non-functional dialog elements for now
 		EnableWindow(GetDlgItem(hFindObjectDlg, IDC_FIND_FILTERED), false);
 		EnableWindow(GetDlgItem(hFindObjectDlg, IDE_FIND_PROPERTY_VALUE), false);
 		EnableWindow(GetDlgItem(hFindObjectDlg, IDE_FIND_VALUE_VALUE), false);

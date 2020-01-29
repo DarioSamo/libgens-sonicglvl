@@ -139,6 +139,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_LOCAL_ROTATION:
 					editor_application->toggleLocalRotation();
 					break;
+				case IMD_ROTATION_SNAP:
+					editor_application->toggleRotationSnap();
+					break;
 			}
 			break;
 	}

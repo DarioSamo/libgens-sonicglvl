@@ -316,6 +316,7 @@ class EditorApplication : public BaseApplication {
 		void deleteSelection();
 		void clearSelection();
 		void cloneSelection();
+		void temporaryCloneSelection();
 		void showSelectionNames();
 		void selectAll();
 		void translateSelection(Ogre::Vector3 v);
@@ -326,6 +327,8 @@ class EditorApplication : public BaseApplication {
 		void toggleWorldTransform();
 		void togglePlacementSnap();
 		void toggleLocalRotation();
+		void toggleRotationSnap();
+		void toggleTranslationSnap();
 		void updateNodeVisibility();
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();

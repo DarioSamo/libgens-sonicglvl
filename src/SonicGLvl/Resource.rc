@@ -65,6 +65,8 @@ IDR_TOOLMENU MENU
         MENUITEM "Use World Transform\tCtrl+E", IMD_WORLD_TRANSFORM
         MENUITEM "Use Local Rotation", IMD_LOCAL_ROTATION
         MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP
+        MENUITEM "Use Rotation Snap", IMD_ROTATION_SNAP
+        MENUITEM "Use Translation Snap", 0
     }
     POPUP "Physics"
     {
