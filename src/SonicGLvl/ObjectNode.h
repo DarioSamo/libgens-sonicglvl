@@ -162,6 +162,9 @@ class ObjectNode : public EditorNode {
 			return object;
 		}
 
+
+		void createObjectMultiSetNodes(LibGens::Object *object, Ogre::SceneManager *scene_manager);
+		void clearObjectMultiSetNodes();
 		void removeObjectMultiSetNode(ObjectMultiSetNode* msNode);
 
 		void addTime(float time_s);
@@ -178,6 +181,13 @@ class ObjectNode : public EditorNode {
 
 		bool isForceHidden() {
 			return force_hide;
+		}
+
+		void clearNames() {
+			current_model_name = "";
+			current_animation_name = "";
+			current_skeleton_name = "";
+			current_type_name = "";
 		}
 
 		~ObjectNode();

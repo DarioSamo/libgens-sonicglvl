@@ -126,7 +126,6 @@
     <ClCompile Include="DefaultShaderParameters.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="EditorClone.cpp" />
     <ClCompile Include="EditorClone.cpp">
       <Filter>Editor</Filter>
     </ClCompile>

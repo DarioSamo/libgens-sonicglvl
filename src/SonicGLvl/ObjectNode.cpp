@@ -85,25 +85,7 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	setRotation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
 
 	// Create multiset param nodes
-	list<LibGens::MultiSetNode *> msp_nodes = object->getMultiSetParam()->getNodes();
-	for (list<LibGens::MultiSetNode *>::iterator it=msp_nodes.begin(); it!=msp_nodes.end(); it++) {
-		ObjectMultiSetNode *object_msp_node = new ObjectMultiSetNode(object, (*it), scene_manager);
-		object_msp_node->offset_rotation_x = offset_rotation_x;
-		object_msp_node->offset_rotation_y = offset_rotation_y;
-		object_msp_node->offset_rotation_z = offset_rotation_z;
-
-		object_msp_node->offset_rotation_x_speed = offset_rotation_x_speed;
-		object_msp_node->offset_rotation_y_speed = offset_rotation_y_speed;
-		object_msp_node->offset_rotation_z_speed = offset_rotation_z_speed;
-
-		object_msp_node->offset_rotation_animation_enabled = offset_rotation_animation_enabled;
-
-		object_msp_node->object_node = this;
-
-		// Update rotation with offset
-		object_msp_node->setRotation(object_msp_node->getRotation());
-		object_msp_nodes.push_back(object_msp_node);
-	}
+	createObjectMultiSetNodes(object, scene_manager);
 
 	// Load Entities for all nodes
 	reloadEntities(scene_manager, model_library, material_library, object_production, slot_id_name);
@@ -135,6 +117,7 @@ void ObjectNode::reloadEntities(Ogre::SceneManager *scene_manager, LibGens::Mode
 
 
 void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager *scene_manager, LibGens::ModelLibrary *model_library, LibGens::MaterialLibrary *material_library, LibGens::ObjectProduction *object_production, string slot_id_name) {
+
 	string model_name=object->queryEditorModel(slot_id_name, OBJECT_NODE_UNKNOWN_MESH);
 	string skeleton_name=object->queryEditorSkeleton(slot_id_name, "");
 	string animation_name=object->queryEditorAnimation(slot_id_name, "");
@@ -402,11 +385,47 @@ void ObjectNode::setSelect(bool v) {
 	preview_box_node->setVisible(v);
 }
 
+void ObjectNode::createObjectMultiSetNodes(LibGens::Object* object, Ogre::SceneManager *scene_manager) {
+	// remove old nodes
+	clearObjectMultiSetNodes();
+
+	list<LibGens::MultiSetNode*> msp_nodes = object->getMultiSetParam()->getNodes();
+	for (list<LibGens::MultiSetNode*>::iterator it = msp_nodes.begin(); it != msp_nodes.end(); it++) {
+		ObjectMultiSetNode* object_msp_node = new ObjectMultiSetNode(object, (*it), scene_manager);
+
+		object_msp_node->offset_rotation_x = offset_rotation_x;
+		object_msp_node->offset_rotation_y = offset_rotation_y;
+		object_msp_node->offset_rotation_z = offset_rotation_z;
+
+		object_msp_node->offset_rotation_x_speed = offset_rotation_x_speed;
+		object_msp_node->offset_rotation_y_speed = offset_rotation_y_speed;
+		object_msp_node->offset_rotation_z_speed = offset_rotation_z_speed;
+
+		object_msp_node->offset_rotation_animation_enabled = offset_rotation_animation_enabled;
+
+		object_msp_node->object_node = this;
+
+		// Update rotation with offset
+		object_msp_node->setRotation(object_msp_node->getRotation());
+		object_msp_nodes.push_back(object_msp_node);
+	}
+}
+
+void ObjectNode::clearObjectMultiSetNodes()
+{
+	for (list<ObjectMultiSetNode*>::iterator it = object_msp_nodes.begin(); it != object_msp_nodes.end(); ++it)
+	{
+		delete* it;
+		object_msp_nodes.erase(it);
+	}
+}
+
 void ObjectNode::removeObjectMultiSetNode(ObjectMultiSetNode* msNode)
 {
 	for (list<ObjectMultiSetNode*>::iterator it = object_msp_nodes.begin(); it != object_msp_nodes.end(); ++it)
 		if ((*it) == msNode)
 		{
+			delete* it;
 			object_msp_nodes.erase(it);
 			return;
 		}

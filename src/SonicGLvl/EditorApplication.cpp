@@ -249,6 +249,45 @@ void EditorApplication::cloneSelection() {
 	updateSelection();
 }
 
+void EditorApplication::temporaryCloneSelection() {
+	if (!selected_nodes.size()) return;
+
+	list<EditorNode*> nodes_to_clone = selected_nodes;
+	clearSelection();
+
+	for (list<EditorNode*>::iterator it = nodes_to_clone.begin(); it != nodes_to_clone.end(); it++) {
+		// Cast to appropiate types depending on the type of editor node
+		if ((*it)->getType() == EDITOR_NODE_OBJECT) {
+			ObjectNode* object_node = static_cast<ObjectNode*>(*it);
+
+			LibGens::Object* object = object_node->getObject();
+			if (object) {
+				LibGens::Object* new_object = new LibGens::Object(object);
+
+				if (current_level) {
+					if (current_level->getLevel()) {
+						new_object->setID(current_level->getLevel()->newObjectID());
+					}
+				}
+
+				LibGens::ObjectSet* parent_set = object->getParentSet();
+				if (parent_set) {
+					parent_set->addObject(new_object);
+				}
+
+				// Create
+				ObjectNode* new_object_node = object_node_manager->createObjectNode(new_object);
+
+				// Add to current selection
+				new_object_node->setSelect(true);
+				selected_nodes.push_back(new_object_node);
+			}
+		}
+	}
+
+	updateSelection();
+}
+
 void EditorApplication::translateSelection(Ogre::Vector3 v) {
 	for (list<EditorNode *>::iterator it=selected_nodes.begin(); it!=selected_nodes.end(); it++) {
 		(*it)->translate(v);
@@ -440,6 +479,28 @@ void EditorApplication::toggleLocalRotation() {
 
 	if (hViewSubMenu) {
 		CheckMenuItem(hViewSubMenu, IMD_LOCAL_ROTATION, (local_rotation ? MF_CHECKED : MF_UNCHECKED));
+	}
+}
+
+void EditorApplication::toggleRotationSnap() {
+	axis->setRotationSnap(!axis->isRotationSnap());
+
+	const int viewMenuPos = 2;
+	HMENU hViewSubMenu = GetSubMenu(hMenu, viewMenuPos);
+
+	if (hViewSubMenu) {
+		CheckMenuItem(hViewSubMenu, IMD_ROTATION_SNAP, (axis->isRotationSnap() ? MF_CHECKED : MF_UNCHECKED));
+	}
+}
+
+void EditorApplication::toggleTranslationSnap() {
+	axis->setTranslationSnap(!axis->isTranslationSnap());
+
+	const int viewMenuPos = 2;
+	HMENU hViewSubMenu = GetSubMenu(hMenu, viewMenuPos);
+
+	if (hViewSubMenu) {
+		CheckMenuItem(hViewSubMenu, IMD_TRANSLATION_SNAP, (axis->isTranslationSnap() ? MF_CHECKED : MF_UNCHECKED));
 	}
 }
 
@@ -952,10 +1013,10 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 			if (axis->mousePressed(viewport, arg, id)) {
 				dragging_mode = 0;
 
-				if (keyboard->isModifierDown(OIS::Keyboard::Shift)) {
+				if (keyboard->isModifierDown(OIS::Keyboard::Shift) && !hMultiSetParamDlg) {
 					dragging_mode = 1;
 					rememberCloningNodes();
-					cloneSelection();
+					temporaryCloneSelection();
 				}
 
 				if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
@@ -1047,12 +1108,13 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 bool EditorApplication::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
 	if (id == OIS::MB_Left) {
 		if (axis->mouseReleased(arg, id)) {
-			makeHistorySelection(axis->getMode());
+			if (dragging_mode != 1)
+				makeHistorySelection(axis->getMode());
 		}
 
 		if (dragging_mode == 1)
 		{
-			if (cloning_nodes.size())
+			if (cloning_nodes.size() && !hMultiSetParamDlg)
 			{
 				openMultiSetParamDlg();
 				setVectorAndSpacing();

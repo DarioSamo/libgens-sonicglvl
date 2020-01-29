@@ -60,6 +60,10 @@ void EditorApplication::createMultiSetParamObjects()
 	LibGens::Vector3 pos_vector(vec_x, vec_y, vec_z);
 
 	list<EditorNode*>::iterator it;
+	list<EditorNode*> nodes_to_be_reselected;
+
+	if (nodes_to_be_reselected.size())
+		nodes_to_be_reselected.clear();
 
 	for (it = selected_nodes.begin(); it != selected_nodes.end(); ++it)
 	{
@@ -113,9 +117,9 @@ void EditorApplication::createMultiSetParamObjects()
 					obj->getMultiSetParam()->addNode(msp_node);
 				}
 
-				// reload object and its instances
-				object_node_manager->deleteObjectNode(obj);
-				object_node_manager->createObjectNode(obj);
+				obj_node->createObjectMultiSetNodes(obj, scene_manager);
+				obj_node->clearNames();
+				object_node_manager->reloadObjectNode(obj);
 			}
 		}
 	}
@@ -203,11 +207,14 @@ void EditorApplication::deleteTemporaryNodes()
 					object_set->eraseObject(object);
 				}
 
-				object_node_manager->hideObjectNode(object, true);
 				(*it)->setSelect(false);
+				object_node_manager->deleteObjectNode(object);
+				delete object;
 			}
 		}
 	}
+
+	temporary_nodes.clear();
 }
 
 INT_PTR CALLBACK MultiSetParamCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
