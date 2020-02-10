@@ -339,7 +339,6 @@ class EditorApplication : public BaseApplication {
 		void closeFindGUI();
 		void findNext(string obj_name, string param, string value);
 		void findAll(string obj_name, string param, string value);
-		bool matchesPropertyAndValue(ObjectNode *object_node, string param, string value);
 
 		void copySelection();
 		void pasteSelection();

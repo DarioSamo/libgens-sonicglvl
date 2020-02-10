@@ -74,13 +74,15 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_DELETE:
 					editor_application->deleteSelection();
 					break;
+				case IMD_CLEAR_SELECTION:
+					editor_application->clearSelection();
+					break;
 				case IMD_SELECT_ALL:
 					editor_application->selectAll();
 					break;
 				case IMD_FIND:
 					editor_application->openFindGUI();
 					break;
-
 
 				// Physics
 				case IMD_OPEN_PHYSICS_EDITOR :

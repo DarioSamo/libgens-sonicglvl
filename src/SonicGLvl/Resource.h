@@ -178,9 +178,10 @@
 #define IDE_MATERIAL_PARAMETER_8_N              40034
 #define IMD_EXPORT_SCENE_FBX                    40034
 #define IDE_MATERIAL_PARAMETER_9_N              40035
-#define IMD_TRANSLATION_SNAP                    40035
+#define IMD_CLEAR_SELECTION                     40035
 #define IDE_MATERIAL_PARAMETER_10_N             40036
 #define IDE_MATERIAL_PARAMETER_1_R              40037
+#define IMD_TRANSLATION_SNAP                    40037
 #define IDE_MATERIAL_PARAMETER_1_G              40038
 #define IDE_MATERIAL_PARAMETER_1_B              40039
 #define IDE_MATERIAL_PARAMETER_1_A              40040

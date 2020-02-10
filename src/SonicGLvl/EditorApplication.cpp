@@ -798,9 +798,8 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			}
 
 			if(arg.key == OIS::KC_F) {
-				if (camera_manager) {
-					camera_manager->setForceCamera(!camera_manager->getForceCamera());
-				}
+				if (!hFindObjectDlg)
+					openFindGUI();
 			}
 
 			if(arg.key == OIS::KC_D) {
@@ -854,6 +853,14 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
+			}
+		}
+		else if (keyboard->isModifierDown(OIS::Keyboard::Alt))
+		{
+			if (arg.key == OIS::KC_F) {
+				if (camera_manager) {
+					camera_manager->setForceCamera(!camera_manager->getForceCamera());
+				}
 			}
 		}
 	}

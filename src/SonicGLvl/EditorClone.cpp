@@ -56,14 +56,9 @@ void EditorApplication::createMultiSetParamObjects()
 	vec_x = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_X);
 	vec_y = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_Y);
 	vec_z = GetDlgItemFloat(hMultiSetParamDlg, IDE_MULTISETPARAM_Z);
-
 	LibGens::Vector3 pos_vector(vec_x, vec_y, vec_z);
 
 	list<EditorNode*>::iterator it;
-	list<EditorNode*> nodes_to_be_reselected;
-
-	if (nodes_to_be_reselected.size())
-		nodes_to_be_reselected.clear();
 
 	for (it = selected_nodes.begin(); it != selected_nodes.end(); ++it)
 	{
