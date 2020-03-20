@@ -43,6 +43,7 @@ class GhostNode : public EditorNode {
 	protected:
 		LibGens::Ghost *ghost;
 		float current_time;
+		float duration;
 		bool play;
 		Ogre::Entity *ghost_entity;
 		Ogre::Entity *ghost_spin_entity;
@@ -71,6 +72,14 @@ class GhostNode : public EditorNode {
 
 		void setRotation(Ogre::Quaternion v) {
 			EditorNode::setRotation(v);
+		}
+		
+		float getDuration() {
+			return duration;
+		}
+
+		float getTime() {
+			return current_time;
 		}
 
 		Ogre::Vector3 getCameraPosition() {

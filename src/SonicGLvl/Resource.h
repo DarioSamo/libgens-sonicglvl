@@ -129,12 +129,15 @@
 #define IDC_MATERIAL_BACKFACE_CULLING           40012
 #define IDR_MULTISETPARAM_MSP_ADD               40012
 #define IMD_IMPORT_TERRAIN_FBX                  40012
+#define IDB_BOTTOM_GHOST_FORWARD                40013
 #define IDB_MULTISETPARAM_CLEAR                 40013
 #define IDC_MATERIAL_ADDITIVE                   40013
 #define IMD_GENERATE_TERRAIN_GROUPS             40013
+#define IDB_BOTTOM_GHOST_PLAY                   40014
 #define IDC_MATERIAL_UNKNOWN_FLAG               40014
 #define IDC_MULTISETPARAM_SNAP_PATH_CENTERS     40014
 #define IMD_RELOAD_TEMPLATES_DATABASE           40014
+#define IDB_BOTTOM_GHOST_PAUSE                  40015
 #define IDS_MATERIAL_TEXTURE_UNIT_LIST          40015
 #define IDS_MULTISETPARAM_SPACING               40015
 #define IMD_SAVE_TEMPLATES_DATABASE             40015
@@ -142,7 +145,9 @@
 #define IMD_GAME_SHADERS                        40016
 #define IDB_MATERIAL_NEW_TEXTURE_UNIT           40017
 #define IDB_MULTISETPARAM_FROM_OBJECT           40017
+#define IDS_BOTTOM_GHOST_SEEK                   40017
 #define IMD_FRAMEBUFFER                         40017
+#define IDB_BOTTOM_GHOST_BACK                   40018
 #define IDB_MATERIAL_DELETE_TEXTURE_UNIT        40018
 #define IMD_UV_ANIMATIONS                       40018
 #define IDB_MATERIAL_CREATE_TEXTURE_UNITS       40019

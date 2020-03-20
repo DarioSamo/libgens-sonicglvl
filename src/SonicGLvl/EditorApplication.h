@@ -533,6 +533,10 @@ class EditorApplication : public BaseApplication {
 
 		//bool renderOneFrame();
 
+		GhostNode *getGhostNode() {
+			return ghost_node;
+		}
+
 		EditorAxis *getEditorAxis() {
 			return axis;
 		}

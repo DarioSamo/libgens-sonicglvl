@@ -23,16 +23,14 @@ void EditorApplication::checkGhost(Ogre::Real timeSinceLastFrame) {
 	if (ghost_node) {
 		if (editor_mode == EDITOR_NODE_QUERY_GHOST) {
 			camera_manager->update(timeSinceLastFrame, ghost_node);
-		}
-		else {
-			ghost_node->addTime(timeSinceLastFrame * farPlaneChange);
+			ghost_node->addTime(timeSinceLastFrame);
 
 			if (current_level) {
 				ghost_node->checkModeChangers(current_level->getLevel());
 				ghost_node->checkSplines(current_level->getLevel());
 			}
 
-			camera_manager->update(abs(timeSinceLastFrame * farPlaneChange), ghost_node);
+			camera_manager->update(abs(timeSinceLastFrame), ghost_node);
 		}
 	}
 }

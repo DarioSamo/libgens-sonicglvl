@@ -62,6 +62,7 @@ GhostNode::GhostNode(LibGens::Ghost *ghost_p, Ogre::SceneManager *scene_manager,
 	current_changer_object = NULL;
 	current_spline = NULL;
 	current_spline_node = NULL;
+	duration = ghost->calculateDuration();
 }
 
 
@@ -141,6 +142,7 @@ void GhostNode::addTime(float time) {
 	if (!animation_ball) camera_direction = (scene_node->getOrientation() * bone->_getDerivedOrientation()) * Ogre::Vector3::NEGATIVE_UNIT_Z;
 	else camera_direction = (scene_node->getOrientation() * bone->_getDerivedOrientation()) * Ogre::Vector3::UNIT_Z;
 	*/
+	editor_application->updateBottomSelectionGUI();
 }
 
 

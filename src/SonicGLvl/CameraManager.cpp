@@ -158,6 +158,8 @@ CameraManager::CameraManager() {
 	force_camera = false;
 	level = NULL;
 	reference_camera = NULL;
+	camera_marker_node = new Ogre::SceneNode(editor_application->getSceneManager());
+	camera_marker_tangent = new Ogre::SceneNode(editor_application->getSceneManager());
 }
 
 void CameraManager::checkCameraVolumeChanger(LibGens::Object *object, Ogre::Vector3 position_p) {

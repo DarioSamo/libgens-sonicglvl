@@ -98,4 +98,13 @@ namespace LibGens {
 			animation_ball = previous_node->animation_ball;
 		}
 	}
+
+	float Ghost::calculateDuration() {
+		float duration = 0;
+		for (size_t i = 0; i < ghost_nodes.size(); i++)
+		{
+			duration += ghost_nodes[i]->timer;
+		}
+		return duration;
+	}
 };

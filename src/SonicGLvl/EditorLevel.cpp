@@ -586,6 +586,7 @@ void EditorLevel::loadTerrain(Ogre::SceneManager *scene_manager, list<TerrainNod
 			terrain_data_folder = data_cache_folder;
 		}
 
+		string ghost_filename = data_cache_folder + "/" + slot_name + LIBGENS_GHOST_EXTENSION;
 		string terrain_filename    = terrain_data_folder + "/" + level->getTerrainInfo() + LIBGENS_TERRAIN_EXTENSION;
 		string block_filename      = terrain_data_folder + "/" + LIBGENS_TERRAIN_BLOCK_FILENAME;
 		string light_list_filename = terrain_data_folder + "/" + LIBGENS_LIGHT_LIST_FILENAME;
@@ -599,6 +600,7 @@ void EditorLevel::loadTerrain(Ogre::SceneManager *scene_manager, list<TerrainNod
 		terrain_block    = new LibGens::TerrainBlock(block_filename);
 		light_list       = new LibGens::LightList(light_list_filename);
 		terrain_autodraw = new LibGens::TerrainAutodraw(autodraw_filename);
+		ghost    	     = new LibGens::Ghost(ghost_filename);
 
 		material_library = terrain->getMaterialLibrary();
 

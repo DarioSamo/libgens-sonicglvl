@@ -34,6 +34,7 @@ namespace LibGens {
 			Ghost(string filename);
 			void read(File *file);
 			void calculate(float time, Vector3 &position, Quaternion &rotation, string &animation_name, float &animation_frame, bool &animation_ball);
+			float calculateDuration();
 	};
 };
 

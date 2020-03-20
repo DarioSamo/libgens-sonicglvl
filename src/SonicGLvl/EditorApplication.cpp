@@ -848,7 +848,8 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 					camera_manager->setLevel(current_level->getLevel());
 
 					loadGhostAnimations();
-					ghost_node = new GhostNode(NULL, scene_manager, model_library, material_library);
+					ghost_node = new GhostNode(current_level->getGhost(), scene_manager, model_library, material_library);
+					ghost_node->setAnimationMappings(ghost_animation_mappings);
 				}
 
 				clearSelection();
