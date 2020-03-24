@@ -849,10 +849,23 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 					loadGhostAnimations();
 					ghost_node = new GhostNode(NULL, scene_manager, model_library, material_library);
+					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection()*10));
 				}
 
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
+			}
+			if(arg.key == OIS::KC_S) 
+			{
+				editor_application->saveLevelDataGUI();
+			}
+			if (arg.key == OIS::KC_R)
+			{
+				if (editor_mode == EDITOR_NODE_OBJECT || EDITOR_NODE_QUERY_GHOST)
+				{
+					toggleRotationSnap();
+					updateSelection();
+				}
 			}
 		}
 		else if (keyboard->isModifierDown(OIS::Keyboard::Alt))
@@ -860,6 +873,15 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			if (arg.key == OIS::KC_F) {
 				if (camera_manager) {
 					camera_manager->setForceCamera(!camera_manager->getForceCamera());
+				}
+			}
+
+			if (arg.key == OIS::KC_G) 
+			{
+				if (editor_mode == EDITOR_NODE_QUERY_GHOST)
+				{
+					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
+					updateSelection();
 				}
 			}
 		}
@@ -905,6 +927,10 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 		if(arg.key == OIS::KC_6) {
 			editor_application->toggleNodeVisibility(EDITOR_NODE_GHOST);
+		}
+		if (arg.key == OIS::KC_O)
+		{
+			editor_application->openLevelGUI();
 		}
 	}
 

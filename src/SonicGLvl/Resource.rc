@@ -18,12 +18,9 @@ IDR_TOOLMENU MENU
 {
     POPUP "File"
     {
-        MENUITEM "Open Stage...", IMD_OPEN_LEVEL
+        MENUITEM "Open Stage...\tCtrl+O", IMD_OPEN_LEVEL
         MENUITEM SEPARATOR
-        MENUITEM "Save Stage Data...", IMD_SAVE_LEVEL_DATA
-        MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN
-        MENUITEM SEPARATOR
-        MENUITEM "Export Scene as FBX...", IMD_EXPORT_SCENE_FBX
+        MENUITEM "Save Stage Data...\tCtrl+S", IMD_SAVE_LEVEL_DATA
         MENUITEM SEPARATOR
         MENUITEM "Close", IMD_CLOSE
     }
@@ -66,7 +63,7 @@ IDR_TOOLMENU MENU
         MENUITEM "Use World Transform\tCtrl+E", IMD_WORLD_TRANSFORM
         MENUITEM "Use Local Rotation", IMD_LOCAL_ROTATION
         MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP
-        MENUITEM "Use Rotation Snap", IMD_ROTATION_SNAP
+        MENUITEM "Use Rotation Snap\tCrtl+R", IMD_ROTATION_SNAP
         MENUITEM "Use Translation Snap", IMD_TRANSLATION_SNAP
     }
     POPUP "Physics"
@@ -78,6 +75,9 @@ IDR_TOOLMENU MENU
         MENUITEM "Delete all Terrain...", IMD_CLEAN_TERRAIN
         MENUITEM SEPARATOR
         MENUITEM "Import FBX as Terrain...", IMD_IMPORT_TERRAIN_FBX
+        MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN
+        MENUITEM SEPARATOR
+        MENUITEM "Export Scene as FBX...", IMD_EXPORT_SCENE_FBX
         MENUITEM SEPARATOR
         MENUITEM "Generate Terrain Groups...", IMD_GENERATE_TERRAIN_GROUPS
     }
