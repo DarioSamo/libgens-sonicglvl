@@ -329,6 +329,7 @@ class EditorApplication : public BaseApplication {
 		void toggleLocalRotation();
 		void toggleRotationSnap();
 		void toggleTranslationSnap();
+		void lookAtEachOther();
 		void updateNodeVisibility();
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();

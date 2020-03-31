@@ -37,7 +37,7 @@ IDR_TOOLMENU MENU
         MENUITEM "Clear Selection\tCtrl+D", IMD_CLEAR_SELECTION
         MENUITEM "Select All\tCtrl+A", IMD_SELECT_ALL
         MENUITEM SEPARATOR
-        MENUITEM "Look at each other (two objects)", IMD_LOOK_AT_EACH_OTHER
+        MENUITEM "Look At Each Other (Two Objects)", IMD_LOOK_AT_EACH_OTHER
         MENUITEM "Find\tCtrl+F", IMD_FIND
     }
     POPUP "View"

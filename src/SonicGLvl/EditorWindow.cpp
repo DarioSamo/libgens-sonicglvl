@@ -83,6 +83,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_FIND:
 					editor_application->openFindGUI();
 					break;
+				case IMD_LOOK_AT_EACH_OTHER:
+					editor_application->lookAtEachOther();
+					break;
 
 				// Physics
 				case IMD_OPEN_PHYSICS_EDITOR :

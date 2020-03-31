@@ -504,6 +504,67 @@ void EditorApplication::toggleTranslationSnap() {
 	}
 }
 
+void EditorApplication::lookAtEachOther()
+{
+	if (selected_nodes.size() != 2)
+		return;
+
+	list<EditorNode*>::iterator it = selected_nodes.begin();
+	EditorNode* node1 = *it++;
+	EditorNode* node2 = *it;
+
+	if (node1->getType() == EDITOR_NODE_OBJECT || node1->getType() == EDITOR_NODE_OBJECT_MSP &&
+		node2->getType() == EDITOR_NODE_OBJECT || node2->getType() == EDITOR_NODE_OBJECT_MSP)
+	{
+		HistoryActionWrapper* wrapper = new HistoryActionWrapper();
+		HistoryActionWrapper* sub_wrapper = new HistoryActionWrapper();
+
+		for (it = selected_nodes.begin(); it != selected_nodes.end(); ++it)
+		{
+			EditorNode* node = *it;
+			EditorNode* other_node;
+			if (it == selected_nodes.begin())
+			{
+				++it;
+				other_node = *it;
+				--it;
+			}
+			else
+			{
+				--it;
+				other_node = *it;
+				++it;
+			}
+
+			Ogre::Vector3 direction = other_node->getPosition() - node->getPosition();
+			direction.normalise();
+
+			Ogre::Quaternion node_rotation = node->getRotation();
+			Ogre::Radian y_rad, p_rad, r_rad;
+			Ogre::Matrix3 rot_matrix;
+			node_rotation.ToRotationMatrix(rot_matrix);
+			rot_matrix.ToEulerAnglesYXZ(y_rad, p_rad, r_rad);
+
+			Ogre::Real yaw_rad = y_rad.valueRadians();
+			Ogre::Real pitch_rad = p_rad.valueRadians();
+			Ogre::Real roll_rad = r_rad.valueRadians();
+			yaw_rad = atan2(direction.x, direction.z);
+			pitch_rad = asin(-direction.y);
+			y_rad = yaw_rad;
+			p_rad = pitch_rad;
+			rot_matrix.FromEulerAnglesYXZ(y_rad, p_rad, r_rad);
+			node_rotation = Ogre::Quaternion(rot_matrix);
+
+			node->rememberRotation();
+			node->setRotation(node_rotation);
+			HistoryActionRotateNode* action_rot = new HistoryActionRotateNode(node, node->getLastRotation(), node->getRotation());
+			sub_wrapper->push(action_rot);
+		}
+		
+		wrapper->push(sub_wrapper);
+		pushHistory(wrapper);
+	}
+}
 
 void EditorApplication::createScene(void) {
 	// Initialize LibGens Managers
