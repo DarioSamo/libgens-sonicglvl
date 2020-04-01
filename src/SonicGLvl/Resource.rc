@@ -14,81 +14,100 @@
 // Menu resources
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDR_TOOLMENU MENU
+IDR_TOOLMENU MENUEX
 {
-    POPUP "File"
+    POPUP "File", 0, 0, 0
     {
-        MENUITEM "Open Stage...", IMD_OPEN_LEVEL
-        MENUITEM SEPARATOR
-        MENUITEM "Save Stage Data...", IMD_SAVE_LEVEL_DATA
-        MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN
-        MENUITEM SEPARATOR
-        MENUITEM "Export Scene as FBX...", IMD_EXPORT_SCENE_FBX
-        MENUITEM SEPARATOR
-        MENUITEM "Close", IMD_CLOSE
+        MENUITEM "Open Stage...", IMD_OPEN_LEVEL, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Save Stage Data...", IMD_SAVE_LEVEL_DATA, 0, 0
+        MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Close", IMD_CLOSE, 0, 0
     }
-    POPUP "Edit"
+    POPUP "Edit", 0, 0, 0
     {
-        MENUITEM "Undo\tCtrl+Z", IMD_UNDO
-        MENUITEM "Redo\tCtrl+Y", IMD_REDO
-        MENUITEM SEPARATOR
-        MENUITEM "Cut\tCtrl+X", IMD_CUT
-        MENUITEM "Copy\tCtrl+C", IMD_COPY
-        MENUITEM "Paste\tCtrl+V", IMD_PASTE
-        MENUITEM "Delete\tDel", IMD_DELETE
-        MENUITEM SEPARATOR
-        MENUITEM "Clear Selection\tCtrl+D", IMD_CLEAR_SELECTION
-        MENUITEM "Select All\tCtrl+A", IMD_SELECT_ALL
-        MENUITEM SEPARATOR
-        MENUITEM "Look at each other (two objects)", IMD_LOOK_AT_EACH_OTHER
-        MENUITEM "Find\tCtrl+F", IMD_FIND
+        MENUITEM "Undo\tCtrl+Z", IMD_UNDO, 0, 0
+        MENUITEM "Redo\tCtrl+Y", IMD_REDO, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Cut\tCtrl+X", IMD_CUT, 0, 0
+        MENUITEM "Copy\tCtrl+C", IMD_COPY, 0, 0
+        MENUITEM "Paste\tCtrl+V", IMD_PASTE, 0, 0
+        MENUITEM "Delete\tDel", IMD_DELETE, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Clear Selection\tCtrl+D", IMD_CLEAR_SELECTION, 0, 0
+        MENUITEM "Select All\tCtrl+A", IMD_SELECT_ALL, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Look at each other (two objects)", IMD_LOOK_AT_EACH_OTHER, 0, 0
+        MENUITEM "Find\tCtrl+F", IMD_FIND, 0, 0
     }
-    POPUP "View"
+    POPUP "View", 0, 0, 0
     {
-        POPUP "Show"
+        POPUP "Show", 0, 0, 0
         {
-            MENUITEM "Objects\tCtrl+1", IMD_SHOW_OBJECTS, CHECKED
-            MENUITEM "Terrain\tCtrl+2", IMD_SHOW_TERRAIN, CHECKED
-            MENUITEM "Terrain Autodraw\tCtrl+3", IMD_SHOW_TERRAIN_AUTODRAW, CHECKED
-            MENUITEM "Collision\tCtrl+4", IMD_SHOW_COLLISION, CHECKED
-            MENUITEM "Paths\tCtrl+5", IMD_SHOW_PATHS, CHECKED
-            MENUITEM "Ghost\tCtrl+6", IMD_SHOW_GHOST, CHECKED
+            MENUITEM "Objects\tCtrl+1", IMD_SHOW_OBJECTS, 0, MFS_CHECKED
+            MENUITEM "Terrain\tCtrl+2", IMD_SHOW_TERRAIN, 0, MFS_CHECKED
+            MENUITEM "Terrain Autodraw\tCtrl+3", IMD_SHOW_TERRAIN_AUTODRAW, 0, MFS_CHECKED
+            MENUITEM "Collision\tCtrl+4", IMD_SHOW_COLLISION, 0, MFS_CHECKED
+            MENUITEM "Paths\tCtrl+5", IMD_SHOW_PATHS, 0, MFS_CHECKED
+            MENUITEM "Ghost\tCtrl+6", IMD_SHOW_GHOST, 0, MFS_CHECKED
         }
-        POPUP "Graphics"
+        POPUP "Graphics", 0, 0, 0
         {
-            MENUITEM "Game Shaders\tF5", IMD_GAME_SHADERS, CHECKED
-            MENUITEM SEPARATOR
-            MENUITEM "Framebuffer && Depth Buffer (Requires Shaders)\tF6", IMD_FRAMEBUFFER, CHECKED
-            MENUITEM "UV Animations (Requires Shaders)\tF7", IMD_UV_ANIMATIONS, CHECKED
-            MENUITEM "Skybox\tF8", IMD_SKYBOX, CHECKED
+            MENUITEM "Game Shaders\tF5", IMD_GAME_SHADERS, 0, MFS_CHECKED
+            MENUITEM "", 0, MFT_SEPARATOR, 0
+            MENUITEM "Framebuffer && Depth Buffer (Requires Shaders)\tF6", IMD_FRAMEBUFFER, 0, MFS_CHECKED
+            MENUITEM "UV Animations (Requires Shaders)\tF7", IMD_UV_ANIMATIONS, 0, MFS_CHECKED
+            MENUITEM "Skybox\tF8", IMD_SKYBOX, 0, MFS_CHECKED
         }
-        MENUITEM SEPARATOR
-        MENUITEM "Use World Transform\tCtrl+E", IMD_WORLD_TRANSFORM
-        MENUITEM "Use Local Rotation", IMD_LOCAL_ROTATION
-        MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP
-        MENUITEM "Use Rotation Snap", IMD_ROTATION_SNAP
-        MENUITEM "Use Translation Snap", IMD_TRANSLATION_SNAP
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Use World Transform\tCtrl+E", IMD_WORLD_TRANSFORM, 0, 0
+        MENUITEM "Use Local Rotation", IMD_LOCAL_ROTATION, 0, 0
+        MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP, 0, 0
+        MENUITEM "Use Rotation Snap", IMD_ROTATION_SNAP, 0, 0
+        MENUITEM "Use Translation Snap", IMD_TRANSLATION_SNAP, 0, 0
     }
-    POPUP "Physics"
+    POPUP "Physics", 0, 0, 0
     {
-        MENUITEM "Open Physics Editor...", IMD_OPEN_PHYSICS_EDITOR
+        MENUITEM "Open Physics Editor...", IMD_OPEN_PHYSICS_EDITOR, 0, 0
     }
-    POPUP "Terrain"
+    POPUP "Terrain", 0, 0, 0
     {
-        MENUITEM "Delete all Terrain...", IMD_CLEAN_TERRAIN
-        MENUITEM SEPARATOR
-        MENUITEM "Import FBX as Terrain...", IMD_IMPORT_TERRAIN_FBX
-        MENUITEM SEPARATOR
-        MENUITEM "Generate Terrain Groups...", IMD_GENERATE_TERRAIN_GROUPS
+        MENUITEM "Delete all Terrain...", IMD_CLEAN_TERRAIN, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Import FBX as Terrain...", IMD_IMPORT_TERRAIN_FBX, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Generate Terrain Groups...", IMD_GENERATE_TERRAIN_GROUPS, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Export Scene as FBX...", IMD_EXPORT_SCENE_FBX, 0, 0
     }
-    POPUP "Objects"
+    POPUP "Objects", 0, 0, 0
     {
-        MENUITEM "Reload Object Templates Database...", IMD_RELOAD_TEMPLATES_DATABASE
-        MENUITEM "Save Object Templates Database...", IMD_SAVE_TEMPLATES_DATABASE
+        MENUITEM "Reload Object Templates Database...", IMD_RELOAD_TEMPLATES_DATABASE, 0, 0
+        MENUITEM "Save Object Templates Database...", IMD_SAVE_TEMPLATES_DATABASE, 0, 0
     }
-    POPUP "Materials"
+    POPUP "Materials", 0, 0, 0
     {
-        MENUITEM "Open Material Editor...", IMD_OPEN_MATERIAL_EDITOR
+        MENUITEM "Open Material Editor...", IMD_OPEN_MATERIAL_EDITOR, 0, 0
+    }
+    POPUP "Editor", 0, 0, 0
+    {
+        MENUITEM "Save Configuration...", IMD_SAVE_CONFIG, 0, 0
+        MENUITEM "Reload Configuration...", IMD_LOAD_CONFIG, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Launch Game", IMD_LAUNCH_GAME, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Connect To Game", IMD_CONNECT_GAME, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        POPUP "Ghost", 0, 0, 0
+        {
+            MENUITEM "Start Recording", IMD_START_GHOST_RECORD, 0, 0
+            MENUITEM "Stop Recording", IMD_STOP_GHOST_RECORD, 0, 0
+            MENUITEM "Load Recording From Game", IMD_LOAD_GHOST_RECORDING_FROM_GAME, 0, 0
+            MENUITEM "", , MFT_SEPARATOR, 0
+            MENUITEM "Load From File", IMD_LOAD_GHOST_RECORDING, 0, 0
+            MENUITEM "Save Recording", IMD_SAVE_GHOST_RECORDING, 0, MFS_GRAYED
+        }
     }
 }
 

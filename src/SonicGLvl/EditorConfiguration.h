@@ -26,6 +26,7 @@
 #define SONICGLVL_CONFIGURATION_ERROR_FILE_ROOT             "Configuration file doesn't have a valid root."
 #define SONICGLVL_CONFIGURATION_FILENAME_ATTRIBUTE          "filename"
 #define SONICGLVL_CONFIGURATION_VALUE_ATTRIBUTE             "value"
+#define SONICGLVL_CONFIGURATION_GAME_PATH					"GamePath"
 #define SONICGLVL_CONFIGURATION_OBJECT_PRODUCTION_PATH      "ObjectProductionPath"
 #define SONICGLVL_CONFIGURATION_TERRAIN_VIEW_DISTANCE       "TerrainViewDistance"
 #define SONICGLVL_CONFIGURATION_TERRAIN_CAMERA_OFFSET       "TerrainCameraOffset"
@@ -45,6 +46,7 @@ class EditorConfiguration {
 		float terrain_update_interval;
 		unsigned int visibility_flags;
 	public:
+		string game_path;
 		EditorConfiguration();
 
 		void load(string filename);

@@ -24,7 +24,6 @@
 GhostNode::GhostNode(LibGens::Ghost *ghost_p, Ogre::SceneManager *scene_manager, LibGens::ModelLibrary *model_library, LibGens::MaterialLibrary *material_library) {
 	type = EDITOR_NODE_GHOST;
 
-	ghost = ghost_p;
 	scene_node = scene_manager->getRootSceneNode()->createChildSceneNode();
 
 	LibGens::Model *model=model_library->getModel("chr_Sonic_HD");
@@ -62,7 +61,7 @@ GhostNode::GhostNode(LibGens::Ghost *ghost_p, Ogre::SceneManager *scene_manager,
 	current_changer_object = NULL;
 	current_spline = NULL;
 	current_spline_node = NULL;
-	duration = ghost->calculateDuration();
+	setGhost(ghost_p);
 }
 
 
@@ -81,32 +80,30 @@ void GhostNode::addTime(float time) {
 	//ghost_entity->setVisible(!animation_ball);
 	//ghost_spin_entity->setVisible(animation_ball);
 	
-	if (!animation_ball) {
-		if (current_animation_name != animation_name) {
-			current_animation_name = animation_name;
-
-			if (current_animation_state) {
-				current_animation_state->setEnabled(false);
-				current_animation_state = NULL;
-			}
-
-			string entity_animation_name = animation_mappings[current_animation_name];
-
-			unsigned short attached_objects=scene_node->numAttachedObjects();
-			for (unsigned short i=0; i<attached_objects; i++) {
-				Ogre::Entity *entity=static_cast<Ogre::Entity *>(scene_node->getAttachedObject(i));
-				if (entity->hasAnimationState(entity_animation_name)) {
-					current_animation_state = entity->getAnimationState(entity_animation_name);
-					current_animation_state->setLoop(true);
-					current_animation_state->setEnabled(true);
-					break;
-				}
-			}
-		}
+	if (current_animation_name != animation_name) {
+		current_animation_name = animation_name;
 
 		if (current_animation_state) {
-			current_animation_state->setTimePosition(animation_frame / 60.0f);
+			current_animation_state->setEnabled(false);
+			current_animation_state = NULL;
 		}
+
+		string entity_animation_name = animation_mappings[current_animation_name];
+
+		unsigned short attached_objects = scene_node->numAttachedObjects();
+		for (unsigned short i = 0; i < attached_objects; i++) {
+			Ogre::Entity* entity = static_cast<Ogre::Entity*>(scene_node->getAttachedObject(i));
+			if (entity->hasAnimationState(entity_animation_name)) {
+				current_animation_state = entity->getAnimationState(entity_animation_name);
+				current_animation_state->setLoop(true);
+				current_animation_state->setEnabled(true);
+				break;
+			}
+		}
+	}
+
+	if (current_animation_state) {
+		current_animation_state->setTimePosition(animation_frame / 60.0f);
 	}
     
 	Ogre::Vector3 new_position(pv.x, pv.y, pv.z);
@@ -283,6 +280,32 @@ bool GhostNode::checkModeChanger(LibGens::Object *object) {
 	return false;
 }
 
+
+void EditorApplication::setupGhost()
+{
+	if (!camera_manager)
+	{
+		camera_manager = new CameraManager();
+		camera_manager->addCamera(viewport->getCamera());
+		camera_manager->addCamera(viewport->getCameraOverlay());
+	}
+
+	if (current_level && camera_manager)
+	{
+		camera_manager->setLevel(current_level->getLevel());
+	}
+
+	if (!ghost_node)
+	{
+		chdir(exe_path.c_str());
+		loadGhostAnimations();
+		ghost_node = new GhostNode(NULL, scene_manager, model_library, material_library);
+		ghost_node->setAnimationMappings(ghost_animation_mappings);
+		if (current_level) {
+			ghost_node->setGhost(current_level->getGhost());
+		}
+	}
+}
 
 void EditorApplication::loadGhostAnimations() {
 	TiXmlDocument doc(SONICGLVL_GHOST_DATABASE_PATH);

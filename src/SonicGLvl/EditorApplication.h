@@ -47,6 +47,7 @@
 #include "Object.h"
 #include "ObjectCategory.h"
 #include "ObjectSet.h"
+#include "PipeClient.h"
 
 #ifndef EDITOR_APPLICATION_H_INCLUDED
 #define EDITOR_APPLICATION_H_INCLUDED
@@ -295,6 +296,13 @@ class EditorApplication : public BaseApplication {
 		list<EditorNode*> cloning_nodes;
 		list<EditorNode*> temporary_nodes;
 
+		// Game
+		PipeClient* game_client;
+
+		// Ghost
+		LibGens::Ghost* ghost_data;
+		bool isGhostRecording;
+
 	public:
 		EditorApplication(void);
 		virtual ~EditorApplication(void);
@@ -384,6 +392,7 @@ class EditorApplication : public BaseApplication {
 		void saveXNAnimation();
 
 		void updateBottomSelectionGUI();
+		void updateMenu();
 		void updateSetsGUI();
 		void updateSelectedSetGUI();
 		void newCurrentSet();
@@ -522,6 +531,17 @@ class EditorApplication : public BaseApplication {
 
 		// Havok method
 		void loadGhostAnimations();
+		void setupGhost();
+
+		// Ghost methods
+		void loadGhostRecording();
+		void saveGhostRecording();
+
+		// Game methods
+		void processGameMessage(PipeClient* client, PipeMessage* msg);
+		void launchGame();
+		bool connectGame();
+		DWORD sendMessageGame(PipeMessage* msg, size_t size);
 
 		void createLevel(string name);
 		void createLibrary();
@@ -533,8 +553,24 @@ class EditorApplication : public BaseApplication {
 
 		//bool renderOneFrame();
 
+		bool checkGameConnection() {
+			return game_client->checkConnection();
+		}
+
 		GhostNode *getGhostNode() {
 			return ghost_node;
+		}
+
+		void setGhost(LibGens::Ghost* ghost_p) {
+			if (!ghost_p)
+				return;
+			
+			if (ghost_data != ghost_p && ghost_data)
+				delete ghost_data;
+
+			ghost_data = ghost_p;
+			setupGhost();
+			ghost_node->setGhost(ghost_p);
 		}
 
 		EditorAxis *getEditorAxis() {
@@ -567,6 +603,10 @@ class EditorApplication : public BaseApplication {
 
 		LibGens::HavokEnviroment *getHavokEnviroment() {
 			return havok_enviroment;
+		}
+
+		EditorConfiguration *getConfiguration() {
+			return configuration;
 		}
 
 		void updateBottomSelectionPosition(float value_x, float value_y, float value_z);

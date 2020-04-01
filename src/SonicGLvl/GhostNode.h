@@ -73,6 +73,13 @@ class GhostNode : public EditorNode {
 		void setRotation(Ogre::Quaternion v) {
 			EditorNode::setRotation(v);
 		}
+
+		void setGhost(LibGens::Ghost* ghost_p) {
+			if (ghost_p) {
+				ghost = ghost_p;
+				duration = ghost->calculateDuration();
+			}
+		}
 		
 		float getDuration() {
 			return duration;

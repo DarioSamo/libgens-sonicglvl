@@ -25,7 +25,6 @@ namespace LibGens {
 		File file(filename, LIBGENS_FILE_READ_BINARY);
 
 		if (file.valid()) {
-			file.readHeader();
 			read(&file);
 			file.close();
 		}
@@ -54,6 +53,39 @@ namespace LibGens {
 			GhostNode *ghost_node = new GhostNode();
 			ghost_node->read(file);
 			ghost_nodes.push_back(ghost_node);
+		}
+	}
+
+	void Ghost::write(File *file) {
+		if (!file) {
+			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GHOST_ERROR_MESSAGE_NULL_FILE);
+			return;
+		}
+
+		int animation_count = animation_names.size();
+		int node_count = ghost_nodes.size();
+		file->writeInt32BE(&animation_count);
+		file->writeInt32BE(&node_count);
+		char name_buffer[32];
+
+		for (int i = 0; i < animation_count; i++)
+		{
+			ZeroMemory(name_buffer, sizeof(name_buffer));
+			strcpy(name_buffer, animation_names[i].c_str());
+			file->write(name_buffer, sizeof(name_buffer));
+		}
+
+		for (int i = 0; i < node_count; i++)
+		{
+			ghost_nodes[i]->write(file);
+		}
+	}
+
+	void Ghost::save(string filename) {
+		File file(filename, LIBGENS_FILE_WRITE_BINARY);
+		if (file.valid()) {
+			write(&file);
+			file.close();
 		}
 	}
 

@@ -111,6 +111,7 @@
     <ClCompile Include="ObjectNode.cpp" />
     <ClCompile Include="ObjectNodeHistory.cpp" />
     <ClCompile Include="PathNode.cpp" />
+    <ClCompile Include="PipeClient.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -139,9 +140,11 @@
     <ClInclude Include="HavokNode.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="HistoryAction.h" />
+    <ClInclude Include="MessageTypes.h" />
     <ClInclude Include="ObjectNode.h" />
     <ClInclude Include="ObjectNodeHistory.h" />
     <ClInclude Include="PathNode.h" />
+    <ClInclude Include="PipeClient.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TerrainNode.h" />

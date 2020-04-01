@@ -18,6 +18,7 @@
 //=========================================================================
 
 #include "EditorApplication.h"
+#include "MessageTypes.h"
 
 int global_cursor_state=0;
 
@@ -29,11 +30,35 @@ bool EditorApplication::inFocus() {
 	return GetFocus() == hwnd;
 }
 
+void EditorApplication::updateMenu() {
+	UINT connected = checkGameConnection() ? MF_ENABLED : MF_GRAYED;
+	
+	EnableMenuItem(hMenu, IMD_CONNECT_GAME, checkGameConnection() ? MF_GRAYED : MF_ENABLED);
+	EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, connected);
+	EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, connected);
+
+	EnableMenuItem(hMenu, IMD_SAVE_GHOST_RECORDING, ghost_data ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(hMenu, IMD_LOAD_GHOST_RECORDING_FROM_GAME, connected);
+
+	if (isGhostRecording && checkGameConnection()) {
+		EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, MF_GRAYED);
+		EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, MF_ENABLED);
+	}
+	else if (!isGhostRecording && checkGameConnection()) {
+		EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, MF_ENABLED);
+		EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, MF_GRAYED);
+	}
+}
+
 extern WNDPROC globalWinProc;
 LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	//MINMAXINFO FAR *lpMinMaxInfo;  
+	//MINMAXINFO FAR *lpMinMaxInfo;
 	switch(uMsg)
 	{
+		case WM_MENUSELECT:
+			editor_application->updateMenu();
+			break;
+
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
 			{
@@ -143,6 +168,45 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					break;
 				case IMD_ROTATION_SNAP:
 					editor_application->toggleRotationSnap();
+					break;
+
+				// Editor
+				case IMD_SAVE_CONFIG:
+					editor_application->getConfiguration()->save(SONICGLVL_CONFIGURATION_FILE);
+					break;
+
+				case IMD_LOAD_CONFIG:
+					editor_application->getConfiguration()->load(SONICGLVL_CONFIGURATION_FILE);
+					break;
+
+				// Game
+				case IMD_LAUNCH_GAME:
+					editor_application->launchGame();
+					break;
+
+				case IMD_CONNECT_GAME:
+					editor_application->connectGame();
+					break;
+
+				case IMD_START_GHOST_RECORD:
+					editor_application->sendMessageGame(&MsgSetRecording(true), sizeof(MsgSetRecording));
+					break;
+
+				case IMD_STOP_GHOST_RECORD:
+					editor_application->sendMessageGame(&MsgSetRecording(false), sizeof(MsgSetRecording));
+					break;
+
+				case IMD_LOAD_GHOST_RECORDING_FROM_GAME:
+					editor_application->setupGhost();
+					editor_application->sendMessageGame(&MsgSaveRecording(), sizeof(MsgSaveRecording));
+					break;
+
+				case IMD_LOAD_GHOST_RECORDING:
+					editor_application->loadGhostRecording();
+					break;
+
+				case IMD_SAVE_GHOST_RECORDING:
+					editor_application->saveGhostRecording();
 					break;
 			}
 			break;

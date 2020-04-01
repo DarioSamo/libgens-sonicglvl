@@ -21,6 +21,7 @@
 
 EditorConfiguration::EditorConfiguration() {
 	object_production_path = "";
+	game_path = "";
 }
 
 void EditorConfiguration::load(string filename) {
@@ -77,9 +78,31 @@ void EditorConfiguration::load(string filename) {
 		if (entry_name==SONICGLVL_CONFIGURATION_VISIBILITY_FLAGS) {
 			FromString<unsigned int>(visibility_flags, value, std::dec);
 		}
+
+		if (entry_name == SONICGLVL_CONFIGURATION_GAME_PATH) {
+			game_path = filename;
+		}
 	}
 }
 
 void EditorConfiguration::save(string filename) {
 
+#define CREATE_ELEMENT_FILENAME_ATTRIBUTE(parent, elemName, value) \
+	((TiXmlElement*)parent->InsertEndChild(TiXmlElement(elemName)))->SetAttribute(SONICGLVL_CONFIGURATION_FILENAME_ATTRIBUTE, value)
+
+#define CREATE_ELEMENT_VALUE_ATTRIBUTE(parent, elemName, value) \
+	((TiXmlElement*)parent->InsertEndChild(TiXmlElement(elemName)))->SetAttribute(SONICGLVL_CONFIGURATION_VALUE_ATTRIBUTE, value)
+
+	TiXmlDocument doc(filename);
+	TiXmlNode* root = doc.InsertEndChild(TiXmlElement("Configuration"));
+	CREATE_ELEMENT_FILENAME_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_OBJECT_PRODUCTION_PATH, object_production_path);
+	CREATE_ELEMENT_FILENAME_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_GAME_PATH, game_path);
+	CREATE_ELEMENT_VALUE_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_TERRAIN_VIEW_DISTANCE, terrain_view_distance);
+	CREATE_ELEMENT_VALUE_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_TERRAIN_CAMERA_OFFSET, terrain_camera_offset);
+	CREATE_ELEMENT_VALUE_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_GI_LEVEL_1_QUALITY_OFFSET, gi_level_1_quality_offset);
+	CREATE_ELEMENT_VALUE_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_GI_LEVEL_2_QUALITY_OFFSET, gi_level_2_quality_offset);
+	CREATE_ELEMENT_VALUE_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_TERRAIN_UPDATE_INTERVAL_S, terrain_update_interval);
+	CREATE_ELEMENT_VALUE_ATTRIBUTE(root, SONICGLVL_CONFIGURATION_VISIBILITY_FLAGS, visibility_flags);
+
+	doc.SaveFile(filename);
 }

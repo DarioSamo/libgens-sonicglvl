@@ -95,9 +95,12 @@ void CameraInfluence::calculateNewTargetPosition(Ogre::Vector3 target_position, 
 	Ogre::Vector3 target_right = target_rotation * Ogre::Vector3::UNIT_X;
 
 	new_target_position = target_position;
-	new_target_position += target_front * e_targetoffset_front->value;
-	new_target_position += target_up    * e_targetoffset_up->value;
-	new_target_position += target_right * e_targetoffset_right->value;
+
+	if (e_targetoffset_front && e_targetoffset_up && e_targetoffset_right) {
+		new_target_position += target_front * e_targetoffset_front->value;
+		new_target_position += target_up * e_targetoffset_up->value;
+		new_target_position += target_right * e_targetoffset_right->value;
+	}
 }
 
 
