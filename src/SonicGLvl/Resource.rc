@@ -18,9 +18,9 @@ IDR_TOOLMENU MENUEX
 {
     POPUP "File", 0, 0, 0
     {
-        MENUITEM "Open Stage...", IMD_OPEN_LEVEL, 0, 0
+        MENUITEM "Open Stage...\tCtrl+O", IMD_OPEN_LEVEL, 0, 0
         MENUITEM "", 0, MFT_SEPARATOR, 0
-        MENUITEM "Save Stage Data...", IMD_SAVE_LEVEL_DATA, 0, 0
+        MENUITEM "Save Stage Data...\tCtrl+S", IMD_SAVE_LEVEL_DATA, 0, 0
         MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN, 0, 0
         MENUITEM "", 0, MFT_SEPARATOR, 0
         MENUITEM "Close", IMD_CLOSE, 0, 0
@@ -104,7 +104,7 @@ IDR_TOOLMENU MENUEX
             MENUITEM "Start Recording", IMD_START_GHOST_RECORD, 0, 0
             MENUITEM "Stop Recording", IMD_STOP_GHOST_RECORD, 0, 0
             MENUITEM "Load Recording From Game", IMD_LOAD_GHOST_RECORDING_FROM_GAME, 0, 0
-            MENUITEM "", , MFT_SEPARATOR, 0
+            MENUITEM "", 0, MFT_SEPARATOR, 0
             MENUITEM "Load From File", IMD_LOAD_GHOST_RECORDING, 0, 0
             MENUITEM "Save Recording", IMD_SAVE_GHOST_RECORDING, 0, MFS_GRAYED
         }

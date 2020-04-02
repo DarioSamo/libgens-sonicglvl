@@ -848,8 +848,30 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			if(arg.key == OIS::KC_G) {
 				setupGhost();
 
+				if (editor_mode != EDITOR_NODE_QUERY_GHOST) {
+					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
+					editor_mode = EDITOR_NODE_QUERY_OBJECT;
+				}
+
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
+			}
+
+			if (arg.key == OIS::KC_O) {
+				editor_application->openLevelGUI();
+			}
+
+			if (arg.key == OIS::KC_S)
+			{
+				editor_application->saveLevelDataGUI();
+			}
+			if (arg.key == OIS::KC_R)
+			{
+				if (editor_mode == EDITOR_NODE_OBJECT || EDITOR_NODE_QUERY_GHOST)
+				{
+					toggleRotationSnap();
+					updateSelection();
+				}
 			}
 		}
 		else if (keyboard->isModifierDown(OIS::Keyboard::Alt))
