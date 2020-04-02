@@ -22,21 +22,26 @@
 #include "ObjectNodeHistory.h"
 #include "ObjectSet.h"
 #include "ObjectLibrary.h"
+#include "MessageTypes.h"
 
 Ogre::Rectangle2D* mMiniScreen=NULL;
 
 INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
-
+void Game_ProcessMessage(PipeClient* client, PipeMessage* msg);
 
 EditorApplication::EditorApplication(void)
 {
 	hLeftDlg = NULL;
 	hBottomDlg = NULL;
+	game_client = new PipeClient();
+	game_client->AddMessageProcessor(Game_ProcessMessage);
+	ghost_data = nullptr;
+	isGhostRecording = false;
 }
 
 EditorApplication::~EditorApplication(void) {
-
+	delete game_client;
 }
 
 ObjectNodeManager* EditorApplication::getObjectNodeManager()
@@ -902,21 +907,22 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			}
 
 			if(arg.key == OIS::KC_G) {
-				if (!ghost_node && !camera_manager) {
-					camera_manager = new CameraManager();
-					camera_manager->addCamera(viewport->getCamera());
-					camera_manager->addCamera(viewport->getCameraOverlay());
-					camera_manager->setLevel(current_level->getLevel());
+				setupGhost();
 
-					loadGhostAnimations();
-					ghost_node = new GhostNode(NULL, scene_manager, model_library, material_library);
-					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection()*10));
+				if (editor_mode != EDITOR_NODE_QUERY_GHOST) {
+					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
+					editor_mode = EDITOR_NODE_QUERY_OBJECT;
 				}
 
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
 			}
-			if(arg.key == OIS::KC_S) 
+
+			if (arg.key == OIS::KC_O) {
+				editor_application->openLevelGUI();
+			}
+
+			if (arg.key == OIS::KC_S)
 			{
 				editor_application->saveLevelDataGUI();
 			}
@@ -1279,6 +1285,112 @@ bool EditorApplication::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     return true;
 }
 
+void EditorApplication::loadGhostRecording() 
+{
+	char filename[MAX_PATH];
+	ZeroMemory(filename, sizeof(filename));
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "Ghost Recording(.gst.bin)\0*.gst.bin\0";
+	ofn.nFilterIndex = 1;
+	ofn.nMaxFile = 1024;
+	ofn.lpstrTitle = "Open Ghost Recording";
+	ofn.lpstrFile = filename;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_EXPLORER | OFN_ENABLESIZING;
+
+	if (!GetOpenFileName(&ofn))
+		return;
+
+	chdir(exe_path.c_str());
+	LibGens::Ghost* gst = new LibGens::Ghost(std::string(filename));
+	setGhost(gst);
+}
+
+void EditorApplication::saveGhostRecording()
+{
+	if (!ghost_data)
+		return;
+
+	char filename[MAX_PATH];
+	ZeroMemory(filename, sizeof(filename));
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "Ghost Recording(.gst.bin)\0*.gst.bin\0";
+	ofn.nFilterIndex = 1;
+	ofn.nMaxFile = 1024;
+	ofn.lpstrTitle = "Open Ghost Recording";
+	ofn.lpstrFile = filename;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_EXPLORER | OFN_ENABLESIZING;
+
+	if (!GetSaveFileName(&ofn))
+		return;
+
+	chdir(exe_path.c_str());
+	ghost_data->save(std::string(filename));
+}
+
+void EditorApplication::launchGame()
+{
+	if (GetFileAttributes(configuration->game_path.c_str()) == INVALID_FILE_ATTRIBUTES)
+	{
+		char filename[MAX_PATH];
+		ZeroMemory(filename, sizeof(filename));
+		OPENFILENAME ofn;
+		memset(&ofn, 0, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.lpstrFilter = "Windows Executable(.exe)\0*.exe\0";
+		ofn.nFilterIndex = 1;
+		ofn.nMaxFile = 1024;
+		ofn.lpstrTitle = "Select Sonic Generations";
+		ofn.lpstrFile = filename;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_EXPLORER | OFN_ENABLESIZING;
+
+		if (GetOpenFileName(&ofn))
+		{
+			chdir(exe_path.c_str());
+			configuration->game_path = std::string(ofn.lpstrFile);
+		}
+	}
+
+	string directory = configuration->game_path.substr(0, configuration->game_path.find_last_of('\\'));
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	memset(&si, 0, sizeof(si));
+	memset(&pi, 0, sizeof(pi));
+	si.cb = sizeof(si);
+
+	CreateProcess(configuration->game_path.c_str(), NULL, NULL, NULL, FALSE, 0, FALSE, directory.c_str(), &si, &pi);
+}
+
+bool EditorApplication::connectGame() {
+	return game_client->Connect();
+}
+
+DWORD EditorApplication::sendMessageGame(PipeMessage* msg, size_t size) {
+	return game_client->UploadMessage(msg, size);
+}
+
+void Game_ProcessMessage(PipeClient* client, PipeMessage* msg) {
+	editor_application->processGameMessage(client, msg);
+}
+
+void EditorApplication::processGameMessage(PipeClient* client, PipeMessage* msg) {
+	switch (msg->ID)
+	{
+	case SONICGLVL_MSG_SETRECORDING:
+		isGhostRecording = ((MsgSetRecording*)msg)->Enable;
+		break;
+
+	case SONICGLVL_MSG_SAVERECORDING:
+		isGhostRecording = false;
+		MsgSaveRecording* m = (MsgSaveRecording*)msg;
+		LibGens::Ghost* gst = new LibGens::Ghost(std::string(m->FilePath));
+		setGhost(gst);
+		break;
+	}
+}
 
 void ColorListener::preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt)
 {

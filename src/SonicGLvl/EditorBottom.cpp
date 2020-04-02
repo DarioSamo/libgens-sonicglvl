@@ -54,6 +54,12 @@ void EditorApplication::updateBottomSelectionGUI() {
 	EnableWindow(hSelectionSpinRotY, objects_selected);
 	EnableWindow(hSelectionSpinRotZ, objects_selected);
 
+	EnableWindow(GetDlgItem(hBottomDlg, IDB_BOTTOM_GHOST_BACK), (BOOL)editor_application->getGhostNode());
+	EnableWindow(GetDlgItem(hBottomDlg, IDB_BOTTOM_GHOST_FORWARD), (BOOL)editor_application->getGhostNode());
+	EnableWindow(GetDlgItem(hBottomDlg, IDB_BOTTOM_GHOST_PAUSE), (BOOL)editor_application->getGhostNode());
+	EnableWindow(GetDlgItem(hBottomDlg, IDB_BOTTOM_GHOST_PLAY), (BOOL)editor_application->getGhostNode());
+	EnableWindow(GetDlgItem(hBottomDlg, IDS_BOTTOM_GHOST_SEEK), (BOOL)editor_application->getGhostNode());
+
 	if (objects_selected) {
 		Ogre::Vector3 axis_position=axis->getPosition();
 		Ogre::Quaternion axis_rotation=axis->getRotation();
@@ -101,6 +107,12 @@ void EditorApplication::updateBottomSelectionGUI() {
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_ROT_Y, "");
 		SetDlgItemText(hBottomDlg, IDE_BOTTOM_SELECTION_ROT_Z, "");
 	}
+
+	if (editor_application->getGhostNode())
+	{
+		SendDlgItemMessage(hBottomDlg, IDS_BOTTOM_GHOST_SEEK, (UINT)TBM_SETRANGEMAX, TRUE, editor_application->getGhostNode()->getDuration() * 1000);
+		SendDlgItemMessage(hBottomDlg, IDS_BOTTOM_GHOST_SEEK, (UINT)TBM_SETPOS, TRUE, editor_application->getGhostNode()->getTime() * 1000);
+	}
 }
 
 
@@ -147,6 +159,20 @@ INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 
 		case WM_NOTIFY:
 			return false;
+
+		case WM_HSCROLL:
+		{
+			if (GetDlgCtrlID((HWND)lParam) == IDS_BOTTOM_GHOST_SEEK) {
+				float value = (float)SendDlgItemMessage(hDlg, IDS_BOTTOM_GHOST_SEEK, TBM_GETPOS, 0, 0);
+				if (editor_application->getGhostNode())
+				{
+					editor_application->getGhostNode()->setPlay(true);
+					editor_application->getGhostNode()->setTime(value / 1000.0f);
+					editor_application->getGhostNode()->setPlay(false);
+				}
+			}
+			break;
+		}
 
 		case WM_COMMAND:
 			if (LOWORD(wParam) == IDC_BOTTOM_CURRENT_OBJECT_SET_VISIBLE) {
@@ -201,6 +227,30 @@ INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 						SendDlgItemMessage(hDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, (UINT)CB_INSERTSTRING, (WPARAM)index, (LPARAM)value_str);
 						editor_application->renameCurrentSet(ToString(value_str));
 					}
+				}
+			}
+			else if (LOWORD(wParam) == IDB_BOTTOM_GHOST_PLAY) {
+				if (editor_application->getGhostNode()) {
+					editor_application->getGhostNode()->setPlay(true);
+				}
+			}
+			else if (LOWORD(wParam) == IDB_BOTTOM_GHOST_PAUSE) {
+				if (editor_application->getGhostNode()) {
+					editor_application->getGhostNode()->setPlay(false);
+				}
+			}
+			else if (LOWORD(wParam) == IDB_BOTTOM_GHOST_BACK) {
+				if (editor_application->getGhostNode()) {
+					editor_application->getGhostNode()->setPlay(true);
+					editor_application->getGhostNode()->addTime(-0.01f);
+					editor_application->getGhostNode()->setPlay(false);
+				}
+			}
+			else if (LOWORD(wParam) == IDB_BOTTOM_GHOST_FORWARD) {
+				if (editor_application->getGhostNode()) {
+					editor_application->getGhostNode()->setPlay(true);
+					editor_application->getGhostNode()->addTime(0.01f);
+					editor_application->getGhostNode()->setPlay(false);
 				}
 			}
 

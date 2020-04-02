@@ -132,11 +132,11 @@
     <ClCompile Include="EditorFind.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
+    <ClCompile Include="PipeClient.cpp">
+      <Filter>Editor Game Message</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h">
-      <Filter>Resource</Filter>
-    </ClInclude>
     <ClInclude Include="BaseApplication.h">
       <Filter>Editor</Filter>
     </ClInclude>
@@ -216,6 +216,15 @@
     <ClInclude Include="DefaultShaderParameters.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="PipeClient.h">
+      <Filter>Editor Game Message</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageTypes.h">
+      <Filter>Editor Game Message</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource">
@@ -229,6 +238,9 @@
     </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{d284170e-3f38-41a4-9ae4-db1b57891ec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor Game Message">
+      <UniqueIdentifier>{8e0d817d-fe40-4d79-a7f6-78b024e7c0c1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -97,6 +97,7 @@ class EditorLevel {
 		LibGens::GITextureGroupInfo *terrain_gi_info;
 		LibGens::LightList *light_list;
 		LibGens::Light *direct_light;
+		LibGens::Ghost *ghost;
 		LibGens::ModelLibrary *model_library;
 		LibGens::MaterialLibrary *material_library;
 		LibGens::TerrainAutodraw *terrain_autodraw;
@@ -175,6 +176,10 @@ class EditorLevel {
 
 		LibGens::LightList *getLightList() {
 			return light_list;
+		}
+
+		LibGens::Ghost *getGhost() {
+			return ghost;
 		}
 
 		LibGens::ModelLibrary *getModelLibrary() {

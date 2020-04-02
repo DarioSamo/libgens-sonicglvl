@@ -33,4 +33,13 @@ namespace LibGens {
 		file->readInt16BE(&animation_ball);
 		file->readFloat32BE(&animation_frame);
 	}
+
+	void GhostNode::write(File *file) {
+		file->writeFloat32BE(&timer);
+		position.write(file);
+		rotation.write(file);
+		file->writeInt16BE(&animation_index);
+		file->writeInt16BE(&animation_ball);
+		file->writeFloat32BE(&animation_frame);
+	}
 };
