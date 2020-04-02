@@ -51,7 +51,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>../../depends/allegro/include;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2010_2_0_r1/Source;../../depends/ogre/boost;../../depends/ogre/include;../../depends/ogre/include/OIS;../../depends/ogre/include/OGRE;../../depends/ogre/include/OGRE/Overlay;../LibGens;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

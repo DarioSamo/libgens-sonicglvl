@@ -10,13 +10,14 @@ UINT INVALID_MESSAGE = UINT32_MAX;
 PipeClient::PipeClient()
 {
 	connected = false;
+	client_running = false;
 	hServer = 0;
 	hClient = 0;
 }
 
 PipeClient::~PipeClient()
 {
-	if (connected)
+	if (client_running)
 	{
 		pthread_kill(message_thread, 0);
 	}
@@ -81,13 +82,14 @@ void PipeClient::Disconnect()
 void* thread_client(void* handle)
 {
 	PipeClient* client = (PipeClient*)handle;
+	client->client_running = true;
 	DWORD state;
 	DWORD dwRead;
-	while (GetNamedPipeHandleState(client->getClientHandle(), &state, NULL, NULL, NULL, NULL, NULL)) {
+	while (GetNamedPipeHandleState(client->getClientHandle(), &state, NULL, NULL, NULL, NULL, NULL) && state) {
 		if (ReadFile(client->getClientHandle(), pipe_buffer, sizeof(pipe_buffer), &dwRead, NULL)) {
 			client->ProcessMessage((PipeMessage*)pipe_buffer);
 		}
 	}
-	client->forceConnectionCheck();
+	client->client_running = false;
 	return handle;
 }

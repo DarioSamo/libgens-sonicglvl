@@ -8,7 +8,7 @@ protected:
 	HANDLE hServer;
 	HANDLE hClient;
 	pthread_t message_thread;
-	bool connected;
+	DWORD connected;
 	std::vector<void(*) (PipeClient* client, PipeMessage* msg)> processors;
 
 public:
@@ -19,18 +19,19 @@ public:
 	void AddMessageProcessor(void(*processor)(PipeClient* client, PipeMessage* msg));
 	void ProcessMessage(PipeMessage* msg);
 	DWORD UploadMessage(PipeMessage* msg, size_t size);
+	bool client_running;
 
 	HANDLE getClientHandle() {
 		return hClient;
 	}
 
 	bool checkConnection() {
+		GetNamedPipeHandleState(hClient, NULL, &connected, NULL, NULL, NULL, NULL);
+		if (client_running) {
+			pthread_kill(message_thread, 0);
+			client_running = false;
+		}
 		return connected;
-	}
-
-	void forceConnectionCheck(){
-		DWORD state;
-		connected = GetNamedPipeHandleState(hClient, &state, NULL, NULL, NULL, NULL, NULL);
 	}
 };
 
