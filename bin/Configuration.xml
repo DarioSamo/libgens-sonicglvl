@@ -1,9 +1,10 @@
 <Configuration>
-	<ObjectProductionPath filename="../database/ObjectProduction.phy.xml" />
-    <TerrainViewDistance value="600.0" />
-	<TerrainCameraOffset value="300.0" />
-    <GILevel1QualityOffset value="200.0" />
-    <GILevel2QualityOffset value="350.0" />
-	<TerrainUpdateIntervalSeconds value="1.0" />
-	<VisibilityFlags value="117" />
+  <ObjectProductionPath filename="../database/ObjectProduction.phy.xml" />
+  <GamePath filename="E:\Games\SteamLibrary\steamapps\common\Sonic Generations\SonicGenerations.exe" />
+  <TerrainViewDistance value="600" />
+  <TerrainCameraOffset value="300" />
+  <GILevel1QualityOffset value="200" />
+  <GILevel2QualityOffset value="350" />
+  <TerrainUpdateIntervalSeconds value="1" />
+  <VisibilityFlags value="117" />
 </Configuration>

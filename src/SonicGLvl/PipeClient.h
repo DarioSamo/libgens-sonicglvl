@@ -27,10 +27,6 @@ public:
 
 	bool checkConnection() {
 		GetNamedPipeHandleState(hClient, NULL, &connected, NULL, NULL, NULL, NULL);
-		if (client_running) {
-			pthread_kill(message_thread, 0);
-			client_running = false;
-		}
 		return connected;
 	}
 };

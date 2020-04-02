@@ -27,8 +27,8 @@ PipeClient::~PipeClient()
 bool PipeClient::Connect()
 {
 	Disconnect();
-	hServer = CreateFile("\\\\.\\pipe\\HedgehogIn", GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-	hClient = CreateFile("\\\\.\\pipe\\HedgehogOut", GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	hServer = CreateFile("\\\\.\\pipe\\HedgehogIn", GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+	hClient = CreateFile("\\\\.\\pipe\\HedgehogOut", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
 	DWORD dwMode = PIPE_READMODE_MESSAGE;
 	SetNamedPipeHandleState(hServer, &dwMode, NULL, NULL);
@@ -83,12 +83,9 @@ void* thread_client(void* handle)
 {
 	PipeClient* client = (PipeClient*)handle;
 	client->client_running = true;
-	DWORD state;
 	DWORD dwRead;
-	while (GetNamedPipeHandleState(client->getClientHandle(), &state, NULL, NULL, NULL, NULL, NULL) && state) {
-		if (ReadFile(client->getClientHandle(), pipe_buffer, sizeof(pipe_buffer), &dwRead, NULL)) {
-			client->ProcessMessage((PipeMessage*)pipe_buffer);
-		}
+	while (ReadFile(client->getClientHandle(), pipe_buffer, sizeof(pipe_buffer), &dwRead, NULL)) {
+		client->ProcessMessage((PipeMessage*)pipe_buffer);
 	}
 	client->client_running = false;
 	return handle;

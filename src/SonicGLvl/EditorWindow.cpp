@@ -31,20 +31,21 @@ bool EditorApplication::inFocus() {
 }
 
 void EditorApplication::updateMenu() {
-	UINT connected = checkGameConnection() ? MF_ENABLED : MF_GRAYED;
+	bool connected = checkGameConnection();
+	UINT connected_state = connected ? MF_ENABLED : MF_GRAYED;
 	
-	EnableMenuItem(hMenu, IMD_CONNECT_GAME, checkGameConnection() ? MF_GRAYED : MF_ENABLED);
-	EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, connected);
-	EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, connected);
+	EnableMenuItem(hMenu, IMD_CONNECT_GAME, connected ? MF_GRAYED : MF_ENABLED);
+	EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, connected_state);
+	EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, connected_state);
 
 	EnableMenuItem(hMenu, IMD_SAVE_GHOST_RECORDING, ghost_data ? MF_ENABLED : MF_GRAYED);
-	EnableMenuItem(hMenu, IMD_LOAD_GHOST_RECORDING_FROM_GAME, connected);
+	EnableMenuItem(hMenu, IMD_LOAD_GHOST_RECORDING_FROM_GAME, connected_state);
 
-	if (isGhostRecording && checkGameConnection()) {
+	if (isGhostRecording && connected) {
 		EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, MF_GRAYED);
 		EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, MF_ENABLED);
 	}
-	else if (!isGhostRecording && checkGameConnection()) {
+	else if (!isGhostRecording && connected) {
 		EnableMenuItem(hMenu, IMD_START_GHOST_RECORD, MF_ENABLED);
 		EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, MF_GRAYED);
 	}
