@@ -38,7 +38,14 @@ IDR_TOOLMENU MENUEX
         MENUITEM "Clear Selection\tCtrl+D", IMD_CLEAR_SELECTION, 0, 0
         MENUITEM "Select All\tCtrl+A", IMD_SELECT_ALL, 0, 0
         MENUITEM "", 0, MFT_SEPARATOR, 0
-        MENUITEM "Look at each other (two objects)", IMD_LOOK_AT_EACH_OTHER, 0, 0
+        POPUP "Look at each other (two objects)", 0, 0, 0
+        {
+            MENUITEM "Use X-Axis As Direciton", IMD_LOOK_AT_EACH_OTHER_X, 0, 0
+            MENUITEM "Use Y-Axis As Direction", IMD_LOOK_AT_EACH_OTHER_Y, 0, 0
+            MENUITEM "Use Z-Axis As Direction", IMD_LOOK_AT_EACH_OTHER_Z, 0, 0
+        }
+        MENUITEM "Look at...", IMD_LOOK_AT_POINT, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
         MENUITEM "Find\tCtrl+F", IMD_FIND, 0, 0
     }
     POPUP "View", 0, 0, 0
@@ -65,7 +72,7 @@ IDR_TOOLMENU MENUEX
         MENUITEM "Use Local Rotation", IMD_LOCAL_ROTATION, 0, 0
         MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP, 0, 0
         MENUITEM "Use Rotation Snap", IMD_ROTATION_SNAP, 0, 0
-        MENUITEM "Use Translation Snap", IMD_TRANSLATION_SNAP, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
     }
     POPUP "Physics", 0, 0, 0
     {
@@ -327,6 +334,33 @@ FONT 8, "Ms Shell Dlg"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_LOOK_AT_POINT DIALOG 0, 0, 239, 144
+STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
+CAPTION "Look At Point"
+FONT 8, "Ms Shell Dlg"
+{
+    AUTORADIOBUTTON "X-Axis", IDR_LOOK_AT_AXIS_X, 133, 65, 35, 8, 0, WS_EX_LEFT
+    PUSHBUTTON      "Confirm", IDOK, 69, 126, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Enable editing in viewport", IDC_LOOK_AT_VIEWPORT, 32, 62, 86, 14, BS_PUSHLIKE, WS_EX_LEFT
+    EDITTEXT        IDE_LOOK_AT_X, 33, 26, 44, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    LTEXT           "New point value", 0, 96, 10, 49, 9, SS_LEFT, WS_EX_LEFT
+    CONTROL         "", IDS_LOOK_AT_X, UPDOWN_CLASS, UDS_ARROWKEYS, 77, 26, 11, 10, WS_EX_LEFT
+    PUSHBUTTON      "Focus on point", IDB_LOOK_AT_FOCUS, 32, 104, 86, 14, 0, WS_EX_LEFT
+    EDITTEXT        IDE_LOOK_AT_Y, 93, 26, 44, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    CONTROL         "", IDS_LOOK_AT_Y, UPDOWN_CLASS, UDS_ARROWKEYS, 137, 26, 11, 10, WS_EX_LEFT
+    EDITTEXT        IDE_LOOK_AT_Z, 153, 26, 44, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    CONTROL         "", IDS_LOOK_AT_Z, UPDOWN_CLASS, UDS_ARROWKEYS, 197, 26, 11, 10, WS_EX_LEFT
+    PUSHBUTTON      "Cancel", IDCANCEL, 123, 126, 50, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Modify Point", 0, 28, 46, 94, 54, 0, WS_EX_LEFT
+    GROUPBOX        "Direction Axis", 0, 127, 46, 81, 73, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Y-Axis", IDR_LOOK_AT_AXIS_Y, 133, 80, 35, 8, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Z-Axis", IDR_LOOK_AT_AXIS_Z, 133, 96, 35, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Get from object", IDC_LOOK_AT_OBJECT, 32, 78, 86, 14, BS_PUSHLIKE, WS_EX_LEFT
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDD_MATERIAL_EDITOR DIALOG 0, 0, 515, 399
 STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
 CAPTION "Material Editor"
@@ -463,14 +497,14 @@ FONT 8, "Ms Shell Dlg"
     CONTROL         "", IDS_MULTISETPARAM_Y, UPDOWN_CLASS, 0, 172, 39, 10, 12, WS_EX_LEFT
     CONTROL         "", IDS_EDIT_VECTOR_Z, UPDOWN_CLASS, 0, 172, 54, 10, 12, WS_EX_LEFT
     LTEXT           "Cloning will create new copies of the selected object with independent properties.\n\nInstancing will use the game's cloning method. The copies will share their properties with the source object.", 0, 113, 94, 145, 49, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Snap to path edges", IDC_MULTISETPARAM_SNAP_PATH_EDGES, 13, 105, 78, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Snap to path centers", IDC_MULTISETPARAM_SNAP_PATH_CENTERS, 13, 124, 82, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Snap to path edges", IDC_MULTISETPARAM_SNAP_PATH_EDGES, 13, 105, 78, 8, WS_DISABLED, WS_EX_LEFT
+    AUTOCHECKBOX    "Snap to path centers", IDC_MULTISETPARAM_SNAP_PATH_CENTERS, 13, 124, 82, 8, WS_DISABLED, WS_EX_LEFT
     GROUPBOX        "Method", 0, 5, 2, 102, 87, 0, WS_EX_LEFT
     GROUPBOX        "Parameters", 0, 109, 2, 150, 87, 0, WS_EX_LEFT
     GROUPBOX        "Options", 0, 6, 90, 102, 49, 0, WS_EX_LEFT
     AUTORADIOBUTTON "Cloning", IDR_MULTISETPARAM_CLONE, 13, 21, 39, 8, 0, WS_EX_LEFT
     AUTORADIOBUTTON "Instancing", IDR_MULTISETPARAM_MSP, 13, 43, 49, 8, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Instancing (additive)", IDR_MULTISETPARAM_MSP_ADD, 13, 65, 79, 8, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Instancing (additive)", IDR_MULTISETPARAM_MSP_ADD, 13, 65, 79, 8, WS_DISABLED, WS_EX_LEFT
     PUSHBUTTON      "Clear ", IDB_MULTISETPARAM_CLEAR, 109, 147, 44, 14, 0, WS_EX_LEFT
     DEFPUSHBUTTON   "Create", IDB_MULTISETPARAM_CREATE, 47, 147, 44, 14, 0, WS_EX_LEFT
     DEFPUSHBUTTON   "Get from object", IDB_MULTISETPARAM_FROM_OBJECT, 124, 70, 58, 14, 0, WS_EX_LEFT

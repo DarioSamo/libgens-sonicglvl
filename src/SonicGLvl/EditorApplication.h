@@ -155,7 +155,9 @@ class EditorApplication : public BaseApplication {
 		int last_id_list_selection;
 		bool is_update_vector_list;
 		bool is_pick_target;
+		bool is_pick_target_position;
 		bool is_update_pos_rot;
+		bool is_update_look_at_vector;
 
 		// Finder
 		list<ObjectNode*>::iterator find_position;
@@ -229,12 +231,14 @@ class EditorApplication : public BaseApplication {
 		HWND hEditPropertyDlg;
 
 		RECT hEditPropertyDlg_old_rect;
+		RECT hLookAtPointDlg_old_rect;
 
 		HWND hMaterialEditorDlg;
 		HWND hPhysicsEditorDlg;
 		HWND hMaterialEditorPreviewDlg;
 		HWND hMultiSetParamDlg;
 		HWND hFindObjectDlg;
+		HWND hLookAtPointDlg;
 		// Object Palette
 		int current_category_index;
 		LibGens::Object *last_palette_selection;
@@ -257,6 +261,7 @@ class EditorApplication : public BaseApplication {
 
 		vector<VectorNode *> property_vector_nodes;
 		History *property_vector_history;
+		History* look_at_vector_history;
 
 
 		// Material Editor
@@ -303,6 +308,9 @@ class EditorApplication : public BaseApplication {
 		LibGens::Ghost* ghost_data;
 		bool isGhostRecording;
 
+		// LookAt feature
+		VectorNode* vector_node;
+
 	public:
 		EditorApplication(void);
 		virtual ~EditorApplication(void);
@@ -336,8 +344,9 @@ class EditorApplication : public BaseApplication {
 		void togglePlacementSnap();
 		void toggleLocalRotation();
 		void toggleRotationSnap();
-		void toggleTranslationSnap();
-		void lookAtEachOther();
+		void lookAt(EditorNode*, int, Ogre::Vector3);
+		void lookAtPoint(int, Ogre::Vector3);
+		void lookAtEachOther(int);
 		void updateNodeVisibility();
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
@@ -402,12 +411,20 @@ class EditorApplication : public BaseApplication {
 		void changeCurrentSet(string change_set);
 		void renameCurrentSet(string rename_set);
 
-
 		void openPhysicsEditorGUI();
 		void clearPhysicsEditorGUI();
 		void addPhysicsEditorEntryGUI(LibGens::LevelCollisionEntry *entry);
 		void importPhysicsEditorGUI();
 		void detectAndTagHavokPhysics(LibGens::HavokPhysicsCache *physics_cache);
+
+		void openLookAtPointGUI();
+		void closeLookAtPointGUI();
+		void updateLookAtPointVectorNode(Ogre::Vector3);
+		void focusLookAtPointVector();
+		void queryLookAtObject(bool);
+		void updateLookAtVectorMode(bool);
+		void updateLookAtVectorGUI();
+		bool isUpdateLookAtVector();
 
 		void openMaterialEditorGUI();
 		void clearMaterialEditorGUI();

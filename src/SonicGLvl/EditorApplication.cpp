@@ -325,9 +325,6 @@ void EditorApplication::setSelectionRotation(Ogre::Quaternion q) {
 		EditorNode *node = *selected_nodes.begin();
 		node->setRotation(q);
 	}
-	else {
-		
-	}
 }
 
 
@@ -351,10 +348,17 @@ void EditorApplication::makeHistorySelection(bool mode) {
 			wrapper->push(action);
 			if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
 				VectorNode* vector_node = static_cast<VectorNode*>(*it);
-				while (property_vector_nodes[index] != vector_node)
-					++index;
+				if (!hLookAtPointDlg)
+				{
+					while (property_vector_nodes[index] != vector_node)
+						++index;
 
-				updateEditPropertyVectorGUI(index, is_list);
+					updateEditPropertyVectorGUI(index, is_list);
+				}
+				else
+				{
+					updateLookAtVectorGUI();
+				}
 			}
 		}
 		else {
@@ -396,20 +400,28 @@ void EditorApplication::makeHistorySelection(bool mode) {
 
 void EditorApplication::undoHistory() {
 	if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
-		property_vector_history->undo();
-		bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
-
-		for (int index = 0; index < property_vector_nodes.size(); ++index)
-			updateEditPropertyVectorGUI(index, is_list);
-		if (is_list)
+		if (hLookAtPointDlg)
 		{
-			updateEditPropertyVectorList(temp_property_vector_list);
-			if (hEditPropertyDlg && isVectorListSelectionValid())
+			look_at_vector_history->undo();
+			updateLookAtVectorGUI();
+		}
+		else
+		{
+			property_vector_history->undo();
+			bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
+
+			for (int index = 0; index < property_vector_nodes.size(); ++index)
+				updateEditPropertyVectorGUI(index, is_list);
+			if (is_list)
 			{
-				Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
-				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
-				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
-				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+				updateEditPropertyVectorList(temp_property_vector_list);
+				if (hEditPropertyDlg && isVectorListSelectionValid())
+				{
+					Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
+					SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
+					SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
+					SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+				}
 			}
 		}
 	}
@@ -419,20 +431,28 @@ void EditorApplication::undoHistory() {
 
 void EditorApplication::redoHistory() {
 	if (editor_mode == EDITOR_NODE_QUERY_VECTOR) {
-		property_vector_history->redo();
-		bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
-
-		for (int index = 0; index < property_vector_nodes.size(); ++index)
-			updateEditPropertyVectorGUI(index, is_list);
-		if (is_list)
+		if (hLookAtPointDlg)
 		{
-			updateEditPropertyVectorList(temp_property_vector_list);
-			if (hEditPropertyDlg && isVectorListSelectionValid())
+			look_at_vector_history->redo();
+			updateLookAtVectorGUI();
+		}
+		else
+		{
+			property_vector_history->redo();
+			bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
+
+			for (int index = 0; index < property_vector_nodes.size(); ++index)
+				updateEditPropertyVectorGUI(index, is_list);
+			if (is_list)
 			{
-				Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
-				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
-				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
-				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+				updateEditPropertyVectorList(temp_property_vector_list);
+				if (hEditPropertyDlg && isVectorListSelectionValid())
+				{
+					Ogre::Vector3 v = property_vector_nodes[current_vector_list_selection]->getPosition();
+					SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
+					SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
+					SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+				}
 			}
 		}
 	}
@@ -441,7 +461,11 @@ void EditorApplication::redoHistory() {
 
 
 void EditorApplication::pushHistory(HistoryAction *action) {
-	if (editor_mode == EDITOR_NODE_QUERY_VECTOR) property_vector_history->push(action);
+	if (editor_mode == EDITOR_NODE_QUERY_VECTOR)
+	{
+		property_vector_history->push(action);
+		look_at_vector_history->push(action);
+	}
 	else history->push(action);
 }
 
@@ -498,79 +522,6 @@ void EditorApplication::toggleRotationSnap() {
 	}
 }
 
-void EditorApplication::toggleTranslationSnap() {
-	axis->setTranslationSnap(!axis->isTranslationSnap());
-
-	const int viewMenuPos = 2;
-	HMENU hViewSubMenu = GetSubMenu(hMenu, viewMenuPos);
-
-	if (hViewSubMenu) {
-		CheckMenuItem(hViewSubMenu, IMD_TRANSLATION_SNAP, (axis->isTranslationSnap() ? MF_CHECKED : MF_UNCHECKED));
-	}
-}
-
-void EditorApplication::lookAtEachOther()
-{
-	if (selected_nodes.size() != 2)
-		return;
-
-	list<EditorNode*>::iterator it = selected_nodes.begin();
-	EditorNode* node1 = *it++;
-	EditorNode* node2 = *it;
-
-	if (node1->getType() == EDITOR_NODE_OBJECT || node1->getType() == EDITOR_NODE_OBJECT_MSP &&
-		node2->getType() == EDITOR_NODE_OBJECT || node2->getType() == EDITOR_NODE_OBJECT_MSP)
-	{
-		HistoryActionWrapper* wrapper = new HistoryActionWrapper();
-		HistoryActionWrapper* sub_wrapper = new HistoryActionWrapper();
-
-		for (it = selected_nodes.begin(); it != selected_nodes.end(); ++it)
-		{
-			EditorNode* node = *it;
-			EditorNode* other_node;
-			if (it == selected_nodes.begin())
-			{
-				++it;
-				other_node = *it;
-				--it;
-			}
-			else
-			{
-				--it;
-				other_node = *it;
-				++it;
-			}
-
-			Ogre::Vector3 direction = other_node->getPosition() - node->getPosition();
-			direction.normalise();
-
-			Ogre::Quaternion node_rotation = node->getRotation();
-			Ogre::Radian y_rad, p_rad, r_rad;
-			Ogre::Matrix3 rot_matrix;
-			node_rotation.ToRotationMatrix(rot_matrix);
-			rot_matrix.ToEulerAnglesYXZ(y_rad, p_rad, r_rad);
-
-			Ogre::Real yaw_rad = y_rad.valueRadians();
-			Ogre::Real pitch_rad = p_rad.valueRadians();
-			Ogre::Real roll_rad = r_rad.valueRadians();
-			yaw_rad = atan2(direction.x, direction.z);
-			pitch_rad = asin(-direction.y);
-			y_rad = yaw_rad;
-			p_rad = pitch_rad;
-			rot_matrix.FromEulerAnglesYXZ(y_rad, p_rad, r_rad);
-			node_rotation = Ogre::Quaternion(rot_matrix);
-
-			node->rememberRotation();
-			node->setRotation(node_rotation);
-			HistoryActionRotateNode* action_rot = new HistoryActionRotateNode(node, node->getLastRotation(), node->getRotation());
-			sub_wrapper->push(action_rot);
-		}
-		
-		wrapper->push(sub_wrapper);
-		pushHistory(wrapper);
-	}
-}
-
 void EditorApplication::createScene(void) {
 	// Initialize LibGens Managers
 	havok_enviroment = new LibGens::HavokEnviroment(100 * 1024 * 1024);
@@ -580,6 +531,7 @@ void EditorApplication::createScene(void) {
 	havok_property_database = new LibGens::HavokPropertyDatabase(SONICGLVL_HAVOK_PROPERTY_DATABASE_PATH);
 	history                 = new History();
 	property_vector_history = new History();
+	look_at_vector_history  = new History();
 	level_database          = new EditorLevelDatabase(SONICGLVL_LEVEL_DATABASE_PATH);
 	material_library        = new LibGens::MaterialLibrary(SONICGLVL_RESOURCES_PATH);
 	model_library           = new LibGens::ModelLibrary(SONICGLVL_RESOURCES_PATH);
@@ -613,6 +565,7 @@ void EditorApplication::createScene(void) {
 	hPhysicsEditorDlg = NULL;
 	hMultiSetParamDlg = NULL;
 	hFindObjectDlg = NULL;
+	hLookAtPointDlg = NULL;
 	
 	updateVisibilityGUI();
 	updateObjectCategoriesGUI();
@@ -629,6 +582,8 @@ void EditorApplication::createScene(void) {
 	history_edit_property_wrapper = NULL;
 	cloning_mode = SONICGLVL_MULTISETPARAM_MODE_CLONE;
 	is_pick_target = false;
+	is_pick_target_position = false;
+	is_update_look_at_vector = 
 
 	// Set up Scene Managers
 	scene_manager = root->createSceneManager("OctreeSceneManager");
@@ -832,6 +787,11 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 		if (is_pick_target)
 		{
 			openQueryTargetMode(false);
+		}
+
+		if (is_pick_target_position)
+		{
+			queryLookAtObject(false);
 		}
 	}
 
@@ -1128,7 +1088,7 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 			}
 			else if (id == OIS::MB_Left) {
 				if (current_node) {
-					if (!is_pick_target) {
+					if (!is_pick_target && !is_pick_target_position) {
 						if (!keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
 							clearSelection();
 						}
@@ -1148,14 +1108,31 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 					{
 						if (current_node->getType() == EDITOR_NODE_OBJECT)
 						{
+							
 							ObjectNode* object_node = static_cast<ObjectNode*>(current_node);
 							size_t id = object_node->getObject()->getID();
 
-							bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_ID_LIST;
-							int combo_box = is_list ? IDE_EDIT_ID_LIST_VALUE : IDC_EDIT_ID_VALUE;
-							SetDlgItemText(hEditPropertyDlg, combo_box, ToString<size_t>(id).c_str());
+							if (is_pick_target)
+							{
+								bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_ID_LIST;
+								int combo_box = is_list ? IDE_EDIT_ID_LIST_VALUE : IDC_EDIT_ID_VALUE;
+								SetDlgItemText(hEditPropertyDlg, combo_box, ToString<size_t>(id).c_str());
 
-							setTargetName(id, is_list);
+								setTargetName(id, is_list);
+							}
+
+							if (is_pick_target_position)
+							{
+								is_update_look_at_vector = false;
+
+								Ogre::Vector3 position = object_node->getPosition();
+								SetDlgItemText(hLookAtPointDlg, IDE_LOOK_AT_X, ToString<float>(position.x).c_str());
+								SetDlgItemText(hLookAtPointDlg, IDE_LOOK_AT_Y, ToString<float>(position.y).c_str());
+								SetDlgItemText(hLookAtPointDlg, IDE_LOOK_AT_Z, ToString<float>(position.z).c_str());
+
+								updateLookAtPointVectorNode(position);
+								is_update_look_at_vector = true;
+							}
 						}
 					}
 				}

@@ -109,8 +109,17 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_FIND:
 					editor_application->openFindGUI();
 					break;
-				case IMD_LOOK_AT_EACH_OTHER:
-					editor_application->lookAtEachOther();
+				case IMD_LOOK_AT_EACH_OTHER_X:
+					editor_application->lookAtEachOther(LIBGENS_MATH_AXIS_X);
+					break;
+				case IMD_LOOK_AT_EACH_OTHER_Y:
+					editor_application->lookAtEachOther(LIBGENS_MATH_AXIS_Y);
+					break;
+				case IMD_LOOK_AT_EACH_OTHER_Z:
+					editor_application->lookAtEachOther(LIBGENS_MATH_AXIS_Z);
+					break;
+				case IMD_LOOK_AT_POINT:
+					editor_application->openLookAtPointGUI();
 					break;
 
 				// Physics

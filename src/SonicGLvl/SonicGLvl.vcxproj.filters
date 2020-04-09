@@ -135,6 +135,9 @@
     <ClCompile Include="PipeClient.cpp">
       <Filter>Editor Game Message</Filter>
     </ClCompile>
+    <ClCompile Include="EditorLookAt.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseApplication.h">
