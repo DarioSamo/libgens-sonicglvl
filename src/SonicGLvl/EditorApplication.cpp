@@ -868,12 +868,6 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 			if(arg.key == OIS::KC_G) {
 				setupGhost();
-
-				if (editor_mode != EDITOR_NODE_QUERY_GHOST) {
-					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
-					editor_mode = EDITOR_NODE_QUERY_OBJECT;
-				}
-
 				clearSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
 			}
