@@ -48,6 +48,7 @@
 #include "ObjectCategory.h"
 #include "ObjectSet.h"
 #include "PipeClient.h"
+#include "TrajectoryNode.h"
 
 #ifndef EDITOR_APPLICATION_H_INCLUDED
 #define EDITOR_APPLICATION_H_INCLUDED
@@ -259,6 +260,7 @@ class EditorApplication : public BaseApplication {
 		HistoryActionWrapper *history_edit_property_wrapper;
 		int ignore_mouse_clicks_frames;
 
+		vector<TrajectoryNode*> trajectory_preview_nodes;
 		vector<VectorNode *> property_vector_nodes;
 		History *property_vector_history;
 		History* look_at_vector_history;
@@ -351,6 +353,9 @@ class EditorApplication : public BaseApplication {
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
 		void rememberCloningNodes();
+		ObjectNode* getObjectNodeFromEditorNode(EditorNode* node);
+		TrajectoryMode getTrajectoryMode(EditorNode* node);
+		void addTrajectory(TrajectoryMode mode);
 		bool isUpdatePosRot();
 
 		void openFindGUI();
@@ -369,6 +374,7 @@ class EditorApplication : public BaseApplication {
 		void checkGhost(Ogre::Real timeSinceLastFrame);
 		void checkTerrainStreamer();
 		void checkTerrainVisibilityAndQuality(Ogre::Real timeSinceLastFrame);
+		void updateTrajectoryNodes(Ogre::Real timeSinceLastFrame);
 
 		void ignoreMouseClicks(int frames) {
 			ignore_mouse_clicks_frames = frames;

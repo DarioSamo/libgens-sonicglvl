@@ -60,6 +60,8 @@ THE SOFTWARE.
 #define LIBGENS_MATH_AXIS_Z_TEXT                 "z"
 #define LIBGENS_MATH_AXIS_W_TEXT                 "w"
 
+#define LIBGENS_MATH_GRAVITY					  35
+
 namespace LibGens {
 	class File;
 	class Matrix3;

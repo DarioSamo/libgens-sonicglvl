@@ -138,6 +138,9 @@
     <ClCompile Include="EditorLookAt.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
+    <ClCompile Include="TrajectoryNode.cpp">
+      <Filter>Editor Nodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseApplication.h">
@@ -227,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="MessageTypes.h">
       <Filter>Editor Game Message</Filter>
+    </ClInclude>
+    <ClInclude Include="TrajectoryNode.h">
+      <Filter>Editor Nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

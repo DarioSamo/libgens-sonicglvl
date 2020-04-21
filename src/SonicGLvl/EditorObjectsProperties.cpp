@@ -605,8 +605,9 @@ void EditorApplication::editObjectPropertyIndex(int selection_index) {
 
 				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_X);
 				SetFocus(hEditMainControl);
-
-				LibGens::Vector3 dv(0.0, 0.0, 0.0);
+				
+				ObjectNode* first_selection = static_cast<ObjectNode*>(*(selected_nodes.begin()));
+				LibGens::Vector3 dv = first_selection->getObject()->getPosition();
 
 				// Set Default
 				if (current_single_property_object) {
@@ -1719,6 +1720,8 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 void EditorApplication::addVectorToList(LibGens::Vector3 v3)
 {
 	HWND hVectorList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
+	ObjectNode* first_selection = static_cast<ObjectNode*>(*(selected_nodes.begin()));
+	v3 = first_selection->getObject()->getPosition();
 	float x = v3.x;
 	float y = v3.y;
 	float z = v3.z;

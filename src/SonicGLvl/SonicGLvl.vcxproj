@@ -118,6 +118,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TerrainNode.cpp" />
+    <ClCompile Include="TrajectoryNode.cpp" />
     <ClCompile Include="VectorNode.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +151,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TerrainNode.h" />
+    <ClInclude Include="TrajectoryNode.h" />
     <ClInclude Include="VectorNode.h" />
   </ItemGroup>
   <ItemGroup>

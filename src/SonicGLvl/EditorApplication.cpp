@@ -153,6 +153,10 @@ void EditorApplication::clearSelection() {
 		delete wrapper;
 	}
 
+	for (vector<TrajectoryNode*>::iterator it = trajectory_preview_nodes.begin(); it != trajectory_preview_nodes.end(); ++it)
+		delete (*it);
+
+	trajectory_preview_nodes.clear();
 	selected_nodes.clear();
 	axis->setVisible(false);
 }
@@ -1092,6 +1096,7 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, false, true, &selected_nodes);
 							current_node->setSelect(true);
 							selected_nodes.push_back(current_node);
+							addTrajectory(getTrajectoryMode(current_node));
 							pushHistory(action_select);
 
 						}
@@ -1237,6 +1242,9 @@ bool EditorApplication::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 
 	// Update Ghost
 	checkGhost(timeSinceLastFrame);
+
+	// Update Trajectory previews
+	updateTrajectoryNodes(timeSinceLastFrame);
 
 	if (terrain_streamer) {
 		Ogre::Vector3 v = viewport->getCamera()->getPosition();
@@ -1398,3 +1406,95 @@ bool DepthListener::renderableQueued(Ogre::Renderable* rend, Ogre::uint8 groupID
 	*ppTech = mDepthMaterial->getTechnique(0);
 	return true;
 };
+
+ObjectNode* EditorApplication::getObjectNodeFromEditorNode(EditorNode* node)
+{
+	ObjectNode* object_node;
+	if (node->getType() == EDITOR_NODE_OBJECT)
+	{
+		object_node = static_cast<ObjectNode*>(node);
+	}
+	else if (node->getType() == EDITOR_NODE_OBJECT_MSP)
+	{
+		ObjectMultiSetNode* ms_node = static_cast<ObjectMultiSetNode*>(node);
+		object_node = ms_node->getObjectNode();
+	}
+
+	return object_node;
+}
+
+TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
+{
+	ObjectNode* object_node = getObjectNodeFromEditorNode(node);
+	std::string object_name = object_node->getObject()->getName();
+
+	TrajectoryMode mode = NONE;
+
+	if ((object_name ==  "Spring") || (object_name == "AirSpring") || (object_name == "SpringFake") ||
+		(object_name == "SpringClassic") || (object_name == "SpringClassicYellow"))
+		mode = SPRING;
+	else if (object_name == "WideSpring")
+		mode = WIDE_SPRING;
+	else if (object_name ==  "JumpPole")
+		mode = JUMP_POLE;
+	else if ((object_name == "JumpBoard") || (object_name == "JumpBoard3D") ||
+		(object_name == "AdlibTrickJump") || (object_name == "ClassicJumpBoard"))
+		mode = JUMP_PANEL;
+	else if ((object_name == "DashRing") || (object_name == "RainbowRing"))
+		mode = DASH_RING;
+
+	return mode;
+}
+
+void EditorApplication::addTrajectory(TrajectoryMode mode)
+{
+	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
+	
+	// JumpBoards need two nodes. One for normal, and the other for boost
+	if (mode == JUMP_PANEL)
+		trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
+}
+
+void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
+{
+	if (!selected_nodes.size())
+		return;
+
+	for (int count = 0; count < trajectory_preview_nodes.size(); ++count)
+		trajectory_preview_nodes[count]->addTime(timeSinceLastFrame);
+
+	int count = 0;
+	list<EditorNode*>::iterator it = selected_nodes.begin();
+
+	for (; it != selected_nodes.end(); ++it)
+	{
+		if (count < trajectory_preview_nodes.size())
+		{
+			EditorNode* node = *it;
+			TrajectoryMode mode = getTrajectoryMode(node);
+			switch (mode)
+			{
+			case SPRING:
+			case WIDE_SPRING:
+				trajectory_preview_nodes[count]->getTrajectorySpring(node);
+				break;
+
+			case JUMP_PANEL:
+				trajectory_preview_nodes[count++]->getTrajectoryJumpBoard(node, false);
+				trajectory_preview_nodes[count]->getTrajectoryJumpBoard(node, true);
+				break;
+
+			case DASH_RING:
+				trajectory_preview_nodes[count]->getTrajectoryDashRing(node);
+				break;
+
+			default:
+				break;
+			}
+
+			++count;
+		}
+		else
+			break;
+	}
+}
