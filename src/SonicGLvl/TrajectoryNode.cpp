@@ -121,7 +121,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 		switch (angle_type)
 		{
 		case 0:
-			angle = 12;
+			angle = 15;
 			break;
 			
 		case 1:
