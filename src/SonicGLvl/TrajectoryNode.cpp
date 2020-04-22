@@ -105,7 +105,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 
 	std::string impulse_speed_variable = boost ? "ImpulseSpeedOnBoost" : "ImpulseSpeedOnNormal";
 	speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(impulse_speed_variable));
-	if (object_name == "Jumpboard")
+	if (object_name == "JumpBoard")
 	{
 		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("AngleType"));
 		angle_type	= angle_property->value;
@@ -118,7 +118,22 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	*/
 	if (object_name == "JumpBoard")
 	{
-		angle = !angle_type ? 12 : 27;
+		switch (angle_type)
+		{
+		case 0:
+			angle = 12;
+			break;
+			
+		case 1:
+		case 2:
+		case 3:
+			angle = 27;
+			break;
+			
+		default:
+			setPosition(node->getPosition());
+			return;
+		}
 	}
 	else
 	{
