@@ -160,26 +160,13 @@ void EditorApplication::getVectorFromObject()
 		ObjectNode* obj_node = static_cast<ObjectNode*>(*it);
 
 		Ogre::Quaternion obj_rotation = obj_node->getRotation();
-		Ogre::Radian y_rad, p_rad, r_rad;
-		Ogre::Matrix3 rot_matrix;
-		obj_rotation.ToRotationMatrix(rot_matrix);
-		rot_matrix.ToEulerAnglesYXZ(y_rad, p_rad, r_rad);
-		
-		Ogre::Real yaw_rad = y_rad.valueRadians();
-		Ogre::Real pitch_rad = p_rad.valueRadians();
-		Ogre::Real roll_rad = r_rad.valueRadians();
+		Ogre::Vector3 direction(0, 0, 1);
+		direction = obj_rotation * direction;
 
-		float vec_x = sin(yaw_rad);
-		float vec_y = sin(pitch_rad);
-		float vec_z = cos(yaw_rad);
-
-		vec_y *= -1;
-
-		SetDlgItemText(hMultiSetParamDlg, IDE_MULTISETPARAM_X, ToString<float>(vec_x).c_str());
-		SetDlgItemText(hMultiSetParamDlg, IDE_MULTISETPARAM_Y, ToString<float>(vec_y).c_str());
-		SetDlgItemText(hMultiSetParamDlg, IDE_MULTISETPARAM_Z, ToString<float>(vec_z).c_str());
+		SetDlgItemText(hMultiSetParamDlg, IDE_MULTISETPARAM_X, ToString<float>(direction.x).c_str());
+		SetDlgItemText(hMultiSetParamDlg, IDE_MULTISETPARAM_Y, ToString<float>(direction.y).c_str());
+		SetDlgItemText(hMultiSetParamDlg, IDE_MULTISETPARAM_Z, ToString<float>(direction.z).c_str());
 	}
-
 }
 
 void EditorApplication::setCloningMode(size_t mode)

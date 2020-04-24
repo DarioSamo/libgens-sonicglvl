@@ -356,6 +356,7 @@ class EditorApplication : public BaseApplication {
 		ObjectNode* getObjectNodeFromEditorNode(EditorNode* node);
 		TrajectoryMode getTrajectoryMode(EditorNode* node);
 		void addTrajectory(TrajectoryMode mode);
+		void removeAllTrajectoryNodes();
 		bool isUpdatePosRot();
 
 		void openFindGUI();

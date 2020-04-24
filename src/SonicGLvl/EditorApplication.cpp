@@ -123,6 +123,7 @@ void EditorApplication::deleteSelection() {
 			}
 		}
 
+		removeAllTrajectoryNodes();
 		selected_nodes.clear();
 		axis->setVisible(false);
 
@@ -153,10 +154,7 @@ void EditorApplication::clearSelection() {
 		delete wrapper;
 	}
 
-	for (vector<TrajectoryNode*>::iterator it = trajectory_preview_nodes.begin(); it != trajectory_preview_nodes.end(); ++it)
-		delete (*it);
-
-	trajectory_preview_nodes.clear();
+	removeAllTrajectoryNodes();
 	selected_nodes.clear();
 	axis->setVisible(false);
 }
@@ -1496,4 +1494,12 @@ void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
 		else
 			break;
 	}
+}
+
+void EditorApplication::removeAllTrajectoryNodes()
+{
+	for (vector<TrajectoryNode*>::iterator it = trajectory_preview_nodes.begin(); it != trajectory_preview_nodes.end(); ++it)
+		delete* it;
+
+	trajectory_preview_nodes.clear();
 }

@@ -11,6 +11,7 @@ TrajectoryNode::TrajectoryNode(Ogre::SceneManager* scene_manager, TrajectoryMode
 	scene_node->getUserObjectBindings().setUserAny("EditorNodePtr", Ogre::Any((EditorNode*)this));
 
 	Ogre::Entity* entity = scene_manager->createEntity("w_axis.mesh");
+	entity->setQueryFlags(0x100);
 	entity->setRenderQueueGroup(Ogre::RENDER_QUEUE_MAX);
 	scene_node->attachObject(entity);
 
@@ -100,7 +101,9 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 
 	LibGens::ObjectElementFloat* speed_property;
 	LibGens::ObjectElementFloat* angle_property;
+	LibGens::ObjectElementFloat* size_property;
 	int angle_type;
+	int size_type;
 	float angle;
 
 	std::string impulse_speed_variable = boost ? "ImpulseSpeedOnBoost" : "ImpulseSpeedOnNormal";
@@ -110,24 +113,36 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("AngleType"));
 		angle_type	= angle_property->value;
 	}
+	else
+	{
+		size_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("SizeType"));
+		size_type = size_property->value;
+	}
 
 	float impulse_speed = speed_property->value;
-	/* JumpBoard and JumpBoard3D can have to two different inclination angles
-	   15 and 30. However, this does not yield accurate results so the angles
-	   are reduced by 3 degrees each
-	*/
+	float y_offset = 0.0f;
 	if (object_name == "JumpBoard")
 	{
 		switch (angle_type)
 		{
 		case 0:
+			y_offset = 0.325;
 			angle = 15;
 			break;
 			
 		case 1:
+			y_offset = 0.55;
+			angle = 30;
+			break;
+
 		case 2:
+			y_offset = 0.74;
+			angle = 30;
+			break;
+
 		case 3:
-			angle = 27;
+			y_offset = 1.9;
+			angle = 30;
 			break;
 			
 		default:
@@ -137,9 +152,11 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	}
 	else
 	{
-		angle = 27;
+		y_offset = size_type ? 1.9 : 0.7;
+		angle = 30;
 	}
 
+	Ogre::Vector3 direction(0, 0, 1);
 	Ogre::Quaternion obj_rotation = node->getRotation();
 	Ogre::Radian y_rad, p_rad, r_rad;
 	Ogre::Matrix3 rot_matrix;
@@ -151,12 +168,10 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	Ogre::Real roll_rad  = r_rad.valueRadians();
 	pitch_rad += (angle * LIBGENS_MATH_PI) / 180;
 
-	float vec_x = sin(yaw_rad);
-	float vec_y = sin(pitch_rad);
-	float vec_z = cos(yaw_rad);
-	vec_y *= -1;
+	rot_matrix.FromEulerAnglesYXZ(Ogre::Radian(yaw_rad), Ogre::Radian(pitch_rad), Ogre::Radian(roll_rad));
+	obj_rotation.FromRotationMatrix(rot_matrix);
 
-	Ogre::Vector3 direction(vec_x, vec_y, vec_z);
+	direction = obj_rotation * direction;
 	direction *= -1;
 
 	if (m_total_time >= m_max_time)
@@ -167,7 +182,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	float delta_y   = (impulse_speed * m_total_time * direction.y) + (0.5 * -gravity * (m_total_time * m_total_time));
 
 	float new_pos_x = (impulse_speed * m_total_time) * direction.x;
-	float new_pos_y = delta_y;
+	float new_pos_y = delta_y + y_offset;
 	float new_pos_z = (impulse_speed * m_total_time) * direction.z;
 
 	Ogre::Vector3 new_position = node->getPosition();
