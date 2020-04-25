@@ -126,22 +126,22 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 		switch (angle_type)
 		{
 		case 0:
-			y_offset = 0.325;
+			y_offset = 0.8;
 			angle = 15;
 			break;
 			
 		case 1:
-			y_offset = 0.55;
+			y_offset = 1.0;
 			angle = 30;
 			break;
 
 		case 2:
-			y_offset = 0.74;
+			y_offset = 1.5;
 			angle = 30;
 			break;
 
 		case 3:
-			y_offset = 1.9;
+			y_offset = 2.5;
 			angle = 30;
 			break;
 			
@@ -152,7 +152,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	}
 	else
 	{
-		y_offset = size_type ? 1.9 : 0.7;
+		y_offset = size_type ? 2.5 : 1.5;
 		angle = 30;
 	}
 

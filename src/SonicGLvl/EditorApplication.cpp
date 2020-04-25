@@ -1407,7 +1407,7 @@ bool DepthListener::renderableQueued(Ogre::Renderable* rend, Ogre::uint8 groupID
 
 ObjectNode* EditorApplication::getObjectNodeFromEditorNode(EditorNode* node)
 {
-	ObjectNode* object_node;
+	ObjectNode* object_node = nullptr;
 	if (node->getType() == EDITOR_NODE_OBJECT)
 	{
 		object_node = static_cast<ObjectNode*>(node);
@@ -1423,8 +1423,10 @@ ObjectNode* EditorApplication::getObjectNodeFromEditorNode(EditorNode* node)
 
 TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 {
+	std::string object_name;
 	ObjectNode* object_node = getObjectNodeFromEditorNode(node);
-	std::string object_name = object_node->getObject()->getName();
+	if (object_node)
+		object_name = object_node->getObject()->getName();
 
 	TrajectoryMode mode = NONE;
 
@@ -1445,6 +1447,9 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 
 void EditorApplication::addTrajectory(TrajectoryMode mode)
 {
+	if (mode == NONE)
+		return;
+
 	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
 	
 	// JumpBoards need two nodes. One for normal, and the other for boost
