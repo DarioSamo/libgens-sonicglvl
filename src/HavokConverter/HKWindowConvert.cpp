@@ -96,7 +96,7 @@ bool HKWindow::convert() {
 	world->lock();
 #endif // HAVOKCONVERTER_LOST_WORLD
 
-
+	std::unordered_set<std::string> rigid_body_names;
 
 	//*************************
 	//  Load Assimp Scene
@@ -128,7 +128,7 @@ bool HKWindow::convert() {
 		hkpStaticCompoundShape* shape = convertNodeTreeCompoundShape(scene, scene->mRootNode, global_transform);
 		shapes.pushBack(hkRootLevelContainer::NamedVariant("shape",shape, &hkcdStaticTreeDefaultTreeStorage6Class));
 #else
-		convertNodeTree(scene, scene->mRootNode, global_transform, world);
+		convertNodeTree(scene, scene->mRootNode, global_transform, world, rigid_body_names);
 #endif
 	}
 	
@@ -263,11 +263,13 @@ hkpShape *HKWindow::convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale) {
 	return mopp_shape;
 }
 
-QList<hkpRigidBody *> HKWindow::convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform) {
+QList<hkpRigidBody *> HKWindow::convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::unordered_set<std::string>& names) {
 	QList<hkpRigidBody *> rigid_bodies;
 	LibGens::Vector3 pos, sca;
 	LibGens::Quaternion ori;
 	transform.decomposition(pos, sca, ori);
+
+	size_t index = 0;
 
 	for (unsigned int m = 0; m < node->mNumMeshes; m++) {
 		// Rigid body information.
@@ -281,7 +283,15 @@ QList<hkpRigidBody *> HKWindow::convertNodeToRigidBodies(const aiScene *scene, a
 		rigid_body_info.m_mass = 0.0f;
 		rigid_body_info.m_motionType = hkpMotion::MOTION_FIXED;
 		hkpRigidBody* rigid_body = new hkpRigidBody(rigid_body_info);
-		rigid_body->setName(node->mName.C_Str());
+
+		std::string rigid_body_name = node->mName.C_Str();
+
+		while (names.find(rigid_body_name) != names.end()) {
+			rigid_body_name = ToString(node->mName.C_Str()) + "_" + ToString(index++);
+		}
+
+		// The name is going to be kept alive by the unordered set.
+		rigid_body->setName(names.insert(rigid_body_name).first->c_str());
 
 		// Prepare properties.
 		QMap<hkUint32, int> properties;
@@ -321,7 +331,7 @@ QList<hkpRigidBody *> HKWindow::convertNodeToRigidBodies(const aiScene *scene, a
 	return rigid_bodies;
 }
 
-void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world) {
+void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::unordered_set<std::string>& names) {
 	// Convert meshes to rigid bodies.
 	LibGens::Matrix4 local_transform;
 	for (int i = 0; i < 4; i++)
@@ -332,7 +342,7 @@ void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matr
 		logProgress(ProgressNormal, QString("Converting %1 to rigid bodies.").arg(node->mName.C_Str()));
 
 	LibGens::Matrix4 transform = parent_transform * local_transform;
-	QList<hkpRigidBody *> rigid_bodies = convertNodeToRigidBodies(scene, node, transform);
+	QList<hkpRigidBody *> rigid_bodies = convertNodeToRigidBodies(scene, node, transform, names);
 	
 	if (!rigid_bodies.isEmpty())
 		logProgress(ProgressNormal, QString("Adding %1 rigid bodies to World.").arg(rigid_bodies.size()));
@@ -344,7 +354,7 @@ void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matr
 
 	// Convert children.
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
-		convertNodeTree(scene, node->mChildren[i], transform, world);
+		convertNodeTree(scene, node->mChildren[i], transform, world, names);
 	}
 }
 
