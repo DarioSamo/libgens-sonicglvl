@@ -24,6 +24,7 @@
 #include "HKPropertyTag.h"
 #include "assimp/scene.h"
 #include "LibGens.h"
+#include <unordered_set>
 
 class hkpShape;
 class hkpRigidBody;
@@ -88,8 +89,8 @@ private:
 	void logNodeTree(aiNode *node, QString prefix);
 	void beep();
 	hkpShape *convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale);
-	QList<hkpRigidBody *> convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform);
-	void convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world);
+	QList<hkpRigidBody *> convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::unordered_set<std::string>& names);
+	void convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::unordered_set<std::string>& names);
 #ifdef HAVOKCONVERTER_LOST_WORLD
 	hkpShape* convertMeshToCompressedShape(aiMesh* mesh, int userdata);
 	hkQsTransform createHKTransform(LibGens::Matrix4 transform);
