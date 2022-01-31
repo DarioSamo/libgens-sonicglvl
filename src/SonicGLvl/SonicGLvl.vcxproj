@@ -51,13 +51,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>../../depends/allegro/include;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2010_2_0_r1/Source;../../depends/ogre/boost;../../depends/ogre/include;../../depends/ogre/include/OIS;../../depends/ogre/include/OGRE;../../depends/ogre/include/OGRE/Overlay;../LibGens;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
       <AdditionalOptions>/Zm300 %(AdditionalOptions)</AdditionalOptions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -80,12 +81,15 @@
     <ClCompile Include="EditorApplicationLevel.cpp" />
     <ClCompile Include="EditorAxis.cpp" />
     <ClCompile Include="EditorBottom.cpp" />
+    <ClCompile Include="EditorClone.cpp" />
     <ClCompile Include="EditorConfiguration.cpp" />
+    <ClCompile Include="EditorFind.cpp" />
     <ClCompile Include="EditorGhost.cpp" />
     <ClCompile Include="EditorGlobalIllumination.cpp" />
     <ClCompile Include="EditorGUI.cpp" />
     <ClCompile Include="EditorHavok.cpp" />
     <ClCompile Include="EditorLevel.cpp" />
+    <ClCompile Include="EditorLookAt.cpp" />
     <ClCompile Include="EditorMaterial.cpp" />
     <ClCompile Include="EditorNode.cpp" />
     <ClCompile Include="EditorNodeHistory.cpp" />
@@ -109,10 +113,12 @@
     <ClCompile Include="ObjectNode.cpp" />
     <ClCompile Include="ObjectNodeHistory.cpp" />
     <ClCompile Include="PathNode.cpp" />
+    <ClCompile Include="PipeClient.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TerrainNode.cpp" />
+    <ClCompile Include="TrajectoryNode.cpp" />
     <ClCompile Include="VectorNode.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -137,12 +143,15 @@
     <ClInclude Include="HavokNode.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="HistoryAction.h" />
+    <ClInclude Include="MessageTypes.h" />
     <ClInclude Include="ObjectNode.h" />
     <ClInclude Include="ObjectNodeHistory.h" />
     <ClInclude Include="PathNode.h" />
+    <ClInclude Include="PipeClient.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TerrainNode.h" />
+    <ClInclude Include="TrajectoryNode.h" />
     <ClInclude Include="VectorNode.h" />
   </ItemGroup>
   <ItemGroup>

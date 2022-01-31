@@ -14,74 +14,107 @@
 // Menu resources
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-IDR_TOOLMENU MENU
+IDR_TOOLMENU MENUEX
 {
-    POPUP "File"
+    POPUP "File", 0, 0, 0
     {
-        MENUITEM "Open Stage...", IMD_OPEN_LEVEL
-        MENUITEM SEPARATOR
-        MENUITEM "Save Stage Data...", IMD_SAVE_LEVEL_DATA
-        MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN
-        MENUITEM SEPARATOR
-        MENUITEM "Export Scene as FBX...", IMD_EXPORT_SCENE_FBX
-        MENUITEM SEPARATOR
-        MENUITEM "Close", IMD_CLOSE
+        MENUITEM "Open Stage...\tCtrl+O", IMD_OPEN_LEVEL, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Save Stage Data...\tCtrl+S", IMD_SAVE_LEVEL_DATA, 0, 0
+        MENUITEM "Save Stage Terrain...", IMD_SAVE_LEVEL_TERRAIN, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Close", IMD_CLOSE, 0, 0
     }
-    POPUP "Edit"
+    POPUP "Edit", 0, 0, 0
     {
-        MENUITEM "Undo\tCtrl+Z", IMD_UNDO
-        MENUITEM "Redo\tCtrl+Y", IMD_REDO
-        MENUITEM SEPARATOR
-        MENUITEM "Cut\tCtrl+X", IMD_CUT
-        MENUITEM "Copy\tCtrl+C", IMD_COPY
-        MENUITEM "Paste\tCtrl+V", IMD_PASTE
-        MENUITEM "Delete\tDel", IMD_DELETE
-        MENUITEM SEPARATOR
-        MENUITEM "Select All\tCtrl+A", IMD_SELECT_ALL
-    }
-    POPUP "View"
-    {
-        POPUP "Show"
+        MENUITEM "Undo\tCtrl+Z", IMD_UNDO, 0, 0
+        MENUITEM "Redo\tCtrl+Y", IMD_REDO, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Cut\tCtrl+X", IMD_CUT, 0, 0
+        MENUITEM "Copy\tCtrl+C", IMD_COPY, 0, 0
+        MENUITEM "Paste\tCtrl+V", IMD_PASTE, 0, 0
+        MENUITEM "Delete\tDel", IMD_DELETE, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Clear Selection\tCtrl+D", IMD_CLEAR_SELECTION, 0, 0
+        MENUITEM "Select All\tCtrl+A", IMD_SELECT_ALL, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        POPUP "Look at each other (two objects)", 0, 0, 0
         {
-            MENUITEM "Objects\tCtrl+1", IMD_SHOW_OBJECTS, CHECKED
-            MENUITEM "Terrain\tCtrl+2", IMD_SHOW_TERRAIN, CHECKED
-            MENUITEM "Terrain Autodraw\tCtrl+3", IMD_SHOW_TERRAIN_AUTODRAW, CHECKED
-            MENUITEM "Collision\tCtrl+4", IMD_SHOW_COLLISION, CHECKED
-            MENUITEM "Paths\tCtrl+5", IMD_SHOW_PATHS, CHECKED
-            MENUITEM "Ghost\tCtrl+6", IMD_SHOW_GHOST, CHECKED
+            MENUITEM "Use X-Axis As Direciton", IMD_LOOK_AT_EACH_OTHER_X, 0, 0
+            MENUITEM "Use Y-Axis As Direction", IMD_LOOK_AT_EACH_OTHER_Y, 0, 0
+            MENUITEM "Use Z-Axis As Direction", IMD_LOOK_AT_EACH_OTHER_Z, 0, 0
         }
-        POPUP "Graphics"
+        MENUITEM "Look at...", IMD_LOOK_AT_POINT, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Find\tCtrl+F", IMD_FIND, 0, 0
+    }
+    POPUP "View", 0, 0, 0
+    {
+        POPUP "Show", 0, 0, 0
         {
-            MENUITEM "Game Shaders\tF5", IMD_GAME_SHADERS, CHECKED
-            MENUITEM SEPARATOR
-            MENUITEM "Framebuffer && Depth Buffer (Requires Shaders)\tF6", IMD_FRAMEBUFFER, CHECKED
-            MENUITEM "UV Animations (Requires Shaders)\tF7", IMD_UV_ANIMATIONS, CHECKED
-            MENUITEM "Skybox\tF8", IMD_SKYBOX, CHECKED
+            MENUITEM "Objects\tCtrl+1", IMD_SHOW_OBJECTS, 0, MFS_CHECKED
+            MENUITEM "Terrain\tCtrl+2", IMD_SHOW_TERRAIN, 0, MFS_CHECKED
+            MENUITEM "Terrain Autodraw\tCtrl+3", IMD_SHOW_TERRAIN_AUTODRAW, 0, MFS_CHECKED
+            MENUITEM "Collision\tCtrl+4", IMD_SHOW_COLLISION, 0, MFS_CHECKED
+            MENUITEM "Paths\tCtrl+5", IMD_SHOW_PATHS, 0, MFS_CHECKED
+            MENUITEM "Ghost\tCtrl+6", IMD_SHOW_GHOST, 0, MFS_CHECKED
         }
-        MENUITEM SEPARATOR
-        MENUITEM "Use World Transform\tCtrl+E", IMD_WORLD_TRANSFORM
-        MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP
+        POPUP "Graphics", 0, 0, 0
+        {
+            MENUITEM "Game Shaders\tF5", IMD_GAME_SHADERS, 0, MFS_CHECKED
+            MENUITEM "", 0, MFT_SEPARATOR, 0
+            MENUITEM "Framebuffer && Depth Buffer (Requires Shaders)\tF6", IMD_FRAMEBUFFER, 0, MFS_CHECKED
+            MENUITEM "UV Animations (Requires Shaders)\tF7", IMD_UV_ANIMATIONS, 0, MFS_CHECKED
+            MENUITEM "Skybox\tF8", IMD_SKYBOX, 0, MFS_CHECKED
+        }
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Use World Transform\tCtrl+E", IMD_WORLD_TRANSFORM, 0, 0
+        MENUITEM "Use Local Rotation", IMD_LOCAL_ROTATION, 0, 0
+        MENUITEM "Use Placement Snap", IMD_PLACEMENT_SNAP, 0, 0
+        MENUITEM "Use Rotation Snap", IMD_ROTATION_SNAP, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
     }
-    POPUP "Physics"
+    POPUP "Physics", 0, 0, 0
     {
-        MENUITEM "Open Physics Editor...", IMD_OPEN_PHYSICS_EDITOR
+        MENUITEM "Open Physics Editor...", IMD_OPEN_PHYSICS_EDITOR, 0, 0
     }
-    POPUP "Terrain"
+    POPUP "Terrain", 0, 0, 0
     {
-        MENUITEM "Delete all Terrain...", IMD_CLEAN_TERRAIN
-        MENUITEM SEPARATOR
-        MENUITEM "Import FBX as Terrain...", IMD_IMPORT_TERRAIN_FBX
-        MENUITEM SEPARATOR
-        MENUITEM "Generate Terrain Groups...", IMD_GENERATE_TERRAIN_GROUPS
+        MENUITEM "Delete all Terrain...", IMD_CLEAN_TERRAIN, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Import FBX as Terrain...", IMD_IMPORT_TERRAIN_FBX, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Generate Terrain Groups...", IMD_GENERATE_TERRAIN_GROUPS, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Export Scene as FBX...", IMD_EXPORT_SCENE_FBX, 0, 0
     }
-    POPUP "Objects"
+    POPUP "Objects", 0, 0, 0
     {
-        MENUITEM "Reload Object Templates Database...", IMD_RELOAD_TEMPLATES_DATABASE
-        MENUITEM "Save Object Templates Database...", IMD_SAVE_TEMPLATES_DATABASE
+        MENUITEM "Reload Object Templates Database...", IMD_RELOAD_TEMPLATES_DATABASE, 0, 0
+        MENUITEM "Save Object Templates Database...", IMD_SAVE_TEMPLATES_DATABASE, 0, 0
     }
-    POPUP "Materials"
+    POPUP "Materials", 0, 0, 0
     {
-        MENUITEM "Open Material Editor...", IMD_OPEN_MATERIAL_EDITOR
+        MENUITEM "Open Material Editor...", IMD_OPEN_MATERIAL_EDITOR, 0, 0
+    }
+    POPUP "Editor", 0, 0, 0
+    {
+        MENUITEM "Save Configuration...", IMD_SAVE_CONFIG, 0, 0
+        MENUITEM "Reload Configuration...", IMD_LOAD_CONFIG, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Launch Game", IMD_LAUNCH_GAME, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        MENUITEM "Connect To Game", IMD_CONNECT_GAME, 0, 0
+        MENUITEM "", 0, MFT_SEPARATOR, 0
+        POPUP "Ghost", 0, 0, 0
+        {
+            MENUITEM "Start Recording", IMD_START_GHOST_RECORD, 0, 0
+            MENUITEM "Stop Recording", IMD_STOP_GHOST_RECORD, 0, 0
+            MENUITEM "Load Recording From Game", IMD_LOAD_GHOST_RECORDING_FROM_GAME, 0, 0
+            MENUITEM "", 0, MFT_SEPARATOR, 0
+            MENUITEM "Load From File", IMD_LOAD_GHOST_RECORDING, 0, 0
+            MENUITEM "Save Recording", IMD_SAVE_GHOST_RECORDING, 0, MFS_GRAYED
+        }
     }
 }
 
@@ -92,8 +125,7 @@ IDR_TOOLMENU MENU
 //
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDD_BOTTOM_DIALOG DIALOG 0, 0, 708, 50
-STYLE DS_3DLOOK | DS_CENTER | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW
-EXSTYLE WS_EX_TOOLWINDOW | WS_EX_TOPMOST
+STYLE DS_3DLOOK | DS_ABSALIGN | DS_CENTER | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW
 FONT 8, "Ms Shell Dlg"
 {
     EDITTEXT        IDE_BOTTOM_SELECTION_POS_Z, 343, 16, 47, 12, ES_AUTOHSCROLL, WS_EX_LEFT
@@ -102,7 +134,11 @@ FONT 8, "Ms Shell Dlg"
     LTEXT           "Position:", 0, 195, 17, 28, 8, SS_LEFT, WS_EX_LEFT
     LTEXT           "Rotation:", 0, 193, 32, 30, 8, SS_LEFT, WS_EX_LEFT
     GROUPBOX        "Ghost Playback Controls", 0, 408, 1, 236, 45, 0, WS_EX_LEFT
-    LTEXT           "Placeholder", 0, 506, 22, 38, 8, SS_LEFT, WS_EX_LEFT
+    PUSHBUTTON      ">>", IDB_BOTTOM_GHOST_FORWARD, 578, 28, 60, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "<<", IDB_BOTTOM_GHOST_BACK, 413, 29, 60, 14, WS_GROUP, WS_EX_LEFT
+    PUSHBUTTON      "| |", IDB_BOTTOM_GHOST_PAUSE, 475, 29, 50, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "|>", IDB_BOTTOM_GHOST_PLAY, 527, 29, 50, 14, 0, WS_EX_LEFT
+    CONTROL         "", IDS_BOTTOM_GHOST_SEEK, TRACKBAR_CLASS, WS_TABSTOP | TBS_BOTH | TBS_NOTICKS, 410, 15, 231, 12, WS_EX_LEFT
     COMBOBOX        IDC_BOTTOM_CURRENT_OBJECT_SET, 6, 21, 114, 14, CBS_DROPDOWN | CBS_HASSTRINGS, WS_EX_LEFT
     AUTOCHECKBOX    "Visible", IDC_BOTTOM_CURRENT_OBJECT_SET_VISIBLE, 126, 21, 45, 14, 0, WS_EX_LEFT
     CONTROL         "", IDS_BOTTOM_SELECTION_POS_Z, UPDOWN_CLASS, UDS_ARROWKEYS, 391, 16, 10, 12, WS_EX_LEFT
@@ -158,8 +194,8 @@ CAPTION "Change Property Value"
 FONT 8, "Ms Shell Dlg"
 {
     LTEXT           "Points to: (none)", IDT_EDIT_ID_POINT, 6, 37, 142, 8, SS_LEFT, WS_EX_LEFT
-    PUSHBUTTON      "Select from Viewport", IDB_EDIT_ID_SELECT_FROM_VIEWPORT, 9, 52, 76, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Go to Target", IDB_EDIT_ID_GO_TO_TARGET, 86, 52, 59, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Select From Viewport", IDC_EDIT_ID_SELECT_FROM_VIEWPORT, 6, 52, 80, 14, BS_PUSHLIKE, WS_EX_LEFT
+    PUSHBUTTON      "Go to Target", IDB_EDIT_ID_GO_TO_TARGET, 90, 52, 59, 14, 0, WS_EX_LEFT
     COMBOBOX        IDC_EDIT_ID_VALUE, 6, 19, 142, 20, WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS, WS_EX_LEFT
     LTEXT           "New Value (Object ID)", 0, 41, 7, 72, 8, SS_LEFT, WS_EX_LEFT
     PUSHBUTTON      "Cancel", IDCANCEL, 82, 72, 50, 14, 0, WS_EX_LEFT
@@ -175,7 +211,7 @@ EXSTYLE WS_EX_WINDOWEDGE
 CAPTION "Change Property Value"
 FONT 8, "Ms Shell Dlg"
 {
-    COMBOBOX        IDC_EDIT_ID_LIST_VALUE, 14, 83, 142, 20, WS_VSCROLL | CBS_DROPDOWN | CBS_HASSTRINGS, WS_EX_LEFT
+    EDITTEXT        IDE_EDIT_ID_LIST_VALUE, 13, 86, 139, 12, ES_AUTOHSCROLL, WS_EX_LEFT
     LTEXT           "Points to: (none)", IDT_EDIT_ID_LIST_POINT, 14, 99, 142, 8, SS_LEFT, WS_EX_LEFT
     CONTROL         "", IDL_EDIT_ID_LIST_LIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SHOWSELALWAYS | LVS_REPORT, 6, 12, 200, 65, WS_EX_LEFT
     PUSHBUTTON      "Create", IDB_EDIT_ID_LIST_CREATE, 209, 15, 47, 14, 0, WS_EX_LEFT
@@ -185,8 +221,8 @@ FONT 8, "Ms Shell Dlg"
     GROUPBOX        "Object ID List", 0, 1, 2, 258, 111, 0, WS_EX_LEFT
     DEFPUSHBUTTON   "Confirm", IDOK, 75, 136, 50, 14, 0, WS_EX_LEFT
     PUSHBUTTON      "Cancel", IDCANCEL, 135, 136, 50, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Go to Target", IDB_EDIT_ID_LIST_GO_TO_TARGET, 170, 90, 76, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Add from viewport", IDB_EDIT_ID_LIST_ADD_FROM_VIEWPORT, 51, 117, 158, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Go to Target", IDB_EDIT_ID_LIST_GO_TO_TARGET, 170, 86, 76, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Select from viewport", IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT, 51, 117, 158, 14, BS_PUSHLIKE, WS_EX_LEFT
 }
 
 
@@ -256,6 +292,30 @@ FONT 8, "Ms Shell Dlg"
 
 
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_FIND_DIALOG DIALOG 0, 0, 218, 158
+STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP
+EXSTYLE WS_EX_WINDOWEDGE
+CAPTION "Find"
+FONT 8, "Ms Shell Dlg"
+{
+    AUTOCHECKBOX    "Match Exactly", IDC_FIND_EXACTLY, 15, 59, 61, 8, 0, WS_EX_LEFT
+    GROUPBOX        "Filter Options", IDG_FIND_ADVANCED, 7, 78, 204, 58, 0, WS_EX_LEFT
+    EDITTEXT        IDE_FIND_VALUE, 15, 29, 119, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    LTEXT           "Object Name", IDT_FIND_OBJECT_NAME, 15, 18, 42, 9, SS_LEFT, WS_EX_LEFT
+    DEFPUSHBUTTON   "Close", IDCLOSE, 83, 141, 52, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Find Next", IDB_FIND, 143, 27, 57, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Basic Options", IDG_FIND_BASIC, 7, 5, 203, 69, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "With Property And Value", IDC_FIND_FILTERED, 15, 91, 93, 8, 0, WS_EX_LEFT
+    EDITTEXT        IDE_FIND_PROPERTY_VALUE, 15, 115, 120, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    LTEXT           "Property", 0, 16, 104, 27, 9, SS_LEFT, WS_EX_LEFT
+    LTEXT           "Value", 0, 143, 104, 19, 9, SS_LEFT, WS_EX_LEFT
+    EDITTEXT        IDE_FIND_VALUE_VALUE, 143, 115, 55, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    AUTOCHECKBOX    "Find And Select All", IDC_FIND_ALL, 15, 48, 75, 8, 0, WS_EX_LEFT
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 IDD_LEFT_DIALOG DIALOG 0, 0, 185, 342
 STYLE DS_3DLOOK | DS_CENTER | DS_SHELLFONT | WS_VISIBLE | WS_CHILDWINDOW
 EXSTYLE WS_EX_TOOLWINDOW | WS_EX_TOPMOST
@@ -269,6 +329,33 @@ FONT 8, "Ms Shell Dlg"
     CONTROL         "", IDL_PALETTE_LIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SINGLESEL | LVS_LIST, 6, 82, 174, 96, WS_EX_LEFT
     GROUPBOX        "Help", IDG_HELP_GROUP, 2, 287, 181, 52, 0, WS_EX_LEFT
     LTEXT           "Description lines of current selection. Object's Description will be used if selected on stage or palette. Property description will be used if a property is selected.", IDT_HELP_DESCRIPTION, 7, 298, 173, 37, SS_LEFT, WS_EX_LEFT
+}
+
+
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+IDD_LOOK_AT_POINT DIALOG 0, 0, 239, 144
+STYLE DS_3DLOOK | DS_CENTER | DS_MODALFRAME | DS_SHELLFONT | WS_CAPTION | WS_VISIBLE | WS_POPUP | WS_SYSMENU
+CAPTION "Look At Point"
+FONT 8, "Ms Shell Dlg"
+{
+    AUTORADIOBUTTON "X-Axis", IDR_LOOK_AT_AXIS_X, 133, 65, 35, 8, 0, WS_EX_LEFT
+    PUSHBUTTON      "Confirm", IDOK, 69, 126, 50, 14, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Enable editing in viewport", IDC_LOOK_AT_VIEWPORT, 32, 62, 86, 14, BS_PUSHLIKE, WS_EX_LEFT
+    EDITTEXT        IDE_LOOK_AT_X, 33, 26, 44, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    LTEXT           "New point value", 0, 96, 10, 49, 9, SS_LEFT, WS_EX_LEFT
+    CONTROL         "", IDS_LOOK_AT_X, UPDOWN_CLASS, UDS_ARROWKEYS, 77, 26, 11, 10, WS_EX_LEFT
+    PUSHBUTTON      "Focus on point", IDB_LOOK_AT_FOCUS, 32, 104, 86, 14, 0, WS_EX_LEFT
+    EDITTEXT        IDE_LOOK_AT_Y, 93, 26, 44, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    CONTROL         "", IDS_LOOK_AT_Y, UPDOWN_CLASS, UDS_ARROWKEYS, 137, 26, 11, 10, WS_EX_LEFT
+    EDITTEXT        IDE_LOOK_AT_Z, 153, 26, 44, 12, ES_AUTOHSCROLL, WS_EX_LEFT
+    CONTROL         "", IDS_LOOK_AT_Z, UPDOWN_CLASS, UDS_ARROWKEYS, 197, 26, 11, 10, WS_EX_LEFT
+    PUSHBUTTON      "Cancel", IDCANCEL, 123, 126, 50, 14, 0, WS_EX_LEFT
+    GROUPBOX        "Modify Point", 0, 28, 46, 94, 54, 0, WS_EX_LEFT
+    GROUPBOX        "Direction Axis", 0, 127, 46, 81, 73, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Y-Axis", IDR_LOOK_AT_AXIS_Y, 133, 80, 35, 8, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Z-Axis", IDR_LOOK_AT_AXIS_Z, 133, 96, 35, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Get from object", IDC_LOOK_AT_OBJECT, 32, 78, 86, 14, BS_PUSHLIKE, WS_EX_LEFT
 }
 
 
@@ -410,14 +497,14 @@ FONT 8, "Ms Shell Dlg"
     CONTROL         "", IDS_MULTISETPARAM_Y, UPDOWN_CLASS, 0, 172, 39, 10, 12, WS_EX_LEFT
     CONTROL         "", IDS_EDIT_VECTOR_Z, UPDOWN_CLASS, 0, 172, 54, 10, 12, WS_EX_LEFT
     LTEXT           "Cloning will create new copies of the selected object with independent properties.\n\nInstancing will use the game's cloning method. The copies will share their properties with the source object.", 0, 113, 94, 145, 49, SS_LEFT, WS_EX_LEFT
-    AUTOCHECKBOX    "Snap to path edges", IDC_MULTISETPARAM_SNAP_PATH_EDGES, 13, 105, 78, 8, 0, WS_EX_LEFT
-    AUTOCHECKBOX    "Snap to path centers", IDC_MULTISETPARAM_SNAP_PATH_CENTERS, 13, 124, 82, 8, 0, WS_EX_LEFT
+    AUTOCHECKBOX    "Snap to path edges", IDC_MULTISETPARAM_SNAP_PATH_EDGES, 13, 105, 78, 8, WS_DISABLED, WS_EX_LEFT
+    AUTOCHECKBOX    "Snap to path centers", IDC_MULTISETPARAM_SNAP_PATH_CENTERS, 13, 124, 82, 8, WS_DISABLED, WS_EX_LEFT
     GROUPBOX        "Method", 0, 5, 2, 102, 87, 0, WS_EX_LEFT
     GROUPBOX        "Parameters", 0, 109, 2, 150, 87, 0, WS_EX_LEFT
     GROUPBOX        "Options", 0, 6, 90, 102, 49, 0, WS_EX_LEFT
     AUTORADIOBUTTON "Cloning", IDR_MULTISETPARAM_CLONE, 13, 21, 39, 8, 0, WS_EX_LEFT
     AUTORADIOBUTTON "Instancing", IDR_MULTISETPARAM_MSP, 13, 43, 49, 8, 0, WS_EX_LEFT
-    AUTORADIOBUTTON "Instancing (additive)", IDR_MULTISETPARAM_MSP_ADD, 13, 65, 79, 8, 0, WS_EX_LEFT
+    AUTORADIOBUTTON "Instancing (additive)", IDR_MULTISETPARAM_MSP_ADD, 13, 65, 79, 8, WS_DISABLED, WS_EX_LEFT
     PUSHBUTTON      "Clear ", IDB_MULTISETPARAM_CLEAR, 109, 147, 44, 14, 0, WS_EX_LEFT
     DEFPUSHBUTTON   "Create", IDB_MULTISETPARAM_CREATE, 47, 147, 44, 14, 0, WS_EX_LEFT
     DEFPUSHBUTTON   "Get from object", IDB_MULTISETPARAM_FROM_OBJECT, 124, 70, 58, 14, 0, WS_EX_LEFT

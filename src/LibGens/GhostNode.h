@@ -34,5 +34,6 @@ namespace LibGens {
 		public:
 			GhostNode();
 			void read(File *file);
+			void write(File *file);
 	};
 };

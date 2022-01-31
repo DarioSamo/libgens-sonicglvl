@@ -45,7 +45,7 @@ enum EditorNodeQueryFlags {
 	EDITOR_NODE_QUERY_GHOST          =  0x10,
 	EDITOR_NODE_QUERY_VECTOR         =  0x20,
 	EDITOR_NODE_QUERY_NODE           =  0x40,
-	EDITOR_NODE_QUERY_PREVIEW_BOX    =  0x80
+	EDITOR_NODE_QUERY_PREVIEW_BOX    =  0x80,
 };
 
 void buildHavokMesh(Ogre::SceneNode *scene_node, string name, hkGeometry* geometry, Ogre::SceneManager *scene_manager, Ogre::uint32 query_flags, string resource_group);

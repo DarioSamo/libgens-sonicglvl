@@ -304,11 +304,22 @@ bool EditorAxis::mouseMoved(EditorViewport *viewport, const OIS::MouseEvent &arg
 			if (current_axis==LIBGENS_MATH_AXIS_Y) axis = Ogre::Vector3::UNIT_Y;
 			if (current_axis==LIBGENS_MATH_AXIS_Z) axis = Ogre::Vector3::UNIT_Z;
 
-			rotate.FromAngleAxis(rotate_a,axis);
+			int degrees = rotate_a.valueDegrees();
+
+			if (isRotationSnap())
+			{
+				if (degrees != 0 && degrees % 5 == 0)
+					rotate_a = ((float)degrees * LIBGENS_MATH_PI) / 180;
+				else
+					return false;
+			}
+
+			rotate.FromAngleAxis(rotate_a, axis);
 			rotate.normalise();
-			if (!rotation_frozen) rotation =  rotation * rotate;
+			if (!rotation_frozen) rotation = rotation * rotate;
 			holding_angle = angle;
 		}
+
 		return true;
 	}
 

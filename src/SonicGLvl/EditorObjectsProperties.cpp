@@ -28,6 +28,9 @@ INT_PTR CALLBACK EditIntCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 INT_PTR CALLBACK EditFloatCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK EditStringCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK EditVectorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK EditIdCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK EditIdListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK EditControlCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 WNDPROC globalEditControlOldProc;
@@ -438,13 +441,13 @@ void EditorApplication::editObjectPropertyIndex(int selection_index) {
 
 			
 			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_ID) {
-				// Create Dialog for Float
-				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_FLOAT_DIALOG), hwnd, EditIntCallback);
+				// Create Dialog for ID
+				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_ID_DIALOG), hwnd, EditIdCallback);
 
 				COMBOBOXINFO hComboBoxInfo;
 				hComboBoxInfo.cbSize = sizeof(COMBOBOXINFO);
 
-				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE);
+				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDC_EDIT_ID_VALUE);
 				GetComboBoxInfo(hEditMainControl, &hComboBoxInfo);
 				SetFocus(hEditMainControl);
 				globalEditControlOldProc = (WNDPROC) SetWindowLong(hComboBoxInfo.hwndItem, GWL_WNDPROC, (LONG) EditControlCallback);
@@ -457,8 +460,40 @@ void EditorApplication::editObjectPropertyIndex(int selection_index) {
 					if (element) {
 						LibGens::ObjectElementID *element_id = static_cast<LibGens::ObjectElementID *>(element);
 						unsigned int default_value = element_id->value;
-						SetDlgItemText(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, ToString(default_value).c_str());
-						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_FLOAT_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+
+						// get the target object's name
+						editor_application->setTargetName(default_value);
+
+						SetDlgItemText(hEditPropertyDlg, IDC_EDIT_ID_VALUE, ToString(default_value).c_str());
+						SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_ID_VALUE, (UINT)CB_SETEDITSEL, (WPARAM)0, MAKELPARAM(0, -1));
+					}
+				}
+			}
+
+			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_ID_LIST) {
+				// Create dialog for ID list
+				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_ID_LIST_DIALOG), hwnd, EditIdListCallback);
+				HWND hIDList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_ID_LIST_LIST);
+
+				LVCOLUMN Col;
+				Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+				Col.cx = 285;
+				Col.pszText = "Object IDs";
+				Col.cchTextMax = strlen(Col.pszText);
+				ListView_InsertColumn(hIDList, 0, &Col);
+
+				if (current_single_property_object) {
+					string element_name = current_properties_names[current_property_index];
+					LibGens::ObjectElement* element = current_single_property_object->getElement(element_name);
+
+					if (element) {
+						LibGens::ObjectElementIDList* element_id_list = static_cast<LibGens::ObjectElementIDList*>(element);
+						
+						for (vector<size_t>::iterator it = element_id_list->value.begin(); it != element_id_list->value.end(); ++it) {
+							addIDToList(*it);
+						}
+
+						updateEditPropertyIDList(temp_property_id_list);
 					}
 				}
 			}
@@ -570,8 +605,9 @@ void EditorApplication::editObjectPropertyIndex(int selection_index) {
 
 				HWND hEditMainControl = GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_X);
 				SetFocus(hEditMainControl);
-
-				LibGens::Vector3 dv(0.0, 0.0, 0.0);
+				
+				ObjectNode* first_selection = static_cast<ObjectNode*>(*(selected_nodes.begin()));
+				LibGens::Vector3 dv = first_selection->getObject()->getPosition();
 
 				// Set Default
 				if (current_single_property_object) {
@@ -591,6 +627,33 @@ void EditorApplication::editObjectPropertyIndex(int selection_index) {
 				VectorNode *vector_node = new VectorNode(scene_manager);
 				vector_node->setPosition(Ogre::Vector3(dv.x, dv.y, dv.z));
 				property_vector_nodes.push_back(vector_node);
+			}
+
+			if (current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST) {
+				// Create Dialog for Vector List
+				hEditPropertyDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_EDIT_VECTOR_LIST_DIALOG), hwnd, EditVectorListCallback);
+				HWND hVectorList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
+
+				LVCOLUMN Col;
+				Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+				Col.cx = 285;
+				Col.pszText = "Vector (x, y, z)";
+				Col.cchTextMax = strlen(Col.pszText);
+				ListView_InsertColumn(hVectorList, 0, &Col);
+
+				if (current_single_property_object) {
+					string element_name = current_properties_names[current_property_index];
+					LibGens::ObjectElement* element = current_single_property_object->getElement(element_name);
+
+					if (element) {
+						LibGens::ObjectElementVectorList* element_vector_list = static_cast<LibGens::ObjectElementVectorList*>(element);
+
+						for (vector<LibGens::Vector3>::iterator it = element_vector_list->value.begin(); it != element_vector_list->value.end(); ++it)
+							addVectorToList(*it);
+
+						updateEditPropertyVectorList(temp_property_vector_list);
+					}
+				}
 			}
 		}
 	}
@@ -703,6 +766,56 @@ void EditorApplication::updateEditPropertyString(string v) {
 	}
 }
 
+void EditorApplication::updateEditPropertyID(size_t v)
+{
+	string element_name = current_properties_names[current_property_index];
+
+	for (list<LibGens::Object*>::iterator it = current_object_list_properties.begin(); it != current_object_list_properties.end(); ++it)
+	{
+		LibGens::ObjectElement* element = (*it)->getElement(element_name);
+
+		if (element)
+		{
+			if (element->getType() == LibGens::OBJECT_ELEMENT_ID)
+			{
+				LibGens::ObjectElementID* element_id = static_cast<LibGens::ObjectElementID*>(element);
+				HistoryActionEditObjectElementID* history_action = new HistoryActionEditObjectElementID((*it), object_node_manager, element_id, element_id->value, v);
+				element_id->value = v;
+				history_edit_property_wrapper->push(history_action);
+			}
+		}
+	}
+
+	if (current_single_property_object) {
+		updateObjectsPropertiesValuesGUI(current_single_property_object);
+	}
+}
+
+void EditorApplication::updateEditPropertyIDList(vector<size_t> v)
+{
+	string element_name = current_properties_names[current_property_index];
+
+	for (list<LibGens::Object*>::iterator it = current_object_list_properties.begin(); it != current_object_list_properties.end(); ++it)
+	{
+		LibGens::ObjectElement* element = (*it)->getElement(element_name);
+
+		if (element)
+		{
+			if (element->getType() == LibGens::OBJECT_ELEMENT_ID_LIST)
+			{
+				LibGens::ObjectElementIDList* element_id_list = static_cast<LibGens::ObjectElementIDList*>(element);
+				HistoryActionEditObjectElementIDList* history_action = new HistoryActionEditObjectElementIDList((*it), object_node_manager, element_id_list, element_id_list->value, v);
+				element_id_list->value = v;
+				history_edit_property_wrapper->push(history_action);
+			}
+		}
+	}
+
+	if (current_single_property_object) {
+		updateObjectsPropertiesValuesGUI(current_single_property_object);
+	}
+}
+
 
 void EditorApplication::updateEditPropertyVector(LibGens::Vector3 v) {
 	string element_name = current_properties_names[current_property_index];
@@ -731,39 +844,106 @@ void EditorApplication::updateEditPropertyVector(LibGens::Vector3 v) {
 	}
 }
 
+void EditorApplication::updateEditPropertyVectorList(vector<LibGens::Vector3> v)
+{
+	string element_name = current_properties_names[current_property_index];
 
-void EditorApplication::updateEditPropertyVectorFocus() {
+	for (list<LibGens::Object*>::iterator it = current_object_list_properties.begin(); it != current_object_list_properties.end(); ++it)
+	{
+		LibGens::ObjectElement* element = (*it)->getElement(element_name);
+		if (element)
+		{
+			if (element->getType() == LibGens::OBJECT_ELEMENT_VECTOR_LIST)
+			{
+				LibGens::ObjectElementVectorList* element_vector_list = static_cast<LibGens::ObjectElementVectorList*>(element);
+				HistoryActionEditObjectElementVectorList* history_action = new HistoryActionEditObjectElementVectorList((*it), object_node_manager, element_vector_list, element_vector_list->value, v);
+				element_vector_list->value = v;
+				history_edit_property_wrapper->push(history_action);
+
+				object_node_manager->reloadObjectNode((*it));
+			}
+		}
+	}
+
+	if (current_single_property_object) {
+		updateObjectsPropertiesValuesGUI(current_single_property_object);
+	}
+
 	if (property_vector_nodes.size()) {
-		viewport->focusOnPoint(property_vector_nodes[0]->getPosition());
+		for (int i = 0; i < property_vector_nodes.size(); ++i)
+		{
+			LibGens::Vector3 v3 = v[i];
+			property_vector_nodes[i]->setPosition(Ogre::Vector3(v3.x, v3.y, v3.z));
+		}
 	}
 }
 
 
-void EditorApplication::updateEditPropertyVectorGUI() {
+void EditorApplication::updateEditPropertyVectorFocus(int index) {
 	if (property_vector_nodes.size()) {
-		Ogre::Vector3 v=property_vector_nodes[0]->getPosition();
+		viewport->focusOnPoint(property_vector_nodes[index]->getPosition());
+	}
+}
+
+
+void EditorApplication::updateEditPropertyVectorGUI(int index, bool is_list) {
+	if (property_vector_nodes.size()) {
+
+		Ogre::Vector3 v=property_vector_nodes[index]->getPosition();
 
 		if (hEditPropertyDlg) {
-			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_X, ToString((float)v.x).c_str());
-			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Y, ToString((float)v.y).c_str());
-			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Z, ToString((float)v.z).c_str());
+
+			if (!is_list)
+			{
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_X, ToString((float)v.x).c_str());
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Y, ToString((float)v.y).c_str());
+				SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_Z, ToString((float)v.z).c_str());
+			}
 		}
 
-		updateEditPropertyVector(LibGens::Vector3(v.x, v.y, v.z));
+		if (!is_list)
+			updateEditPropertyVector(LibGens::Vector3(v.x, v.y, v.z));
+		else
+		{
+			HWND list_view = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
+			temp_property_vector_list[index] = LibGens::Vector3(v.x, v.y, v.z);
+
+			if (hEditPropertyDlg)
+			{
+				string vector_string = ToString<float>(v.x) + ", " + ToString<float>(v.y) + ", " + ToString<float>(v.z);
+				char buffer[128];
+				strcpy(buffer, vector_string.c_str());
+
+				ListView_SetItemText(list_view, index, 0, buffer);
+			}
+		}
 	}
 }
 
 
-void EditorApplication::updateEditPropertyVectorMode(bool mode_state) {
+void EditorApplication::updateEditPropertyVectorMode(bool mode_state, bool is_list, int index) {
 	SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_VECTOR_EDITING, BM_SETCHECK, (WPARAM)mode_state, 0);
+	SendDlgItemMessage(hEditPropertyDlg, IDC_EDIT_VECTOR_LIST_EDITING, BM_SETCHECK, (WPARAM)mode_state, 0);
+	if (!is_list)
+	{
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_X), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_Y), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_Z), !mode_state);
 
-	EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_X), !mode_state);
-	EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_Y), !mode_state);
-	EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_Z), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_X), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_Y), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_Z), !mode_state);
+	}
+	else
+	{
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z), !mode_state);
 
-	EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_X), !mode_state);
-	EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_Y), !mode_state);
-	EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_Z), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_LIST_X), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_LIST_Y), !mode_state);
+		EnableWindow(GetDlgItem(hEditPropertyDlg, IDS_EDIT_VECTOR_LIST_Z), !mode_state);
+	}
 
 	if (mode_state) {
 		previous_selected_nodes = selected_nodes;
@@ -777,11 +957,11 @@ void EditorApplication::updateEditPropertyVectorMode(bool mode_state) {
 
 		property_vector_history->clear();
 
-		selected_nodes.push_back(property_vector_nodes[0]);
-		property_vector_nodes[0]->setSelect(true);
+		selected_nodes.push_back(property_vector_nodes[index]);
+		property_vector_nodes[index]->setSelect(true);
 
 		updateSelection();
-		updateEditPropertyVectorFocus();
+		updateEditPropertyVectorFocus(index);
 
 		// Move window to the bottom right corner of the main window
 		RECT main_window_rect;
@@ -826,6 +1006,34 @@ void EditorApplication::closeVectorQueryMode() {
 	global_cursor_state = 0;
 }
 
+void EditorApplication::closeTargetQueryMode() {
+	editor_mode = EDITOR_NODE_QUERY_OBJECT;
+	global_cursor_state = 0;
+}
+
+void EditorApplication::openQueryTargetMode(bool mode)
+{
+	if (mode)
+	{
+		is_pick_target = true;
+		SetFocus(hwnd);
+
+		RECT main_window_rect;
+		GetWindowRect(hwnd, &main_window_rect);
+		GetWindowRect(hEditPropertyDlg, &hEditPropertyDlg_old_rect);
+
+		LONG dlg_w = hEditPropertyDlg_old_rect.right - hEditPropertyDlg_old_rect.left;
+		LONG dlg_h = hEditPropertyDlg_old_rect.bottom - hEditPropertyDlg_old_rect.top;
+		MoveWindow(hEditPropertyDlg, main_window_rect.right - dlg_w - 15, main_window_rect.bottom - dlg_h - SONICGLVL_GUI_BOTTOM_HEIGHT - 15, dlg_w, dlg_h, true);
+	}
+	else
+	{
+		is_pick_target = false;
+		LONG dlg_w = hEditPropertyDlg_old_rect.right - hEditPropertyDlg_old_rect.left;
+		LONG dlg_h = hEditPropertyDlg_old_rect.bottom - hEditPropertyDlg_old_rect.top;
+		MoveWindow(hEditPropertyDlg, hEditPropertyDlg_old_rect.left, hEditPropertyDlg_old_rect.top, dlg_w, dlg_h, true);
+	}
+}
 
 void EditorApplication::verifySonicSpawnChange() {
 	// Verify that property is valid and only a single object is selected
@@ -919,6 +1127,8 @@ void EditorApplication::clearEditPropertyGUI() {
 		delete (*it);
 	}
 	property_vector_nodes.clear();
+	temp_property_vector_list.clear();
+	temp_property_id_list.clear();
 }
 
 void EditorApplication::closeEditPropertyGUI() {
@@ -1265,6 +1475,613 @@ INT_PTR CALLBACK EditVectorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM l
 			return true;
 	}
 	
+	return false;
+}
+
+vector<VectorNode*>& EditorApplication::getPropertyVectorNodes()
+{
+	return property_vector_nodes;
+}
+
+vector<LibGens::Vector3>& EditorApplication::getCurrentPropertyVectorList()
+{
+	return temp_property_vector_list;
+}
+
+void EditorApplication::updateVectorListSelection(int index)
+{
+	current_vector_list_selection = index;
+	HWND viewport_edit = GetDlgItem(hEditPropertyDlg, IDC_EDIT_VECTOR_LIST_EDITING);
+	HWND viewport_focus = GetDlgItem(hEditPropertyDlg, IDB_EDIT_VECTOR_LIST_FOCUS);
+	HWND vector_delete = GetDlgItem(hEditPropertyDlg, IDB_EDIT_VECTOR_LIST_DELETE);
+	HWND vector_up = GetDlgItem(hEditPropertyDlg, IDB_EDIT_VECTOR_LIST_MOVE_UP);
+	HWND vector_down = GetDlgItem(hEditPropertyDlg, IDB_EDIT_VECTOR_LIST_MOVE_DOWN);
+
+	if (current_vector_list_selection != last_vector_list_selection)
+	{
+		last_vector_list_selection = current_vector_list_selection;
+		
+		if (isVectorListSelectionValid())
+		{
+			is_update_vector_list = false;
+			LibGens::Vector3 v = temp_property_vector_list[current_vector_list_selection];
+
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_X, ToString<float>(v.x).c_str());
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Y, ToString<float>(v.y).c_str());
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_VECTOR_LIST_Z, ToString<float>(v.z).c_str());
+		}
+	}
+
+	if (isVectorListSelectionValid())
+	{
+		EnableWindow(viewport_edit, true);
+		EnableWindow(viewport_focus, true);
+		EnableWindow(vector_delete, true);
+
+		// Enable or disable buttons based on current selection in the list view
+		if (property_vector_nodes.size() > 1)
+		{
+			if (current_vector_list_selection > 0)
+			{
+				EnableWindow(vector_up, true);
+
+				if (current_vector_list_selection < property_vector_nodes.size() - 1)
+					EnableWindow(vector_down, true);
+				else
+					EnableWindow(vector_down, false);
+			}
+
+			if (current_vector_list_selection == 0)
+			{
+				EnableWindow(vector_up, false);
+
+				if (property_vector_nodes.size() > 1)
+					EnableWindow(vector_down, true);
+			}
+		}
+	}
+	else
+	{
+		EnableWindow(viewport_edit, false);
+		EnableWindow(viewport_focus, false);
+		EnableWindow(vector_delete, false);
+		EnableWindow(vector_up, false);
+		EnableWindow(vector_down, false);
+	}
+
+	is_update_vector_list = true;
+}
+
+void EditorApplication::removeVectorFromList(int index)
+{
+	HWND list_view = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
+	ListView_DeleteItem(list_view, index);
+	int count = ListView_GetItemCount(list_view);
+	ListView_SetItemCount(list_view, count - 1);
+
+	for (vector<LibGens::Vector3>::iterator it = temp_property_vector_list.begin(); it != temp_property_vector_list.end(); ++it)
+	{
+		if (*it == temp_property_vector_list[index])
+		{
+			temp_property_vector_list.erase(it);
+			break;
+		}
+	}
+
+	for (vector<VectorNode *>::iterator it = property_vector_nodes.begin(); it != property_vector_nodes.end(); ++it)
+	{
+		if (*it == property_vector_nodes[index])
+		{
+			delete *it;
+			property_vector_nodes.erase(it);
+			break;
+		}
+	}
+
+	if (count)
+		ListView_SetSelectionMark(list_view, index - 1);
+}
+
+void EditorApplication::moveVector(int index, bool up)
+{
+	HWND list_view = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
+	char buffer[128];
+
+	LV_ITEM item;
+	item.mask = LVIF_TEXT;
+	item.iItem = index;
+	item.iSubItem = 0;
+	item.pszText = buffer;
+
+	ListView_GetItem(list_view, &item);
+	ListView_DeleteItem(list_view, index);
+
+	if (up)
+	{
+		item.iItem = index - 1;
+		ListView_InsertItem(list_view, &item);
+
+		swap(temp_property_vector_list[index], temp_property_vector_list[index - 1]);
+		swap(property_vector_nodes[index], property_vector_nodes[index - 1]);
+	}
+	else
+	{
+		item.iItem = index + 1;
+		ListView_InsertItem(list_view, &item);
+
+		swap(temp_property_vector_list[index], temp_property_vector_list[index + 1]);
+		swap(property_vector_nodes[index], property_vector_nodes[index + 1]);
+	}
+}
+
+bool EditorApplication::isVectorListSelectionValid()
+{
+	return current_vector_list_selection > -1 && current_vector_list_selection < temp_property_vector_list.size() && temp_property_vector_list.size();
+}
+
+bool EditorApplication::isUpdateVectorList()
+{
+	return is_update_vector_list;
+}
+
+INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+	HWND list_view = GetDlgItem(hDlg, IDL_EDIT_VECTOR_LIST_LIST);
+	int list_view_index = ListView_GetNextItem(list_view, -1, LVIS_SELECTED | LVIS_FOCUSED);
+	editor_application->updateVectorListSelection(list_view_index);
+	
+	switch (msg) {
+	case WM_INITDIALOG:
+		return true;
+
+	case WM_CLOSE:
+		if (IsDlgButtonChecked(hDlg, IDC_EDIT_VECTOR_LIST_EDITING)) {
+			editor_application->updateEditPropertyVectorMode(false);
+		}
+
+		EndDialog(hDlg, false);
+		editor_application->clearEditPropertyGUI();
+		return true;
+
+	case WM_COMMAND:
+		if (HIWORD(wParam) == EN_CHANGE)
+		{
+			if ((LOWORD(wParam) == IDE_EDIT_VECTOR_LIST_X) || (LOWORD(wParam) == IDE_EDIT_VECTOR_LIST_Y) || (LOWORD(wParam) == IDE_EDIT_VECTOR_LIST_Z)) {
+				if (editor_application->isUpdateVectorList() && editor_application->isVectorListSelectionValid())
+				{
+					float value_x = 0.0f;
+					float value_y = 0.0f;
+					float value_z = 0.0f;
+
+					value_x = GetDlgItemFloat(hDlg, IDE_EDIT_VECTOR_LIST_X);
+					value_y = GetDlgItemFloat(hDlg, IDE_EDIT_VECTOR_LIST_Y);
+					value_z = GetDlgItemFloat(hDlg, IDE_EDIT_VECTOR_LIST_Z);
+
+					char text[128];
+					string newText = ToString<float>(value_x) + ", " + ToString<float>(value_y) + ", " + ToString<float>(value_z);
+					strcpy(text, newText.c_str());
+
+					ListView_SetItemText(list_view, list_view_index, 0, (char*)newText.c_str());
+					editor_application->getCurrentPropertyVectorList()[list_view_index] = LibGens::Vector3(value_x, value_y, value_z);
+					editor_application->getPropertyVectorNodes()[list_view_index]->setPosition(Ogre::Vector3(value_x, value_y, value_z));
+				}
+			}
+		}
+
+		switch ((LPARAM)wParam)
+		{
+		case IDCANCEL:
+			SendMessage(hDlg, WM_CLOSE, 0, 0);
+			editor_application->revertEditProperty();
+			return true;
+
+		case IDOK:
+			editor_application->updateEditPropertyVectorList(editor_application->getCurrentPropertyVectorList());
+			SendMessage(hDlg, WM_CLOSE, 0, 0);
+			editor_application->confirmEditProperty();
+			return true;
+
+		case IDB_EDIT_VECTOR_LIST_CREATE:
+			editor_application->addVectorToList();
+			editor_application->updateEditPropertyVectorList(editor_application->getCurrentPropertyVectorList());
+			break;
+
+		case IDB_EDIT_VECTOR_LIST_FOCUS:
+			if (editor_application->isVectorListSelectionValid())
+				editor_application->updateEditPropertyVectorFocus(list_view_index);
+			break;
+
+		case IDB_EDIT_VECTOR_LIST_DELETE:
+			if (editor_application->isVectorListSelectionValid())
+			{
+				editor_application->removeVectorFromList(list_view_index);
+				editor_application->updateEditPropertyVectorList(editor_application->getCurrentPropertyVectorList());
+			}
+			break;
+
+		case IDC_EDIT_VECTOR_LIST_EDITING:
+			if (editor_application->isVectorListSelectionValid())
+				editor_application->updateEditPropertyVectorMode(IsDlgButtonChecked(hDlg, IDC_EDIT_VECTOR_LIST_EDITING), true, list_view_index);
+			break;
+
+		case IDB_EDIT_VECTOR_LIST_MOVE_UP:
+			editor_application->moveVector(list_view_index, true);
+			break;
+
+		case IDB_EDIT_VECTOR_LIST_MOVE_DOWN:
+			editor_application->moveVector(list_view_index, false);
+		}
+		break;
+	}
+
+	return false;
+}
+
+void EditorApplication::addVectorToList(LibGens::Vector3 v3)
+{
+	HWND hVectorList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
+	ObjectNode* first_selection = static_cast<ObjectNode*>(*(selected_nodes.begin()));
+	v3 = first_selection->getObject()->getPosition();
+	float x = v3.x;
+	float y = v3.y;
+	float z = v3.z;
+
+	string v3_combined = ToString<float>(x) + ", " + ToString<float>(y) + ", " + ToString<float>(z);
+	char v[256];
+
+	strcpy(v, v3_combined.c_str());
+
+	LV_ITEM item;
+	item.mask = LVIF_TEXT;
+	item.pszText = v;
+	item.cchTextMax = strlen(v);
+	item.state = 0;
+	item.iSubItem = 0;
+	item.lParam = (LPARAM)NULL;
+	item.iItem = temp_property_vector_list.size();
+	ListView_InsertItem(hVectorList, &item);
+	ListView_SetItemText(hVectorList, item.iItem, 0, item.pszText);
+
+	temp_property_vector_list.push_back(v3);
+	VectorNode* vector_node = new VectorNode(scene_manager);
+	vector_node->setPosition(Ogre::Vector3(x, y, z));
+	property_vector_nodes.push_back(vector_node);
+}
+
+void EditorApplication::addIDToList(size_t id)
+{
+	HWND hIDList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_ID_LIST_LIST);
+	
+	string id_string = ToString<size_t>(id);
+	char v[128];
+
+	strcpy(v, id_string.c_str());
+
+	LV_ITEM item;
+	item.mask = LVIF_TEXT;
+	item.pszText = v;
+	item.cchTextMax = strlen(v);
+	item.state = 0;
+	item.iSubItem = 0;
+	item.lParam = (LPARAM)NULL;
+	item.iItem = temp_property_id_list.size();
+	ListView_InsertItem(hIDList, &item);
+	ListView_SetItemText(hIDList, item.iItem, 0, item.pszText);
+
+	temp_property_id_list.push_back(id);
+}
+
+void EditorApplication::removeIDFromList(int index)
+{
+	HWND list_view = GetDlgItem(hEditPropertyDlg, IDL_EDIT_ID_LIST_LIST);
+
+	for (vector<size_t>::iterator it = temp_property_id_list.begin(); it != temp_property_id_list.end(); ++it)
+	{
+		if (*it == temp_property_id_list[index])
+		{
+			temp_property_id_list.erase(it);
+			ListView_DeleteItem(list_view, index);
+			return;
+		}
+	}
+}
+
+void EditorApplication::moveID(int index, bool up)
+{
+	HWND list_view = GetDlgItem(hEditPropertyDlg, IDL_EDIT_ID_LIST_LIST);
+	char item_text[128];
+
+	LV_ITEM item;
+	item.mask = LVIF_TEXT;
+	item.iItem = index;
+	item.iSubItem = 0;
+	item.pszText = item_text;
+	
+	ListView_GetItem(list_view, &item);
+	ListView_DeleteItem(list_view, index);
+
+	if (up)
+	{
+		item.iItem = index - 1;
+		ListView_InsertItem(list_view, &item);
+		ListView_SetItemText(list_view, item.iItem, item.iSubItem, item.pszText);
+
+		swap(temp_property_id_list[index - 1], temp_property_id_list[index]);
+	}
+	else
+	{
+		item.iItem = index + 1;
+		ListView_InsertItem(list_view, &item);
+		ListView_SetItemText(list_view, item.iItem, item.iSubItem, item.pszText);
+
+		swap(temp_property_id_list[index + 1], temp_property_id_list[index]);
+	}
+	
+}
+
+void EditorApplication::setTargetName(size_t id, bool is_list)
+{
+	LibGens::Object* obj = getCurrentLevel()->getLevel()->getObjectByID(id);
+	string object_name = "none";
+	bool enabled = false;
+
+	if (obj)
+	{
+		object_name = obj->getName();
+		enabled = true;
+	}
+
+	string result = "Points to: (" + object_name + ")";
+	HWND button;
+
+	if (!is_list)
+	{
+		SetDlgItemText(hEditPropertyDlg, IDT_EDIT_ID_POINT, result.c_str());
+
+		button = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_GO_TO_TARGET);
+		EnableWindow(button, enabled);
+	}
+	else
+	{
+		SetDlgItemText(hEditPropertyDlg, IDT_EDIT_ID_LIST_POINT, result.c_str());
+
+		button = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_LIST_GO_TO_TARGET);
+		EnableWindow(button, enabled);
+	}
+}
+
+INT_PTR CALLBACK EditIdCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		return true;
+
+	case WM_CLOSE:
+		EndDialog(hDlg, false);
+		editor_application->openQueryTargetMode(false);
+		editor_application->clearEditPropertyGUI();
+		return true;
+
+	case WM_COMMAND:
+		if (HIWORD(wParam) == CBN_EDITCHANGE)
+		{
+			if (LOWORD(wParam) == IDC_EDIT_ID_VALUE)
+			{
+				size_t id = GetDlgItemFloat(hDlg, IDC_EDIT_ID_VALUE);
+				editor_application->setTargetName(id);
+			}
+		}
+
+		switch (LOWORD(wParam))
+		{
+		case IDC_EDIT_ID_SELECT_FROM_VIEWPORT:
+			editor_application->openQueryTargetMode(IsDlgButtonChecked(hDlg, IDC_EDIT_ID_SELECT_FROM_VIEWPORT));
+			break;
+
+		case IDB_EDIT_ID_GO_TO_TARGET:
+		{
+			size_t id = GetDlgItemFloat(hDlg, IDC_EDIT_ID_VALUE);
+			LibGens::Object* obj = editor_application->getCurrentLevel()->getLevel()->getObjectByID(id);
+			if (obj)
+			{
+				editor_application->clearSelection();
+				ObjectNode *obj_node = editor_application->getObjectNodeManager()->findObjectNode(obj);
+				if (obj_node)
+				{
+					SendMessage(hDlg, WM_CLOSE, 0, 0);
+					editor_application->selectNode(obj_node);
+					editor_application->updateSelection();
+					return true;
+				}
+			}
+			break;
+		}
+		break;
+
+		case IDOK:
+		{
+			size_t value = GetDlgItemFloat(hDlg, IDC_EDIT_ID_VALUE);
+			editor_application->updateEditPropertyID(value);
+			editor_application->confirmEditProperty();
+			SendMessage(hDlg, WM_CLOSE, 0, 0);
+			return true;
+		}
+
+		case IDCANCEL:
+			SendMessage(hDlg, WM_CLOSE, 0, 0);
+			return true;
+
+		}
+
+		break;
+	}
+
+	return false;
+}
+
+void EditorApplication::updateIDListSelection(int index)
+{
+	HWND list_delete = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_LIST_DELETE);
+	HWND list_move_up = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_LIST_MOVE_UP);
+	HWND list_move_down = GetDlgItem(hEditPropertyDlg, IDB_EDIT_ID_LIST_MOVE_DOWN);
+	HWND list_add = GetDlgItem(hEditPropertyDlg, IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT);
+	HWND list_text = GetDlgItem(hEditPropertyDlg, IDE_EDIT_ID_LIST_VALUE);
+
+	current_id_list_selection = index;
+	if (current_id_list_selection != last_id_list_selection)
+	{
+		last_id_list_selection = current_id_list_selection;
+		if (isIDListSelectionValid())
+		{
+			size_t id = temp_property_id_list[index];
+			SetDlgItemText(hEditPropertyDlg, IDE_EDIT_ID_LIST_VALUE, ToString<size_t>(id).c_str());
+		}
+	}
+
+	if (isIDListSelectionValid())
+	{
+		EnableWindow(list_delete, true);
+		EnableWindow(list_add, true);
+		EnableWindow(list_text, true);
+
+		// Enable or disable buttons based on current selection in the list view
+		if (temp_property_id_list.size() > 1)
+		{
+			if (current_id_list_selection > 0)
+			{
+				EnableWindow(list_move_up, true);
+
+				if (current_id_list_selection < temp_property_id_list.size() - 1)
+					EnableWindow(list_move_down, true);
+				else
+					EnableWindow(list_move_down, false);
+			}
+
+			if (current_id_list_selection == 0)
+			{
+				EnableWindow(list_move_up, false);
+
+				if (temp_property_id_list.size() > 1)
+					EnableWindow(list_move_down, true);
+			}
+		}
+	}
+	else
+	{
+		EnableWindow(list_delete, false);
+		EnableWindow(list_move_up, false);
+		EnableWindow(list_move_down, false);
+		EnableWindow(list_add, false);
+		EnableWindow(list_text, false);
+	}
+}
+
+vector<size_t>& EditorApplication::getCurrentPropertyIDList()
+{
+	return temp_property_id_list;
+}
+
+bool EditorApplication::isIDListSelectionValid()
+{
+	return current_id_list_selection > -1 && current_id_list_selection < temp_property_id_list.size() && temp_property_id_list.size();
+}
+
+INT_PTR CALLBACK EditIdListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	HWND list_view = GetDlgItem(hDlg, IDL_EDIT_ID_LIST_LIST);
+	int index = ListView_GetNextItem(list_view, -1, LVIS_SELECTED | LVIS_FOCUSED);
+	editor_application->updateIDListSelection(index);
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		return true;
+
+	case WM_CLOSE:
+		EndDialog(hDlg, false);
+		editor_application->openQueryTargetMode(false);
+		editor_application->clearEditPropertyGUI();
+		return true;
+
+	case WM_COMMAND:
+		if (HIWORD(wParam) == EN_CHANGE)
+		{
+			if (LOWORD(wParam) == IDE_EDIT_ID_LIST_VALUE)
+			{
+				if (editor_application->isIDListSelectionValid())
+				{
+					size_t id = GetDlgItemFloat(hDlg, IDE_EDIT_ID_LIST_VALUE);
+					string id_string = ToString<size_t>(id);
+					char buffer[128];
+					strcpy(buffer, id_string.c_str());
+
+					ListView_SetItemText(list_view, index, 0, (char*)buffer);
+					editor_application->getCurrentPropertyIDList()[index] = id;
+					editor_application->setTargetName(id, true);
+				}
+			}
+		}
+
+		switch (LOWORD(wParam))
+		{
+		case IDB_EDIT_ID_LIST_CREATE:
+			editor_application->addIDToList(0);
+			editor_application->updateEditPropertyIDList(editor_application->getCurrentPropertyIDList());
+			break;
+
+		case IDB_EDIT_ID_LIST_DELETE:
+			editor_application->removeIDFromList(index);
+			editor_application->updateEditPropertyIDList(editor_application->getCurrentPropertyIDList());
+			break;
+
+		case IDB_EDIT_ID_LIST_MOVE_UP:
+			editor_application->moveID(index, true);
+			break;
+
+		case IDB_EDIT_ID_LIST_MOVE_DOWN:
+			editor_application->moveID(index, false);
+			break;
+
+		case IDB_EDIT_ID_LIST_GO_TO_TARGET:
+		{
+			size_t id = GetDlgItemFloat(hDlg, IDE_EDIT_ID_LIST_VALUE);
+			LibGens::Object* obj = editor_application->getCurrentLevel()->getLevel()->getObjectByID(id);
+			if (obj)
+			{
+				editor_application->clearSelection();
+				ObjectNode* obj_node = editor_application->getObjectNodeManager()->findObjectNode(obj);
+				if (obj_node)
+				{
+					SendMessage(hDlg, WM_CLOSE, 0, 0);
+					editor_application->selectNode(obj_node);
+					editor_application->updateSelection();
+					return true;
+				}
+			}
+			break;
+		}
+		break;
+
+		case IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT:
+			editor_application->openQueryTargetMode(IsDlgButtonChecked(hDlg, IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT));
+			break;
+
+		case IDCANCEL:
+			editor_application->revertEditProperty();
+			SendMessage(hDlg, WM_CLOSE, 0, 0);
+			return true;
+
+		case IDOK:
+			editor_application->openQueryTargetMode(false);
+			editor_application->updateEditPropertyIDList(editor_application->getCurrentPropertyIDList());
+			editor_application->confirmEditProperty();
+			SendMessage(hDlg, WM_CLOSE, 0, 0);
+			return true;
+		}
+		break;
+	}
+
 	return false;
 }
 

@@ -165,6 +165,9 @@ namespace LibGens {
 
 			void removeAllNodes()
 			{
+				for (list<MultiSetNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it)
+					delete (*it);
+
 				nodes.clear();
 			}
 

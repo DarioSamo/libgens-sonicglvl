@@ -47,6 +47,8 @@
 #include "Object.h"
 #include "ObjectCategory.h"
 #include "ObjectSet.h"
+#include "PipeClient.h"
+#include "TrajectoryNode.h"
 
 #ifndef EDITOR_APPLICATION_H_INCLUDED
 #define EDITOR_APPLICATION_H_INCLUDED
@@ -138,6 +140,7 @@ class EditorApplication : public BaseApplication {
 		// General Editor Variables
 		Ogre::uint32 editor_mode;
 		bool world_transform;
+		bool local_rotation;
 		size_t dragging_mode;
 		size_t cloning_mode;
 		Ogre::AnimationState *animation_state;
@@ -146,6 +149,19 @@ class EditorApplication : public BaseApplication {
 		string current_level_filename;
 		map<LibGens::ObjectSet *, int> set_indices;
 		map<LibGens::ObjectSet *, bool> set_visibility;
+
+		int current_vector_list_selection;
+		int last_vector_list_selection;
+		int current_id_list_selection;
+		int last_id_list_selection;
+		bool is_update_vector_list;
+		bool is_pick_target;
+		bool is_pick_target_position;
+		bool is_update_pos_rot;
+		bool is_update_look_at_vector;
+
+		// Finder
+		list<ObjectNode*>::iterator find_position;
 		
 		// Ogre
 		Ogre::Light *global_directional_light;
@@ -216,12 +232,14 @@ class EditorApplication : public BaseApplication {
 		HWND hEditPropertyDlg;
 
 		RECT hEditPropertyDlg_old_rect;
+		RECT hLookAtPointDlg_old_rect;
 
 		HWND hMaterialEditorDlg;
 		HWND hPhysicsEditorDlg;
 		HWND hMaterialEditorPreviewDlg;
 		HWND hMultiSetParamDlg;
-
+		HWND hFindObjectDlg;
+		HWND hLookAtPointDlg;
 		// Object Palette
 		int current_category_index;
 		LibGens::Object *last_palette_selection;
@@ -234,14 +252,18 @@ class EditorApplication : public BaseApplication {
 		list<LibGens::Object *> current_object_list_properties;
 		vector<string> current_properties_names;
 		vector<LibGens::ObjectElementType> current_properties_types;
+		vector<LibGens::Vector3> temp_property_vector_list;
+		vector<unsigned int> temp_property_id_list;
 		int current_property_index;
 		LibGens::Object *current_single_property_object;
 
 		HistoryActionWrapper *history_edit_property_wrapper;
 		int ignore_mouse_clicks_frames;
 
+		vector<TrajectoryNode*> trajectory_preview_nodes;
 		vector<VectorNode *> property_vector_nodes;
 		History *property_vector_history;
+		History* look_at_vector_history;
 
 
 		// Material Editor
@@ -281,6 +303,16 @@ class EditorApplication : public BaseApplication {
 		list<EditorNode*> cloning_nodes;
 		list<EditorNode*> temporary_nodes;
 
+		// Game
+		PipeClient* game_client;
+
+		// Ghost
+		LibGens::Ghost* ghost_data;
+		bool isGhostRecording;
+
+		// LookAt feature
+		VectorNode* vector_node;
+
 	public:
 		EditorApplication(void);
 		virtual ~EditorApplication(void);
@@ -302,6 +334,7 @@ class EditorApplication : public BaseApplication {
 		void deleteSelection();
 		void clearSelection();
 		void cloneSelection();
+		void temporaryCloneSelection();
 		void showSelectionNames();
 		void selectAll();
 		void translateSelection(Ogre::Vector3 v);
@@ -311,10 +344,25 @@ class EditorApplication : public BaseApplication {
 		void makeHistorySelection(bool mode);
 		void toggleWorldTransform();
 		void togglePlacementSnap();
+		void toggleLocalRotation();
+		void toggleRotationSnap();
+		void lookAt(EditorNode*, int, Ogre::Vector3);
+		void lookAtPoint(int, Ogre::Vector3);
+		void lookAtEachOther(int);
 		void updateNodeVisibility();
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
 		void rememberCloningNodes();
+		ObjectNode* getObjectNodeFromEditorNode(EditorNode* node);
+		TrajectoryMode getTrajectoryMode(EditorNode* node);
+		void addTrajectory(TrajectoryMode mode);
+		void removeAllTrajectoryNodes();
+		bool isUpdatePosRot();
+
+		void openFindGUI();
+		void closeFindGUI();
+		void findNext(string obj_name, string param, string value);
+		void findAll(string obj_name, string param, string value);
 
 		void copySelection();
 		void pasteSelection();
@@ -327,6 +375,7 @@ class EditorApplication : public BaseApplication {
 		void checkGhost(Ogre::Real timeSinceLastFrame);
 		void checkTerrainStreamer();
 		void checkTerrainVisibilityAndQuality(Ogre::Real timeSinceLastFrame);
+		void updateTrajectoryNodes(Ogre::Real timeSinceLastFrame);
 
 		void ignoreMouseClicks(int frames) {
 			ignore_mouse_clicks_frames = frames;
@@ -360,6 +409,7 @@ class EditorApplication : public BaseApplication {
 		void saveXNAnimation();
 
 		void updateBottomSelectionGUI();
+		void updateMenu();
 		void updateSetsGUI();
 		void updateSelectedSetGUI();
 		void newCurrentSet();
@@ -368,12 +418,20 @@ class EditorApplication : public BaseApplication {
 		void changeCurrentSet(string change_set);
 		void renameCurrentSet(string rename_set);
 
-
 		void openPhysicsEditorGUI();
 		void clearPhysicsEditorGUI();
 		void addPhysicsEditorEntryGUI(LibGens::LevelCollisionEntry *entry);
 		void importPhysicsEditorGUI();
 		void detectAndTagHavokPhysics(LibGens::HavokPhysicsCache *physics_cache);
+
+		void openLookAtPointGUI();
+		void closeLookAtPointGUI();
+		void updateLookAtPointVectorNode(Ogre::Vector3);
+		void focusLookAtPointVector();
+		void queryLookAtObject(bool);
+		void updateLookAtVectorMode(bool);
+		void updateLookAtVectorGUI();
+		bool isUpdateLookAtVector();
 
 		void openMaterialEditorGUI();
 		void clearMaterialEditorGUI();
@@ -435,14 +493,32 @@ class EditorApplication : public BaseApplication {
 		void updateEditPropertyID(size_t v);
 		void updateEditPropertyIDList(vector<size_t> v);
 		void updateEditPropertyVector(LibGens::Vector3 v);
-		void updateEditPropertyVectorFocus();
-		void updateEditPropertyVectorGUI();
-		void updateEditPropertyVectorMode(bool mode_state);
+		void updateEditPropertyVectorFocus(int index = 0);
+		void updateEditPropertyVectorGUI(int index = 0, bool is_list = false);
+		void updateEditPropertyVectorMode(bool mode_state, bool is_list = false, int index = 0);
 		void updateEditPropertyVectorList(vector<LibGens::Vector3> v);
-		void updateEditPropertyVectorListFocus();
+		void selectNode(EditorNode* node);
+		void openQueryTargetMode(bool mode);
+		void setTargetName(size_t id, bool is_list = false);
+		void addVectorToList(LibGens::Vector3 = LibGens::Vector3(0, 0, 0));
+		void updateVectorListSelection(int index);
+		void removeVectorFromList(int index);
+		void moveVector(int index, bool up);
+		bool isVectorListSelectionValid();
+		bool isUpdateVectorList();
+		void addIDToList(size_t id);
+		void updateIDListSelection(int index);
+		void removeIDFromList(int index);
+		void moveID(int index, bool up);
+		bool isIDListSelectionValid();
+		vector<size_t>& getCurrentPropertyIDList();
+		vector<LibGens::Vector3>& getCurrentPropertyVectorList();
+		vector<VectorNode*>& getPropertyVectorNodes();
+		ObjectNodeManager* getObjectNodeManager();
 
 
 		void closeVectorQueryMode();
+		void closeTargetQueryMode();
 
 		void verifySonicSpawnChange();
 		void confirmEditProperty();
@@ -480,6 +556,17 @@ class EditorApplication : public BaseApplication {
 
 		// Havok method
 		void loadGhostAnimations();
+		void setupGhost();
+
+		// Ghost methods
+		void loadGhostRecording();
+		void saveGhostRecording();
+
+		// Game methods
+		void processGameMessage(PipeClient* client, PipeMessage* msg);
+		void launchGame();
+		bool connectGame();
+		DWORD sendMessageGame(PipeMessage* msg, size_t size);
 
 		void createLevel(string name);
 		void createLibrary();
@@ -490,6 +577,26 @@ class EditorApplication : public BaseApplication {
 		void createNodesFromHavokEnviroment(LibGens::HavokEnviroment *havok_enviroment);
 
 		//bool renderOneFrame();
+
+		bool checkGameConnection() {
+			return game_client->checkConnection();
+		}
+
+		GhostNode *getGhostNode() {
+			return ghost_node;
+		}
+
+		void setGhost(LibGens::Ghost* ghost_p) {
+			if (!ghost_p)
+				return;
+			
+			if (ghost_data != ghost_p && ghost_data)
+				delete ghost_data;
+
+			ghost_data = ghost_p;
+			setupGhost();
+			ghost_node->setGhost(ghost_p);
+		}
 
 		EditorAxis *getEditorAxis() {
 			return axis;
@@ -521,6 +628,10 @@ class EditorApplication : public BaseApplication {
 
 		LibGens::HavokEnviroment *getHavokEnviroment() {
 			return havok_enviroment;
+		}
+
+		EditorConfiguration *getConfiguration() {
+			return configuration;
 		}
 
 		void updateBottomSelectionPosition(float value_x, float value_y, float value_z);

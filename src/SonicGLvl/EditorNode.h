@@ -32,7 +32,8 @@ enum EditorNodeType {
 	EDITOR_NODE_PATH             = 32,
 	EDITOR_NODE_TERRAIN_AUTODRAW = 64,
 	EDITOR_NODE_AXIS             = 128,
-	EDITOR_NODE_VECTOR           = 256
+	EDITOR_NODE_VECTOR           = 256,
+	EDITOR_NODE_TRAJECTORY		 = 512
 };
 
 class EditorNode {

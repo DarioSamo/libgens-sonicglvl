@@ -184,3 +184,8 @@ ui_*.h
 
 # Microsoft Fakes
 FakesAssemblies/
+
+# Intellisense database
+.vs/
+bin/database_gens
+database

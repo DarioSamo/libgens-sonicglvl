@@ -162,6 +162,9 @@ class ObjectNode : public EditorNode {
 			return object;
 		}
 
+
+		void createObjectMultiSetNodes(LibGens::Object *object, Ogre::SceneManager *scene_manager);
+		void clearObjectMultiSetNodes();
 		void removeObjectMultiSetNode(ObjectMultiSetNode* msNode);
 
 		void addTime(float time_s);
@@ -178,6 +181,13 @@ class ObjectNode : public EditorNode {
 
 		bool isForceHidden() {
 			return force_hide;
+		}
+
+		void clearNames() {
+			current_model_name = "";
+			current_animation_name = "";
+			current_skeleton_name = "";
+			current_type_name = "";
 		}
 
 		~ObjectNode();
@@ -216,9 +226,11 @@ class ObjectNodeManager {
 		void hideObjectNode(LibGens::Object *object, bool permanent=false);
 		void reloadObjectNode(LibGens::Object *object);
 
-		list<ObjectNode *> getObjectNodes() {
+		list<ObjectNode *>& getObjectNodes() {
 			return object_nodes;
 		}
+
+		ObjectNode* findObjectNode(LibGens::Object* object);
 
 		void showAll();
 		void hideAll();

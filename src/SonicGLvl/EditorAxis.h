@@ -81,6 +81,8 @@ class EditorAxis {
 		bool holding;
 		bool visible;
 		bool rotation_frozen;
+		bool rotation_snap;
+		bool translation_snap;
 		int current_axis;
 
 		float current_w_offset;
@@ -157,6 +159,22 @@ class EditorAxis {
 
 		bool isRotationFrozen() {
 			return rotation_frozen;
+		}
+
+		void setRotationSnap(bool v) {
+			rotation_snap = v;
+		}
+
+		void setTranslationSnap(bool v) {
+			translation_snap = v;
+		}
+
+		bool isRotationSnap() {
+			return rotation_snap;
+		}
+
+		bool isTranslationSnap() {
+			return translation_snap;
 		}
 };
 

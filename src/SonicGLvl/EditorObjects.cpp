@@ -76,6 +76,17 @@ void ObjectNodeManager::reloadObjectNode(LibGens::Object *object) {
 	}
 }
 
+ObjectNode* ObjectNodeManager::findObjectNode(LibGens::Object* object)
+{
+	for (list<ObjectNode*>::iterator it = object_nodes.begin(); it != object_nodes.end(); ++it)
+	{
+		if ((*it)->getObject() == object)
+			return (*it);
+	}
+
+	return NULL;
+}
+
 
 void ObjectNodeManager::addTime(float time_s) {
 	for (list<ObjectNode *>::iterator it=object_nodes.begin(); it!=object_nodes.end(); it++) {
