@@ -228,7 +228,7 @@ void EditorApplication::updateMaterialEditorTextureList() {
 
 void EditorApplication::updateMaterialTextureInfo() {
 	LibGens::Texture* tex = material_editor_texture;
-	if (!material_editor_material) return;
+	if (!material_editor_texture) return;
 
 	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_FILENAME, tex->getName().c_str());
 	SetDlgItemText(hMaterialEditorDlg, IDE_MATERIAL_TEXTURE_UNIT, tex->getTexset().c_str());
