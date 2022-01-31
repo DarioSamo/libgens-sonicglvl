@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <GravRatio type="float" default="0.65" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <HopVY type="float" default="7" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Range type="float" default="99999" description="" />
+  <RopeLen type="float" default="6" description="" />
+  <RopeLenMin type="float" default="2" description="" />
+</Template>

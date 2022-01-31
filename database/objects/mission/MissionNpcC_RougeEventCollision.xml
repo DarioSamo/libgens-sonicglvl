@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <Accele type="float" default="100" description="" />
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Length type="float" default="3" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="1000" description="" />
+  <RougeID type="id" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <Speed type="float" default="5.5" description="" />
+  <TouchType type="float" default="0" description="" />
+</Template>

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <Cycle type="float" default="10" description="" />
+  <Damage type="float" default="100" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsUseMessage type="bool" default="false" description="" />
+  <Length type="float" default="1" description="" />
+  <ModelType type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Range type="float" default="30" description="" />
+  <Scl type="float" default="3" description="" />
+  <StopTime type="float" default="0" description="" />
+  <Extra type="model" name="cmn_obj_blade_HD.model" />
+</Template>

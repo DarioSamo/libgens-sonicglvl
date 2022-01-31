@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttachOffsetX_0 type="float" default="0" description="" />
+  <AttachOffsetX_1 type="float" default="0" description="" />
+  <AttachOffsetX_2 type="float" default="0" description="" />
+  <AttachOffsetY_0 type="float" default="0" description="" />
+  <AttachOffsetY_1 type="float" default="0" description="" />
+  <AttachOffsetY_2 type="float" default="0" description="" />
+  <AttachOffsetZ_0 type="float" default="0" description="" />
+  <AttachOffsetZ_1 type="float" default="0" description="" />
+  <AttachOffsetZ_2 type="float" default="0" description="" />
+  <AttachTarget_0 type="undefined" description="" />
+  <AttachTarget_1 type="undefined" description="" />
+  <AttachTarget_2 type="undefined" description="" />
+  <ChainNum type="float" default="4" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsMessageOn type="bool" default="false" description="" />
+  <ModelNum type="float" default="3" description="" />
+  <PhaseRate type="float" default="0" description="" />
+  <Range type="float" default="30" description="" />
+  <RollSpeed type="float" default="-100" description="" />
+</Template>

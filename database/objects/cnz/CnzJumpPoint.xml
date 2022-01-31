@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<Template>
+  <AimDirection type="float" default="0" description="" />
+  <DebugShotTimeLength type="float" default="2" description="" />
+  <FirstSpeed type="float" default="13.4" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsChangeCameraWhenPathChange type="bool" default="false" description="" />
+  <IsPathChange type="bool" default="false" description="" />
+  <IsStartVelocityConstant type="bool" default="true" description="" />
+  <IsWallWalk type="bool" default="false" description="" />
+  <IsYawUpdate type="bool" default="false" description="" />
+  <KeepVelocityDistance type="float" default="4.2" description="" />
+  <OutOfControl type="float" default="1.32" description="" />
+  <Range type="float" default="50" description="" />
+  <m_FlipperJumpCollisionSize type="float" default="1" description="" />
+  <m_IsConstantFrame type="bool" default="false" description="" />
+  <m_IsConstantPosition type="bool" default="true" description="" />
+  <m_IsFlipperJump type="bool" default="false" description="" />
+  <m_IsHideSpring type="bool" default="false" description="" />
+  <m_IsMonkeyHunting type="bool" default="false" description="" />
+  <m_IsStopBoost type="bool" default="false" description="" />
+  <m_IsTo3D type="bool" default="false" description="" />
+  <m_MonkeyTarget type="vector" description="" />
+</Template>

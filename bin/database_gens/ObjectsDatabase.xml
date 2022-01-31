@@ -1,13 +1,17 @@
 <?xml version="1.0" ?>
 <LevelDatabase>
-  <Entry name="Common" folder="common" />
-  <Entry name="Mission Common" folder="mission" />
+  <Entry name="SonicGLvl Helpers" folder="helpers" />
+  <Entry name="Common (Mobility Gimmicks)" folder="common_movement" />
+  <Entry name="Common (Damage Gimmicks)" folder="common_hazard" />
+  <Entry name="Common (Items/Goals)" folder="common_item" />
   <Entry name="Cameras" folder="cameras" />
+  <Entry name="System Objects" folder="system" />
+  <Entry name="Player System Objects" folder="playersystem" />
   <Entry name="Enemies" folder="enemies" />
-  <Entry name="Mode Changers" folder="mode_changers" />
-  <Entry name="Collision Triggers" folder="collision" />
-  <Entry name="Terrain Controllers" folder="terrain" />
   <Entry name="Sounds" folder="sounds" />
+  <Entry name="Platforms" folder="platforms" />
+  <Entry name="Breakables" folder="breakables" />
+  <Entry name="Playable Menu" folder="pam" />
   <Entry name="Green Hill Zone" folder="ghz" />
   <Entry name="Chemical Plant Zone" folder="cpz" />
   <Entry name="Sky Sanctuary Zone" folder="ssz" />
@@ -17,7 +21,18 @@
   <Entry name="Crisis City" folder="csc" />
   <Entry name="Rooftop Run" folder="euc" />
   <Entry name="Planet Wisp" folder="pla" />
+  <Entry name="Pinball (Casino Night DLC)" folder="cnz" />
+  <Entry name="Metal Sonic" folder="bms" />
+  <Entry name="Shadow" folder="bsd" />
+  <Entry name="Silver" folder="bsl" />
+  <Entry name="Death Egg Robot" folder="bde" />
+  <Entry name="Perfect Chaos" folder="bpc" />
+  <Entry name="Egg Dragoon" folder="bne" />
+  <Entry name="Time Eater" folder="blb" />
+  <Entry name="Mission Objects" folder="mission" />
+  <Entry name="Navigation Hints" folder="navi" />
   <Entry name="Sonic Unleashed (Generations Compatible)" folder="unleashed_compatible" />
   <Entry name="Sonic Unleashed" folder="unleashed" />
   <Entry name="Unassigned" folder="unassigned" />
+  <Entry name="Unused (Listed in ObjectDefine)" folder="unused" />
 </LevelDatabase>

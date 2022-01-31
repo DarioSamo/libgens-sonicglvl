@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <ChainNum type="float" default="3" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsMessageOn type="bool" default="false" description="" />
+  <ModelNum type="float" default="3" description="" />
+  <PhaseRate type="float" default="0.08" description="" />
+  <Range type="float" default="30" description="" />
+  <RollSpeed type="float" default="130" description="" />
+</Template>

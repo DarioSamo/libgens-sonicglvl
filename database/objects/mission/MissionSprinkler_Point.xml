@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <BombInterval type="float" default="1.5" description="" />
+  <BombNumMax type="float" default="2" description="" />
+  <BombNumMin type="float" default="1" description="" />
+  <BombPercent type="float" default="60" description="" />
+  <BombShowerTime type="float" default="100" description="" />
+  <EscapeOffset type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Link type="id" description="" />
+  <MoveRange type="float" default="0" description="" />
+  <Overwrite type="bool" default="true" description="" />
+  <Range type="float" default="10030" description="" />
+  <RingInterval type="float" default="2" description="" />
+  <Vel type="float" default="15" description="" />
+</Template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="7" description="" />
+  <Collision_Width type="float" default="3" description="" />
+  <CueName type="string" default="4502_whoosh02" description="" />
+  <EmitterPos type="vector" description="" />
+  <FileName type="string" default="42AMB_CMN" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <InsideRadius type="float" default="5" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Radius type="float" default="22" description="" />
+  <Range type="float" default="30" description="" />
+</Template>

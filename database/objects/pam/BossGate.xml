@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="50" description="" />
+  <area type="float" default="23" description="" />
+  <m_EventCameraEaseTimeBack type="float" default="1" description="" />
+  <m_EventCameraEaseTimeNormal type="float" default="10" description="" />
+  <m_EventCameraOffsetY type="float" default="4.99999" description="" />
+  <m_EventCameraOffsetZ type="float" default="25" description="" />
+  <m_EventTargetPosition type="vector" description="" />
+  <m_IconOffset type="float" default="-0.2" description="" />
+</Template>

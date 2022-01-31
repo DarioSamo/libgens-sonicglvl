@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Template>
+  <Ease_Time_Enter type="float" default="0" description="" />
+  <Ease_Time_Leave type="float" default="0" description="" />
+  <EyePathID type="float" default="101" description="" />
+  <EyePathType type="float" default="0" description="" />
+  <EyeSpeed type="float" default="5" description="" />
+  <Fovy type="float" default="33" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="true" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsCollision type="bool" default="false" description="" />
+  <IsControllable type="bool" default="false" description="" />
+  <LookPathID type="float" default="102" description="" />
+  <LookPathPosition type="vector" description="" />
+  <LookPathType type="float" default="0" description="" />
+  <LookSpeed type="float" default="5" description="" />
+  <OffsetOnEyePath type="float" default="0" description="" />
+  <OffsetOnLookPath type="float" default="0" description="" />
+  <Range type="float" default="10030" description="" />
+  <Target type="id" description="" />
+  <TargetOffset_Front type="float" default="0" description="" />
+  <TargetOffset_Right type="float" default="0" description="" />
+  <TargetOffset_Up type="float" default="0" description="" />
+  <TargetOffset_Vel type="float" default="0.4" description="" />
+  <TargetPositionFix type="vector" description="" />
+  <Target_Type type="float" default="0" description="" />
+  <VelOffsetXYZ type="float" default="2" description="" />
+  <ZRot type="float" default="0" description="" />
+</Template>

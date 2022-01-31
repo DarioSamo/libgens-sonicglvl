@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <FlipAngleRate type="float" default="0.8" description="" />
+  <FlipperType type="float" default="0" description="" />
+  <Friction type="float" default="250" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="50" description="" />
+  <RelatedJumper_RelationSetObject type="id" description="" />
+  <Restitution type="float" default="1.4" description="" />
+  <SignOffsetInX type="float" default="0" description="" />
+  <SignOffsetInY type="float" default="0" description="" />
+  <SignOffsetInZ type="float" default="0" description="" />
+  <SignRadiusInX type="float" default="0" description="" />
+  <SignRadiusInY type="float" default="0" description="" />
+  <SignRadiusInZ type="float" default="0" description="" />
+  <m_IsBaseFlipper type="bool" default="false" description="" />
+</Template>

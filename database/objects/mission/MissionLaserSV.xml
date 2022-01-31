@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsMessageOn type="bool" default="false" description="" />
+  <Length type="float" default="2.5" description="" />
+  <Range type="float" default="30" description="" />
+</Template>

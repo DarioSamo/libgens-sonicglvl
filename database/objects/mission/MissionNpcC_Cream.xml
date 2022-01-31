@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstWaitTime type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <PositionList0 type="vector_list" description="" />
+  <PositionList1 type="vector_list" description="" />
+  <PositionList2 type="vector_list" description="" />
+  <PositionList3 type="undefined" description="" />
+  <PositionList4 type="undefined" description="" />
+  <PositionList5 type="undefined" description="" />
+  <PositionList6 type="undefined" description="" />
+  <PositionList7 type="undefined" description="" />
+  <PositionList8 type="undefined" description="" />
+  <PositionList9 type="undefined" description="" />
+  <Range type="float" default="99999" description="" />
+  <UseChaoNum type="float" default="21" description="" />
+  <UsePathNum type="float" default="1" description="" />
+  <Vel1D type="float" default="12.7" description="" />
+  <Vel1D_Min type="float" default="6.5" description="" />
+</Template>

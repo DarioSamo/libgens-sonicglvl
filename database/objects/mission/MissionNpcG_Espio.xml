@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <HP type="float" default="1" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Range type="float" default="111" description="" />
+  <StartRange type="float" default="1" description="" />
+  <WaitTime_After type="float" default="0.5" description="" />
+  <WaitTime_Before type="float" default="1" description="" />
+  <WarpPointList type="id_list" description="" />
+</Template>

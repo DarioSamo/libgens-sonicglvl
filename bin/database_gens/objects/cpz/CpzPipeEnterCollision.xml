@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="2.1" description="" />
+  <Collision_Length type="float" default="3.5" description="" />
+  <Collision_Width type="float" default="2.5" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAddVelocity type="bool" default="false" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsEventStart type="bool" default="false" description="" />
+  <LaunchVelocity type="float" default="18.6" description="" />
+  <OutOfControl type="float" default="0.3" description="" />
+  <PathID type="float" default="2" description="" />
+  <Range type="float" default="100" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <Velocity type="float" default="23.2" description="" />
+</Template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <CountMax type="float" default="0" description="" />
+  <CountMin type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <PercentCurveL type="float" default="0" description="" />
+  <PercentCurveR type="float" default="0" description="" />
+  <PercentLob type="float" default="0" description="" />
+  <PercentSlow type="float" default="0" description="" />
+  <PercentStraight type="float" default="100" description="" />
+  <Range type="float" default="300" description="" />
+</Template>

@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Length type="float" default="10" description="" />
+  <Collision_Width type="float" default="27" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <Ease_Time_Enter type="float" default="1.5" description="" />
+  <Ease_Time_Leave type="float" default="1.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsEnableCollision type="bool" default="false" description="" />
+  <LineType type="float" default="0" description="" />
+  <PositionList type="undefined" description="" />
+  <Priority type="float" default="0" description="" />
+  <Range type="float" default="30" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <Target type="id" description="" />
+</Template>

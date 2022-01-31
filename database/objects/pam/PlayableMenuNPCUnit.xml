@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <NPCList type="float" default="9" description="" />
+  <OffsetY type="float" default="0" description="" />
+  <OffsetZ type="float" default="-0.6" description="" />
+  <Range type="float" default="300" description="" />
+  <Scale type="float" default="0.84" description="" />
+</Template>

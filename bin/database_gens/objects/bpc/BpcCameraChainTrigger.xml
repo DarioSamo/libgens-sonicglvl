@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="159" description="" />
+  <Collision_Width type="float" default="214" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsActive type="bool" default="true" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Range type="float" default="10000" description="" />
+  <State type="float" default="1" description="" />
+</Template>

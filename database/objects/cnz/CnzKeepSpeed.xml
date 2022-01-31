@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <ForBreakObj type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <KeepSpeed type="float" default="12.1" description="" />
+  <MinSpeed type="float" default="7.09999" description="" />
+  <Range type="float" default="100" description="" />
+  <SizeX type="float" default="0.5" description="" />
+  <SizeY type="float" default="0.4" description="" />
+  <SizeZ type="float" default="1.7" description="" />
+</Template>

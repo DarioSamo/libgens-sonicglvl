@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Length type="float" default="10" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <Durability type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="1000" description="" />
+  <ShakeCount type="float" default="10" description="" />
+  <ShakeSize type="float" default="0.5" description="" />
+  <ShakeTime type="float" default="1" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <SizeAttenuation type="float" default="0.05" description="" />
+  <Trigger type="id" description="" />
+  <TriggerType type="float" default="1" description="" />
+</Template>

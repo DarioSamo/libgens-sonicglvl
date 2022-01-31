@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <Grav type="float" default="3" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <MinVelD type="float" default="5" description="" />
+  <Rad type="float" default="0" description="" />
+  <Range type="float" default="30" description="" />
+  <SlowGroundHeight type="float" default="1.5" description="" />
+  <SlowGroundVel type="float" default="0.7" description="" />
+  <TimeRatio_Delta type="float" default="0.99" description="" />
+  <VelF type="float" default="12" description="" />
+  <VelF_Weal type="float" default="6.5" description="" />
+  <VelU type="float" default="6" description="" />
+  <VelU_Weal type="float" default="4" description="" />
+</Template>

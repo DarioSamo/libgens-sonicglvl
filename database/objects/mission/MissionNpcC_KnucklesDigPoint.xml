@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <AppearPos type="vector" description="" />
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Length type="float" default="2" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <Range type="float" default="99999" description="" />
+  <Shape_Type type="float" default="0" description="" />
+</Template>

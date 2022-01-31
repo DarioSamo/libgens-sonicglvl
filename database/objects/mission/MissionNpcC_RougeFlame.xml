@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <FlameType type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <LengthType type="float" default="0" description="" />
+  <OffTime type="float" default="3" description="" />
+  <OnTime type="float" default="1" description="" />
+  <PhaseRate type="float" default="0" description="" />
+  <Range type="float" default="30" description="" />
+</Template>

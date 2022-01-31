@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<Template>
+  <Gravity type="float" default="40" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAir type="bool" default="true" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsRevive type="bool" default="false" description="" />
+  <IsSideGet type="bool" default="false" description="" />
+  <ItemType type="float" default="1" description="" />
+  <LaunchSpeed type="float" default="7.8" description="" />
+  <Range type="float" default="30" description="" />
+  <TreasureSearchHideType type="float" default="0" description="" />
+  <Extra type="model" name="cmn_obj_c_itembox_fly_HD.model" />
+  <Extra type="model" name="cmn_obj_c_itembox_HD.model" condition="IsAir == True" />
+  <Extra type="model" name="cmn_obj_c_item_ring10_HD.model" condition="ItemType == 1" />
+  <Extra type="skeleton" name="cmn_obj_c_item_ring10_HD.skl.hkx" condition="ItemType == 1" />
+  <Extra type="model" name="cmn_obj_c_item_1up_HD.model" condition="ItemType == 2" />
+  <Extra type="skeleton" name="cmn_obj_c_item_1up_HD.skl.hkx" condition="ItemType == 2" />
+  <Extra type="model" name="cmn_obj_c_item_speed_HD.model" condition="ItemType == 3" />
+  <Extra type="skeleton" name="cmn_obj_c_item_speed_HD.skl.hkx" condition="ItemType == 3" />
+  <Extra type="model" name="cmn_obj_c_item_muteki_HD.model" condition="ItemType == 4" />
+  <Extra type="skeleton" name="cmn_obj_c_item_muteki_HD.skl.hkx" condition="ItemType == 4" />
+  <Extra type="model" name="cmn_obj_c_item_skateboard_HD.model" condition="ItemType == 5" />
+  <Extra type="skeleton" name="cmn_obj_c_item_skateboard_HD.skl.hkx" condition="ItemType == 5" />
+  <Extra type="model" name="cmn_obj_c_item_flame_HD.model" condition="ItemType == 8" />
+  <Extra type="skeleton" name="cmn_obj_c_item_flame_HD.skl.hkx" condition="ItemType == 8" />
+  <Extra type="model" name="cmn_obj_c_item_aqua_HD.model" condition="ItemType == 9" />
+  <Extra type="skeleton" name="cmn_obj_c_item_aqua_HD.skl.hkx" condition="ItemType == 9" />
+  <Extra type="model" name="cmn_obj_c_item_thunder_HD.model" condition="ItemType == 10" />
+  <Extra type="skeleton" name="cmn_obj_c_item_thunder_HD.skl.hkx" condition="ItemType == 10" />
+  <Extra type="animation" name="cmn_obj_c_item_df.anm.hkx" />
+</Template>

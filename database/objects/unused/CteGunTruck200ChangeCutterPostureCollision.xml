@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="12" description="" />
+  <Collision_Length type="float" default="6" description="" />
+  <Collision_Width type="float" default="7" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GravityOffset type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <JumpTarget type="vector" description="" />
+  <Range type="float" default="300" description="" />
+  <Shape_Type type="float" default="0" description="" />
+</Template>

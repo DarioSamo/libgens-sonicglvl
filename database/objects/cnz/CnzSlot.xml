@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <BonusRing type="float" default="1500" description="" />
+  <Emerald_RelationSetObject type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <JackpotMedal_RelationSetObject type="id" description="" />
+  <JackpotPay_RelationSetObject type="id" description="" />
+  <Payout type="float" default="0.92" description="" />
+  <Range type="float" default="1000" description="" />
+  <Win_Bar type="float" default="120" description="" />
+  <Win_Eggman type="float" default="0" description="" />
+  <Win_Jackpot type="float" default="600" description="" />
+  <Win_Ring type="float" default="60" description="" />
+  <Win_Sonic type="float" default="400" description="" />
+  <Win_Tails type="float" default="250" description="" />
+</Template>

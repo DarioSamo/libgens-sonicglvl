@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Template>
+  <ChangeB type="bool" default="true" description="" />
+  <ChangeF type="bool" default="true" description="" />
+  <Collision_Height type="float" default="64" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <EaseTimeB type="float" default="3" description="" />
+  <EaseTimeF type="float" default="3" description="" />
+  <EnableB type="bool" default="false" description="" />
+  <EnableF type="bool" default="true" description="" />
+  <EyeLightDiffuseBB type="float" default="0" description="" />
+  <EyeLightDiffuseBF type="float" default="0" description="" />
+  <EyeLightDiffuseGB type="float" default="0" description="" />
+  <EyeLightDiffuseGF type="float" default="0" description="" />
+  <EyeLightDiffuseRB type="float" default="0" description="" />
+  <EyeLightDiffuseRF type="float" default="0" description="" />
+  <EyeLightSpecularBB type="float" default="0" description="" />
+  <EyeLightSpecularBF type="float" default="0.3" description="" />
+  <EyeLightSpecularGB type="float" default="0" description="" />
+  <EyeLightSpecularGF type="float" default="0.3" description="" />
+  <EyeLightSpecularRB type="float" default="0" description="" />
+  <EyeLightSpecularRF type="float" default="0.3" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Range type="float" default="30" description="" />
+  <RangeFarEndB type="float" default="40" description="" />
+  <RangeFarEndF type="float" default="40" description="" />
+  <RangeFarStartB type="float" default="0" description="" />
+  <RangeFarStartF type="float" default="0" description="" />
+</Template>

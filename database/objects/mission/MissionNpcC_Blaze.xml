@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Template>
+  <DecCycle type="float" default="5" description="" />
+  <DecDelta type="float" default="0.2" description="" />
+  <DecValMax type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <HalfVelTime type="float" default="90" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <NoClearFlag type="bool" default="false" description="" />
+  <PositionList0 type="vector_list" description="" />
+  <PositionList1 type="undefined" description="" />
+  <PositionList2 type="vector_list" description="" />
+  <PositionList3 type="vector_list" description="" />
+  <PositionList4 type="vector_list" description="" />
+  <PositionList5 type="undefined" description="" />
+  <PositionList6 type="undefined" description="" />
+  <PositionList7 type="undefined" description="" />
+  <PositionList8 type="undefined" description="" />
+  <PositionList9 type="undefined" description="" />
+  <PositionListStart type="vector_list" description="" />
+  <Range type="float" default="99999" description="" />
+  <SensorDistance type="float" default="30" description="" />
+  <UsePathNum type="float" default="1" description="" />
+  <Vel1D type="float" default="10.8" description="" />
+  <Vel1D_Danger type="float" default="12.9" description="" />
+  <Vel1D_Danger_Spike type="float" default="7.7" description="" />
+  <Vel1D_Danger_Spin type="float" default="17.8" description="" />
+  <Vel1D_Spike type="float" default="7.3" description="" />
+  <Vel1D_Spin type="float" default="17.8" description="" />
+</Template>
