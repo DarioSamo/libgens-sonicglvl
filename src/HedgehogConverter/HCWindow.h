@@ -30,6 +30,7 @@
 struct ModelRecord {
 	LibGens::AABB aabb;
 	QList<int> used_meshes;
+	unsigned int submesh_counts[3];
 };
 
 struct SceneData {

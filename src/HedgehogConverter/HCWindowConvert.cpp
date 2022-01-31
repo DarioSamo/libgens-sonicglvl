@@ -871,6 +871,12 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 					logProgress(ProgressWarning, QString("Detected %1 as duplicate model name. Renamed to %2.").arg(model_base_name).arg(model_name));
 				}
 
+				ModelRecord record;
+				record.used_meshes = mesh_indices;
+				for (int i = 0; i < LIBGENS_MODEL_SUBMESH_SLOTS; i++) {
+					record.submesh_counts[i] = 0;
+				}
+
 				LibGens::Model *model = new LibGens::Model();
 				model->setName(model_name.toStdString());
 				model->setTerrainMode(true);
@@ -997,6 +1003,11 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 
 						mesh->addSubmesh(submesh, submesh_slot);
 
+						// Increment the count in model record
+						if (submesh_slot < LIBGENS_MODEL_SUBMESH_ROOT_SLOTS) {
+							record.submesh_counts[submesh_slot]++;
+						}
+
 						logProgress(ProgressNormal, QString("Converted submesh and added to slot %1, with %2 resulting vertices and %3 resulting indices.").arg(submesh_slot).arg(submesh->getVerticesSize()).arg(submesh->getFacesIndicesSize()));
 					}
 				}
@@ -1008,8 +1019,6 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 				model->save(model_filename.toStdString());
 				logProgress(ProgressNormal, QString("Saved model to %1.").arg(model_filename));
 
-				ModelRecord record;
-				record.used_meshes = mesh_indices;
 				record.aabb = model->getAABB();
 				scene_data.model_map[model_name] = record;
 
@@ -1049,6 +1058,17 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 			LibGens::AABB instance_aabb = scene_data.model_map[existing_model_name].aabb;
 			instance_aabb.transform(instance_matrix);
 			instance->setAABB(instance_aabb);
+
+			// Create an empty mesh for the instance using the count info in record
+			LibGens::TerrainInstanceMesh *instance_mesh = new LibGens::TerrainInstanceMesh();
+			for (int i = 0; i < LIBGENS_MODEL_SUBMESH_ROOT_SLOTS; i++) {
+				for (unsigned int j = 0; j < scene_data.model_map[existing_model_name].submesh_counts[i]; j++) {
+					LibGens::TerrainInstanceSubmesh *instance_submesh = new LibGens::TerrainInstanceSubmesh();
+					instance_mesh->addSubmesh(instance_submesh, i);
+				}
+			}
+			instance->addMesh(instance_mesh);
+
 			instance->save(instance_filename.toStdString());
 			scene_data.instances.insertMulti(parent_group_id, instance);
 
