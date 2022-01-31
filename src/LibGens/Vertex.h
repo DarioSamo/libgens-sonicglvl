@@ -24,6 +24,10 @@
 
 #define LIBGENS_VERTEX_FORMAT_PC             1
 #define LIBGENS_VERTEX_FORMAT_PC_TERRAIN     2
+#define LIBGENS_VERTEX_FORMAT_360            3
+#define LIBGENS_VERTEX_FORMAT_360_TERRAIN    4
+#define LIBGENS_VERTEX_FORMAT_FORCES         5
+#define LIBGENS_VERTEX_FORMAT_FORCES_TERRAIN 6
 
 namespace LibGens {
 	// Model Vertex Declaration

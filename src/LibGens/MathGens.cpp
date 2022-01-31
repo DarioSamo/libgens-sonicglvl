@@ -30,6 +30,8 @@ THE SOFTWARE.
 //	Most of this code has been copied and modified from the Ogre3D Project.
 //=========================================================================
 
+#include "MathGens.h"
+
 namespace LibGens {
 	float asm_rsq(float r) {
 		__asm {
@@ -375,6 +377,17 @@ namespace LibGens {
 		}
 	}
 
+	void Vector2::writeHalf(File *file, bool big_endian) {
+		if (big_endian) {
+			file->writeFloat16BE(&x);
+			file->writeFloat16BE(&y);
+		}
+		else {
+			file->writeFloat16(&x);
+			file->writeFloat16(&y);
+		}
+	}
+
 	void Vector3::read(File *file, bool big_endian) {
 		file->readFloat32E(&x, big_endian);
 		file->readFloat32E(&y, big_endian);
@@ -390,6 +403,15 @@ namespace LibGens {
 		z = ((value&0x80000000 ? -1 : 0) + (float)((value>>23)&0x0FF) / 256.0f);
 	}
 
+	void Vector3::readNormalForces(File * file, bool big_endian) {
+		unsigned int value = 0;
+		file->readInt32E(&value, big_endian);
+
+		x = ((value & 0x00000200 ? -1 : 0) + (float)((value) & 0x1FF) / 512.0f);
+		y = ((value & 0x00080000 ? -1 : 0) + (float)((value >> 10) & 0x1FF) / 512.0f);
+		z = ((value & 0x20000000 ? -1 : 0) + (float)((value >> 20) & 0x1FF) / 512.0f);
+	}
+
 	void Vector3::write(File *file, bool big_endian) {
 		if (big_endian) {
 			file->writeFloat32BE(&x);
@@ -400,6 +422,52 @@ namespace LibGens {
 			file->writeFloat32(&x);
 			file->writeFloat32(&y);
 			file->writeFloat32(&z);
+		}
+	}
+
+	inline unsigned int packBits360(float value) {
+		if (value < -1.0f) {
+			value = -1.0f;
+		}
+		else if (value > 1.0f) {
+			value = 1.0f;
+		}
+
+		unsigned int bits = (unsigned int)(value * 0xFF);
+		return (bits < 0 ? 0x200 + bits : bits) & 0x1FF;
+	}
+
+	void Vector3::writeNormal360(File *file, bool big_endian) {
+		unsigned int v = packBits360(x) << 2 | packBits360(y) << 13 | packBits360(z) << 23;
+
+		if (big_endian) {
+			file->writeInt32BE(&v);
+		}
+		else {
+			file->writeInt32(&v);
+		}
+	}
+
+	inline unsigned int packBitsForces(float value) {
+		if (value < -1.0f) {
+			value = -1.0f;
+		}
+		else if (value > 1.0f) {
+			value = 1.0f;
+		}
+
+		unsigned int bits = (unsigned int)(value * 0x1FF);
+		return (bits < 0 ? 0x400 + bits : bits) & 0x3FF;
+	}
+
+	void Vector3::writeNormalForces(File *file, bool big_endian) {
+		unsigned int v = packBitsForces(x) | packBitsForces(y) << 10 | packBitsForces(z) << 20 | (3 << 30);
+		
+		if (big_endian) {
+			file->writeInt32BE(&v);
+		}
+		else {
+			file->writeInt32(&v);
 		}
 	}
 
@@ -534,6 +602,18 @@ namespace LibGens {
 		file->writeUChar(&r_c);
 		file->writeUChar(&g_c);
 		file->writeUChar(&b_c);
+	}
+
+	void Color::writeABGR8(File *file) {
+		unsigned char a_c = (unsigned char)(a*LIBGENS_MATH_COLOR_CHAR);
+		unsigned char r_c = (unsigned char)(r*LIBGENS_MATH_COLOR_CHAR);
+		unsigned char g_c = (unsigned char)(g*LIBGENS_MATH_COLOR_CHAR);
+		unsigned char b_c = (unsigned char)(b*LIBGENS_MATH_COLOR_CHAR);
+
+		file->writeUChar(&a_c);
+		file->writeUChar(&b_c);
+		file->writeUChar(&g_c);
+		file->writeUChar(&r_c);
 	}
 
 	void Quaternion::read(File *file) {

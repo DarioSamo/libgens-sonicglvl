@@ -82,6 +82,7 @@ namespace LibGens {
 			void read(File *file, bool big_endian=true);
 			void readHalf(File *file, bool big_endian=true);
 			void write(File *file, bool big_endian=true);
+			void writeHalf(File *file, bool big_endian = true);
 
 			inline bool operator == (const Vector2& vector) {
 	            return (x == vector.x && y == vector.y);
@@ -123,7 +124,10 @@ namespace LibGens {
 
 			void read(File *file, bool big_endian=true);
 			void readNormal360(File *file, bool big_endian=true);
+			void readNormalForces(File *file, bool big_endian = true);
 			void write(File *file, bool big_endian=true);
+			void writeNormal360(File *file, bool big_endian = true);
+			void writeNormalForces(File *file, bool big_endian = true);
 
 			void readXML(TiXmlElement *root);
 			void readSingleXML(TiXmlElement *root);
@@ -159,6 +163,14 @@ namespace LibGens {
 
 			inline float squaredDistance(const Vector3& rhs) {
 	            return (*this - rhs).squaredLength();
+			}
+
+			inline Vector3 operator + (const float& sum) {
+				return Vector3(x + sum, y + sum, z + sum);
+			}
+
+			inline Vector3 operator - (const float& sub) {
+				return Vector3(x - sub, y - sub, z - sub);
 			}
 
 			inline Vector3 operator * (const float& mult) {
@@ -476,6 +488,7 @@ namespace LibGens {
 
 			void write(File *file, bool big_endian=false);
 			void writeARGB8(File *file);
+			void writeABGR8(File *file);
 
 			void interpolate(const Color &v, const float m) {
 				r+=(v.r-r)*m;

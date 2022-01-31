@@ -112,6 +112,8 @@ namespace LibGens {
 			void writeInt32BE(int *dest);
 			void writeInt32BEA(size_t *dest);
 			void writeFloat8(float *dest);
+			void writeFloat16(float* dest);
+			void writeFloat16BE(float* dest);
 			void writeFloat32(float *dest);
 			void writeFloat32BE(float *dest);
 			void writeNull(size_t size);
