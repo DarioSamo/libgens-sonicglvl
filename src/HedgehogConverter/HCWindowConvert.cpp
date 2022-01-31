@@ -39,6 +39,7 @@
 #include "Texture.h"
 #include "Tags.h"
 #include "AR.h"
+#include "GITextureGroup.h"
 #include "Terrain.h"
 #include "TerrainBlock.h"
 #include "Light.h"
@@ -735,6 +736,25 @@ bool HCWindow::convert() {
 			logProgress(ProgressNormal, QString("Saved terrain block to %1.").arg(terrain_block_filename.c_str()));
 
 			delete terrain_block;
+
+			// Save an empty gi-texture.gi-texture-group-info to prevent crash when not merging with an existing stage.
+			if (!converter_settings.merge_existing) {
+				LibGens::GITextureGroupInfo gi_texture_group_info;
+				foreach(LibGens::TerrainGroup * group, terrain_groups) {
+					list<LibGens::TerrainInstance*> instances = group->getInstances();
+					for (auto it = instances.begin(); it != instances.end(); ++it) {
+						gi_texture_group_info.addInstance((*it)->getName(), (*it)->getAABB().center(), (*it)->getAABB().radius());
+					}
+				}
+
+				string output_file_path = temp_path.toStdString() + "/gi-texture.gi-texture-group-info";
+				gi_texture_group_info.save(output_file_path);
+				logProgress(ProgressNormal, QString("Saved GI texture group info to %1").arg(output_file_path.c_str()));
+
+				output_file_path = temp_path.toStdString() + "/gi-lim.gil";
+				gi_texture_group_info.saveMipLevelLimitFile(output_file_path, false, false, true);
+				logProgress(ProgressNormal, QString("Saved GI mip level limit file to %1").arg(output_file_path.c_str()));
+			}
 		}
 		else {
 			logProgress(ProgressError, "No terrain groups were generated.");

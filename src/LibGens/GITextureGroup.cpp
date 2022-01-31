@@ -158,7 +158,20 @@ namespace LibGens {
 		}
 	}
 
-	GITextureGroupInfo::GITextureGroupInfo() {
+    void GITextureGroupInfo::saveMipLevelLimitFile(string filename, bool limitLevel0, bool limitLevel1, bool limitLevel2) {
+		File file(filename, LIBGENS_FILE_WRITE_BINARY);
+		if (file.valid()) {
+			file.prepareHeader(0);
+			file.writeUChar((unsigned char*)&limitLevel0);
+			file.writeUChar((unsigned char*)&limitLevel1);
+			file.writeUChar((unsigned char*)&limitLevel2);
+			file.fixPadding();
+			file.writeHeader();
+			file.close();
+		}
+    }
+
+    GITextureGroupInfo::GITextureGroupInfo() {
 
 	}
 
@@ -168,7 +181,13 @@ namespace LibGens {
 		instance_radius.push_back(radius);
 	}
 
-	void GISubtexture::read(File *file) {
+    void GITextureGroupInfo::removeInstance(int index) {
+		instance_names.erase(instance_names.begin() + index);
+		instance_centers.erase(instance_centers.begin() + index);
+		instance_radius.erase(instance_radius.begin() + index);
+    }
+
+    void GISubtexture::read(File *file) {
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_NULL_FILE);
 			return;
@@ -412,9 +431,10 @@ namespace LibGens {
 			return;
 		}
 
-		unsigned short texture_count=0;
-		file->readInt16BE(&texture_count);
 		file->moveAddress(1);
+
+		unsigned short texture_count=0;
+		file->readInt16(&texture_count);
 
 		for (size_t i=0; i<texture_count; i++) {
 			GITexture *texture=new GITexture(terrain_folder);
@@ -463,8 +483,8 @@ namespace LibGens {
 
 	void GITextureGroup::writeAtlasinfo(File *file) {
 		unsigned short texture_count=textures.size();
-		file->writeInt16BE(&texture_count);
 		file->writeNull(1);
+		file->writeInt16(&texture_count);
 
 		for (list<GITexture *>::iterator it = textures.begin(); it != textures.end(); it++) {
 			(*it)->write(file);
@@ -490,6 +510,7 @@ namespace LibGens {
 
 		vector<string> instance_names;
 		file->goToAddress(index_table_address);
+		instance_indices.reserve(instance_count);
 		for (size_t i=0; i<instance_count; i++) {
 			unsigned int instance_index=0;
 			file->readInt32BE(&instance_index);
@@ -783,6 +804,9 @@ namespace LibGens {
 		file->readInt32BE(&low_gia_total);
 		file->readInt32BEA(&low_gia_table_address);
 
+		instance_names.reserve(name_total);
+		instance_centers.reserve(name_total);
+		instance_radius.reserve(name_total);
 		for (size_t i=0; i<name_total; i++) {
 			// Names
 			file->goToAddress(name_table_address + i*4);
@@ -811,6 +835,7 @@ namespace LibGens {
 		}
 
 
+		groups.reserve(gia_total);
 		for (size_t i=0; i<gia_total; i++) {
 			file->goToAddress(gia_table_address + i*4);
 			size_t address=0;

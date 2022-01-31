@@ -25,6 +25,7 @@
 #define LIBGENS_GI_TEXTURE_GROUP_ERROR_MESSAGE_WRITE_NULL_FILE "Trying to write GI group texture info data to an unreferenced file."
 #define LIBGENS_GI_TEXTURE_GROUP_ATLASINFO_FILE                "atlasinfo"
 #define LIBGENS_GI_TEXTURE_GROUP_INFO_FILE                     "gi-texture.gi-texture-group-info"
+#define LIBGENS_GI_TEXTURE_GROUP_MIP_LEVEL_LIMIT_FILE		   "gi-lim.gil"
 #define LIBGENS_GI_TEXTURE_GROUP_FOLDER_BEFORE                 "gia-"
 #define LIBGENS_GI_TEXTURE_GROUP_FOLDER_AFTER                  ".ar"
 #define LIBGENS_GI_TEXTURE_GROUP_SUBTEXTURE_LEVEL              "-level"
@@ -165,12 +166,14 @@ namespace LibGens {
 			GITextureGroupInfo();
 			GITextureGroupInfo(string filename, string terrain_folder = "");
 			void save(string filename);
+			void saveMipLevelLimitFile(string filename, bool limitLevel0, bool limitLevel1, bool limitLevel2);
 			void read(File *file, string terrain_folder);
 			void write(File *file);
 			GITextureGroup *createGroup();
 			GITextureGroup *getGroupByIndex(size_t index);
 			int getGroupIndex(GITextureGroup *group);
 			void addInstance(string name, Vector3 center, float radius);
+			void removeInstance(int index);
 			vector<string> getInstanceNames();
 			GISubtexture *getTextureByInstance(string instance, size_t quality_level);
 			vector<GITextureGroup *> getGroups();
