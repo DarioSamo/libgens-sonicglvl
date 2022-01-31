@@ -222,9 +222,6 @@ bool HCWindow::convert() {
 		logProgress(ProgressNormal, QString("* Node Tree:"));
 		logNodeTree(scene->mRootNode, "**");
 
-		// FIXME: Hardly any format supports lights correctly. We're better off looking for another solution.
-
-		/*
 		int lights_count = scene->mNumLights;
 		if (lights_count && converter_settings.convert_lights) {
 			LibGens::LightList light_list;
@@ -302,7 +299,6 @@ bool HCWindow::convert() {
 				logProgress(ProgressNormal, QString("Saved light list with %1 lights.").arg(light_list.getLightCount()));
 			}
 		}
-		*/
 
 		//**********************************************************
 		//  Dump embedded textures to another temporary directory
