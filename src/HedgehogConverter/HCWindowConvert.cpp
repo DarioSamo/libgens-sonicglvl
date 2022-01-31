@@ -943,7 +943,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 								vertex->setTangent(LibGens::Vector3(src_mesh->mTangents[v].x, src_mesh->mTangents[v].y, src_mesh->mTangents[v].z));
 
 							if (src_mesh->mBitangents)
-								vertex->setBinormal(LibGens::Vector3(src_mesh->mBitangents[v].x, src_mesh->mBitangents[v].y, src_mesh->mBitangents[v].z));
+								vertex->setBinormal(LibGens::Vector3(src_mesh->mBitangents[v].x, src_mesh->mBitangents[v].y, src_mesh->mBitangents[v].z) * -1);
 
 							if (src_mesh->GetNumColorChannels() && src_mesh->mColors)
 								vertex->setColor(LibGens::Color(src_mesh->mColors[0][v].r, src_mesh->mColors[0][v].g, src_mesh->mColors[0][v].b, src_mesh->mColors[0][v].a));
