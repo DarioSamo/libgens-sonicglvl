@@ -39,7 +39,13 @@ QList<LibGens::TerrainGroup *> HCWindow::convertTerrainGroups(SceneData &scene_d
 				}
 
 				LibGens::TerrainGroup *group = new LibGens::TerrainGroup();
-				group->addInstances(instances.toVector().toStdVector());
+
+				foreach(LibGens::TerrainInstance* instance, instances) {
+					std::vector<LibGens::TerrainInstance*> subset;
+					subset.push_back(instance);
+					group->addInstances(subset);
+				}
+
 				foreach(std::string model_name, model_names) {
 					group->addFakeModel(model_name);
 				}
@@ -66,6 +72,10 @@ QList<LibGens::TerrainGroup *> HCWindow::convertTerrainGroups(SceneData &scene_d
 }
 
 void HCWindow::convertTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QList<LibGens::TerrainInstance *> instances, LibGens::AABB aabb) {
+	if (instances.empty()) {
+		return;
+	}
+
 	// Calculate current AABB
 	if ((aabb.start == LibGens::Vector3(0, 0, 0)) && (aabb.end == LibGens::Vector3(0, 0, 0))) {
 		aabb.reset();
@@ -93,7 +103,13 @@ void HCWindow::convertTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_grou
 
 		logProgress(ProgressNormal, QString("Recursive Generation Step: Creating terrain group with %1 instances.").arg(instances.size()));
 		LibGens::TerrainGroup *group = new LibGens::TerrainGroup();
-		group->addInstances(instances.toVector().toStdVector());
+
+		foreach(LibGens::TerrainInstance* instance, instances) {
+			std::vector<LibGens::TerrainInstance*> subset;
+			subset.push_back(instance);
+			group->addInstances(subset);
+		}
+
 		foreach(std::string model_name, model_names) {
 			group->addFakeModel(model_name);
 		}

@@ -23,9 +23,12 @@
 #define LIBGENS_TERRAIN_BLOCK_ERROR_MESSAGE_WRITE_NULL_FILE "Trying to write terrain block data to an unreferenced file."
 #define LIBGENS_TERRAIN_BLOCK_FILENAME                      "terrain-block.tbst"
 #define LIBGENS_TERRAIN_BLOCK_ROOT_GENERATIONS              0
-
+#define LIBGENS_TERRAIN_BLOCK_INSTANCE_TYPE_BRANCH			0
+#define LIBGENS_TERRAIN_BLOCK_INSTANCE_TYPE_LEAF			1
 
 namespace LibGens {
+	class TerrainGroup;
+
 	class TerrainBlockInstance {
 		protected:
 			Vector3 center;
@@ -49,8 +52,10 @@ namespace LibGens {
 	class TerrainBlock {
 		protected:
 			vector<TerrainBlockInstance *> blocks;
+			int root_instance_index;
 		public:
 			TerrainBlock() {
+				root_instance_index = -1;
 			}
 
 			TerrainBlock(string filename);
@@ -59,6 +64,8 @@ namespace LibGens {
 			void read(File *file);
 			void write(File *file);
 			void addBlockInstance(TerrainBlockInstance *instance);
+			size_t getBlockInstanceCount();
+			void build(const std::vector<TerrainGroup*>& groups);
 
 			void clean() {
 				for (vector<TerrainBlockInstance *>::iterator it=blocks.begin(); it!=blocks.end(); it++) {

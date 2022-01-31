@@ -728,23 +728,7 @@ bool HCWindow::convert() {
 			delete terrain;
 
 			LibGens::TerrainBlock *terrain_block = new LibGens::TerrainBlock();
-			group_index = 0;
-			foreach(LibGens::TerrainGroup *group, terrain_groups) {
-				vector<vector<LibGens::TerrainInstance *>> instances = group->getInstanceVectors();
-				vector<LibGens::Vector3> centers = group->getInstanceCenters();
-				vector<float> radiuses = group->getInstanceRadiuses();
-				for (size_t i=0; i<instances.size(); i++) {
-					LibGens::TerrainBlockInstance *block_instance = new LibGens::TerrainBlockInstance();
-					block_instance->setCenter(centers[i]);
-					block_instance->setRadius(radiuses[i]);
-					block_instance->setIdentifierA(group_index);
-					block_instance->setIdentifierB(i);
-					block_instance->setType(1);
-					terrain_block->addBlockInstance(block_instance);
-				}
-
-				group_index++;
-			}
+			terrain_block->build(terrain_groups.toVector().toStdVector());
 
 			string terrain_block_filename = temp_path.toStdString() + "/terrain-block.tbst";
 			terrain_block->save(terrain_block_filename.c_str());

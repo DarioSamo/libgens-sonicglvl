@@ -18,6 +18,8 @@
 //=========================================================================
 
 #include "TerrainBlock.h"
+#include "TerrainInstance.h"
+#include "TerrainGroup.h"
 
 namespace LibGens {
 	TerrainBlock::TerrainBlock(string filename) {
@@ -100,7 +102,9 @@ namespace LibGens {
 		size_t instance_table_address=0;
 		file->readInt32BE(&instance_count);
 		file->readInt32BEA(&instance_table_address);
+		file->readInt32BE(&root_instance_index);
 
+		blocks.reserve(instance_count);
 		for (size_t i=0; i<instance_count; i++) {
 			file->goToAddress(instance_table_address + i*4);
 			size_t address=0;
@@ -119,10 +123,9 @@ namespace LibGens {
 
 		unsigned int instance_count=blocks.size();
 		size_t instance_table_address=36;
-		unsigned int instance_count_2=blocks.size()-1;
 		file->writeInt32BE(&instance_count);
 		file->writeInt32BEA(&instance_table_address);
-		file->writeInt32BE(&instance_count_2);
+		file->writeInt32BE(&root_instance_index);
 
 		vector<size_t> instance_addresses;
 		file->writeNull(instance_count*4);
@@ -141,5 +144,125 @@ namespace LibGens {
 
 	void TerrainBlock::addBlockInstance(TerrainBlockInstance *instance) {
 		blocks.push_back(instance);
+	}
+
+    size_t TerrainBlock::getBlockInstanceCount() {
+		return blocks.size();
+    }
+
+    struct TerrainBlockInstanceCache {
+		LibGens::AABB aabb;
+		Vector3 center;
+		uint32_t terrain_group_index;
+		uint32_t instance_index;
+	};
+
+	int buildRecursively(const std::vector<const TerrainBlockInstanceCache*>& items, TerrainBlock* block) {
+		if (items.empty()) {
+			return -1;
+		}
+
+		LibGens::TerrainBlockInstance* instance = new LibGens::TerrainBlockInstance();
+
+		LibGens::AABB aabb;
+		aabb.reset();
+
+		for (size_t i = 0; i < items.size(); i++)
+			aabb.merge(items[i]->aabb);
+
+		const Vector3 center = aabb.center();
+
+		instance->setCenter(center);
+		instance->setRadius(aabb.radius());
+
+		if (items.size() == 1) {
+			instance->setType(LIBGENS_TERRAIN_BLOCK_INSTANCE_TYPE_LEAF);
+			instance->setIdentifierA(items[0]->terrain_group_index);
+			instance->setIdentifierB(items[0]->instance_index);
+		}
+
+		else {
+			instance->setType(LIBGENS_TERRAIN_BLOCK_INSTANCE_TYPE_BRANCH);
+
+			size_t dimIndex = 0;
+			float maxDim = 0;
+
+			for (size_t i = 0; i < 3; i++) {
+				const float currDim = i == 0 ? aabb.sizeX() : i == 1 ? aabb.sizeY() : aabb.sizeZ();
+				if (currDim > maxDim) {
+					dimIndex = i;
+					maxDim = currDim;
+				}
+			}
+
+			std::vector<const TerrainBlockInstanceCache*> left;
+			std::vector<const TerrainBlockInstanceCache*> right;
+
+			for (size_t i = 0; i < items.size(); i++) {
+				if (((float*)&items[i]->center)[dimIndex] < ((float*)&center)[dimIndex])
+					left.push_back(items[i]);
+				else
+					right.push_back(items[i]);
+			}
+
+			if (left.empty())
+				std::swap(left, right);
+
+			if (right.empty()) {
+				for (size_t i = 0; i < left.size(); i++) {
+					if ((i & 1) == 0) {
+						right.push_back(left.back());
+						left.pop_back();
+					}
+				}
+			}
+
+			const int index0 = buildRecursively(left, block);
+			const int index1 = buildRecursively(right, block);
+
+			if (index0 == -1) {
+				delete instance;
+				return index1;
+			}
+
+			if (index1 == -1) {
+				delete instance;
+				return index0;
+			}
+
+			instance->setIdentifierA(index0);
+			instance->setIdentifierB(index1);
+		}
+
+		const int index = block->getBlockInstanceCount();
+		block->addBlockInstance(instance);
+		return index;
+	}
+
+	void TerrainBlock::build(const std::vector<TerrainGroup*>& groups) {
+		std::vector<const TerrainBlockInstanceCache*> items;
+
+		for (size_t i = 0; i < groups.size(); i++) {
+			std::vector<std::vector<TerrainInstance*>> instance_vectors = groups[i]->getInstanceVectors();
+
+			for (size_t j = 0; j < instance_vectors.size(); j++) {
+				TerrainBlockInstanceCache* item = new TerrainBlockInstanceCache();
+
+				item->aabb.reset();
+				for (size_t k = 0; k < instance_vectors[j].size(); k++)
+					item->aabb.merge(instance_vectors[j][k]->getAABB());
+
+				item->center = item->aabb.center();
+				item->terrain_group_index = i;
+				item->instance_index = j;
+
+				items.push_back(item);
+			}
+		}
+
+		root_instance_index = buildRecursively(items, this);
+
+		for (size_t i = 0; i < items.size(); i++)
+			delete items[i];
 	}
 };
