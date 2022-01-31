@@ -75,23 +75,25 @@ namespace LibGens {
 			return;
 		}
 
-		unsigned int identifiers_total=0;
-		size_t identifiers_address=0;
+		unsigned int light_indices_total=0;
+		size_t light_indices_address=0;
 		unsigned int faces_total=0;
 		size_t faces_address=0;
 
-		file->readInt32BE(&identifiers_total);
-		file->readInt32BEA(&identifiers_address);
+		file->readInt32BE(&light_indices_total);
+		file->readInt32BEA(&light_indices_address);
 		file->readInt32BE(&faces_total);
 		file->readInt32BEA(&faces_address);
 
-		for (size_t i=0; i<identifiers_total; i++) {
-			file->goToAddress(identifiers_address + i*4);
+		light_indices.reserve(light_indices_total);
+		for (size_t i=0; i<light_indices_total; i++) {
+			file->goToAddress(light_indices_address + i*4);
 			unsigned int identifier=0;
 			file->readInt32BE(&identifier);
-			identifiers.push_back(identifier);
+			light_indices.push_back(identifier);
 		}
 
+		faces.reserve(faces_total);
 		for (size_t i=0; i<faces_total; i++) {
 			file->goToAddress(faces_address + i*2);
 			unsigned short face=0;
@@ -108,19 +110,19 @@ namespace LibGens {
 
 		size_t header_address=file->getCurrentAddress();
 
-		unsigned int identifiers_total=identifiers.size();
-		size_t identifiers_address=0;
+		unsigned int light_indices_total=light_indices.size();
+		size_t light_indices_address=0;
 		unsigned int faces_total=faces.size();
 		size_t faces_address=0;
 
-		file->writeInt32BE(&identifiers_total);
+		file->writeInt32BE(&light_indices_total);
 		file->writeNull(4);
 		file->writeInt32BE(&faces_total);
 		file->writeNull(4);
 
-		identifiers_address = file->getCurrentAddress();
-		for (size_t i=0; i<identifiers_total; i++) {
-			file->writeInt32BE(&identifiers[i]);
+		light_indices_address = file->getCurrentAddress();
+		for (size_t i=0; i<light_indices_total; i++) {
+			file->writeInt32BE(&light_indices[i]);
 		}
 
 		faces_address = file->getCurrentAddress();
@@ -132,13 +134,12 @@ namespace LibGens {
 		// Fix header
 		file->goToAddress(header_address);
 		file->moveAddress(4);
-		file->writeInt32BEA(&identifiers_address);
+		file->writeInt32BEA(&light_indices_address);
 		file->moveAddress(4);
 		file->writeInt32BEA(&faces_address);
 
 		file->goToEnd();
 	}
-
 	
 	void TerrainInstanceSubmesh::read(File *file) {
 		if (!file) {
@@ -151,6 +152,7 @@ namespace LibGens {
 		file->readInt32BE(&element_count);
 		file->readInt32BEA(&element_table_address);
 
+		elements.reserve(element_count);
 		for (size_t i=0; i<element_count; i++) {
 			file->goToAddress(element_table_address + i*4);
 
@@ -213,6 +215,7 @@ namespace LibGens {
 			file->readInt32BE(&submesh_count);
 			file->readInt32BEA(&submesh_table_address);
 
+			submeshes[slot].reserve(submesh_count);
 			for (size_t i=0; i<submesh_count; i++) {
 				file->goToAddress(submesh_table_address + i*4);
 
@@ -321,6 +324,7 @@ namespace LibGens {
 
 		// Instance Mesh
 		if (file->getRootNodeType() == LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS) {
+			meshes.reserve(instance_mesh_count);
 			for (size_t i=0; i<instance_mesh_count; i++) {
 				file->goToAddress(instance_mesh_address + i*4);
 
@@ -345,8 +349,6 @@ namespace LibGens {
 			}
 		}
 	}
-
-	
 
 	void TerrainInstance::write(File *file) {
 		if (!file) {
@@ -534,7 +536,6 @@ namespace LibGens {
 		grid.clear();
 		
 	}
-
 
 	TerrainInstance::~TerrainInstance() {
 		for (vector<TerrainInstanceMesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
