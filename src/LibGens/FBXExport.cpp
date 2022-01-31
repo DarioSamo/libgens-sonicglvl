@@ -553,6 +553,15 @@ namespace LibGens {
 				}
 			}
 		}
+		
+		else if (lMeshNode) {
+			vector<FbxNode *> skeleton_bones;
+			addSkeleton(skeleton_bones, model);
+			
+			if (skeleton_bones.size()) {
+				skinModelToSkeleton(model, lMesh, skeleton_bones, lMeshNode->EvaluateGlobalTransform());
+			}
+		}
 
 		return lMesh;
 	}
@@ -602,5 +611,56 @@ namespace LibGens {
 		}
 
 		return lMesh;
+	}
+	
+	void FBX::addSkeleton(vector<FbxNode *>& skeleton_bones, Model *model) {
+		vector<Bone *> bones = model->getBones();
+		
+		FbxNode *lRootNode = scene->GetRootNode();
+		skeleton_bones.reserve(bones.size());
+		
+		addBone(lRootNode, -1, skeleton_bones, bones);
+	}
+	
+	void FBX::addBone(FbxNode *parent_node, unsigned int parent_index, vector<FbxNode *>& skeleton_bones, vector<Bone *>& bones) {
+		for (size_t i = 0; i < bones.size(); i++) {
+			if (bones[i]->getParentIndex() != parent_index) {
+				continue;
+			}
+			
+			string bone_name = bones[i]->getName();
+			
+			FbxNode *lBoneNode = FbxNode::Create(scene, bone_name.c_str());
+			FbxSkeleton* lSkeletonRootAttribute = FbxSkeleton::Create(scene, bone_name.c_str());
+			if (parent_index == -1) {
+				lSkeletonRootAttribute->SetSkeletonType(FbxSkeleton::eRoot);
+			}
+			else {
+				lSkeletonRootAttribute->SetSkeletonType(FbxSkeleton::eLimbNode);
+			}
+			lBoneNode->SetNodeAttribute(lSkeletonRootAttribute);
+			
+			Matrix4 bone_matrix = bones[i]->getMatrix().inverse();
+			if (parent_index >= 0 && parent_index < bones.size()) {
+				bone_matrix = bones[parent_index]->getMatrix() * bone_matrix;
+			}
+			
+			Vector3 pos, sca;
+			Quaternion ori;
+			bone_matrix.decomposition(pos, sca, ori);
+			
+			lBoneNode->LclTranslation.Set(FbxVector4(pos.x, pos.y, pos.z));
+			lBoneNode->LclScaling.Set(FbxVector4(sca.x, sca.y, sca.z));
+			
+			FbxQuaternion quaternion(ori.x, ori.y, ori.z, ori.w);
+			FbxVector4 lcl_rotation;
+			lcl_rotation.SetXYZ(quaternion);
+			lBoneNode->LclRotation.Set(lcl_rotation);
+			
+			parent_node->AddChild(lBoneNode);
+			skeleton_bones.push_back(lBoneNode);
+			
+			addBone(lBoneNode, i, skeleton_bones, bones);
+		}
 	}
 };
