@@ -64,7 +64,7 @@ namespace LibGens {
 		// Build Center and Radius
 		if (object) {
 			object->center = object->aabb.center();
-			object->radius = object->aabb.sizeMax();
+			object->radius = object->aabb.radius();
 		}
 	}
 

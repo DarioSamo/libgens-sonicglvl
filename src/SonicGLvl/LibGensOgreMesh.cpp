@@ -1011,7 +1011,7 @@ void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneMana
 			}
 
 			msh->_setBounds(Ogre::AxisAlignedBox(mesh_aabb.start.x, mesh_aabb.start.y, mesh_aabb.start.z, mesh_aabb.end.x, mesh_aabb.end.y, mesh_aabb.end.z));
-			msh->_setBoundingSphereRadius(mesh_aabb.sizeMax()/2);
+			msh->_setBoundingSphereRadius(mesh_aabb.radius());
 			msh->load();
 		}
 		

@@ -751,6 +751,7 @@ namespace LibGens {
 			float sizeMax();
 			Vector3 center();
 			float size();
+			float radius();
 
 			Vector3 corner(int type);
 

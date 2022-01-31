@@ -29,7 +29,7 @@ TerrainNode::TerrainNode(LibGens::TerrainInstance *terrain_instance_p, Ogre::Sce
 		//printf("Building terrain instance %s\n", terrain_instance->getName().c_str());
 		LibGens::AABB instance_aabb=terrain_instance->getAABB();
 		real_center = Ogre::Vector3(instance_aabb.centerX(), instance_aabb.centerY(), instance_aabb.centerZ());
-		radius = instance_aabb.sizeMax()/2;
+		radius = instance_aabb.radius();
 		quality_level = 3;
 
 		scene_node = scene_manager->getRootSceneNode()->createChildSceneNode();

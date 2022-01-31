@@ -236,7 +236,7 @@ bool GIWindow::convert() {
 						world_aabb.merge(aabb);
 						logProgress(ProgressNormal, QString("Loaded %1.terrain-instanceinfo using model %2 from group's AR Pack. AABB: [%3, %4, %5][%6, %7, %8]").arg(instance_name.c_str()).arg(model_name.c_str()).arg(aabb.start.x).arg(aabb.start.y).arg(aabb.start.z).arg(aabb.end.x).arg(aabb.end.y).arg(aabb.end.z));
 
-						gi_group_info->addInstance(instance_name, aabb.center(), aabb.sizeMax() / 2.0f);
+						gi_group_info->addInstance(instance_name, aabb.center(), aabb.radius());
 					}
 					else {
 						logProgress(ProgressError, QString("Couldn't find %1 in calculated AABBs for models.").arg(model_name.c_str()));
@@ -883,7 +883,7 @@ QList<GIWindow::GIGroup> GIWindow::createGroups(LibGens::AABB current_aabb, QLis
 				string instance_name = instances[i];
 				int instance_index = gi_group_info->getInstanceIndex(instance_name);
 				LibGens::AABB aabb = instance_aabbs[instance_name];
-				float sphere_size = aabb.sizeMax() / 2.0F;
+				float sphere_size = aabb.radius();
 
 				// Divide the quality size multiplier by the current scale factor.
 				int texture_size = (int)(converter_settings.quality_size_multiplier / quality_scale_factor * sphere_size);
@@ -917,7 +917,7 @@ QList<GIWindow::GIGroup> GIWindow::createGroups(LibGens::AABB current_aabb, QLis
 			group.index = group_index;
 			group.instance_count = instance_max_size;
 			gi_group->setCenter(group.aabb.center());
-			gi_group->setRadius(group.aabb.sizeMax() / 2.0f);
+			gi_group->setRadius(group.aabb.radius());
 
 			logProgress(ProgressNormal, QString("Created group #%1 with %2 instances and Sphere %3 %4 %5 - %6. [%7, %8, %9][%10, %11, %12]").arg(group_index).arg(instance_max_size).arg(gi_group->getCenter().x).arg(gi_group->getCenter().y).arg(gi_group->getCenter().z).arg(gi_group->getRadius()).arg(group.aabb.start.x).arg(group.aabb.start.y).arg(group.aabb.start.z).arg(group.aabb.end.x).arg(group.aabb.end.y).arg(group.aabb.end.z));
 			return_groups.append(group);
@@ -1016,7 +1016,7 @@ QList<GIWindow::GIGroup> GIWindow::createGroups(LibGens::AABB current_aabb, QLis
 					groups_in_level = leftover_groups;
 
 					gi_group->setCenter(group.aabb.center());
-					gi_group->setRadius(group.aabb.sizeMax() / 2.0f);
+					gi_group->setRadius(group.aabb.radius());
 					logProgress(ProgressNormal, QString("Created group #%1 with quality level %2 and %3 sub-groups.").arg(group.index).arg(group.level).arg(gi_group->getInstanceIndexCount()));
 					return_groups.append(group);
 				}

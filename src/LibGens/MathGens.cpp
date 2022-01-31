@@ -757,6 +757,10 @@ namespace LibGens {
 		return sizeX() * sizeY() * sizeZ();
 	}
 
+	float AABB::radius() {
+		return start.distance(end) / 2.0f;
+	}
+
 	Vector3 AABB::center() {
 		return (start+end)/2.0f;
 	}
