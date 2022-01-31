@@ -82,6 +82,7 @@ namespace LibGens {
 			void addTextureID(unsigned int v);
 			unsigned int getEstimatedMemorySize();
 			void changeVertexFormat(int format);
+			VertexFormat* getVertexFormat();
 			~Submesh();
 	};
 };

@@ -466,7 +466,8 @@ namespace LibGens {
 	}
 
 	void Submesh::setVertexFormat(VertexFormat *v) {
-		vertex_format = v;
+		delete vertex_format;
+		vertex_format = new VertexFormat(v);
 	}
 
 	void Submesh::addBone(unsigned char bone) {
@@ -495,6 +496,10 @@ namespace LibGens {
 
 	void Submesh::changeVertexFormat(int format) {
 		delete vertex_format;
-		setVertexFormat(new VertexFormat(format));
+		vertex_format = new VertexFormat(format);
+	}
+
+	VertexFormat* Submesh::getVertexFormat() {
+		return vertex_format;
 	}
 };

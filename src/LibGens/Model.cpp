@@ -20,15 +20,20 @@
 #include "Bone.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "MorphModel.h"
 #include "TerrainGroup.h"
+#include "SampleChunkNode.h"
+#include "SampleChunkProperty.h"
 
 namespace LibGens {
 	Model::Model() {
 		meshes.clear();
 		bones.clear();
+		properties.clear();
 		name="";
 		filename="";
 		terrain_mode = false;
+		has_instances = true;
 	}
 
 	Model::Model(string filename_p) {
@@ -78,8 +83,8 @@ namespace LibGens {
 				readRootNodeDynamicGenerations(file);
 				break;
 
-			case LIBGENS_MODEL_ROOT_DYNAMIC_LOST_WORLD:
-				readRootNodeDynamicGenerations(file);
+			case LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD:
+				readRootNodeDynamicLostWorld(file);
 				break;
 		}
 	}
@@ -130,7 +135,7 @@ namespace LibGens {
 
 		if (terrain_mode) {
 			file->readInt32BEA(&mesh_name_address);
-			file->readInt32BE(&model_flag);
+			file->readInt32BE(&has_instances);
 
 			// Read Name
 			file->goToAddress(mesh_name_address);
@@ -140,6 +145,7 @@ namespace LibGens {
 			readSkeleton(file);
 		}
 
+		meshes.reserve(mesh_count);
 		for (size_t i=0; i<mesh_count; i++) {
 			size_t mesh_address=0;
 			file->goToAddress(mesh_table_address + i*4);
@@ -159,51 +165,29 @@ namespace LibGens {
 
 	
 	void Model::readRootNodeDynamicLostWorld(File *file) {
-		/*
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
 			return;
 		}
 
-		size_t header_address=file->getCurrentAddress();
+		SampleChunkNode *root_node = new SampleChunkNode();
+		root_node->read(file);
 
-		// Read Meshes
-		unsigned int mesh_count=0;
-		size_t mesh_table_address=0;
-		size_t mesh_name_address=0;
-
-		
-		file->readInt32BE(&mesh_count);
-		file->readInt32BEA(&mesh_table_address);
-
-		if (terrain_mode) {
-			file->readInt32BEA(&mesh_name_address);
-			file->readInt32BE(&model_flag);
-
-			// Read Name
-			file->goToAddress(mesh_name_address);
-			file->readString(&name);
-		}
-		else {
-			readSkeleton(file);
+		SampleChunkNode *property_node = root_node->find("SCAParam");
+		if (property_node) {
+			vector<SampleChunkNode *> property_nodes = property_node->getNodes();
+			for (vector<SampleChunkNode *>::iterator it = property_nodes.begin(); it != property_nodes.end(); it++) {
+				properties.push_back(new SampleChunkProperty(*it));
+			}
 		}
 
-		for (size_t i=0; i<mesh_count; i++) {
-			size_t mesh_address=0;
-			file->goToAddress(mesh_table_address + i*4);
-			file->readInt32BEA(&mesh_address);
-			file->goToAddress(mesh_address);
-
-			Mesh *mesh = new Mesh();
-			mesh->read(file);
-			mesh->buildAABB();
-			meshes.push_back(mesh);
+		SampleChunkNode *contexts_node = root_node->find("Contexts", false);
+		if (contexts_node) {
+			file->goToAddress(contexts_node->getDataAddress());
+			readRootNodeDynamicGenerations(file);
 		}
 
-		if (terrain_mode) {
-			buildAABB();
-		}
-		*/
+		delete root_node;
 	}
 
 	
@@ -215,10 +199,10 @@ namespace LibGens {
 
 		size_t header_address=file->getCurrentAddress();
 
-		unsigned int unknown_total=0;
-		size_t unknown_address=0;
-		file->readInt32BE(&unknown_total);
-		file->readInt32BEA(&unknown_address);
+		unsigned int morph_model_count=0;
+		size_t morph_models_address=0;
+		file->readInt32BE(&morph_model_count);
+		file->readInt32BEA(&morph_models_address);
 
 		unsigned int bone_total=0;
 		size_t bone_definition_table_address=0;
@@ -230,6 +214,18 @@ namespace LibGens {
 		file->readInt32BEA(&bone_matrix_address);
 		file->readInt32BEA(&global_aabb_address);
 
+		for (size_t i = 0; i < morph_model_count; i++) {
+			file->goToAddress(morph_models_address + i * 4);
+			size_t address = 0;
+			file->readInt32BEA(&address);
+			file->goToAddress(address);
+
+			MorphModel* morph_model = new MorphModel();
+			morph_model->read(file);
+			morph_models.push_back(morph_model);
+		}
+
+		bones.reserve(bone_total);
 		for (size_t i=0; i<bone_total; i++) {
 			file->goToAddress(bone_definition_table_address + i*4);
 			size_t address=0;
@@ -272,6 +268,9 @@ namespace LibGens {
 			case LIBGENS_MODEL_ROOT_DYNAMIC_UNLEASHED_2:
 				writeRootNodeDynamicUnleashed2(file);
 				break;
+			case LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD:
+				writeRootNodeDynamicLostWorld(file);
+				break;
 		}
 	}
 
@@ -286,7 +285,8 @@ namespace LibGens {
 		size_t model_table_address=0;
 		size_t model_name_address=0;
 
-		size_t unknown_address=0;
+		size_t morph_models_address=0;
+		unsigned int morph_model_count = morph_models.size();
 		unsigned int bone_count=bones.size();
 		size_t bone_definition_table_address=0;
 		size_t bone_matrix_address=0;
@@ -297,10 +297,11 @@ namespace LibGens {
 
 		if (terrain_mode) {
 			file->writeNull(4);
-			file->writeInt32BE(&model_flag);
+			file->writeInt32BE(&has_instances);
 		}
 		else {
-			file->writeNull(8);
+			file->writeInt32BE(&morph_model_count);
+			file->writeNull(4);
 			file->writeInt32BE(&bone_count);
 			file->writeNull(12);
 		}
@@ -329,7 +330,21 @@ namespace LibGens {
 			file->fixPadding();
 		}
 		else {
-			unknown_address = file->getCurrentAddress();
+			morph_models_address = file->getCurrentAddress();
+
+			vector<size_t> morph_model_addresses;
+			file->writeNull(morph_model_count * 4);
+
+			for (size_t i = 0; i < morph_model_count; i++) {
+				morph_model_addresses.push_back(file->getCurrentAddress());
+				morph_models[i]->write(file);
+			}
+
+			for (size_t i = 0; i < morph_model_count; i++) {
+				file->goToAddress(morph_models_address + i * 4);
+				file->writeInt32BEA(&morph_model_addresses[i]);
+			}
+			file->goToEnd();
 
 			bone_definition_table_address = file->getCurrentAddress();
 			vector<unsigned int> bone_definition_addresses;
@@ -363,7 +378,7 @@ namespace LibGens {
 		}
 		else {
 			file->moveAddress(4);
-			file->writeInt32BEA(&unknown_address);
+			file->writeInt32BEA(&morph_models_address);
 			file->moveAddress(4);
 			file->writeInt32BEA(&bone_definition_table_address);
 			file->writeInt32BEA(&bone_matrix_address);
@@ -431,7 +446,24 @@ namespace LibGens {
 		file->goToEnd();
 	}
 
+	void Model::writeRootNodeDynamicLostWorld(File *file) {
+		SampleChunkNode *root_node = new SampleChunkNode("Model", 1);
+		
+		if (properties.size()) {
+			SampleChunkNode *property_node = root_node->newNode("NodesExt", 1)->newNode("NodePrms", 0)->newNode("SCAParam", 1);
+			for (vector<SampleChunkProperty *>::iterator it = properties.begin(); it != properties.end(); it++) {
+				property_node->addNode((*it)->toSampleChunkNode());
+			}
+		}
 
+		SampleChunkNode *contexts_node = new SampleChunkNode();
+		contexts_node->setName("Contexts");
+		contexts_node->setData(this, LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS);
+		root_node->addNode(contexts_node);
+
+		root_node->write(file, true);
+		delete root_node;
+	}
 
 	list<Vertex *> Model::getVertexList() {
 		list<Vertex *> vertices;
@@ -556,12 +588,16 @@ namespace LibGens {
 		for (vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
 			(*it)->fixVertexFormatForPC();
 		}
+
+		for (auto it = morph_models.begin(); it != morph_models.end(); ++it)
+			(*it)->fixVertexFormatForPC();
 	}
 
 	void Model::buildAABB() {
 		global_aabb.reset();
 
 		for (std::vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
+			(*it)->buildAABB();
 			global_aabb.merge((*it)->getAABB());
 		}
 	}
@@ -572,6 +608,7 @@ namespace LibGens {
 
 	void Model::setTerrainMode(bool v) {
 		terrain_mode = v;
+		has_instances = v;
 	}
 
 	vector<Bone *> Model::getBones() {
@@ -616,6 +653,39 @@ namespace LibGens {
 		for (vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
 			(*it)->changeVertexFormat(format);
 		}
+	}
+
+    bool Model::getPropertyValue(string name, unsigned& value) {
+		if (name.size() > 8) name = name.substr(0, 8);
+
+		for (vector<SampleChunkProperty*>::iterator it = properties.begin(); it != properties.end(); it++) {
+			if ((*it)->getName() == name) {
+				value = (*it)->getValue();
+				return true;
+			}
+		}
+		return false;
+    }
+
+    void Model::setPropertyValue(string name, unsigned int value) {
+		if (name.size() > 8) name = name.substr(0, 8);
+		
+		for (vector<SampleChunkProperty *>::iterator it = properties.begin(); it != properties.end(); it++) {
+			if ((*it)->getName() == name) {
+				(*it)->setValue(value);
+				return;
+			}
+		}
+
+		properties.push_back(new SampleChunkProperty(name, value));
+	}
+
+	vector<MorphModel*> Model::getMorphModels() {
+		return morph_models;
+	}
+
+	void Model::addMorphModel(MorphModel* morph_model) {
+		morph_models.push_back(morph_model);
 	}
 };
 

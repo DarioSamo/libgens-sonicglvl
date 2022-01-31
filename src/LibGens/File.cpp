@@ -402,61 +402,32 @@ namespace LibGens {
 			return;
 		}
 
-		unsigned char next_gen_check=0;
-		readUChar(&next_gen_check);
+		fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_TYPE_ADDRESS + global_offset, SEEK_SET);
+		readInt32BE(&root_node_type);
 
-		goToAddress(0);
-
-		if (next_gen_check == 0x80) {
-			// Read new header
-			root_node_type = LIBGENS_MODEL_ROOT_DYNAMIC_LOST_WORLD;
-			root_node_address = LIBGENS_FILE_HEADER_ROOT_ADDRESS_NEXT_GEN;
-
-			unsigned short file_size = 0;
-			goToAddress(2);
-			readInt16BE(&file_size);
-
-			unsigned int signature = 0;
-			readInt32BE(&signature);
-
-			unsigned int offset_table_size=0;
-			size_t offset_table_address_absolute=0;
-			readInt32BE(&offset_table_address_absolute);
-			readInt32BE(&offset_table_size);
-
-			// FIXME: Awful way to seek through the new type of Lost World header, needs to be done
-			// in a better way.
-			while (true) {
-				unsigned short section_flag = 0;
-				unsigned short section_address = 0;
-				unsigned int section_value = 0;
-				string section_name = "";
-				readInt16BE(&section_flag);
-				readInt16BE(&section_address);
-				readInt32BE(&section_value);
-				readString(&section_name, 8);
-
-				if (section_name == "Contexts") {
-					break;
-				}
-			}
+		if (root_node_type == LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) {
+			root_node_address = LIBGENS_FILE_HEADER_ROOT_ADDRESS_LOST_WORLD;
 		}
+
 		else {
-			fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_TYPE_ADDRESS+global_offset, SEEK_SET);
-			readInt32BE(&root_node_type);
-
-			fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_NODE_ADDRESS+global_offset, SEEK_SET);
+			fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_NODE_ADDRESS + global_offset, SEEK_SET);
 			readInt32BE(&root_node_address);
-
-			fseek(file_ptr, root_node_address+global_offset, SEEK_SET);
 		}
+
+		fseek(file_ptr, root_node_address + global_offset, SEEK_SET);
 	}
 
-	void File::prepareHeader(int root_type, int root_offset) {
+	void File::prepareHeader(int root_type) {
 		root_node_type=root_type;
-		root_node_address=root_offset;
+		
+		if (root_node_type == LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) {
+			root_node_address = LIBGENS_FILE_HEADER_ROOT_ADDRESS_LOST_WORLD;
+		}
+		else {
+			root_node_address = LIBGENS_FILE_HEADER_ROOT_ADDRESS_DEFAULT;
+		}
 
-		writeNull(LIBGENS_FILE_HEADER_ROOT_ADDRESS_DEFAULT);
+		writeNull(root_node_address);
 	}
 
 	void File::writeHeader(bool no_extra_foot) {
@@ -467,11 +438,11 @@ namespace LibGens {
 
 		sortAddressTable();
 
-		unsigned int final_table_address=getFileSize()-root_node_address;
-		unsigned int final_table_address_abs=getFileSize();
+		unsigned int root_node_size=getFileSize()-root_node_address;
+		unsigned int final_table_address=getFileSize();
 		unsigned int final_table_size=final_address_table.size();
 
-		writeInt32BE(&final_table_size);
+		if (root_node_type != LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) writeInt32BE(&final_table_size);
 		for (list<size_t>::iterator it=final_address_table.begin(); it!=final_address_table.end(); it++) {
 			writeInt32BE(&(*it));
 		}
@@ -486,12 +457,21 @@ namespace LibGens {
 		}
 
 		goToAddress(0);
-		writeInt32BE(&size);
-		writeInt32BE(&root_node_type);
-		writeInt32BE(&final_table_address);
-		writeInt32BE(&root_node_address);
-		writeInt32BE(&final_table_address_abs);
-		writeInt32BE(&size_foot);
+		if (root_node_type == LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) {
+			size = 0x80000000 | size;
+			writeInt32BE(&size);
+			writeInt32BE(&root_node_type);
+			writeInt32BE(&final_table_address);
+			writeInt32BE(&final_table_size);
+		}
+		else {
+			writeInt32BE(&size);
+			writeInt32BE(&root_node_type);
+			writeInt32BE(&root_node_size);
+			writeInt32BE(&root_node_address);
+			writeInt32BE(&final_table_address);
+			writeInt32BE(&size_foot);
+		}
 	}
 
 	size_t File::getCurrentAddress() {
@@ -528,6 +508,7 @@ namespace LibGens {
 			size_t sz=getFileSize();
 			char *data=new char[sz];
 
+			goToAddress(0);
 			read(data, sz);
 			file.write(data, sz);
 

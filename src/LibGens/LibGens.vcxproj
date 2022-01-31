@@ -140,6 +140,9 @@
     <ClCompile Include="MaterialLibrary.cpp" />
     <ClCompile Include="MathGens.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MorphModel.cpp" />
+    <ClCompile Include="SampleChunkNode.cpp" />
+    <ClCompile Include="SampleChunkProperty.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLibrary.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -206,6 +209,9 @@
     <ClInclude Include="MaterialLibrary.h" />
     <ClInclude Include="MathGens.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MorphModel.h" />
+    <ClInclude Include="SampleChunkNode.h" />
+    <ClInclude Include="SampleChunkProperty.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLibrary.h" />
     <ClInclude Include="Object.h" />

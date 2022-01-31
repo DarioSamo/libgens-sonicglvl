@@ -32,11 +32,13 @@
 #define LIBGENS_MATERIAL_TEXTURE_UNIT_DISPLACEMENT      "displacement"
 #define LIBGENS_MATERIAL_TEXTURE_UNIT_REFLECTION        "reflection"
 
+#define LIBGENS_MATERIAL_ROOT_UNLEASHED                 1
 #define LIBGENS_MATERIAL_ROOT_GENERATIONS               3
 
 namespace LibGens {
 	class Texture;
 	class Parameter;
+	class SampleChunkProperty;
 
 	class Material {
 		protected:
@@ -44,6 +46,7 @@ namespace LibGens {
 			string folder;
 			vector<Texture *> textures;
 			vector<Parameter *> parameters;
+			vector<SampleChunkProperty *> properties;
 			string shader;
 			string sub_shader;
 			string extra;
@@ -59,9 +62,16 @@ namespace LibGens {
 
 			Material();
 			Material(string filename);
+			~Material();
 			void read(File *file);
+			void readRootNodeGenerations(File *file);
+			void readRootNodeUnleashed(File *file);
+			void readRootNodeLostWorld(File *file);
 			void write(File *file);
-			void save(string filename);
+			void writeRootNodeGenerations(File *file);
+			void writeRootNodeUnleashed(File *file);
+			void writeRootNodeLostWorld(File *file);
+			void save(string filename, int root_type = LIBGENS_MATERIAL_ROOT_GENERATIONS);
 			void setShader(string v);
 			string getShader();
 			void setLayer(string v);
@@ -94,6 +104,7 @@ namespace LibGens {
 			bool hasNoCulling();
 			void setColorBlend(bool v);
 			bool hasColorBlend();
+			void setPropertyValue(string name, unsigned int value);
 	};
 };
 

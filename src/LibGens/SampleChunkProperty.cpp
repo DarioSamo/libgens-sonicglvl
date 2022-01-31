@@ -17,34 +17,37 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
-#pragma once
-
-#define LIBGENS_TEXSET_EXTENSION          ".texset"
-#define LIBGENS_TEXTURE_EXTENSION         ".texture"
-#define LIBGENS_TEXSET_ROOT_UNLEASHED     0
-#define LIBGENS_TEXTURE_ROOT_UNLEASHED    1
+#include "SampleChunkProperty.h"
+#include "SampleChunkNode.h"
 
 namespace LibGens {
-	class Material;
+	SampleChunkProperty::SampleChunkProperty(string name_p, unsigned int value_p) {
+		name = name_p;
+		value = value_p;
+	}
 
-	class Texture {
-		protected:
-			string internal_name;
-			string unit;
-			string name;
-		    unsigned int flags;
-		public:
-			Texture();
-			Texture(string filename, string internal_name_p);
-			Texture(string internal_name_p, string unit_p, string name_p);
-			void read(File *file, string id);
-			void write(File *file);
-			void save(string filename);
-			void setName(string v);
-			void setUnit(string v);
-			void setInternalName(string v);
-			string getName();
-			string getUnit();
-			string getTexset();
-	};
-};
+	SampleChunkProperty::SampleChunkProperty(SampleChunkNode *sample_chunk_node_p) {
+		name = sample_chunk_node_p->getName();
+		value = sample_chunk_node_p->getValue();
+	}
+
+	string SampleChunkProperty::getName() {
+		return name;
+	}
+
+	unsigned int SampleChunkProperty::getValue() {
+		return value;
+	}
+
+	void SampleChunkProperty::setName(string v) {
+		name = v;
+	}
+
+	void SampleChunkProperty::setValue(unsigned int v) {
+		value = v;
+	}
+
+	SampleChunkNode *SampleChunkProperty::toSampleChunkNode() {
+		return new SampleChunkNode( name, value );
+	}
+}

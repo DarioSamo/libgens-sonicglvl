@@ -183,6 +183,15 @@
     <ClCompile Include="Tags.cpp">
       <Filter>Tags</Filter>
     </ClCompile>
+    <ClCompile Include="SampleChunkNode.cpp">
+      <Filter>Property</Filter>
+    </ClCompile>
+    <ClCompile Include="SampleChunkProperty.cpp">
+      <Filter>Property</Filter>
+    </ClCompile>
+    <ClCompile Include="MorphModel.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -364,6 +373,15 @@
     <ClInclude Include="Tags.h">
       <Filter>Tags</Filter>
     </ClInclude>
+    <ClInclude Include="SampleChunkProperty.h">
+      <Filter>Property</Filter>
+    </ClInclude>
+    <ClInclude Include="SampleChunkNode.h">
+      <Filter>Property</Filter>
+    </ClInclude>
+    <ClInclude Include="MorphModel.h">
+      <Filter>Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="BIXF">
@@ -410,6 +428,9 @@
     </Filter>
     <Filter Include="Tags">
       <UniqueIdentifier>{149b0a3d-bb3a-4a0b-b900-a04bb3ab79b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Property">
+      <UniqueIdentifier>{636ff22b-b7c7-494f-ab62-ba23563a6e14}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

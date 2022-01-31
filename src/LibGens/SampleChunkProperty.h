@@ -19,32 +19,21 @@
 
 #pragma once
 
-#define LIBGENS_TEXSET_EXTENSION          ".texset"
-#define LIBGENS_TEXTURE_EXTENSION         ".texture"
-#define LIBGENS_TEXSET_ROOT_UNLEASHED     0
-#define LIBGENS_TEXTURE_ROOT_UNLEASHED    1
-
 namespace LibGens {
-	class Material;
+	class SampleChunkNode;
 
-	class Texture {
-		protected:
-			string internal_name;
-			string unit;
-			string name;
-		    unsigned int flags;
-		public:
-			Texture();
-			Texture(string filename, string internal_name_p);
-			Texture(string internal_name_p, string unit_p, string name_p);
-			void read(File *file, string id);
-			void write(File *file);
-			void save(string filename);
-			void setName(string v);
-			void setUnit(string v);
-			void setInternalName(string v);
-			string getName();
-			string getUnit();
-			string getTexset();
+	class SampleChunkProperty {
+	protected:
+		string name;
+		unsigned int value;
+	public:
+		SampleChunkProperty(string name_p, unsigned int value_p);
+		SampleChunkProperty(SampleChunkNode *sample_chunk_node_p);
+
+		string getName();
+		unsigned int getValue();
+		void setName(string v);
+		void setValue(unsigned int v);
+		SampleChunkNode *toSampleChunkNode();
 	};
-};
+}

@@ -491,8 +491,10 @@ void EditorApplication::createPreviewMaterialEditorGUI() {
 	}
 
 	rebuildMaterialPreviewNodes();
-	
-	
+
+	// Certain models have invalid AABB values so rebuild it.
+	material_editor_model->buildAABB();
+
 	LibGens::AABB model_aabb=material_editor_model->getAABB();
 	LibGens::Vector3 aabb_center = model_aabb.center();
 	Ogre::Vector3 camera_center = Ogre::Vector3(aabb_center.x, aabb_center.y, aabb_center.z);
