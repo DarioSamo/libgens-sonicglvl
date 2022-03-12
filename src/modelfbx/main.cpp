@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 	LibGens::FBX *fbx_pack = new LibGens::FBX(fbx_manager->getManager());
 	LibGens::HavokEnviroment havok_enviroment(100 * 1024 * 1024);
 
-	havok_enviroment.addFolder("./");
+	havok_enviroment.addFolder("");
 	
 	LibGens::Model *model = NULL;
 
