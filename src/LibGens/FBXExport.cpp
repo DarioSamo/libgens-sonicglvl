@@ -225,6 +225,7 @@ namespace LibGens {
 		FbxAnimStack* lAnimStack = FbxAnimStack::Create(scene, "");
         FbxAnimLayer* lAnimLayer = FbxAnimLayer::Create(scene, "");
         lAnimStack->AddMember(lAnimLayer);
+		lAnimStack->SetLocalTimeSpan(FbxTimeSpan(FbxTimeSeconds(0), FbxTimeSeconds(duration)));
 
 		while (true) {
 			if (!first_frame) current_frame += frame_duration;
