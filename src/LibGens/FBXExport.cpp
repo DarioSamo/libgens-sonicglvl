@@ -344,6 +344,21 @@ namespace LibGens {
 				}
 			}
 		}
+
+		// Apply unroll filter to fix flickering when interpolating
+		FbxAnimCurveFilterUnroll lFilter;
+
+		for (size_t i = 0; i < skeleton_bones.size(); i++)
+		{
+			FbxAnimCurve* lCurve[3];
+
+			lCurve[0] = skeleton_bones[i]->LclRotation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_X);
+			lCurve[1] = skeleton_bones[i]->LclRotation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y);
+			lCurve[2] = skeleton_bones[i]->LclRotation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z);
+
+			if (lCurve[0] && lCurve[1] && lCurve[2] && lFilter.NeedApply(lCurve, 3))
+				lFilter.Apply(lCurve, 3);
+		}
 	}
 
 	FbxMesh *FBX::addTerrainInstance(TerrainInstance *instance) {
