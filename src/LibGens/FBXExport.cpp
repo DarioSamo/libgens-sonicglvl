@@ -206,16 +206,8 @@ namespace LibGens {
 
 
 	void FBX::addHavokAnimation(vector<FbxNode *> &skeleton_bones, hkaSkeleton *skeleton, hkaAnimationBinding *animation_binding, hkaAnimation *animation) {
-		float duration       = animation->m_duration;
-		float frame_duration = 1.0 / 30.0;
-		float current_frame  = 0.0;
-		bool first_frame = true;
-
-		if (frame_duration <= 0.0) return;
-
 		// Create an animation control
 		hkaDefaultAnimationControl* ac = new hkaDefaultAnimationControl(animation_binding);
-		ac->setLocalTime(0);
 
 		// Create a new animated skeleton
 		hkaAnimatedSkeleton* animated_skeleton = new hkaAnimatedSkeleton(skeleton);
@@ -223,33 +215,28 @@ namespace LibGens {
 		ac->removeReference();
 
 		FbxAnimStack* lAnimStack = FbxAnimStack::Create(scene, "");
-        FbxAnimLayer* lAnimLayer = FbxAnimLayer::Create(scene, "");
-        lAnimStack->AddMember(lAnimLayer);
-		lAnimStack->SetLocalTimeSpan(FbxTimeSpan(FbxTimeSeconds(0), FbxTimeSeconds(duration)));
+		FbxAnimLayer* lAnimLayer = FbxAnimLayer::Create(scene, "");
+		lAnimStack->AddMember(lAnimLayer);
+		lAnimStack->SetLocalTimeSpan(FbxTimeSpan(FbxTimeSeconds(0), FbxTimeSeconds(animation->m_duration)));
 
-		while (true) {
-			if (!first_frame) current_frame += frame_duration;
-			if (current_frame > duration) {
-				current_frame = duration;
-			}
-
-			first_frame = false;
-
-			// Advance the animation
-			animated_skeleton->stepDeltaTime(frame_duration);
+		for (int i = 0; i < animation->getNumOriginalFrames(); i++) {
+			// Set animation time
+			FbxTime lTime;
+			lTime.SetSecondDouble((double)i / (double)(animation->getNumOriginalFrames() - 1) * (double)animation->m_duration);
+			ac->setLocalTime((float)lTime.GetSecondDouble());
 
 			hkaPose pose(animated_skeleton->getSkeleton());
 			animated_skeleton->sampleAndCombineAnimations(pose.accessUnsyncedPoseLocalSpace().begin(), pose.getFloatSlotValues().begin());
 
-			for (int i=0; i<skeleton->m_bones.getSize(); i++) {
-				string bone_name= ToString(skeleton->m_bones[i].m_name);
+			for (int j=0; j<skeleton->m_bones.getSize(); j++) {
+				string bone_name= ToString(skeleton->m_bones[j].m_name);
 
 				for (size_t bone_index=0; bone_index<skeleton_bones.size(); bone_index++) {
 					if (bone_name == skeleton_bones[bone_index]->GetName()) {
-						hkQsTransform transform_local = pose.getBoneLocalSpace(i);
+						hkQsTransform transform_local = pose.getBoneLocalSpace(j);
 						hkQsTransform transform_model = hkQsTransform::IDENTITY;
 
-						hkInt16 parent_index = skeleton->m_parentIndices[i];
+						hkInt16 parent_index = skeleton->m_parentIndices[j];
 						if ((parent_index >= 0) && (parent_index < (int) skeleton_bones.size())) {
 							transform_model = pose.getBoneModelSpace(parent_index);
 						}
@@ -276,9 +263,6 @@ namespace LibGens {
 						FbxAnimCurve* curveSY = skeleton_bones[bone_index]->LclScaling.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
 						FbxAnimCurve* curveSZ = skeleton_bones[bone_index]->LclScaling.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
 
-						FbxTime lTime;
-						lTime.SetSecondDouble(current_frame);
-
 						if (curveTX) {
 							curveTX->KeyModifyBegin();
 							int lKeyIndex = curveTX->KeyAdd(lTime);
@@ -302,7 +286,6 @@ namespace LibGens {
 							curveTZ->KeySetInterpolation(lKeyIndex, FbxAnimCurveDef::eInterpolationLinear);
 							curveTZ->KeyModifyEnd();
 						}
-
 						
 						if (curveSX) {
 							curveSX->KeyModifyBegin();
@@ -327,8 +310,6 @@ namespace LibGens {
 							curveSZ->KeySetInterpolation(lKeyIndex, FbxAnimCurveDef::eInterpolationLinear);
 							curveSZ->KeyModifyEnd();
 						}
-						
-						
 
 						FbxQuaternion lcl_quat(tr(0), tr(1), tr(2), tr(3));
 						FbxVector4 lcl_rotation;
@@ -357,15 +338,10 @@ namespace LibGens {
 							curveRZ->KeySetInterpolation(lKeyIndex, FbxAnimCurveDef::eInterpolationLinear);
 							curveRZ->KeyModifyEnd();
 						}
-							
 
 						break;
 					}
 				}
-			}
-
-			if (current_frame == duration) {
-				break;
 			}
 		}
 	}
