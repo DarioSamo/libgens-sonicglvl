@@ -45,7 +45,7 @@ namespace LibGens {
 		}
 
 		FbxScene* lScene = fbx->getScene();
-		lScene->GetGlobalSettings().SetAxisSystem(FbxAxisSystem::Max);
+		lScene->GetGlobalSettings().SetAxisSystem(FbxAxisSystem::OpenGL); // Matches with the game despite the name
 		lScene->GetGlobalSettings().SetSystemUnit(FbxSystemUnit::m);
 
 		// Export scene
