@@ -44,6 +44,7 @@ namespace LibGens {
 			map<Material *, FbxSurfacePhong *> material_map;
 			MaterialLibrary *material_library;
 			FbxScene *scene;
+			FbxPose* bind_pose;
 		public:
 			FBX(FbxManager *sdk_manager, string scene_name=LIBGENS_FBX_DEFAULT_SCENE_NAME_EXPORT);
 			FBX(FbxScene* lScene);

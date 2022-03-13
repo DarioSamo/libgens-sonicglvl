@@ -36,7 +36,7 @@ namespace LibGens {
 		int lFileFormat = sdk_manager->GetIOPluginRegistry()->GetNativeWriterFormat();
 
 		FbxExporter* lExporter = FbxExporter::Create(sdk_manager, "");
-		bool lExportStatus=lExporter->Initialize(filename.c_str(), lFileFormat, sdk_manager->GetIOSettings());
+		bool lExportStatus = lExporter->Initialize(filename.c_str(), lFileFormat, sdk_manager->GetIOSettings());
 
 		if(!lExportStatus) {
 			printf("Call to FbxExporter::Initialize() failed.\n");
@@ -140,6 +140,8 @@ namespace LibGens {
 			skeleton_bones[b] = bone_node;
 			parent_node->AddChild(bone_node);
 
+			bind_pose->Add(bone_node, bone_node->EvaluateGlobalTransform());
+
 			addHavokBone(bone_node, b, skeleton_bones, skeleton);
 		}
 		return root_bone;
@@ -195,8 +197,17 @@ namespace LibGens {
 				}
 
 				lCluster->SetTransformMatrix(lSkinMatrix);
-				FbxAMatrix lXMatrix = skeleton_bones[i]->EvaluateGlobalTransform();
+
+				const Matrix4 matrix = model_bones[model_bone_index]->getMatrix().inverse();
+
+				FbxAMatrix lXMatrix;
+				lXMatrix.mData[0][0] = matrix.m[0][0]; lXMatrix.mData[0][1] = matrix.m[1][0]; lXMatrix.mData[0][2] = matrix.m[2][0]; lXMatrix.mData[0][3] = matrix.m[3][0];
+				lXMatrix.mData[1][0] = matrix.m[0][1]; lXMatrix.mData[1][1] = matrix.m[1][1]; lXMatrix.mData[1][2] = matrix.m[2][1]; lXMatrix.mData[1][3] = matrix.m[3][1];
+				lXMatrix.mData[2][0] = matrix.m[0][2]; lXMatrix.mData[2][1] = matrix.m[1][2]; lXMatrix.mData[2][2] = matrix.m[2][2]; lXMatrix.mData[2][3] = matrix.m[3][2];
+				lXMatrix.mData[3][0] = matrix.m[0][3]; lXMatrix.mData[3][1] = matrix.m[1][3]; lXMatrix.mData[3][2] = matrix.m[2][3]; lXMatrix.mData[3][3] = matrix.m[3][3];
+
 				lCluster->SetTransformLinkMatrix(lXMatrix);
+
 				lSkin->AddCluster(lCluster);
 			}
 		}
@@ -517,6 +528,8 @@ namespace LibGens {
 
 			FbxNode *lRootNode = scene->GetRootNode();
 			lRootNode->AddChild(lMeshNode);
+
+			bind_pose->Add(lMeshNode, lMeshNode->EvaluateGlobalTransform());
 		}
 
 		if (skeleton) {
@@ -535,7 +548,8 @@ namespace LibGens {
 				if (animation) {
 					hkaAnimationBinding *havok_animation_binding=animation->getAnimationBinding();
 					hkaAnimation *havok_animation=animation->getAnimation();
-					addHavokAnimation(skeleton_bones, havok_skeleton, havok_animation_binding, havok_animation);
+					const string animation_name = File::nameFromFilenameNoExtension(animation->getName());
+					addHavokAnimation(skeleton_bones, havok_skeleton, havok_animation_binding, havok_animation, animation_name);
 				}
 			}
 		}
@@ -645,6 +659,8 @@ namespace LibGens {
 			
 			parent_node->AddChild(lBoneNode);
 			skeleton_bones.push_back(lBoneNode);
+
+			bind_pose->Add(lBoneNode, lBoneNode->EvaluateGlobalTransform());
 			
 			addBone(lBoneNode, i, skeleton_bones, bones);
 		}
