@@ -205,7 +205,7 @@ namespace LibGens {
 	}
 
 
-	void FBX::addHavokAnimation(vector<FbxNode *> &skeleton_bones, hkaSkeleton *skeleton, hkaAnimationBinding *animation_binding, hkaAnimation *animation) {
+	void FBX::addHavokAnimation(vector<FbxNode *> &skeleton_bones, hkaSkeleton *skeleton, hkaAnimationBinding *animation_binding, hkaAnimation *animation, const string& animation_name) {
 		// Create an animation control
 		hkaDefaultAnimationControl* ac = new hkaDefaultAnimationControl(animation_binding);
 
@@ -214,8 +214,8 @@ namespace LibGens {
 		animated_skeleton->addAnimationControl( ac );
 		ac->removeReference();
 
-		FbxAnimStack* lAnimStack = FbxAnimStack::Create(scene, "");
-		FbxAnimLayer* lAnimLayer = FbxAnimLayer::Create(scene, "");
+		FbxAnimStack* lAnimStack = FbxAnimStack::Create(scene, animation_name.c_str());
+		FbxAnimLayer* lAnimLayer = FbxAnimLayer::Create(scene, animation_name.c_str());
 		lAnimStack->AddMember(lAnimLayer);
 		lAnimStack->SetLocalTimeSpan(FbxTimeSpan(FbxTimeSeconds(0), FbxTimeSeconds(animation->m_duration)));
 
