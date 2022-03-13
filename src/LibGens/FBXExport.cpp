@@ -373,13 +373,11 @@ namespace LibGens {
 			lMeshNode = FbxNode::Create(scene, name.c_str());
 			lMesh = FbxMesh::Create(scene, (name + "_mesh").c_str());
 
-			// Create Layer 0
+			// Create layers
+			// UV2 needs to be in the second layer
+			while (lMesh->CreateLayer() != 1);
 			FbxLayer* lLayer = lMesh->GetLayer(0);
-			if (lLayer == NULL)
-			{
-				lMesh->CreateLayer();
-				lLayer = lMesh->GetLayer(0);
-			}
+			FbxLayer* lLayer1 = lMesh->GetLayer(1);
 
 			// Build Transform
 			Vector3 position;
@@ -405,35 +403,38 @@ namespace LibGens {
 			lMesh->InitControlPoints(model_vertices.size());
 			FbxVector4* lControlPoints = lMesh->GetControlPoints();
 
-			FbxLayerElementNormal* lLayerElementNormal = FbxLayerElementNormal::Create(lMesh, "");
+			// Element creation needs to be in this exact order for 3DS max to read them properly.
+			FbxLayerElementNormal* lLayerElementNormal = (FbxLayerElementNormal*)lLayer->CreateLayerElementOfType(FbxLayerElement::eNormal);
 			lLayerElementNormal->SetMappingMode(FbxLayerElement::eByControlPoint);
 			lLayerElementNormal->SetReferenceMode(FbxLayerElement::eDirect);
-			lLayer->SetNormals(lLayerElementNormal);
 
-			FbxLayerElementBinormal* lLayerElementBinormal = FbxLayerElementBinormal::Create(lMesh, "");
+			FbxLayerElementBinormal* lLayerElementBinormal = (FbxLayerElementBinormal*)lLayer->CreateLayerElementOfType(FbxLayerElement::eBiNormal);
+			lLayerElementBinormal->SetName("UVChannel_1");
 			lLayerElementBinormal->SetMappingMode(FbxGeometryElement::eByControlPoint);
 			lLayerElementBinormal->SetReferenceMode(FbxGeometryElement::eDirect);
-			lLayer->SetBinormals(lLayerElementBinormal);
 
-			FbxLayerElementTangent* lLayerElementTangent = FbxLayerElementTangent::Create(lMesh, "");
+			FbxLayerElementTangent* lLayerElementTangent = (FbxLayerElementTangent*)lLayer->CreateLayerElementOfType(FbxLayerElement::eTangent);
+			lLayerElementTangent->SetName("UVChannel_1");
 			lLayerElementTangent->SetMappingMode(FbxGeometryElement::eByControlPoint);
 			lLayerElementTangent->SetReferenceMode(FbxGeometryElement::eDirect);
-			lLayer->SetTangents(lLayerElementTangent);
 
-			FbxLayerElementVertexColor* lLayerElementVertexColor = FbxLayerElementVertexColor::Create(lMesh, "");
-			lLayerElementVertexColor->SetMappingMode(FbxGeometryElement::eByControlPoint);
-			lLayerElementVertexColor->SetReferenceMode(FbxGeometryElement::eDirect);
-			lLayer->SetVertexColors(lLayerElementVertexColor);
+			FbxLayerElementMaterial* lMaterialLayer = (FbxLayerElementMaterial*)lLayer->CreateLayerElementOfType(FbxLayerElement::eMaterial);
+			lMaterialLayer->SetMappingMode(FbxLayerElement::eByPolygon);
+			lMaterialLayer->SetReferenceMode(FbxLayerElement::eIndexToDirect);
 
-			FbxLayerElementUV* lLayerUVElement = FbxLayerElementUV::Create(lMesh, "UVChannel_1");
+			FbxLayerElementVertexColor* lLayerElementVertexColor = (FbxLayerElementVertexColor*)lLayer->CreateLayerElementOfType(FbxLayerElement::eVertexColor);
+			lLayerElementVertexColor->SetMappingMode(FbxGeometryElement::eByPolygonVertex); // 3DS Max requires exactly these modes for vertex color.
+			lLayerElementVertexColor->SetReferenceMode(FbxGeometryElement::eIndexToDirect);
+
+			FbxLayerElementUV* lLayerUVElement = (FbxLayerElementUV*)lLayer->CreateLayerElementOfType(FbxLayerElement::eUV);
+			lLayerUVElement->SetName("UVChannel_1");
 			lLayerUVElement->SetMappingMode(FbxGeometryElement::eByControlPoint);
 			lLayerUVElement->SetReferenceMode(FbxGeometryElement::eDirect);
-			lLayer->SetUVs(lLayerUVElement, FbxLayerElement::eTextureDiffuse);
 
-			FbxLayerElementUV* lLayerUV2Element = FbxLayerElementUV::Create(lMesh, "UVChannel_2");
+			FbxLayerElementUV* lLayerUV2Element = (FbxLayerElementUV*)lLayer1->CreateLayerElementOfType(FbxLayerElement::eUV);
+			lLayerUV2Element->SetName("UVChannel_2");
 			lLayerUV2Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
 			lLayerUV2Element->SetReferenceMode(FbxGeometryElement::eDirect);
-			lLayer->SetUVs(lLayerUV2Element, FbxLayerElement::eTextureAmbient);
 			
 			// Create Vertices
 			unsigned int index=0;
@@ -461,7 +462,7 @@ namespace LibGens {
 			unsigned int global_index=0;
 			for (list<unsigned int>::iterator it=model_faces.begin(); it!=model_faces.end(); it++) {
 				if (face_index == 0) {
-					lMesh->BeginPolygon(-1, -1, -1, false);
+					lMesh->BeginPolygon(material_mappings[global_index], -1, -1, false);
 				}
 
 				lMesh->AddPolygon((*it));
@@ -472,30 +473,23 @@ namespace LibGens {
 					face_index = 0;
 				}
 
+				// Vertex color element was set to eByPolygonVertex
+				lLayerElementVertexColor->GetIndexArray().Add(*it);
+
 				global_index++;
 			}
 
-			// Set material indices
-			FbxLayerElementMaterial* lMaterialLayer = FbxLayerElementMaterial::Create(lMesh, "MaterialIndices");
-			lMaterialLayer->SetMappingMode(FbxLayerElement::eByPolygon);
-			lMaterialLayer->SetReferenceMode(FbxLayerElement::eIndexToDirect);
-			lLayer->SetMaterials(lMaterialLayer);
-
-			for (size_t i = 0; i < model_faces.size()/3; i++) {
-				lMaterialLayer->GetIndexArray().Add(material_mappings[i*3]);
-			}
-
 			// Add Materials
-			for (list<string>::iterator it=material_names.begin(); it!=material_names.end(); it++) {
+			for (list<string>::iterator it = material_names.begin(); it != material_names.end(); it++) {
 				if (material_library) {
-					Material *material = material_library->getMaterial(*it);
+					Material* material = material_library->getMaterial(*it);
 					if (material) {
-						FbxSurfacePhong *lMaterial = material_map[material];
+						FbxSurfacePhong* lMaterial = material_map[material];
 						if (!lMaterial) {
 							lMaterial = addMaterial(material);
 							material_map[material] = lMaterial;
 						}
-						
+
 						if (lMaterial) {
 							lMeshNode->AddMaterial(lMaterial);
 						}
