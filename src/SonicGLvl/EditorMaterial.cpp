@@ -668,6 +668,20 @@ void EditorApplication::loadMaterialEditorModelGUI() {
     free(filename);
 }
 
+void EditorApplication::copyMaterialEditorTexture(const string& file) const
+{
+	string destination_folder;
+
+	if (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_MODEL)
+		destination_folder = LibGens::File::folderFromFilename(material_editor_model_filename);
+
+	else if (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN && editor_application->getCurrentLevel())
+		destination_folder = editor_application->getCurrentLevel()->getResourcesFolder();
+
+	if (!destination_folder.empty())
+		CopyFile(file.c_str(), (destination_folder + "\\" + LibGens::File::nameFromFilename(file)).c_str(), false);
+}
+
 void EditorApplication::pickMaterialEditorTextureGUI() {
 	if (!material_editor_texture)
 		return;
@@ -690,8 +704,7 @@ void EditorApplication::pickMaterialEditorTextureGUI() {
 	if (GetOpenFileName(&ofn)) {
 		chdir(exe_path.c_str());
 		string file = ToString(ofn.lpstrFile);
-		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
-		CopyFile(ofn.lpstrFile, name, false);
+		copyMaterialEditorTexture(file);
 		updateEditTextureMaterialEditor(LibGens::File::nameFromFilenameNoExtension(file), true);
 	}
 	chdir(exe_path.c_str());
@@ -720,8 +733,7 @@ void EditorApplication::addMaterialEditorTextureGUI() {
 	if (GetOpenFileName(&ofn)) {
 		chdir(exe_path.c_str());
 		string file = ToString(ofn.lpstrFile);
-		LPCSTR name = (editor_application->getCurrentLevel()->getResourcesFolder() + "\\" + LibGens::File::nameFromFilename(file)).c_str();
-		string internal_name = LibGens::File::nameFromFilenameNoExtension(name);
+		string internal_name = LibGens::File::nameFromFilenameNoExtension(file);
 		char buffer[8];
 		sprintf(buffer, "-%04d", material_editor_material->getTextureUnitsSize());
 		string unitName = material_editor_material->getName() + ToString(buffer);
@@ -742,13 +754,14 @@ void EditorApplication::addMaterialEditorTextureGUI() {
 		LibGens::Texture* tex = new LibGens::Texture(unitName, unit,internal_name);
 		material_editor_material->addTextureUnit(tex);
 
+		copyMaterialEditorTexture(file);
+
 		Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 		if (ogre_material) {
 			updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
 		}
 
-		CopyFile(ofn.lpstrFile, name, false);
 		updateMaterialEditorTextureList();
 	}
 	chdir(exe_path.c_str());

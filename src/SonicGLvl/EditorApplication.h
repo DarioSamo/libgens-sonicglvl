@@ -465,6 +465,8 @@ class EditorApplication : public BaseApplication {
 		void removeMaterialEditorTexture();
 		void loadMaterialDefaultParams();
 
+		void copyMaterialEditorTexture(const string& file) const;
+
 		void createObjectsPropertiesGUI();
 		void updateObjectsPropertiesGUI();
 		void updateObjectsPropertiesValuesGUI(LibGens::Object *object);
