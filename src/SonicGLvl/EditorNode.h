@@ -70,7 +70,6 @@ class EditorNode {
 
 			type = EDITOR_NODE_UNDEFINED;
 		}
-
 		~EditorNode();
 
 		virtual void show();

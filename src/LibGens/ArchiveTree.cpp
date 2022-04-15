@@ -47,6 +47,13 @@ namespace LibGens {
 	void ArchiveSystem::buildFromTreeNode(ArchiveTree *tree, string node_name) {
 	}
 
-	ArchiveFile *ArchiveSystem::findFile(string filename) {
+	ArchiveFile *ArchiveSystem::findFile(string filename) const {
+
+		for (auto file = files.begin(); file != files.end(); ++file) {
+			if ((*file)->getPath() == filename)
+				return *file;
+		}
+
+		return nullptr;
 	}
 }
