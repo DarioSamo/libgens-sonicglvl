@@ -379,17 +379,17 @@ namespace LibGens {
 	}
 
 
-	FbxMesh *FBX::addNode(Model *model, HavokSkeletonCache *skeleton, HavokAnimationCache *animation, Matrix4 transform_matrix) {
+	FbxMesh *FBX::addNode(Model *model, HavokSkeletonCache *skeleton, HavokAnimationCache *animation, Matrix4 transform_matrix, bool skin) {
 		string model_name = "Dummy";
 
 		if (model) {
 			model_name=model->getName();
 		}
 
-		return addNamedNode(model_name, model, skeleton, animation, transform_matrix);
+		return addNamedNode(model_name, model, skeleton, animation, transform_matrix, skin);
 	}
 
-	FbxMesh *FBX::addNamedNode(string name, Model *model, HavokSkeletonCache *skeleton, HavokAnimationCache *animation, Matrix4 transform_matrix) {
+	FbxMesh *FBX::addNamedNode(string name, Model *model, HavokSkeletonCache *skeleton, HavokAnimationCache *animation, Matrix4 transform_matrix, bool skin) {
 		FbxNode* lMeshNode = NULL;
 		FbxMesh* lMesh = NULL;
 
@@ -522,7 +522,7 @@ namespace LibGens {
 					}
 				}
 			}
-
+			
 			lMeshNode->SetNodeAttribute(lMesh);
 			lMeshNode->SetShadingMode(FbxNode::eTextureShading);
 
@@ -532,7 +532,7 @@ namespace LibGens {
 			bind_pose->Add(lMeshNode, lMeshNode->EvaluateGlobalTransform());
 		}
 
-		if (skeleton) {
+		if (skeleton && skin) {
 			hkaSkeleton *havok_skeleton=skeleton->getSkeleton();
 			
 			if (havok_skeleton) {
@@ -554,7 +554,7 @@ namespace LibGens {
 			}
 		}
 		
-		else if (lMeshNode) {
+		else if (lMeshNode && skin) {
 			vector<FbxNode *> skeleton_bones;
 			addSkeleton(skeleton_bones, model);
 			

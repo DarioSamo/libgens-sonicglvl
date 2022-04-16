@@ -24,7 +24,11 @@
 #define LIBGENS_GHOST_EXTENSION                      ".gst.bin"
 
 namespace LibGens {
+	class FBX;
+	class FBXManager;
+	class Model;
 	class GhostNode;
+	class MaterialLibrary;
 
 	class Ghost {
 		protected:
@@ -35,8 +39,9 @@ namespace LibGens {
 			void read(File *file);
 			void write(File *file);
 			void save(string filename);
-			void calculate(float time, Vector3 &position, Quaternion &rotation, string &animation_name, float &animation_frame, bool &animation_ball);
-			float calculateDuration();
+			void calculate(float time, Vector3 &position, Quaternion &rotation, string &animation_name, float &animation_frame, bool &animation_ball) const;
+			float calculateDuration() const;
+			FBX* buildFbx(FBXManager* manager, Model* model, MaterialLibrary* material_lib = nullptr) const;
 	};
 };
 

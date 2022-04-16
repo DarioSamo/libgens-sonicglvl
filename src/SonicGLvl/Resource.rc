@@ -114,6 +114,7 @@ IDR_TOOLMENU MENUEX
             MENUITEM "", 0, MFT_SEPARATOR, 0
             MENUITEM "Load From File", IMD_LOAD_GHOST_RECORDING, 0, 0
             MENUITEM "Save Recording", IMD_SAVE_GHOST_RECORDING, 0, MFS_GRAYED
+            MENUITEM "Save Recording (FBX)", IMD_SAVE_GHOST_RECORDING_FBX, 0, MFS_GRAYED
         }
     }
 }

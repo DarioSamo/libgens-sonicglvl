@@ -18,7 +18,7 @@ public:
 	void Disconnect();
 	void AddMessageProcessor(void(*processor)(PipeClient* client, PipeMessage* msg));
 	void ProcessMessage(PipeMessage* msg);
-	DWORD UploadMessage(PipeMessage* msg, size_t size);
+	DWORD UploadMessage(const PipeMessage& msg, size_t size);
 	bool client_running;
 
 	HANDLE getClientHandle() {

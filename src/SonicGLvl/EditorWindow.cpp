@@ -39,6 +39,7 @@ void EditorApplication::updateMenu() {
 	EnableMenuItem(hMenu, IMD_STOP_GHOST_RECORD, connected_state);
 
 	EnableMenuItem(hMenu, IMD_SAVE_GHOST_RECORDING, ghost_data ? MF_ENABLED : MF_GRAYED);
+	EnableMenuItem(hMenu, IMD_SAVE_GHOST_RECORDING_FBX, ghost_data ? MF_ENABLED : MF_GRAYED);
 	EnableMenuItem(hMenu, IMD_LOAD_GHOST_RECORDING_FROM_GAME, connected_state);
 
 	if (isGhostRecording && connected) {
@@ -201,17 +202,18 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					editor_application->connectGame();
 					break;
 
+				// Ghost
 				case IMD_START_GHOST_RECORD:
-					editor_application->sendMessageGame(&MsgSetRecording(true), sizeof(MsgSetRecording));
+					editor_application->sendMessageGame(MsgSetRecording(true), sizeof(MsgSetRecording));
 					break;
 
 				case IMD_STOP_GHOST_RECORD:
-					editor_application->sendMessageGame(&MsgSetRecording(false), sizeof(MsgSetRecording));
+					editor_application->sendMessageGame(MsgSetRecording(false), sizeof(MsgSetRecording));
 					break;
 
 				case IMD_LOAD_GHOST_RECORDING_FROM_GAME:
 					editor_application->setupGhost();
-					editor_application->sendMessageGame(&MsgSaveRecording(), sizeof(MsgSaveRecording));
+					editor_application->sendMessageGame(MsgSaveRecording(), sizeof(MsgSaveRecording));
 					break;
 
 				case IMD_LOAD_GHOST_RECORDING:
@@ -220,6 +222,10 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
 				case IMD_SAVE_GHOST_RECORDING:
 					editor_application->saveGhostRecording();
+					break;
+
+				case IMD_SAVE_GHOST_RECORDING_FBX:
+					editor_application->saveGhostRecordingFbx();
 					break;
 			}
 			break;
