@@ -222,6 +222,7 @@
 #define IDE_MATERIAL_PARAMETER_5_A              40047
 #define IMD_LOOK_AT_EACH_OTHER_Z                40047
 #define IDE_MATERIAL_PARAMETER_6_A              40048
+#define IMD_SAVE_GHOST_RECORDING_FBX            40048
 #define IDE_MATERIAL_PARAMETER_7_A              40049
 #define IDE_MATERIAL_PARAMETER_8_A              40050
 #define IDE_MATERIAL_PARAMETER_9_A              40051

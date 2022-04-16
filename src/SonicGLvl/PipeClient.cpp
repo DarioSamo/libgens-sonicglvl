@@ -56,7 +56,7 @@ void PipeClient::ProcessMessage(PipeMessage* msg)
 	}
 }
 
-DWORD PipeClient::UploadMessage(PipeMessage* msg, size_t size)
+DWORD PipeClient::UploadMessage(const PipeMessage& msg, size_t size)
 {
 	DWORD dwWrittenTemp;
 	DWORD dwWritten;
@@ -64,7 +64,7 @@ DWORD PipeClient::UploadMessage(PipeMessage* msg, size_t size)
 	DWORD state;
 	if (GetNamedPipeHandleState(hServer, &state, NULL, NULL, NULL, NULL, NULL))
 	{
-		WriteFile(hServer, msg, size, &dwWritten, NULL);
+		WriteFile(hServer, &msg, size, &dwWritten, NULL);
 		WriteFile(hServer, &INVALID_MESSAGE, sizeof(INVALID_MESSAGE), &dwWrittenTemp, NULL);
 		return dwWritten;
 	}

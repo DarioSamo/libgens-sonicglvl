@@ -1297,7 +1297,7 @@ void EditorApplication::saveGhostRecording()
 	ofn.lpstrFilter = "Ghost Recording(.gst.bin)\0*.gst.bin\0";
 	ofn.nFilterIndex = 1;
 	ofn.nMaxFile = 1024;
-	ofn.lpstrTitle = "Open Ghost Recording";
+	ofn.lpstrTitle = "Save Ghost Recording";
 	ofn.lpstrFile = filename;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_EXPLORER | OFN_ENABLESIZING;
 
@@ -1306,6 +1306,33 @@ void EditorApplication::saveGhostRecording()
 
 	chdir(exe_path.c_str());
 	ghost_data->save(std::string(filename));
+}
+
+void EditorApplication::saveGhostRecordingFbx()
+{
+	if (!ghost_data)
+		return;
+
+	char filename[MAX_PATH];
+	ZeroMemory(filename, sizeof(filename));
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "FBX File(.fbx)\0*.fbx\0";
+	ofn.nFilterIndex = 1;
+	ofn.nMaxFile = 1024;
+	ofn.lpstrTitle = "Export Ghost Recording";
+	ofn.lpstrFile = filename;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_LONGNAMES | OFN_EXPLORER | OFN_ENABLESIZING;
+
+	if (!GetSaveFileName(&ofn))
+		return;
+
+	chdir(exe_path.c_str());
+	LibGens::FBX* lFbx = ghost_data->buildFbx(fbx_manager, model_library->getModel("chr_Sonic_HD"), material_library);
+	fbx_manager->exportFBX(lFbx, filename);
+
+	delete lFbx;
 }
 
 void EditorApplication::launchGame()
@@ -1345,7 +1372,7 @@ bool EditorApplication::connectGame() {
 	return game_client->Connect();
 }
 
-DWORD EditorApplication::sendMessageGame(PipeMessage* msg, size_t size) {
+DWORD EditorApplication::sendMessageGame(const PipeMessage& msg, size_t size) {
 	return game_client->UploadMessage(msg, size);
 }
 

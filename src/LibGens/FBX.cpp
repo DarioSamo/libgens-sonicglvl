@@ -31,6 +31,7 @@
 
 namespace LibGens {
 	FBX::FBX(FbxManager *sdk_manager, string scene_name) {
+		material_library = nullptr;
 		scene = FbxScene::Create(sdk_manager, scene_name.c_str());
 
 		bind_pose = FbxPose::Create(scene, "");

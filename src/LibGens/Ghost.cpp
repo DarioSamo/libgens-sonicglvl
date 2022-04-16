@@ -19,6 +19,10 @@
 
 #include "Ghost.h"
 #include "GhostNode.h"
+#include "FBX.h"
+#include "FBXManager.h"
+
+#define FBX_SET_KEY(KEY, TIME, VALUE) { if (KEY) { KEY->KeyModifyBegin(); int lKeyIndex = KEY->KeyAdd(TIME); KEY->KeySetValue(lKeyIndex, VALUE); KEY->KeySetInterpolation(lKeyIndex, FbxAnimCurveDef::eInterpolationLinear); KEY->KeyModifyEnd(); } }
 
 namespace LibGens {
 	Ghost::Ghost(string filename) {
@@ -89,7 +93,7 @@ namespace LibGens {
 		}
 	}
 
-	void Ghost::calculate(float time, Vector3 &position, Quaternion &rotation, string &animation_name, float &animation_frame, bool &animation_ball) {
+	void Ghost::calculate(float time, Vector3 &position, Quaternion &rotation, string &animation_name, float &animation_frame, bool &animation_ball) const {
 		GhostNode *previous_node=NULL;
 		GhostNode *next_node=NULL;
 
@@ -131,12 +135,58 @@ namespace LibGens {
 		}
 	}
 
-	float Ghost::calculateDuration() {
+	float Ghost::calculateDuration() const {
 		float duration = 0;
 		for (size_t i = 0; i < ghost_nodes.size(); i++)
 		{
 			duration += ghost_nodes[i]->timer;
 		}
 		return duration;
+	}
+
+	FBX* Ghost::buildFbx(FBXManager* manager, Model* model, MaterialLibrary* material_lib) const
+	{
+		FBX* fbx = new FBX(manager->getManager(), "Ghost");
+		fbx->setMaterialLibrary(material_lib);
+
+		const FbxMesh* lMesh = fbx->addNode(model, nullptr, nullptr, Matrix4(), false);
+		FbxNode* lNode = lMesh->GetNode(0);
+
+		FbxTimeSpan duration(FbxTimeSeconds(0), FbxTimeSeconds(calculateDuration()));
+		FbxAnimStack* lAnimStack = FbxAnimStack::Create(fbx->getScene(), "Ghost_Move");
+		FbxAnimLayer* lAnimLayer = FbxAnimLayer::Create(fbx->getScene(), "Ghost_Move");
+		lAnimStack->AddMember(lAnimLayer);
+		lAnimStack->SetLocalTimeSpan(duration);
+		lAnimStack->SetReferenceTimeSpan(duration);
+		
+		FbxAnimCurve* curveTX = lNode->LclTranslation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
+		FbxAnimCurve* curveTY = lNode->LclTranslation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
+		FbxAnimCurve* curveTZ = lNode->LclTranslation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
+
+		FbxAnimCurve* curveRX = lNode->LclRotation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_X, true);
+		FbxAnimCurve* curveRY = lNode->LclRotation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y, true);
+		FbxAnimCurve* curveRZ = lNode->LclRotation.GetCurve(lAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z, true);
+
+		FbxTime time;
+		time.Set(0);
+
+		for (auto it = ghost_nodes.begin(); it != ghost_nodes.end(); ++it)
+		{
+			const GhostNode* lgNode = *it;
+			time += FbxTimeSeconds(lgNode->timer);
+			FbxQuaternion lcl_quat(lgNode->rotation.x, lgNode->rotation.y, lgNode->rotation.z, lgNode->rotation.w);
+			FbxVector4 lcl_rotation;
+			lcl_rotation.SetXYZ(lcl_quat);
+
+			FBX_SET_KEY(curveTX, time, lgNode->position.x);
+			FBX_SET_KEY(curveTY, time, lgNode->position.y);
+			FBX_SET_KEY(curveTZ, time, lgNode->position.z);
+
+			FBX_SET_KEY(curveRX, time, lcl_rotation[0]);
+			FBX_SET_KEY(curveRY, time, lcl_rotation[1]);
+			FBX_SET_KEY(curveRZ, time, lcl_rotation[2]);
+		}
+		
+		return fbx;
 	}
 };

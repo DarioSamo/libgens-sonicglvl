@@ -50,8 +50,8 @@ namespace LibGens {
 			FBX(FbxScene* lScene);
 			FbxSurfacePhong *addMaterial(Material *material);
 
-			FbxMesh *addNode(Model *model, HavokSkeletonCache *skeleton=NULL, HavokAnimationCache *animation=NULL, Matrix4 transform_matrix = Matrix4());
-			FbxMesh *addNamedNode(string name, Model *model, HavokSkeletonCache *skeleton=NULL, HavokAnimationCache *animation=NULL, Matrix4 transform_matrix = Matrix4());
+			FbxMesh *addNode(Model *model, HavokSkeletonCache *skeleton=NULL, HavokAnimationCache *animation=NULL, Matrix4 transform_matrix = Matrix4(), bool skin = true);
+			FbxMesh *addNamedNode(string name, Model *model, HavokSkeletonCache *skeleton=NULL, HavokAnimationCache *animation=NULL, Matrix4 transform_matrix = Matrix4(), bool skin = true);
 			FbxMesh *addTerrainInstance(TerrainInstance *instance);
 
 			void skinModelToSkeleton(Model *model, FbxMesh *model_mesh, vector<FbxNode *> &skeleton_bones, FbxAMatrix lSkinMatrix);

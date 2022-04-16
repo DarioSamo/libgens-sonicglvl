@@ -563,12 +563,13 @@ class EditorApplication : public BaseApplication {
 		// Ghost methods
 		void loadGhostRecording();
 		void saveGhostRecording();
+		void saveGhostRecordingFbx();
 
 		// Game methods
 		void processGameMessage(PipeClient* client, PipeMessage* msg);
 		void launchGame();
 		bool connectGame();
-		DWORD sendMessageGame(PipeMessage* msg, size_t size);
+		DWORD sendMessageGame(const PipeMessage& msg, size_t size);
 
 		void createLevel(string name);
 		void createLibrary();
