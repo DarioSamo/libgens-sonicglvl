@@ -169,11 +169,12 @@ namespace LibGens {
 
 		FbxTime time;
 		time.Set(0);
+		if (!ghost_nodes.empty())
+			time = FbxTimeSeconds(ghost_nodes[0]->timer);
 
-		for (auto it = ghost_nodes.begin(); it != ghost_nodes.end(); ++it)
+		for (size_t i = 0; i < ghost_nodes.size(); ++i)
 		{
-			const GhostNode* lgNode = *it;
-			time += FbxTimeSeconds(lgNode->timer);
+			const GhostNode* lgNode = ghost_nodes[i];
 			FbxQuaternion lcl_quat(lgNode->rotation.x, lgNode->rotation.y, lgNode->rotation.z, lgNode->rotation.w);
 			FbxVector4 lcl_rotation;
 			lcl_rotation.SetXYZ(lcl_quat);
@@ -185,6 +186,8 @@ namespace LibGens {
 			FBX_SET_KEY(curveRX, time, lcl_rotation[0]);
 			FBX_SET_KEY(curveRY, time, lcl_rotation[1]);
 			FBX_SET_KEY(curveRZ, time, lcl_rotation[2]);
+
+			time += FbxTimeSeconds(lgNode->timer);
 		}
 		
 		return fbx;
