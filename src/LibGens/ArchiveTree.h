@@ -7,6 +7,8 @@ namespace LibGens {
 	public:
 		ArchiveFile();
 		~ArchiveFile();
+
+		const string& getPath() const { return file_path; }
 	};
 
 	class ArchiveTreeNode {
@@ -38,6 +40,6 @@ namespace LibGens {
 		~ArchiveSystem();
 
 		void buildFromTreeNode(ArchiveTree *tree, string node_name);
-		ArchiveFile *findFile(string filename);
+		ArchiveFile *findFile(string filename) const;
 	};
 };

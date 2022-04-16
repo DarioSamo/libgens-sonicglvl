@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release 2012|Win32">
@@ -19,7 +19,7 @@
     <RootNamespace>HedgehogConverter</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
@@ -39,7 +39,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -56,13 +56,21 @@
     <OutDir>../../bin/</OutDir>
     <TargetName>$(ProjectName) - LostWorld</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <OutDir>..\..\bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/allegro/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/pthreads/include;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc100-mt.lib;libfbxsdk-md.lib;LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;allegro-5.0.10-monolith-mt.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/allegro/lib;../../depends/qt/lib;../../lib/$(Configuration);../../depends/hk2010_2_0_r1/Lib/win32_net_9-0/hybrid_multithreaded_dll;../../depends/fbxsdk/lib/vs2010/x86/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,23 +117,17 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="HKWindow.h">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\depends\qt\bin\moc.exe %(RootDir)%(Directory)%(Filename).h -o %(RootDir)%(Directory)moc_%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">..\..\depends\qt\bin\moc.exe %(RootDir)%(Directory)%(Filename).h -o %(RootDir)%(Directory)moc_%(Filename).cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MOC %(Filename).h</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">MOC %(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Platform)'=='Win32'">..\..\depends\qt\bin\moc.exe %(RootDir)%(Directory)%(Filename).h -o %(RootDir)%(Directory)moc_%(Filename).cpp</Command>
+      <Message Condition="'$(Platform)'=='Win32'">MOC %(Filename).h</Message>
+      <Outputs Condition="'$(Platform)'=='Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="HKWindow.ui">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\depends\qt\bin\uic.exe %(RootDir)%(Directory)%(Filename).ui -o %(RootDir)%(Directory)ui_%(Filename).h</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">..\..\depends\qt\bin\uic.exe %(RootDir)%(Directory)%(Filename).ui -o %(RootDir)%(Directory)ui_%(Filename).h</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">UIC %(Filename).ui</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">UIC %(Filename).ui</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)ui_%(Filename).h</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">%(RootDir)%(Directory)ui_%(Filename).h</Outputs>
+      <Command Condition="'$(Platform)'=='Win32'">..\..\depends\qt\bin\uic.exe %(RootDir)%(Directory)%(Filename).ui -o %(RootDir)%(Directory)ui_%(Filename).h</Command>
+      <Message Condition="'$(Platform)'=='Win32'">UIC %(Filename).ui</Message>
+      <Outputs Condition="'$(Platform)'=='Win32'">%(RootDir)%(Directory)ui_%(Filename).h</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -134,33 +136,24 @@
   <ItemGroup>
     <CustomBuild Include="HKResource.qrc">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\depends\qt\bin\rcc.exe -name %(Filename) %(RootDir)%(Directory)%(Filename).qrc -o %(RootDir)%(Directory)qrc_%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">..\..\depends\qt\bin\rcc.exe -name %(Filename) %(RootDir)%(Directory)%(Filename).qrc -o %(RootDir)%(Directory)qrc_%(Filename).cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">RCC %(Filename).qrc</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">RCC %(Filename).qrc</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)qrc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">%(RootDir)%(Directory)qrc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Platform)'=='Win32'">..\..\depends\qt\bin\rcc.exe -name %(Filename) %(RootDir)%(Directory)%(Filename).qrc -o %(RootDir)%(Directory)qrc_%(Filename).cpp</Command>
+      <Message Condition="'$(Platform)'=='Win32'">RCC %(Filename).qrc</Message>
+      <Outputs Condition="'$(Platform)'=='Win32'">%(RootDir)%(Directory)qrc_%(Filename).cpp</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="HKPropertyDialog.ui">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\depends\qt\bin\uic.exe %(RootDir)%(Directory)%(Filename).ui -o %(RootDir)%(Directory)ui_%(Filename).h</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">..\..\depends\qt\bin\uic.exe %(RootDir)%(Directory)%(Filename).ui -o %(RootDir)%(Directory)ui_%(Filename).h</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">UIC %(Filename).ui</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">UIC %(Filename).ui</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)ui_%(Filename).h</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">%(RootDir)%(Directory)ui_%(Filename).h</Outputs>
+      <Command Condition="'$(Platform)'=='Win32'">..\..\depends\qt\bin\uic.exe %(RootDir)%(Directory)%(Filename).ui -o %(RootDir)%(Directory)ui_%(Filename).h</Command>
+      <Message Condition="'$(Platform)'=='Win32'">UIC %(Filename).ui</Message>
+      <Outputs Condition="'$(Platform)'=='Win32'">%(RootDir)%(Directory)ui_%(Filename).h</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="HKPropertyDialog.h">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\depends\qt\bin\moc.exe %(RootDir)%(Directory)%(Filename).h -o %(RootDir)%(Directory)moc_%(Filename).cpp</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">..\..\depends\qt\bin\moc.exe %(RootDir)%(Directory)%(Filename).h -o %(RootDir)%(Directory)moc_%(Filename).cpp</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MOC %(Filename).h</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">MOC %(Filename).h</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Platform)'=='Win32'">..\..\depends\qt\bin\moc.exe %(RootDir)%(Directory)%(Filename).h -o %(RootDir)%(Directory)moc_%(Filename).cpp</Command>
+      <Message Condition="'$(Platform)'=='Win32'">MOC %(Filename).h</Message>
+      <Outputs Condition="'$(Platform)'=='Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
