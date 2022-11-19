@@ -43,7 +43,7 @@ namespace LibGens {
 			Vector3 tangent;
 			Vector3 binormal;
 			Vector2 uv[4];
-			unsigned char bone_indices[4];
+			unsigned short bone_indices[4];
 			unsigned char bone_weights[4];
 			Color color;
 			Submesh *parent;
@@ -65,7 +65,7 @@ namespace LibGens {
 			Vector3 getTangent();
 			Vector3 getBinormal();
 			Color getColor();
-			unsigned char getBoneIndex(size_t index);
+			unsigned short getBoneIndex(size_t index);
 			unsigned char getBoneWeight(size_t index);
 			Vector2 getUV(size_t channel);
 			void setPosition(Vector3 v);
@@ -73,7 +73,7 @@ namespace LibGens {
 			void setTangent(Vector3 v);
 			void setBinormal(Vector3 v);
 			void setUV(Vector2 v, size_t channel);
-			void setBoneIndex(unsigned char v, size_t index);
+			void setBoneIndex(unsigned short v, size_t index);
 			void setBoneWeight(unsigned char v, size_t index);
 			void setColor(Color v);
 	};

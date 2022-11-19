@@ -34,6 +34,11 @@ namespace LibGens {
 	class VRMapSample;
 	class SampleChunkProperty;
 
+	enum Topology {
+		TRIANGLE_LIST = 3,
+		TRIANGLE_STRIP = 4
+	};
+
 	class Model {
 		protected:
 			vector<Mesh *> meshes;
@@ -45,20 +50,17 @@ namespace LibGens {
 			string filename;
 			bool terrain_mode;
 			AABB global_aabb;
+			Topology topology;
 		public:
 			Model();
 			Model(string filename_p);
 			Model(File *file, bool terrain_mode_p);
 			void save(string filename_p, int root_type = LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS);
-			void write(File *file);
-			void readRootNode(File *file);
-			void readRootNodeDynamicUnleashed2(File *file);
-			void readRootNodeDynamicGenerations(File *file);
-			void readRootNodeDynamicLostWorld(File *file);
+			void read(File *file);
 			void readSkeleton(File *file);
-			void writeRootNodeDynamicGenerations(File *file);
-			void writeRootNodeDynamicUnleashed2(File *file);
-			void writeRootNodeDynamicLostWorld(File *file);
+			void readSampleChunkHeader(File* file);
+			void write(File* file);
+			void writeSampleChunkHeader(File* file);
 			void buildAABB();
 			AABB getAABB();
 			void setTerrainMode(bool v);

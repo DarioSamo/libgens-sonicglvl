@@ -26,6 +26,7 @@ namespace LibGens {
 	class Submesh;
 	class Vertex;
 	class VRMapSample;
+	enum Topology;
 
 	class Mesh {
 		friend class Mesh;
@@ -35,13 +36,14 @@ namespace LibGens {
 			AABB aabb;
 			string extra;
 			string water_slot_string;
+			string name;
 		public:
 			Mesh();
 			Mesh(Mesh *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
 			~Mesh();
 
-			void write(File *file, bool unleashed2_mode=false);
-			void read(File *file);
+			void write(File *file);
+			void read(File *file, Topology topology);
 			void buildAABB();
 			AABB getAABB();
 			void setExtra(string v);

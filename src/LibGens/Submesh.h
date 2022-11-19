@@ -30,6 +30,7 @@ namespace LibGens {
 	class Vertex;
 	class VertexFormat;
 	class VRMapSample;
+	enum Topology;
 
 	struct Polygon {
 		unsigned int a, b, c;
@@ -42,7 +43,7 @@ namespace LibGens {
 			vector<Vertex *> vertices;
 			vector<unsigned short> faces;
 			vector<Polygon> faces_vectors;
-			vector<unsigned char> bone_table;
+			vector<unsigned short> bone_table;
 			vector<string> texture_units;
 			vector<unsigned int> texture_ids;
 			string material_name;
@@ -55,7 +56,7 @@ namespace LibGens {
 			Submesh(Submesh *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
 
 			void write(File *file);
-			void read(File *file);
+			void read(File *file, Topology topology);
 			list<Vertex *> getVertexList();
 			list<unsigned int> getFaceList();
 			vector<Vertex *> getVertices();
@@ -73,9 +74,9 @@ namespace LibGens {
 			void setMaterialName(string v);
 			void setVertexFormat(VertexFormat *v);
 			void createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
-			void addBone(unsigned char bone);
-			unsigned char getBone(unsigned int index);
-			vector<unsigned char> getBoneTable();
+			void addBone(unsigned short bone);
+			unsigned short getBone(unsigned int index);
+			vector<unsigned short> getBoneTable();
 			void build(vector<Vertex *> vertices_p, vector<Polygon> faces_vectors_p);
 			void fixVertexFormatForPC();
 			void addTextureUnit(string v);

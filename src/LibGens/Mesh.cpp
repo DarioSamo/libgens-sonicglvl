@@ -50,10 +50,11 @@ namespace LibGens {
 		buildAABB();
 	}
 	
-	void Mesh::read(File *file) {
+	void Mesh::read(File *file, Topology topology) {
 		size_t header_address=file->getCurrentAddress();
+		int slot_count = file->getRootNodeType() >= 5 ? LIBGENS_MODEL_SUBMESH_SLOTS : LIBGENS_MODEL_SUBMESH_ROOT_SLOTS;
 
-		for (int slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
+		for (int slot=0; slot<slot_count; slot++) {
 			file->goToAddress(header_address + slot*8);
 
 			// Submesh Table
@@ -68,13 +69,15 @@ namespace LibGens {
 					getchar();
 				}
 
-				if (submesh_count == 0) break;
-
 				size_t submesh_count_address=0;
 				file->readInt32BEA(&submesh_count_address);
 
 				size_t submesh_subtable_address=0;
 				file->readInt32BEA(&submesh_subtable_address);
+
+				file->readString(&name);
+
+				if (submesh_count == 0) break;
 
 				size_t address=0;
 
@@ -103,7 +106,7 @@ namespace LibGens {
 					file->goToAddress(submesh_address);
 
 					Submesh *submesh = new Submesh();
-					submesh->read(file);
+					submesh->read(file, topology);
 					submesh->buildAABB();
 					submeshes[slot].push_back(submesh);
 				}
@@ -116,7 +119,7 @@ namespace LibGens {
 					file->goToAddress(submesh_address);
 
 					Submesh *submesh = new Submesh();
-					submesh->read(file);
+					submesh->read(file, topology);
 					submesh->buildAABB();
 
 					submeshes[slot].push_back(submesh);
@@ -135,15 +138,15 @@ namespace LibGens {
 		}
 	}
 
-	void Mesh::write(File *file, bool unleashed2_mode) {		
+	void Mesh::write(File *file) {		
 		size_t header_address=file->getCurrentAddress();
 		vector<unsigned int> slot_addresses;
 		size_t water_slot_address=0;
 
 		// Prepare address table
-		int slots = LIBGENS_MODEL_SUBMESH_SLOTS;
-		if (unleashed2_mode) {
-			slots = LIBGENS_MODEL_SUBMESH_ROOT_SLOTS;
+		int slots = LIBGENS_MODEL_SUBMESH_ROOT_SLOTS;
+		if (file->getRootNodeType() >= 5) {
+			slots = LIBGENS_MODEL_SUBMESH_SLOTS;
 		}
 
 		for (int slot=0; slot<slots; slot++) {
@@ -156,14 +159,15 @@ namespace LibGens {
 					for (size_t i=0; i<12; i++) {
 						file->write(&filler, 1);
 					}
-					file->writeNull(4);
 				}
 				else {
 					unsigned int water_count=1;
 					file->writeInt32BE(&water_count);
 					water_slot_address = file->getCurrentAddress();
-					file->writeNull(16);
+					file->writeNull(12);
 				}
+				file->writeString(&name);
+				file->fixPadding();
 			}
 			else {
 				file->writeInt32BE(&submesh_count);
@@ -171,12 +175,10 @@ namespace LibGens {
 			}
 		}
 
-		if (unleashed2_mode) {
-			file->writeNull(24);
-		}
-
 		// Write Submesh slots
 		for (int slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
+			file->goToEnd();
+
 			vector<unsigned int> submesh_addresses;
 			unsigned int submesh_count=submeshes[slot].size();
 
@@ -227,10 +229,7 @@ namespace LibGens {
 				file->goToAddress(submesh_table_address + i*4);
 				file->writeInt32BEA(&submesh_addresses[i]);
 			}
-
-			file->goToEnd();
 		}
-
 
 		// Fix address table
 		for (int slot=0; slot<LIBGENS_MODEL_SUBMESH_ROOT_SLOTS; slot++) {

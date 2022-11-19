@@ -50,7 +50,7 @@ namespace LibGens {
         return mesh;
     }
 
-    void MorphModel::read(File* file) {
+    void MorphModel::read(File* file, Topology topology) {
         unsigned int vertex_count = 0;
         size_t vertices_address = 0;
         unsigned int morph_count = 0;
@@ -65,7 +65,7 @@ namespace LibGens {
         file->readInt32BEA(&morphs_address);
 
         mesh = new Mesh();
-        mesh->read(file);
+        mesh->read(file, topology);
 
         // Pick the first vertex format, they are all the same between submeshes
         for (size_t i = 0; i < LIBGENS_MODEL_SUBMESH_SLOTS; i++) {

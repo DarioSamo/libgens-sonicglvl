@@ -101,6 +101,7 @@ namespace LibGens {
 		if (nodes.size()) {
 			for (unsigned int i = 0; i < nodes.size(); i++) {
 				nodes[i]->write(file, i == (nodes.size() - 1));
+				file->fixPadding(16);
 			}
 		}
 
@@ -109,11 +110,13 @@ namespace LibGens {
 		}
 
 		if (data) {
+			file->setRootNodeType(value);
+
 			switch (value) {
 				case LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS:
 					{
 						Model *model = (Model *)data;
-						model->writeRootNodeDynamicGenerations(file);
+						model->write(file);
 						break;
 					}
 
@@ -124,6 +127,8 @@ namespace LibGens {
 						break;
 					}
 			}
+
+			file->setRootNodeType(LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD);
 		}
 
 		size_t end_address = file->getCurrentAddress();

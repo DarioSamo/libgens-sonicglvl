@@ -67,92 +67,93 @@ namespace LibGens {
 		switch (type) {
 			case LIBGENS_VERTEX_FORMAT_PC:
 			{
-				addElement(VertexFormatElement(0, VECTOR3, POSITION, 0));
-				addElement(VertexFormatElement(12, VECTOR3, NORMAL, 0));
-				addElement(VertexFormatElement(24, VECTOR3, TANGENT, 0));
-				addElement(VertexFormatElement(36, VECTOR3, BINORMAL, 0));
-				addElement(VertexFormatElement(48, VECTOR2, UV, 0));
-				addElement(VertexFormatElement(56, VECTOR2, UV, 1));
-				addElement(VertexFormatElement(64, VECTOR2, UV, 2));
-				addElement(VertexFormatElement(72, VECTOR2, UV, 3));
-				addElement(VertexFormatElement(80, VECTOR4, RGBA, 0));
-				addElement(VertexFormatElement(96, INDICES, BONE_INDICES, 0));
-				addElement(VertexFormatElement(100, VECTOR4_CHAR, BONE_WEIGHTS, 0));
+				addElement(VertexFormatElement(0, FLOAT3, POSITION, 0));
+				addElement(VertexFormatElement(12, FLOAT3, NORMAL, 0));
+				addElement(VertexFormatElement(24, FLOAT3, TANGENT, 0));
+				addElement(VertexFormatElement(36, FLOAT3, BINORMAL, 0));
+				addElement(VertexFormatElement(48, FLOAT2, UV, 0));
+				addElement(VertexFormatElement(56, FLOAT2, UV, 1));
+				addElement(VertexFormatElement(64, FLOAT2, UV, 2));
+				addElement(VertexFormatElement(72, FLOAT2, UV, 3));
+				addElement(VertexFormatElement(80, FLOAT4, COLOR, 0));
+				addElement(VertexFormatElement(96, UBYTE4, BONE_INDICES, 0));
+				addElement(VertexFormatElement(100, UBYTE4N, BONE_WEIGHTS, 0));
 				size = 104;
 				break;
 			}
 
 			case LIBGENS_VERTEX_FORMAT_PC_TERRAIN:
 			{
-				addElement(VertexFormatElement(0, VECTOR3, POSITION, 0));
-				addElement(VertexFormatElement(12, VECTOR3, NORMAL, 0));
-				addElement(VertexFormatElement(24, VECTOR3, TANGENT, 0));
-				addElement(VertexFormatElement(36, VECTOR3, BINORMAL, 0));
-				addElement(VertexFormatElement(48, VECTOR2, UV, 0));
-				addElement(VertexFormatElement(56, VECTOR2, UV, 1));
-				addElement(VertexFormatElement(64, VECTOR4, RGBA, 0));
+				addElement(VertexFormatElement(0, FLOAT3, POSITION, 0));
+				addElement(VertexFormatElement(12, FLOAT3, NORMAL, 0));
+				addElement(VertexFormatElement(24, FLOAT3, TANGENT, 0));
+				addElement(VertexFormatElement(36, FLOAT3, BINORMAL, 0));
+				addElement(VertexFormatElement(48, FLOAT2, UV, 0));
+				addElement(VertexFormatElement(56, FLOAT2, UV, 1));
+				addElement(VertexFormatElement(64, FLOAT4, COLOR, 0));
 				size = 80;
 				break;
 			}
 
 			case LIBGENS_VERTEX_FORMAT_360:
 			{
-				addElement(VertexFormatElement(0, VECTOR3, POSITION, 0));
-				addElement(VertexFormatElement(12, VECTOR3_360, NORMAL, 0));
-				addElement(VertexFormatElement(16, VECTOR3_360, TANGENT, 0));
-				addElement(VertexFormatElement(20, VECTOR3_360, BINORMAL, 0));
-				addElement(VertexFormatElement(24, VECTOR2_HALF, UV, 0));
-				addElement(VertexFormatElement(28, VECTOR2_HALF, UV, 1));
-				addElement(VertexFormatElement(32, VECTOR2_HALF, UV, 2));
-				addElement(VertexFormatElement(36, VECTOR2_HALF, UV, 3));
-				addElement(VertexFormatElement(40, VECTOR4_CHAR, RGBA, 0));
-				addElement(VertexFormatElement(44, INDICES, BONE_INDICES, 0));
-				addElement(VertexFormatElement(48, VECTOR4_CHAR, BONE_WEIGHTS, 0));
+				addElement(VertexFormatElement(0, FLOAT3, POSITION, 0));
+				addElement(VertexFormatElement(12, DEC3N_360, NORMAL, 0));
+				addElement(VertexFormatElement(16, DEC3N_360, TANGENT, 0));
+				addElement(VertexFormatElement(20, DEC3N_360, BINORMAL, 0));
+				addElement(VertexFormatElement(24, FLOAT2_HALF, UV, 0));
+				addElement(VertexFormatElement(28, FLOAT2_HALF, UV, 1));
+				addElement(VertexFormatElement(32, FLOAT2_HALF, UV, 2));
+				addElement(VertexFormatElement(36, FLOAT2_HALF, UV, 3));
+				addElement(VertexFormatElement(40, UBYTE4N, COLOR, 0));
+				addElement(VertexFormatElement(44, UBYTE4, BONE_INDICES, 0));
+				addElement(VertexFormatElement(48, UBYTE4N, BONE_WEIGHTS, 0));
 				size = 52;
 				break;
 			}
 
 			case LIBGENS_VERTEX_FORMAT_360_TERRAIN:
 			{
-				addElement(VertexFormatElement(0, VECTOR3, POSITION, 0));
-				addElement(VertexFormatElement(12, VECTOR3_360, NORMAL, 0));
-				addElement(VertexFormatElement(16, VECTOR3_360, TANGENT, 0));
-				addElement(VertexFormatElement(20, VECTOR3_360, BINORMAL, 0));
-				addElement(VertexFormatElement(24, VECTOR2_HALF, UV, 0));
-				addElement(VertexFormatElement(28, VECTOR2_HALF, UV, 1));
-				addElement(VertexFormatElement(32, VECTOR4_CHAR, RGBA, 0));
+				addElement(VertexFormatElement(0, FLOAT3, POSITION, 0));
+				addElement(VertexFormatElement(12, DEC3N_360, NORMAL, 0));
+				addElement(VertexFormatElement(16, DEC3N_360, TANGENT, 0));
+				addElement(VertexFormatElement(20, DEC3N_360, BINORMAL, 0));
+				addElement(VertexFormatElement(24, FLOAT2_HALF, UV, 0));
+				addElement(VertexFormatElement(28, FLOAT2_HALF, UV, 1));
+				addElement(VertexFormatElement(32, UBYTE4N, COLOR, 0));
 				size = 36;
 				break;
 			}
 
 			case LIBGENS_VERTEX_FORMAT_FORCES:
 			{
-				addElement(VertexFormatElement(0, VECTOR3, POSITION, 0));
-				addElement(VertexFormatElement(12, VECTOR3_FORCES, NORMAL, 0));
-				addElement(VertexFormatElement(16, VECTOR3_FORCES, TANGENT, 0));
-				addElement(VertexFormatElement(20, VECTOR3_FORCES, BINORMAL, 0));
-				addElement(VertexFormatElement(24, VECTOR2_HALF, UV, 0));
-				addElement(VertexFormatElement(28, VECTOR4_CHAR, RGBA, 0));
-				addElement(VertexFormatElement(32, INDICESB, BONE_INDICES, 0));
-				addElement(VertexFormatElement(36, VECTOR4_CHAR, BONE_WEIGHTS, 0));
+				addElement(VertexFormatElement(0, FLOAT3, POSITION, 0));
+				addElement(VertexFormatElement(12, DEC3N, NORMAL, 0));
+				addElement(VertexFormatElement(16, DEC3N, TANGENT, 0));
+				addElement(VertexFormatElement(20, DEC3N, BINORMAL, 0));
+				addElement(VertexFormatElement(24, FLOAT2_HALF, UV, 0));
+				addElement(VertexFormatElement(28, UBYTE4N, COLOR, 0));
+				addElement(VertexFormatElement(32, UBYTE4_2, BONE_INDICES, 0));
+				addElement(VertexFormatElement(36, UBYTE4N, BONE_WEIGHTS, 0));
 				size = 40;
 				break;
 			}
 
 			case LIBGENS_VERTEX_FORMAT_FORCES_TERRAIN:
 			{
-				addElement(VertexFormatElement(0, VECTOR3, POSITION, 0));
-				addElement(VertexFormatElement(12, VECTOR3_FORCES, NORMAL, 0));
-				addElement(VertexFormatElement(16, VECTOR3_FORCES, TANGENT, 0));
-				addElement(VertexFormatElement(20, VECTOR3_FORCES, BINORMAL, 0));
-				addElement(VertexFormatElement(24, VECTOR2_HALF, UV, 0));
-				addElement(VertexFormatElement(28, VECTOR2_HALF, UV, 1));
-				addElement(VertexFormatElement(32, VECTOR4_CHAR, RGBA, 0));
+				addElement(VertexFormatElement(0, FLOAT3, POSITION, 0));
+				addElement(VertexFormatElement(12, DEC3N, NORMAL, 0));
+				addElement(VertexFormatElement(16, DEC3N, TANGENT, 0));
+				addElement(VertexFormatElement(20, DEC3N, BINORMAL, 0));
+				addElement(VertexFormatElement(24, FLOAT2_HALF, UV, 0));
+				addElement(VertexFormatElement(28, FLOAT2_HALF, UV, 1));
+				addElement(VertexFormatElement(32, UBYTE4N, COLOR, 0));
 				size = 36;
 				break;
 			}
 		}
 	}
+
 
 	VertexFormat::VertexFormat(VertexFormat *clone) {
 		elements = clone->elements;

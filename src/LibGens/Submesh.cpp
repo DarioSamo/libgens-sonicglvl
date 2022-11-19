@@ -18,6 +18,8 @@
 //=========================================================================
 
 #include "Submesh.h"
+
+#include "Model.h"
 #include "Vertex.h"
 #include "VertexFormat.h"
 #include "VRMap.h"
@@ -56,7 +58,7 @@ namespace LibGens {
 		if (vertex_format) delete vertex_format;
 	}
 	
-	void Submesh::read(File *file) {
+	void Submesh::read(File *file, Topology topology) {
 		size_t header_address=file->getCurrentAddress();
 
 		// Header
@@ -95,36 +97,44 @@ namespace LibGens {
 		}
 
 		// Convert Faces in Triangle Strip to Face Vectors
-		unsigned short int face_1=0;
-		unsigned short int face_2=0;
-		unsigned short int face_3=0;
-		unsigned short int last_face=0;
+		if (topology == TRIANGLE_STRIP) {
+			unsigned short int face_1 = 0;
+			unsigned short int face_2 = 0;
+			unsigned short int face_3 = 0;
+			unsigned short int last_face = 0;
 
-		int new_strip=3;
-		int new_index=0;
+			int new_strip = 3;
+			int new_index = 0;
 
-		for (size_t i=0; i<faces_count; i++) {
-			unsigned short int t=faces[i];
-			if (t == 0xFFFF) {
-				new_strip = 3;
-				new_index = 0;
-			}
-			else {
-				if (new_strip==3) last_face = t;
-				new_strip -= 1;
-				face_3 = face_2;
-				face_2 = face_1;
-				face_1 = t;
-				if (new_strip==0) {
-					Polygon poly = {face_1, face_2, face_3};
-					Polygon inv_poly = {face_3, face_2, face_1};
-
-					if ((face_1 != face_2) && (face_2 != face_3) && (face_1 != face_3)) {
-						faces_vectors.push_back((new_index % 2) ? inv_poly : poly);
-					}
-					new_strip = 1;
-					new_index++;
+			for (size_t i = 0; i < faces_count; i++) {
+				unsigned short int t = faces[i];
+				if (t == 0xFFFF) {
+					new_strip = 3;
+					new_index = 0;
 				}
+				else {
+					if (new_strip == 3) last_face = t;
+					new_strip -= 1;
+					face_3 = face_2;
+					face_2 = face_1;
+					face_1 = t;
+					if (new_strip == 0) {
+						Polygon poly = { face_1, face_2, face_3 };
+						Polygon inv_poly = { face_3, face_2, face_1 };
+
+						if ((face_1 != face_2) && (face_2 != face_3) && (face_1 != face_3)) {
+							faces_vectors.push_back((new_index % 2) ? inv_poly : poly);
+						}
+						new_strip = 1;
+						new_index++;
+					}
+				}
+			}
+		}
+		else if (topology == TRIANGLE_LIST) {
+			for (size_t i = 0; i < faces_count; i += 3) {
+				Polygon poly = { faces[i + 2], faces[i + 1], faces[i] };
+				faces_vectors.push_back(poly);
 			}
 		}
 
@@ -145,11 +155,21 @@ namespace LibGens {
 		}
 
 		// Bone Table
-		for (size_t i=0; i<bones_size; i++) {
-			file->goToAddress(bones_address+i*1);
-			unsigned char bone=0;
-			file->readUChar(&bone);
-			bone_table.push_back(bone);
+		file->goToAddress(bones_address);
+
+		if (file->getRootNodeType() >= 6) {
+			for (size_t i = 0; i < bones_size; i++) {
+				unsigned short bone = 0;
+				file->readInt16BE(&bone);
+				bone_table.push_back(bone);
+			}
+		}
+		else {
+			for (size_t i = 0; i < bones_size; i++) {
+				unsigned char bone = 0;
+				file->readUChar(&bone);
+				bone_table.push_back(bone);
+			}
 		}
 
 		// Material Texture Units
@@ -225,9 +245,18 @@ namespace LibGens {
 
 		// Bone Table
 		bones_address = file->getCurrentAddress();
-		for (size_t i=0; i<bones_size; i++) {
-			file->writeUChar(&bone_table[i]);
+
+		if (file->getRootNodeType() >= 6) {
+			for (size_t i = 0; i < bones_size; i++) {
+				file->writeInt16BE(&bone_table[i]);
+			}
 		}
+		else {
+			for (size_t i = 0; i < bones_size; i++) {
+				file->writeUChar((unsigned char*)&bone_table[i]);
+			}
+		}
+
 		file->fixPadding();
 
 		// Texture Units
@@ -470,15 +499,15 @@ namespace LibGens {
 		vertex_format = new VertexFormat(v);
 	}
 
-	void Submesh::addBone(unsigned char bone) {
+	void Submesh::addBone(unsigned short bone) {
 		bone_table.push_back(bone);
 	}
 
-	unsigned char Submesh::getBone(unsigned int index) {
+	unsigned short Submesh::getBone(unsigned int index) {
 		return bone_table[index];
 	}
 
-	vector<unsigned char> Submesh::getBoneTable() {
+	vector<unsigned short> Submesh::getBoneTable() {
 		return bone_table;
 	}
 

@@ -34,6 +34,7 @@ namespace LibGens {
 		filename="";
 		terrain_mode = false;
 		has_instances = true;
+		topology=TRIANGLE_STRIP;
 	}
 
 	Model::Model(string filename_p) {
@@ -52,10 +53,11 @@ namespace LibGens {
 		}
 
 		terrain_mode = (filename.find(LIBGENS_TERRAIN_MODEL_EXTENSION) != string::npos);
+		topology = TRIANGLE_STRIP;
 
 		if (file.valid()) {
 			file.readHeader();
-			readRootNode(&file);
+			read(&file);
 			file.close();
 		}
 	}
@@ -64,76 +66,62 @@ namespace LibGens {
 		if (!file) return;
 
 		terrain_mode = terrain_mode_p;
+		topology = TRIANGLE_STRIP;
+
 		file->readHeader();
-		readRootNode(file);
+		read(file);
 	}
 
-	void Model::readRootNode(File *file) {
+	void Model::read(File *file) {
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
 			return;
 		}
 
-		switch (file->getRootNodeType()) {
-			case LIBGENS_MODEL_ROOT_DYNAMIC_UNLEASHED_2:
-				readRootNodeDynamicUnleashed2(file);
-				break;
-
-			case LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS:
-				readRootNodeDynamicGenerations(file);
-				break;
-
-			case LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD:
-				readRootNodeDynamicLostWorld(file);
-				break;
-		}
-	}
-	
-	void Model::readRootNodeDynamicUnleashed2(File *file) {
-		if (!file) {
-			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
+		if (file->getRootNodeType() == LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) {
+			readSampleChunkHeader(file);
 			return;
 		}
 
-		size_t header_address=file->getCurrentAddress();
+		size_t header_address = file->getCurrentAddress();
 
-		// FIXME: Implement Terrain Mode support for this root type
+		if (file->getRootNodeType() >= 5) {
+			unsigned int mesh_count = 0;
+			size_t mesh_table_address = 0;
 
-		if (!terrain_mode) {
-			// Read Submeshes
-			Mesh *mesh = new Mesh();
-			mesh->read(file);
+			file->readInt32BE(&mesh_count);
+			file->readInt32BEA(&mesh_table_address);
+
+			meshes.reserve(mesh_count);
+			for (size_t i = 0; i < mesh_count; i++) {
+				size_t mesh_address = 0;
+				file->goToAddress(mesh_table_address + i * 4);
+				file->readInt32BEA(&mesh_address);
+				file->goToAddress(mesh_address);
+
+				Mesh* mesh = new Mesh();
+				mesh->read(file, topology);
+				mesh->buildAABB();
+				meshes.push_back(mesh);
+			}
+
+			file->goToAddress(header_address + 8);
+		}
+		else {
+			Mesh* mesh = new Mesh();
+			mesh->read(file, topology);
 			mesh->buildAABB();
 			meshes.push_back(mesh);
 
-			// Go to Skeleton
 			file->goToAddress(header_address + 24);
+		}
+
+		if (!terrain_mode) {
 			readSkeleton(file);
 		}
+		else if (file->getRootNodeType() >= 5) {
+			size_t mesh_name_address = 0;
 
-		if (terrain_mode) {
-			buildAABB();
-		}
-	}
-
-	void Model::readRootNodeDynamicGenerations(File *file) {
-		if (!file) {
-			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
-			return;
-		}
-
-		size_t header_address=file->getCurrentAddress();
-
-		// Read Meshes
-		unsigned int mesh_count=0;
-		size_t mesh_table_address=0;
-		size_t mesh_name_address=0;
-
-		
-		file->readInt32BE(&mesh_count);
-		file->readInt32BEA(&mesh_table_address);
-
-		if (terrain_mode) {
 			file->readInt32BEA(&mesh_name_address);
 			file->readInt32BE(&has_instances);
 
@@ -141,39 +129,83 @@ namespace LibGens {
 			file->goToAddress(mesh_name_address);
 			file->readString(&name);
 		}
-		else {
-			readSkeleton(file);
-		}
-
-		meshes.reserve(mesh_count);
-		for (size_t i=0; i<mesh_count; i++) {
-			size_t mesh_address=0;
-			file->goToAddress(mesh_table_address + i*4);
-			file->readInt32BEA(&mesh_address);
-			file->goToAddress(mesh_address);
-
-			Mesh *mesh = new Mesh();
-			mesh->read(file);
-			mesh->buildAABB();
-			meshes.push_back(mesh);
-		}
-
-		if (terrain_mode) {
-			buildAABB();
-		}
 	}
 
-	
-	void Model::readRootNodeDynamicLostWorld(File *file) {
+	void Model::readSkeleton(File* file) {
 		if (!file) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
 			return;
 		}
 
-		SampleChunkNode *root_node = new SampleChunkNode();
-		root_node->read(file);
+		size_t header_address = file->getCurrentAddress();
 
-		SampleChunkNode *property_node = root_node->find("SCAParam");
+		unsigned int morph_model_count = 0;
+		size_t morph_models_address = 0;
+
+		if (file->getRootNodeType() >= 4) {
+			file->readInt32BE(&morph_model_count);
+			file->readInt32BEA(&morph_models_address);
+		}
+
+		unsigned int bone_total = 0;
+		size_t bone_definition_table_address = 0;
+		size_t bone_matrix_address = 0;
+		size_t global_aabb_address = 0;
+
+		file->readInt32BE(&bone_total);
+		file->readInt32BEA(&bone_definition_table_address);
+		file->readInt32BEA(&bone_matrix_address);
+
+		if (file->getRootNodeType() >= 2) {
+			file->readInt32BEA(&global_aabb_address);
+		}
+
+		if (file->getRootNodeType() >= 4) {
+			for (size_t i = 0; i < morph_model_count; i++) {
+				file->goToAddress(morph_models_address + i * 4);
+				size_t address = 0;
+				file->readInt32BEA(&address);
+				file->goToAddress(address);
+
+				MorphModel* morph_model = new MorphModel();
+				morph_model->read(file, topology);
+				morph_models.push_back(morph_model);
+			}
+		}
+
+		bones.reserve(bone_total);
+		for (size_t i = 0; i < bone_total; i++) {
+			file->goToAddress(bone_definition_table_address + i * 4);
+			size_t address = 0;
+			file->readInt32BEA(&address);
+			file->goToAddress(address);
+
+			Bone* bone = new Bone();
+			bone->readDescription(file);
+			file->goToAddress(bone_matrix_address + i * 64);
+			bone->readMatrix(file);
+			bones.push_back(bone);
+		}
+
+		if (file->getRootNodeType() >= 2) {
+			file->goToAddress(global_aabb_address);
+			global_aabb.read(file);
+		}
+		else {
+			buildAABB();
+		}
+	}
+	
+	void Model::readSampleChunkHeader(File *file) {
+		if (!file) {
+			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
+			return;
+		}
+
+		SampleChunkNode root_node;
+		root_node.read(file);
+
+		SampleChunkNode *property_node = root_node.find("SCAParam");
 		if (property_node) {
 			vector<SampleChunkNode *> property_nodes = property_node->getNodes();
 			for (vector<SampleChunkNode *>::iterator it = property_nodes.begin(); it != property_nodes.end(); it++) {
@@ -181,68 +213,19 @@ namespace LibGens {
 			}
 		}
 
-		SampleChunkNode *contexts_node = root_node->find("Contexts", false);
+		SampleChunkNode* topology_node = root_node.find("Topology");
+		if (topology_node) {
+			topology = (Topology)topology_node->getValue();
+		}
+
+		SampleChunkNode *contexts_node = root_node.find("Contexts", false);
 		if (contexts_node) {
+			file->setRootNodeType(max(contexts_node->getValue(), 5u));
 			file->goToAddress(contexts_node->getDataAddress());
-			readRootNodeDynamicGenerations(file);
+			read(file);
+			file->setRootNodeType(LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD);
 		}
-
-		delete root_node;
 	}
-
-	
-	void Model::readSkeleton(File *file) {
-		if (!file) {
-			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE);
-			return;
-		}
-
-		size_t header_address=file->getCurrentAddress();
-
-		unsigned int morph_model_count=0;
-		size_t morph_models_address=0;
-		file->readInt32BE(&morph_model_count);
-		file->readInt32BEA(&morph_models_address);
-
-		unsigned int bone_total=0;
-		size_t bone_definition_table_address=0;
-		size_t bone_matrix_address=0;
-		size_t global_aabb_address=0;
-
-		file->readInt32BE(&bone_total);
-		file->readInt32BEA(&bone_definition_table_address);
-		file->readInt32BEA(&bone_matrix_address);
-		file->readInt32BEA(&global_aabb_address);
-
-		for (size_t i = 0; i < morph_model_count; i++) {
-			file->goToAddress(morph_models_address + i * 4);
-			size_t address = 0;
-			file->readInt32BEA(&address);
-			file->goToAddress(address);
-
-			MorphModel* morph_model = new MorphModel();
-			morph_model->read(file);
-			morph_models.push_back(morph_model);
-		}
-
-		bones.reserve(bone_total);
-		for (size_t i=0; i<bone_total; i++) {
-			file->goToAddress(bone_definition_table_address + i*4);
-			size_t address=0;
-			file->readInt32BEA(&address);
-			file->goToAddress(address);
-
-			Bone *bone=new Bone();
-			bone->readDescription(file);
-			file->goToAddress(bone_matrix_address + i*64);
-			bone->readMatrix(file);
-			bones.push_back(bone);
-		}
-
-		file->goToAddress(global_aabb_address);
-		global_aabb.read(file);
-	}
-
 
 	void Model::save(string filename_p, int root_type) {
 		File file(filename_p, LIBGENS_FILE_WRITE_BINARY);
@@ -261,208 +244,184 @@ namespace LibGens {
 			return;
 		}
 
-		switch (file->getRootNodeType()) {
-			case LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS:
-				writeRootNodeDynamicGenerations(file);
-				break;
-			case LIBGENS_MODEL_ROOT_DYNAMIC_UNLEASHED_2:
-				writeRootNodeDynamicUnleashed2(file);
-				break;
-			case LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD:
-				writeRootNodeDynamicLostWorld(file);
-				break;
-		}
-	}
-
-	void Model::writeRootNodeDynamicGenerations(File *file) {
-		if (!file) {
-			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_WRITE_NULL_FILE);
+		if (file->getRootNodeType() == LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) {
+			writeSampleChunkHeader(file);
 			return;
 		}
 
-		size_t table_address=file->getCurrentAddress();
-		unsigned int mesh_count=meshes.size();
-		size_t model_table_address=0;
-		size_t model_name_address=0;
+		size_t table_address = file->getCurrentAddress();
+		unsigned int mesh_count = meshes.size();
+		size_t model_table_address = 0;
+		size_t model_name_address = 0;
 
-		size_t morph_models_address=0;
+		size_t morph_models_address = 0;
 		unsigned int morph_model_count = morph_models.size();
-		unsigned int bone_count=bones.size();
-		size_t bone_definition_table_address=0;
-		size_t bone_matrix_address=0;
-		size_t global_aabb_address=0;
+		unsigned int bone_count = bones.size();
+		size_t bone_definition_table_address = 0;
+		size_t bone_matrix_address = 0;
+		size_t global_aabb_address = 0;
 
-		file->writeInt32BE(&mesh_count);
-		file->writeNull(4);
-
-		if (terrain_mode) {
+		if (file->getRootNodeType() >= 5) {
+			file->writeInt32BE(&mesh_count);
 			file->writeNull(4);
-			file->writeInt32BE(&has_instances);
 		}
 		else {
-			file->writeInt32BE(&morph_model_count);
-			file->writeNull(4);
+			file->writeNull(24);
+		}
+
+		if (!terrain_mode) {
+			if (file->getRootNodeType() >= 4) {
+				file->writeInt32BE(&morph_model_count);
+				file->writeNull(4);
+			}
+
 			file->writeInt32BE(&bone_count);
-			file->writeNull(12);
+			file->writeNull(8);
+
+			if (file->getRootNodeType() >= 2) {
+				file->writeNull(4);
+
+				if (file->getRootNodeType() == 2) {
+					file->writeNull(4);
+				}
+			}
 		}
 
-		// Write meshes
-		model_table_address=file->getCurrentAddress();
-		vector<unsigned int> mesh_addresses;
-		file->writeNull(mesh_count*4);
+		if (file->getRootNodeType() >= 5) {
+			if (terrain_mode) {
+				file->writeNull(4);
+				file->writeInt32BE(&has_instances);
+			}
 
-		for (size_t i=0; i<mesh_count; i++) {
-			mesh_addresses.push_back(file->getCurrentAddress());
-			meshes[i]->write(file);
+			model_table_address = file->getCurrentAddress();
+			vector<unsigned int> mesh_addresses;
+			file->writeNull(mesh_count * 4);
+
+			for (size_t i = 0; i < mesh_count; i++) {
+				mesh_addresses.push_back(file->getCurrentAddress());
+				meshes[i]->write(file);
+			}
+
+			file->goToAddress(model_table_address);
+			for (size_t i = 0; i < mesh_count; i++) {
+				file->writeInt32BEA(&mesh_addresses[i]);
+			}
 		}
-
-		file->goToAddress(model_table_address);
-		for (size_t i=0; i<mesh_count; i++) {
-			file->writeInt32BEA(&mesh_addresses[i]);
+		else if (!meshes.empty()) {
+			file->goToAddress(table_address);
+			meshes[0]->write(file);
 		}
 
 		file->goToEnd();
 		file->fixPadding();
 
-		if (terrain_mode) {
-			model_name_address=file->getCurrentAddress();
-			file->writeString(&name);
-			file->fixPadding();
-		}
-		else {
-			morph_models_address = file->getCurrentAddress();
+		if (!terrain_mode) {
+			if (file->getRootNodeType() >= 4) {
+				morph_models_address = file->getCurrentAddress();
 
-			vector<size_t> morph_model_addresses;
-			file->writeNull(morph_model_count * 4);
+				vector<size_t> morph_model_addresses;
+				file->writeNull(morph_model_count * 4);
 
-			for (size_t i = 0; i < morph_model_count; i++) {
-				morph_model_addresses.push_back(file->getCurrentAddress());
-				morph_models[i]->write(file);
+				for (size_t i = 0; i < morph_model_count; i++) {
+					morph_model_addresses.push_back(file->getCurrentAddress());
+					morph_models[i]->write(file);
+				}
+
+				for (size_t i = 0; i < morph_model_count; i++) {
+					file->goToAddress(morph_models_address + i * 4);
+					file->writeInt32BEA(&morph_model_addresses[i]);
+				}
+				file->goToEnd();
 			}
-
-			for (size_t i = 0; i < morph_model_count; i++) {
-				file->goToAddress(morph_models_address + i * 4);
-				file->writeInt32BEA(&morph_model_addresses[i]);
-			}
-			file->goToEnd();
 
 			bone_definition_table_address = file->getCurrentAddress();
 			vector<unsigned int> bone_definition_addresses;
-			file->writeNull(bone_count*4);
+			file->writeNull(bone_count * 4);
 
-			for (size_t i=0; i<bone_count; i++) {
+			for (size_t i = 0; i < bone_count; i++) {
 				bone_definition_addresses.push_back(file->getCurrentAddress());
 				bones[i]->writeDescription(file);
 			}
 
-			for (size_t i=0; i<bone_count; i++) {
-				file->goToAddress(bone_definition_table_address + i*4);
+			for (size_t i = 0; i < bone_count; i++) {
+				file->goToAddress(bone_definition_table_address + i * 4);
 				file->writeInt32BEA(&bone_definition_addresses[i]);
 			}
 			file->goToEnd();
 
 			bone_matrix_address = file->getCurrentAddress();
-			for (size_t i=0; i<bone_count; i++) {
+			for (size_t i = 0; i < bone_count; i++) {
 				bones[i]->writeMatrix(file);
 			}
 
-			global_aabb_address = file->getCurrentAddress();
-			global_aabb.write(file);
+			if (file->getRootNodeType() >= 2) {
+				global_aabb_address = file->getCurrentAddress();
+				global_aabb.write(file);
+			}
+		}
+		else if (file->getRootNodeType() >= 5) {
+			model_name_address = file->getCurrentAddress();
+			file->writeString(&name);
+			file->fixPadding();
 		}
 
-		file->goToAddress(table_address+4);
-		file->writeInt32BEA(&model_table_address);
-
-		if (terrain_mode) {
-			file->writeInt32BEA(&model_name_address);
+		if (file->getRootNodeType() >= 5) {
+			file->goToAddress(table_address + 4);
+			file->writeInt32BEA(&model_table_address);
 		}
 		else {
-			file->moveAddress(4);
-			file->writeInt32BEA(&morph_models_address);
+			file->goToAddress(table_address + 24);
+		}
+
+		if (!terrain_mode) {
+			if (file->getRootNodeType() >= 4) {
+				file->moveAddress(4);
+				file->writeInt32BEA(&morph_models_address);
+			}
+
 			file->moveAddress(4);
 			file->writeInt32BEA(&bone_definition_table_address);
 			file->writeInt32BEA(&bone_matrix_address);
-			file->writeInt32BEA(&global_aabb_address);
+
+			if (file->getRootNodeType() >= 2) {
+				file->writeInt32BEA(&global_aabb_address);
+
+				if (file->getRootNodeType() == 2) {
+					size_t end_address = global_aabb_address + 24;
+					file->writeInt32BEA(&end_address);
+				}
+			}
+		}
+		else if (file->getRootNodeType() >= 5) {
+			file->writeInt32BEA(&model_name_address);
 		}
 
 		file->goToEnd();
 	}
-
 	
-	void Model::writeRootNodeDynamicUnleashed2(File *file) {
-		if (!file) {
-			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_MODEL_ERROR_MESSAGE_WRITE_NULL_FILE);
-			return;
-		}
-
-		size_t table_address=file->getCurrentAddress();
-		unsigned int mesh_count=meshes.size();
-		size_t model_table_address=0;
-		size_t model_name_address=0;
-
-		size_t unknown_address=0;
-		unsigned int bone_count=bones.size();
-		size_t bone_definition_table_address=0;
-		size_t bone_matrix_address=0;
-		size_t global_aabb_address=0;
-
-		meshes[0]->write(file, true);
-
-		file->goToEnd();
-		file->fixPadding();
-
-		unknown_address = file->getCurrentAddress();
-
-		bone_definition_table_address = file->getCurrentAddress();
-		vector<unsigned int> bone_definition_addresses;
-		file->writeNull(bone_count*4);
-
-		for (size_t i=0; i<bone_count; i++) {
-			bone_definition_addresses.push_back(file->getCurrentAddress());
-			bones[i]->writeDescription(file);
-		}
-
-		for (size_t i=0; i<bone_count; i++) {
-			file->goToAddress(bone_definition_table_address + i*4);
-			file->writeInt32BEA(&bone_definition_addresses[i]);
-		}
-		file->goToEnd();
-
-		bone_matrix_address = file->getCurrentAddress();
-		for (size_t i=0; i<bone_count; i++) {
-			bones[i]->writeMatrix(file);
-		}
-
-		global_aabb_address = file->getCurrentAddress();
-		global_aabb.write(file);
-
-		file->goToAddress(table_address + 28);
-		file->writeInt32BEA(&unknown_address);
-		file->writeInt32BE(&bone_count);
-		file->writeInt32BEA(&bone_definition_table_address);
-		file->writeInt32BEA(&bone_matrix_address);
-		file->writeInt32BEA(&global_aabb_address);
-
-		file->goToEnd();
-	}
-
-	void Model::writeRootNodeDynamicLostWorld(File *file) {
-		SampleChunkNode *root_node = new SampleChunkNode("Model", 1);
+	void Model::writeSampleChunkHeader(File *file) {
+		SampleChunkNode root_node("Model", 1);
 		
 		if (properties.size()) {
-			SampleChunkNode *property_node = root_node->newNode("NodesExt", 1)->newNode("NodePrms", 0)->newNode("SCAParam", 1);
+			SampleChunkNode *property_node = root_node.newNode("NodesExt", 1)->newNode("NodePrms", 0)->newNode("SCAParam", 1);
 			for (vector<SampleChunkProperty *>::iterator it = properties.begin(); it != properties.end(); it++) {
 				property_node->addNode((*it)->toSampleChunkNode());
 			}
 		}
 
+		if (topology == TRIANGLE_LIST) {
+			SampleChunkNode* topology_node = new SampleChunkNode();
+			topology_node->setName("Topology");
+			topology_node->setValue(topology);
+			root_node.addNode(topology_node);
+		}
+
 		SampleChunkNode *contexts_node = new SampleChunkNode();
 		contexts_node->setName("Contexts");
 		contexts_node->setData(this, LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS);
-		root_node->addNode(contexts_node);
+		root_node.addNode(contexts_node);
 
-		root_node->write(file, true);
-		delete root_node;
+		root_node.write(file, true);
 	}
 
 	list<Vertex *> Model::getVertexList() {

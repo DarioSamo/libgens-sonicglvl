@@ -33,7 +33,7 @@ namespace LibGens {
 
             Mesh* getMesh();
 
-            void read(File* file);
+            void read(File* file, Topology topology);
             void write(File* file);
     };
 }

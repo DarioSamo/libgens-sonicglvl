@@ -182,12 +182,12 @@ namespace LibGens {
 				unsigned int index=0;
 				for (list<Vertex *>::iterator it=vertices.begin(); it!=vertices.end(); it++) {
 					for (size_t j=0; j<4; j++) {
-						unsigned char bone_index = (*it)->getBoneIndex(j);
-						if (bone_index != 0xFF) {
+						unsigned short bone_index = (*it)->getBoneIndex(j);
+						if (bone_index != 0xFFFF) {
 							unsigned char bone_weight = (*it)->getBoneWeight(j);
 							float bone_weight_f = (float)bone_weight / 255.0;
 
-							unsigned char real_bone_index=(*it)->getParent()->getBone(bone_index);
+							unsigned short real_bone_index=(*it)->getParent()->getBone(bone_index);
 							if (real_bone_index == model_bone_index) {
 								lCluster->AddControlPointIndex(index, bone_weight_f);
 							}

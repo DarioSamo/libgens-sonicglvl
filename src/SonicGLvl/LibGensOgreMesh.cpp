@@ -959,7 +959,7 @@ void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneMana
 				if (skeleton_name.size()) {
 					Ogre::SkeletonPtr ogre_skeleton = Ogre::SkeletonManager::getSingleton().getByName(skeleton_name, resource_group);
 					if (!ogre_skeleton.isNull()) {
-						vector<unsigned char> bone_table = submesh->getBoneTable();
+						vector<unsigned short> bone_table = submesh->getBoneTable();
 
 						for (size_t i=0; i<bone_table.size(); i++) {
 							string bone_name=model_bones[bone_table[i]]->getName();
@@ -979,17 +979,17 @@ void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneMana
 							LibGens::Vertex *vertex=submesh_vertices[i];
 
 							for (size_t j = 0; j < 4; j++) {
-								unsigned char bone_index  = vertex->getBoneIndex(j);
+								unsigned short bone_index  = vertex->getBoneIndex(j);
 								unsigned char bone_weight = vertex->getBoneWeight(j);
 
-								if ((bone_index == 0xFF) && j) {
+								if ((bone_index == 0xFFFF) && j) {
 									break;
 								}
 								else {
 									vba.boneIndex = 0;
 									vba.weight = 1.0f;
 
-									if (bone_index != 0xFF) {
+									if (bone_index != 0xFFFF) {
 										vba.boneIndex = bone_table[bone_index];
 										vba.weight = (((float) bone_weight) / 255.0f);
 									}
