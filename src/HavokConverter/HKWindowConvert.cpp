@@ -65,9 +65,9 @@ bool HKWindow::convert() {
 	LibGens::Vector3 position(converter_settings.position_x, converter_settings.position_y, converter_settings.position_z);
 	LibGens::Vector3 scale(converter_settings.scale_x * 0.01, converter_settings.scale_y * 0.01, converter_settings.scale_z * 0.01);
 	LibGens::Quaternion rotation_x, rotation_y, rotation_z;
-	rotation_x.fromAngleAxis(converter_settings.rotation_x * LIBGENS_MATH_RAD_TO_DEGREE, LibGens::Vector3(1.0f, 0.0f, 0.0f));
-	rotation_y.fromAngleAxis(converter_settings.rotation_y * LIBGENS_MATH_RAD_TO_DEGREE, LibGens::Vector3(0.0f, 1.0f, 0.0f));
-	rotation_z.fromAngleAxis(converter_settings.rotation_z * LIBGENS_MATH_RAD_TO_DEGREE, LibGens::Vector3(0.0f, 0.0f, 1.0f));
+	rotation_x.fromAngleAxis(converter_settings.rotation_x * LIBGENS_MATH_DEGREE_TO_RAD, LibGens::Vector3(1.0f, 0.0f, 0.0f));
+	rotation_y.fromAngleAxis(converter_settings.rotation_y * LIBGENS_MATH_DEGREE_TO_RAD, LibGens::Vector3(0.0f, 1.0f, 0.0f));
+	rotation_z.fromAngleAxis(converter_settings.rotation_z * LIBGENS_MATH_DEGREE_TO_RAD, LibGens::Vector3(0.0f, 0.0f, 1.0f));
 	LibGens::Quaternion orientation = rotation_x * rotation_y * rotation_z;
 	global_transform.makeTransform(position, scale, orientation);
 

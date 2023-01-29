@@ -53,7 +53,8 @@ THE SOFTWARE.
 #define LIBGENS_MATH_EPSION_QUATERNION           1e-03
 
 #define LIBGENS_MATH_INT32_TO_RAD                (0.5493164f / 36000.0f * LIBGENS_MATH_PI * 2)
-#define LIBGENS_MATH_RAD_TO_DEGREE               180.0f / LIBGENS_MATH_PI
+#define LIBGENS_MATH_RAD_TO_DEGREE               (180.0f / LIBGENS_MATH_PI)
+#define LIBGENS_MATH_DEGREE_TO_RAD               (LIBGENS_MATH_PI / 180.0f)
 
 #define LIBGENS_MATH_AXIS_X_TEXT                 "x"
 #define LIBGENS_MATH_AXIS_Y_TEXT                 "y"
