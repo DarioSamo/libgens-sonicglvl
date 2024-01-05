@@ -931,27 +931,65 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 						vector<LibGens::Polygon> polygons;
 
 						int uv_channels = src_mesh->GetNumUVChannels();
-						if (uv_channels > 4)
-							uv_channels = 4;
+						if (uv_channels < 2) 
+							uv_channels = 2; // Enforce minimum 2 UVs to allow room for light maps.
+						else if (uv_channels > 4) 
+							uv_channels = 4; // Cannot have more than 4.
+
+						// Build vertex format based on the vertex attributes the mesh contains.
+					    LibGens::VertexFormat vertex_format;
+						unsigned int vertex_size = 0;
+
+						vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::POSITION, 0));
+						vertex_size += 12;
+
+						if (src_mesh->mNormals) {
+						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::NORMAL, 0));
+						    vertex_size += 12;
+						}
+
+						if (src_mesh->mTangents) {
+						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::TANGENT, 0));
+						    vertex_size += 12;
+						}
+
+						if (src_mesh->mBitangents) {
+						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::BINORMAL, 0));
+						    vertex_size += 12;
+						}
+
+						for (int uv = 0; uv < uv_channels; uv++) {
+						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT2, LibGens::UV, uv));
+							vertex_size += 8;
+						}
+
+						// Color should always be added as there's nearly no shader that does not utilize it.
+						vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT4, LibGens::COLOR, 0));
+						vertex_size += 16;
+
+						vertex_format.setSize(vertex_size);
 
 						for (int v=0; v < num_vertices; v++) {
 							LibGens::Vertex *vertex = new LibGens::Vertex();
 							vertex->setPosition(LibGens::Vector3(src_mesh->mVertices[v].x, src_mesh->mVertices[v].y, src_mesh->mVertices[v].z));
-							vertex->setNormal(LibGens::Vector3(src_mesh->mNormals[v].x, src_mesh->mNormals[v].y, src_mesh->mNormals[v].z));
+
+							if (src_mesh->mNormals)
+							    vertex->setNormal(LibGens::Vector3(src_mesh->mNormals[v].x, src_mesh->mNormals[v].y, src_mesh->mNormals[v].z));
 
 							if (src_mesh->mTangents)
 								vertex->setTangent(LibGens::Vector3(src_mesh->mTangents[v].x, src_mesh->mTangents[v].y, src_mesh->mTangents[v].z));
 
 							if (src_mesh->mBitangents)
-								vertex->setBinormal(LibGens::Vector3(src_mesh->mBitangents[v].x, src_mesh->mBitangents[v].y, src_mesh->mBitangents[v].z) * -1);
+								vertex->setBinormal(LibGens::Vector3(-src_mesh->mBitangents[v].x, -src_mesh->mBitangents[v].y, -src_mesh->mBitangents[v].z));
 
-							if (src_mesh->GetNumColorChannels() && src_mesh->mColors)
-								vertex->setColor(LibGens::Color(src_mesh->mColors[0][v].r, src_mesh->mColors[0][v].g, src_mesh->mColors[0][v].b, src_mesh->mColors[0][v].a));
-
-							
-							for (int uv=0; uv < uv_channels; uv++) {
-								vertex->setUV(LibGens::Vector2(src_mesh->mTextureCoords[uv][v].x, 1.0 - src_mesh->mTextureCoords[uv][v].y), uv);
+						    for (int uv=0; uv < uv_channels; uv++) {
+								if (src_mesh->mTextureCoords[uv]) {
+								    vertex->setUV(LibGens::Vector2(src_mesh->mTextureCoords[uv][v].x, 1.0f - src_mesh->mTextureCoords[uv][v].y), uv);
+								}
 							}
+
+							if (src_mesh->GetNumColorChannels() && src_mesh->mColors[0])
+								vertex->setColor(LibGens::Color(src_mesh->mColors[0][v].r, src_mesh->mColors[0][v].g, src_mesh->mColors[0][v].b, src_mesh->mColors[0][v].a));
 
 							vertices.push_back(vertex);
 						}
@@ -964,7 +1002,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 						}
 
 						submesh->build(vertices, polygons);
-						submesh->setVertexFormat(new LibGens::VertexFormat(LIBGENS_VERTEX_FORMAT_PC_TERRAIN));
+						submesh->setVertexFormat(&vertex_format);
 						submesh->setMaterialName(material_name);
 						submesh->addBone(0);
 

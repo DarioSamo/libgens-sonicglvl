@@ -43,8 +43,8 @@ const QString HCWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Son
 HCWindow::HCWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);
 	cb_game_engine->addItem("Generations");
-	//cb_game_engine->addItem("Unleashed"); // TO VERIFY
-	//cb_game_engine->addItem("Lost World"); // TO VERIFY
+	cb_game_engine->addItem("Unleashed");
+	cb_game_engine->addItem("Lost World");
 	cb_game_engine->setCurrentIndex(0);
 
 	connect(action_open_settings, SIGNAL(triggered()), this, SLOT(openSettingsTriggered()));
