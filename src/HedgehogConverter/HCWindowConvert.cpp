@@ -223,10 +223,10 @@ bool HCWindow::convert() {
 		logProgress(ProgressNormal, QString("* Node Tree:"));
 		logNodeTree(scene->mRootNode, "**");
 
+		LibGens::LightList light_list;
 		int lights_count = scene->mNumLights;
-		if (lights_count && converter_settings.convert_lights) {
-			LibGens::LightList light_list;
 
+		if (lights_count && converter_settings.convert_lights) {
 			for (int l = 0; l < lights_count; l++) {
 				aiLight *scene_light = scene->mLights[l];
 				aiVector3D position = scene_light->mPosition;
@@ -294,11 +294,14 @@ bool HCWindow::convert() {
 					logProgress(ProgressError, QString("The light type %1 of %2 isn't supported.").arg(scene_light->mType).arg(scene_light->mName.C_Str()));
 				}
 			}
+		}
 
-			if (light_list.getLightCount()) {
-				light_list.save(temp_path.toStdString() + "/" + LIBGENS_LIGHT_LIST_FILENAME);
-				logProgress(ProgressNormal, QString("Saved light list with %1 lights.").arg(light_list.getLightCount()));
-			}
+		// Save light list file even if it's empty to prevent crash when it's missing.
+		std::string light_list_file_path = temp_path.toStdString() + "/" + LIBGENS_LIGHT_LIST_FILENAME;
+
+		if (light_list.getLightCount() || !LibGens::File::check(light_list_file_path)) {
+			light_list.save(light_list_file_path);
+			logProgress(ProgressNormal, QString("Saved light list with %1 lights.").arg(light_list.getLightCount()));
 		}
 
 		//**********************************************************
@@ -737,23 +740,24 @@ bool HCWindow::convert() {
 
 			delete terrain_block;
 
-			// Save an empty gi-texture.gi-texture-group-info to prevent crash when not merging with an existing stage.
-			if (!converter_settings.merge_existing) {
+			// Save an empty gi-texture.gi-texture-group-info file to prevent crash when it's missing.
+			string output_gi_texture_file_path = temp_path.toStdString() + "/gi-texture.gi-texture-group-info";
+
+			if (!converter_settings.merge_existing || !LibGens::File::check(output_gi_texture_file_path)) {
 				LibGens::GITextureGroupInfo gi_texture_group_info;
-				foreach(LibGens::TerrainGroup * group, terrain_groups) {
+				foreach(LibGens::TerrainGroup *group, terrain_groups) {
 					list<LibGens::TerrainInstance*> instances = group->getInstances();
 					for (auto it = instances.begin(); it != instances.end(); ++it) {
 						gi_texture_group_info.addInstance((*it)->getName(), (*it)->getAABB().center(), (*it)->getAABB().radius());
 					}
 				}
 
-				string output_file_path = temp_path.toStdString() + "/gi-texture.gi-texture-group-info";
-				gi_texture_group_info.save(output_file_path);
-				logProgress(ProgressNormal, QString("Saved GI texture group info to %1").arg(output_file_path.c_str()));
+				gi_texture_group_info.save(output_gi_texture_file_path);
+				logProgress(ProgressNormal, QString("Saved GI texture group info to %1").arg(output_gi_texture_file_path.c_str()));
 
-				output_file_path = temp_path.toStdString() + "/gi-lim.gil";
-				gi_texture_group_info.saveMipLevelLimitFile(output_file_path, false, false, true);
-				logProgress(ProgressNormal, QString("Saved GI mip level limit file to %1").arg(output_file_path.c_str()));
+				string output_gi_lim_file_path = temp_path.toStdString() + "/gi-lim.gil";
+				gi_texture_group_info.saveMipLevelLimitFile(output_gi_lim_file_path, false, false, true);
+				logProgress(ProgressNormal, QString("Saved GI mip level limit file to %1").arg(output_gi_lim_file_path.c_str()));
 			}
 		}
 		else {
@@ -768,20 +772,19 @@ bool HCWindow::convert() {
 	// Create output path
 	QDir().mkpath(terrain_output_path);
 
+	bool pack_result = false;
+
 	// Packing routines for each game engine
 	if (converter_settings.game_engine == Generations) {
 		logProgress(ProgressNormal, "Packing for Generations engine...");
-		bool pack_result = packGenerations(terrain_groups, terrain_output_path, output_name, temp_path);
-		return pack_result;
+		pack_result = packGenerations(terrain_groups, terrain_output_path, output_name, temp_path);
 	}
 	else if (converter_settings.game_engine == Unleashed) {
 		logProgress(ProgressFatal, "Packing for Unleashed game engine not implemented yet!");
-		return false;
 	}
 	else if (converter_settings.game_engine == LostWorld) {
 		logProgress(ProgressNormal, "Packing for Lost World engine...");
-		bool pack_result = packLostWorld(terrain_output_path, output_name, temp_path);
-		return pack_result;
+		pack_result = packLostWorld(terrain_output_path, output_name, temp_path);
 	}
 	else {
 		logProgress(ProgressFatal, "No valid game engine detected.");
@@ -799,7 +802,7 @@ bool HCWindow::convert() {
 		delete group;
 	}
 
-	return false;
+	return pack_result;
 }
 
 void HCWindow::addTextureToMaterial(LibGens::Material *material, QString material_name, QString texture_path, QString texture_unit, QStringList &textures_to_copy, QStringList &textures_to_convert) {
@@ -1279,10 +1282,20 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 		}
 
 		// Save PFD files
-		stage_pfd_pack.save(output_stage_pfd_path);
+		stage_pfd_pack.save(output_stage_pfd_path, 0x800);
 		logProgress(ProgressNormal, "Packed Stage.pfd");
 		stage_pfd_pack.savePFI(path.toStdString() + "/Stage.pfi");
 		logProgress(ProgressNormal, "Saved Stage.pfi");
+
+		string output_stage_add_pfd_path = output_path.toStdString() + "/Stage-Add.pfd";
+		if (!converter_settings.merge_existing || !LibGens::File::check(output_stage_add_pfd_path)) {
+			LibGens::ArPack stage_add_pfd_pack;
+
+			stage_add_pfd_pack.save(output_stage_add_pfd_path, 0x800);
+			logProgress(ProgressNormal, "Packed Stage-Add.pfd");
+			stage_add_pfd_pack.savePFI(path.toStdString() + "/Stage-Add.pfi");
+			logProgress(ProgressNormal, "Saved Stage-Add.pfi");
+		}
 	}
 
 	// Delete all terrain model and instances from the resources directory
