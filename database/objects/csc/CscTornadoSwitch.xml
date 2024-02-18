@@ -18,4 +18,7 @@
   <TornadoID type="id" description="" />
   <WidthOffset0 type="float" default="-8" description="" />
   <WidthOffset1 type="float" default="12" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>

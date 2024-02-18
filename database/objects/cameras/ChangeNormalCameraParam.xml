@@ -15,4 +15,7 @@
   <m_Param.TargetPitch type="float" default="0" description="" />
   <m_Param.TargetYaw type="float" default="0" description="" />
   <m_Param.VerticalOffset type="float" default="2.6" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>

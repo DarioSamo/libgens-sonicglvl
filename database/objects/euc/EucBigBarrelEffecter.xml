@@ -17,4 +17,7 @@
   <m_ShakeSize type="float" default="0.3" description="" />
   <m_ShakeSizeDistance type="float" default="10" description="" />
   <m_ShakeTime type="float" default="0.6" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>

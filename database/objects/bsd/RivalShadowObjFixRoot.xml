@@ -18,4 +18,6 @@
   <m_TriggerMaxBG type="float" default="100" description="" />
   <m_TriggerMinAR type="float" default="0.5" description="" />
   <m_TriggerMinBG type="float" default="0" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
 </Template>
