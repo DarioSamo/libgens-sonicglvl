@@ -14,4 +14,7 @@
   <TargetAccele type="float" default="3" description="" />
   <TargetSpeed type="float" default="0.1" description="" />
   <TornadoID type="id" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>

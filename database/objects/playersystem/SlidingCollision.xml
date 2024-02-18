@@ -7,4 +7,7 @@
   <Range type="float" default="100" description="" />
   <Velocity type="float" default="10" description="" />
   <Width type="float" default="4.1" description="" />
+  <Extra type="preview_box_x" name="Width" />
+  <Extra type="preview_box_y" name="Height" />
+  <Extra type="preview_box_z" name="Depth" />
 </Template>

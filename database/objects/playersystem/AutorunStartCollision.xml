@@ -11,4 +11,6 @@
   <Speed type="float" default="40" description="" />
   <ToPathEaseTime type="float" default="0.5" description="" />
   <Type type="float" default="0" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
 </Template>

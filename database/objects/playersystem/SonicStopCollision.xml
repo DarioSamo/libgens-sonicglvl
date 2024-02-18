@@ -6,4 +6,7 @@
   <Length type="float" default="48" description="" />
   <Range type="float" default="100" description="" />
   <Width type="float" default="56" description="" />
+  <Extra type="preview_box_x" name="Width" />
+  <Extra type="preview_box_y" name="Height" />
+  <Extra type="preview_box_z" name="Depth" />
 </Template>
