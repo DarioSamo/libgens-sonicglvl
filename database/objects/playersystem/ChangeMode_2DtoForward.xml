@@ -18,4 +18,6 @@
   <m_IsReverseCameraEnable type="bool" default="false" description="" />
   <m_PathCorrectionForce type="float" default="0" description="" />
   <m_PathEaseTime type="float" default="1" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
 </Template>

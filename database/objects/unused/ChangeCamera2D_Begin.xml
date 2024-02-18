@@ -16,4 +16,6 @@
   <Target_Front_Offset_Max type="float" default="4" description="" />
   <Target_Front_Offset_Speed_Scale type="float" default="0.1" description="" />
   <Target_Up_Offset type="float" default="2" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
 </Template>

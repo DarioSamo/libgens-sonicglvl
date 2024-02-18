@@ -12,4 +12,6 @@
   <SubsetID_2 type="float" default="0" description="" />
   <SubsetID_3 type="float" default="0" description="" />
   <SubsetID_4 type="float" default="0" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
 </Template>

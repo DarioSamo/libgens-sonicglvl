@@ -9,4 +9,7 @@
   <Range type="float" default="10000" description="" />
   <Shape_Type type="float" default="0" description="" />
   <StageID type="float" default="2" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>
