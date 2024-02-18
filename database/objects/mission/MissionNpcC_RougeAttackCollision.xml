@@ -11,4 +11,7 @@
   <Range type="float" default="1000" description="" />
   <Shape_Type type="float" default="0" description="" />
   <TargetPos type="vector" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>

@@ -12,4 +12,6 @@
   <m_InvalidTime type="float" default="30" description="" />
   <m_MaxDelayTime type="float" default="0" description="" />
   <m_MinDelayTime type="float" default="0" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
 </Template>

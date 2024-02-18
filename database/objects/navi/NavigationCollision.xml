@@ -20,4 +20,7 @@
   <Range type="float" default="1000" description="" />
   <SlidingPosition type="vector" description="" />
   <TargetObject_RelationSetObject type="id" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>

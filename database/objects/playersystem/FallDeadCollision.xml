@@ -7,5 +7,4 @@
   <Range type="float" default="100" description="" />
   <Extra type="preview_box_x" name="Collision_Width" />
   <Extra type="preview_box_y" name="Collision_Height" />
-  <Extra type="preview_box_z" name="0" />
 </Template>

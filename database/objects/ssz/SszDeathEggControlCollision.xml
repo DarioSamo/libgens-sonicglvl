@@ -13,4 +13,7 @@
   <Shape_Type type="float" default="0" description="" />
   <TargetDeathEggID type="id" description="" />
   <TurnDegree type="float" default="250" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
 </Template>
