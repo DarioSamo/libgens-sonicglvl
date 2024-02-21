@@ -93,6 +93,11 @@ class EditorNode {
 			last_rotation = rotation;
 		}
 
+		virtual void setScale(Ogre::Vector3 v) {
+			scale = v;
+			if (scene_node) scene_node->setScale(v);
+		}
+
 		virtual void setPosition(Ogre::Vector3 v) {
 			position = v;
 			if (scene_node) scene_node->setPosition(position);
@@ -117,6 +122,10 @@ class EditorNode {
 		virtual void setRotation(Ogre::Quaternion v) {
 			rotation = v;
 			if (scene_node) scene_node->setOrientation(rotation);
+		}
+
+		Ogre::Vector3 getScale() {
+			return scale;
 		}
 
 		Ogre::Quaternion getRotation() {

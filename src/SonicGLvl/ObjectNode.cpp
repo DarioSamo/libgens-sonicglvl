@@ -30,7 +30,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 
 	scene_node->getUserObjectBindings().setUserAny(EDITOR_NODE_BINDING, Ogre::Any((EditorNode *)this));
 	
-	scale    = Ogre::Vector3::UNIT_SCALE;
 	selected = false;
 	force_hide = false;
 	offset_rotation_animation_enabled = false;
@@ -39,8 +38,13 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	current_animation_name = "";
 	current_skeleton_name = "";
 	current_type_name = "";
+
 	
-	// Look for offset rotations
+	// Look for offset rotations and scale
+	string scale_x_str=object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_X, "1.0");
+	string scale_y_str=object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Y, "1.0");
+	string scale_z_str=object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Z, "1.0");
+
 	string offset_rotation_x_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_X, "0.0");
 	string offset_rotation_y_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y, "0.0");
 	string offset_rotation_z_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Z, "0.0");
@@ -48,6 +52,10 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	string offset_rotation_x_speed_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_X_SPEED, "0.0");
 	string offset_rotation_y_speed_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y_SPEED, "0.0");
 	string offset_rotation_z_speed_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Z_SPEED, "0.0");
+
+	float scale_x_f=1;
+	float scale_y_f=1;
+	float scale_z_f=1;
 
 	float offset_rotation_x_f=0;
 	float offset_rotation_y_f=0;
@@ -57,6 +65,10 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	float offset_rotation_y_speed_f=0;
 	float offset_rotation_z_speed_f=0;
 
+	FromString<float>(scale_x_f, scale_x_str, std::dec);
+	FromString<float>(scale_y_f, scale_y_str, std::dec);
+	FromString<float>(scale_z_f, scale_z_str, std::dec);
+
 	FromString<float>(offset_rotation_x_f, offset_rotation_x_str, std::dec);
 	FromString<float>(offset_rotation_y_f, offset_rotation_y_str, std::dec);
 	FromString<float>(offset_rotation_z_f, offset_rotation_z_str, std::dec);
@@ -64,6 +76,8 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	FromString<float>(offset_rotation_x_speed_f, offset_rotation_x_speed_str, std::dec);
 	FromString<float>(offset_rotation_y_speed_f, offset_rotation_y_speed_str, std::dec);
 	FromString<float>(offset_rotation_z_speed_f, offset_rotation_z_speed_str, std::dec);
+
+	scale = Ogre::Vector3(scale_x_f, scale_y_f, scale_z_f);
 
 	offset_rotation_x = Ogre::Degree(offset_rotation_x_f);
 	offset_rotation_y = Ogre::Degree(offset_rotation_y_f);
@@ -83,6 +97,7 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	setPosition(Ogre::Vector3(v.x, v.y, v.z));
 	LibGens::Quaternion q=object_p->getRotation();
 	setRotation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+	setScale(scale);
 
 	// Create multiset param nodes
 	createObjectMultiSetNodes(object, scene_manager);
@@ -321,6 +336,8 @@ ObjectMultiSetNode::ObjectMultiSetNode(LibGens::Object *object_p, LibGens::Multi
 	setPosition(Ogre::Vector3(v.x, v.y, v.z));
 	LibGens::Quaternion q=multi_set_node->rotation;
 	setRotation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+	LibGens::Vector3 s = multi_set_node->scale;
+	setScale(Ogre::Vector3(s.x, s.y, s.z));
 
 	offset_rotation_x = 0;
 	offset_rotation_y = 0;
@@ -392,6 +409,8 @@ void ObjectNode::createObjectMultiSetNodes(LibGens::Object* object, Ogre::SceneM
 	list<LibGens::MultiSetNode*> msp_nodes = object->getMultiSetParam()->getNodes();
 	for (list<LibGens::MultiSetNode*>::iterator it = msp_nodes.begin(); it != msp_nodes.end(); it++) {
 		ObjectMultiSetNode* object_msp_node = new ObjectMultiSetNode(object, (*it), scene_manager);
+		
+		object_msp_node->scale = scale;
 
 		object_msp_node->offset_rotation_x = offset_rotation_x;
 		object_msp_node->offset_rotation_y = offset_rotation_y;
@@ -407,6 +426,7 @@ void ObjectNode::createObjectMultiSetNodes(LibGens::Object* object, Ogre::SceneM
 
 		// Update rotation with offset
 		object_msp_node->setRotation(object_msp_node->getRotation());
+		object_msp_node->setScale(object_msp_node->getScale());
 		object_msp_nodes.push_back(object_msp_node);
 	}
 }

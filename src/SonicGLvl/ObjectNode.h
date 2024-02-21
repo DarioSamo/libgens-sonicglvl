@@ -36,6 +36,9 @@
 #define OBJECT_NODE_MESH_EXTENSION                 ".mesh"
 
 #define OBJECT_NODE_EXTRA_DESCRIPTION              "description"
+#define OBJECT_NODE_EXTRA_SCALE_X                  "scale_x"
+#define OBJECT_NODE_EXTRA_SCALE_Y                  "scale_y"
+#define OBJECT_NODE_EXTRA_SCALE_Z                  "scale_z"
 #define OBJECT_NODE_EXTRA_OFFSET_ROTATION_X        "offset_rotation_x"
 #define OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y        "offset_rotation_y"
 #define OBJECT_NODE_EXTRA_OFFSET_ROTATION_Z		   "offset_rotation_z"
@@ -91,6 +94,11 @@ class ObjectMultiSetNode : public EditorNode {
 			scene_node->roll(offset_rotation_z);
 
 			if (multi_set_node) multi_set_node->rotation = LibGens::Quaternion(v.w, v.x, v.y, v.z);
+		}
+
+		void setScale(Ogre::Vector3 v) {
+			EditorNode::setScale(v);
+			if (multi_set_node) multi_set_node->scale = LibGens::Vector3(v.x, v.y, v.z);
 		}
 
 		void addTime(float time_s);

@@ -103,6 +103,7 @@ namespace LibGens {
 
 	class MultiSetNode {
 		public:
+			Vector3 scale;
 			Vector3 position;
 			Quaternion rotation;
 
