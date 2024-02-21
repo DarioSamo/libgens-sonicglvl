@@ -24,7 +24,6 @@
   <Yaw type="float" default="-25" description="" />
   <ZRot type="float" default="0" description="" />
   <Extra type="model" name="Camera.model" />
-  <Extra type="offset_rotation_y" name="-90" />
   <Extra type="scale_x" name="3" />
   <Extra type="scale_y" name="3" />
   <Extra type="scale_z" name="3" />

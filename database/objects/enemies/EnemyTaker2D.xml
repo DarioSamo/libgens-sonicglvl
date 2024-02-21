@@ -44,4 +44,5 @@
   <Vel1DMove type="float" default="10" description="" />
   <WayPointA type="vector" description="" />
   <WayPointB type="vector" description="" />
+  <Extra type="model" name="enm_taker_HD.model" />
 </Template>

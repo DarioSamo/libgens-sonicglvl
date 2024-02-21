@@ -8,7 +8,6 @@
   <IsCollision type="bool" default="true" description="" />
   <Range type="float" default="10100" description="" />
   <Extra type="model" name="Camera.model" />
-  <Extra type="offset_rotation_y" name="-90" />
   <Extra type="scale_x" name="3" />
   <Extra type="scale_y" name="3" />
   <Extra type="scale_z" name="3" />

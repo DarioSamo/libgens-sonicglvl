@@ -17,4 +17,5 @@
   <Target type="vector" description="" />
   <WayPointA type="vector" description="" />
   <WayPointB type="vector" description="" />
+  <Extra type="model" name="enm_biter_HD.model" />
 </Template>

@@ -123,13 +123,37 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 	string skeleton_name=object->queryEditorSkeleton(slot_id_name, "");
 	string animation_name=object->queryEditorAnimation(slot_id_name, "");
 
-	string preview_box_x=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_X, "");
-	string preview_box_y=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Y, "");
-	string preview_box_z=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Z, "");
+	string scale_x_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_X, "1.0");
+	string scale_y_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Y, "1.0");
+	string scale_z_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Z, "1.0");
 
-	string preview_box_x_scale=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_X_SCALE, "");
-	string preview_box_y_scale=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Y_SCALE, "");
-	string preview_box_z_scale=object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Z_SCALE, "");
+	LibGens::ObjectElementFloat* s_x = (LibGens::ObjectElementFloat*)object->getElement(scale_x_str);
+	LibGens::ObjectElementFloat* s_y = (LibGens::ObjectElementFloat*)object->getElement(scale_y_str);
+	LibGens::ObjectElementFloat* s_z = (LibGens::ObjectElementFloat*)object->getElement(scale_z_str);
+
+	float scale_x_f = 1;
+	float scale_y_f = 1;
+	float scale_z_f = 1;
+
+	// Try reading the scale from an existing element. If not found, use the written value
+	if (s_x) scale_x_f = s_x->value;
+	else FromString<float>(scale_x_f, scale_x_str, std::dec);
+
+	if (s_y) scale_y_f = s_y->value;
+	else FromString<float>(scale_y_f, scale_y_str, std::dec);
+
+	if (s_z) scale_z_f = s_z->value;
+	else FromString<float>(scale_z_f, scale_z_str, std::dec);
+
+	setScale(Ogre::Vector3(scale_x_f, scale_y_f, scale_z_f));
+
+	string preview_box_x = object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_X, "");
+	string preview_box_y = object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Y, "");
+	string preview_box_z = object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Z, "");
+
+	string preview_box_x_scale = object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_X_SCALE, "");
+	string preview_box_y_scale = object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Y_SCALE, "");
+	string preview_box_z_scale = object->queryExtraName(OBJECT_NODE_EXTRA_PREVIEW_BOX_Z_SCALE, "");
 
 	if ((preview_box_x.size()) || (preview_box_y.size()) || (preview_box_z.size())) {
 		LibGens::ObjectElementFloat *p_x = (LibGens::ObjectElementFloat *) object->getElement(preview_box_x);
@@ -166,9 +190,9 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 			new_scale.z = scale_f;
 		}
 
-		new_scale.x = new_scale.x * scale_x;
-		new_scale.y = new_scale.y * scale_y;
-		new_scale.z = new_scale.z * scale_z;
+		new_scale.x = new_scale.x * scale_x * (1 / scale_x_f);
+		new_scale.y = new_scale.y * scale_y * (1 / scale_y_f);
+		new_scale.z = new_scale.z * scale_z * (1 / scale_z_f);
 
 		// Check for valid scaling values
 		if (new_scale.x <= 0.0) new_scale.x = 0.1;
@@ -177,30 +201,6 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 
 		preview_box_node->setScale(new_scale);
 	}
-
-	string scale_x_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_X, "1.0");
-	string scale_y_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Y, "1.0");
-	string scale_z_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Z, "1.0");
-
-	LibGens::ObjectElementFloat* s_x = (LibGens::ObjectElementFloat*)object->getElement(scale_x_str);
-	LibGens::ObjectElementFloat* s_y = (LibGens::ObjectElementFloat*)object->getElement(scale_y_str);
-	LibGens::ObjectElementFloat* s_z = (LibGens::ObjectElementFloat*)object->getElement(scale_z_str);
-
-	float scale_x_f = 1;
-	float scale_y_f = 1;
-	float scale_z_f = 1;
-
-	// Try reading the scale from an existing element. If not found, use the written value
-	if (s_x) scale_x_f = s_x->value;
-	else FromString<float>(scale_x_f, scale_x_str, std::dec);
-
-	if (s_y) scale_y_f = s_y->value;
-	else FromString<float>(scale_y_f, scale_y_str, std::dec);
-
-	if (s_z) scale_z_f = s_z->value;
-	else FromString<float>(scale_z_f, scale_z_str, std::dec);
-
-	setScale(Ogre::Vector3(scale_x_f, scale_y_f, scale_z_f));
 
 	if ((object->getName() == OBJECT_NODE_OBJECT_PHYSICS) && object_production) {
 		bool found_model=false;
