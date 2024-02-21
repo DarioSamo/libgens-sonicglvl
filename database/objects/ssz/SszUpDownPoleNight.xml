@@ -11,4 +11,5 @@
   <Phase type="float" default="0.2" description="" />
   <Range type="float" default="30" description="" />
   <Type type="float" default="0" description="" />
+  <Extra type="model" name="ssz_obj_Stick_night.model" />
 </Template>
