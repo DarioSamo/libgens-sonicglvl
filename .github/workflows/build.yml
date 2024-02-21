@@ -1,0 +1,40 @@
+name: SonicGlvl Build
+
+on:
+  push:
+    branches:
+      - ci-test
+      - master
+
+jobs:
+  build:
+    runs-on: windows-2016
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC environment
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: '[15.0,16.0)'
+      
+      - name: Extract Havok 2010 2.0 SDK
+        run: |
+          curl -L -o dogfood.zip https://media.githubusercontent.com/media/reddog-phy/dogfood/main/dogfood.zip?download=true
+          7z x dogfood.zip -odepends
+          
+      - name: Install FBX SDK 2015.1
+        run: |
+          curl -L -o fbxsdk.exe http://images.autodesk.com/adsk/files/fbx20151_fbxsdk_vs2010_win.exe
+          7z x fbxsdk.exe -odepends\fbxsdk
+
+      - name: Install Ogre 1.9 SDK
+        run: |
+          curl -L -o ogresdk.exe https://master.dl.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc10_v1-9-0.exe?viasf=1
+          7z x ogresdk.exe -o.\temp/*
+          robocopy .\temp\ogresdk\OgreSDK_vc10_v1-9-0 .\depends\ogre /e /move
+          rmdir /s /q .\temp
+
+      - name: Build Project
+        run: msbuild /p:PlatformToolset=v100 /p:Configuration=Release src\libgens-sonicglvl.sln
