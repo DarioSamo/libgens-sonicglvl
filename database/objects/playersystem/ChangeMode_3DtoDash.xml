@@ -16,4 +16,6 @@
   <m_PathCorrectionForce type="float" default="0.5" description="" />
   <Extra type="preview_box_x" name="Collision_Width" />
   <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="offset_rotation_y" name="180" />
+  <Extra type="model" name="changemode.mesh" />
 </Template>

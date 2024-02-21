@@ -14,4 +14,9 @@
   <TrgOffsetY type="float" default="1" description="" />
   <TrgOffsetZ type="float" default="15" description="" />
   <TrgRatio type="float" default="0.5" description="" />
+  <Extra type="model" name="Camera.model" />
+  <Extra type="offset_rotation_y" name="-90" />
+  <Extra type="scale_x" name="3" />
+  <Extra type="scale_y" name="3" />
+  <Extra type="scale_z" name="3" />
 </Template>

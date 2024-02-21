@@ -19,4 +19,5 @@
   <TimesType type="float" default="1" description="" />
   <Trigger type="float" default="4" description="" />
   <TriggerList type="id_list" description="" />
+  <Extra type="model" name="EventSetter.model" />
 </Template>

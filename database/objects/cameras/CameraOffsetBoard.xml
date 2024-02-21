@@ -22,4 +22,9 @@
   <Range type="float" default="100" description="" />
   <Extra type="preview_box_x" name="Collision_Width" />
   <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="model" name="Camera.model" />
+  <Extra type="offset_rotation_y" name="-90" />
+  <Extra type="scale_x" name="3" />
+  <Extra type="scale_y" name="3" />
+  <Extra type="scale_z" name="3" />
 </Template>

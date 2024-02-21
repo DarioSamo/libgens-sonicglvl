@@ -18,4 +18,6 @@
   <TargetOffset_Up type="float" default="-0.5" description="" />
   <Target_Type type="float" default="0" description="" />
   <ZRot type="float" default="0" description="" />
+  <Extra type="model" name="target.model" />
+  <Extra type="offset_rotation_y" name="0" />
 </Template>

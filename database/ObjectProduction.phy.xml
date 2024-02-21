@@ -36159,30 +36159,4 @@
 		<FixedNode />
 		<CollisionFlag>true</CollisionFlag>
 	</pam_carsfront>
-
-	<myk_npc_kratos>
-		<DataPath>object\physics\myk_npc_kratos</DataPath>
-		<Model>myk_npc_kratos</Model>
-		<RigidBodyContainer />
-		<RigidBody />
-		<Type>Fixed</Type>
-		<DamageType>Normal</DamageType>
-		<IsVisible>true</IsVisible>
-		<HP>0</HP>
-		<SurvivalTime>0</SurvivalTime>
-		<SurvivalTimeRange>1</SurvivalTimeRange>
-		<NextObjName />
-		<IsHoming>false</IsHoming>
-		<IsRepeat>true</IsRepeat>
-		<Motion />
-		<MotionSkeleton />
-		<AttackPoint>0</AttackPoint>
-		<Category>ghz</Category>
-		<DamageCollision />
-		<WeightType>Middle</WeightType>
-		<LightFieldType>OffsetDisable</LightFieldType> <SoundID />
-		<Effect />
-		<FixedNode />
-		<CollisionFlag>true</CollisionFlag>
-	</myk_npc_kratos>
 </ObjectPhysics>
