@@ -40,10 +40,7 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	current_type_name = "";
 
 	
-	// Look for offset rotations and scale
-	string scale_x_str=object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_X, "1.0");
-	string scale_y_str=object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Y, "1.0");
-	string scale_z_str=object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Z, "1.0");
+	// Look for offset rotations
 
 	string offset_rotation_x_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_X, "0.0");
 	string offset_rotation_y_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y, "0.0");
@@ -53,10 +50,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	string offset_rotation_y_speed_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Y_SPEED, "0.0");
 	string offset_rotation_z_speed_str=object->queryExtraName(OBJECT_NODE_EXTRA_OFFSET_ROTATION_Z_SPEED, "0.0");
 
-	float scale_x_f=1;
-	float scale_y_f=1;
-	float scale_z_f=1;
-
 	float offset_rotation_x_f=0;
 	float offset_rotation_y_f=0;
 	float offset_rotation_z_f=0;
@@ -65,10 +58,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	float offset_rotation_y_speed_f=0;
 	float offset_rotation_z_speed_f=0;
 
-	FromString<float>(scale_x_f, scale_x_str, std::dec);
-	FromString<float>(scale_y_f, scale_y_str, std::dec);
-	FromString<float>(scale_z_f, scale_z_str, std::dec);
-
 	FromString<float>(offset_rotation_x_f, offset_rotation_x_str, std::dec);
 	FromString<float>(offset_rotation_y_f, offset_rotation_y_str, std::dec);
 	FromString<float>(offset_rotation_z_f, offset_rotation_z_str, std::dec);
@@ -76,8 +65,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	FromString<float>(offset_rotation_x_speed_f, offset_rotation_x_speed_str, std::dec);
 	FromString<float>(offset_rotation_y_speed_f, offset_rotation_y_speed_str, std::dec);
 	FromString<float>(offset_rotation_z_speed_f, offset_rotation_z_speed_str, std::dec);
-
-	scale = Ogre::Vector3(scale_x_f, scale_y_f, scale_z_f);
 
 	offset_rotation_x = Ogre::Degree(offset_rotation_x_f);
 	offset_rotation_y = Ogre::Degree(offset_rotation_y_f);
@@ -97,7 +84,6 @@ ObjectNode::ObjectNode(LibGens::Object *object_p, Ogre::SceneManager *scene_mana
 	setPosition(Ogre::Vector3(v.x, v.y, v.z));
 	LibGens::Quaternion q=object_p->getRotation();
 	setRotation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
-	setScale(scale);
 
 	// Create multiset param nodes
 	createObjectMultiSetNodes(object, scene_manager);
@@ -191,6 +177,30 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 
 		preview_box_node->setScale(new_scale);
 	}
+
+	string scale_x_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_X, "1.0");
+	string scale_y_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Y, "1.0");
+	string scale_z_str = object->queryExtraName(OBJECT_NODE_EXTRA_SCALE_Z, "1.0");
+
+	LibGens::ObjectElementFloat* s_x = (LibGens::ObjectElementFloat*)object->getElement(scale_x_str);
+	LibGens::ObjectElementFloat* s_y = (LibGens::ObjectElementFloat*)object->getElement(scale_y_str);
+	LibGens::ObjectElementFloat* s_z = (LibGens::ObjectElementFloat*)object->getElement(scale_z_str);
+
+	float scale_x_f = 1;
+	float scale_y_f = 1;
+	float scale_z_f = 1;
+
+	// Try reading the scale from an existing element. If not found, use the written value
+	if (s_x) scale_x_f = s_x->value;
+	else FromString<float>(scale_x_f, scale_x_str, std::dec);
+
+	if (s_y) scale_y_f = s_y->value;
+	else FromString<float>(scale_y_f, scale_y_str, std::dec);
+
+	if (s_z) scale_z_f = s_z->value;
+	else FromString<float>(scale_z_f, scale_z_str, std::dec);
+
+	setScale(Ogre::Vector3(scale_x_f, scale_y_f, scale_z_f));
 
 	if ((object->getName() == OBJECT_NODE_OBJECT_PHYSICS) && object_production) {
 		bool found_model=false;
