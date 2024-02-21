@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <Range type="float" default="300" description="object culling range" />
-  <Direction type="enum" description="the rotation of orientation" />
-  <Omega type="float" description="rotational speed (angular velocity)" />
-  <IsBootSwitchCollision type="bool" description="SwitchCollision or start-up?" />
-  <Extra type="model" name="w4_obj_cookie01.model" />
-</Template>

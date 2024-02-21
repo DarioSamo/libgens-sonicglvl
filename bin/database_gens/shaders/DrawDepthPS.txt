@@ -1,6 +1,0 @@
-ps_3_0
-def c11, 1, 0, 0, 0
-dcl_texcoord v0
-rcp r0.w, v0.w
-mul r0.w, v0.z, r0.w
-mov oC0.x, r0.w

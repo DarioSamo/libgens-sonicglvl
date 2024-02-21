@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="false" description="" />
-  <Range type="float" default="3000" description="" />
-  <m_FlyingHeight type="float" default="17" description="" />
-  <m_Hitpoint type="float" default="3" description="" />
-  <m_MinSpeed type="float" default="30" description="" />
-</Template>

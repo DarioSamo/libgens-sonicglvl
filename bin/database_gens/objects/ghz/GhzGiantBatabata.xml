@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="true" description="" />
-  <PathID type="float" default="10" description="" />
-  <Range type="float" default="1000" description="" />
-  <Extra type="model" name="ghz_obj_giant_batabata.model" />
-</Template>

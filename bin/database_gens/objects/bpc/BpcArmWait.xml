@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="false" description="" />
-  <IsFinalAttack type="bool" default="false" description="" />
-  <MotionType type="float" default="0" description="" />
-  <Range type="float" default="10000" description="" />
-  <Scale type="float" default="1" description="" />
-</Template>

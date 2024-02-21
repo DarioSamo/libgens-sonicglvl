@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="false" description="" />
-  <IsOnAir type="bool" default="false" description="" />
-  <ModelLengthHeight type="float" default="8" description="" />
-  <Range type="float" default="30" description="" />
-</Template>

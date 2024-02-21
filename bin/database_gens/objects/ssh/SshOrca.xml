@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <DstPos type="vector" description="" />
-  <GroundOffset type="float" default="0" description="" />
-  <IsCastShadow type="bool" default="false" description="" />
-  <MoveTime type="float" default="2.6" description="" />
-  <Range type="float" default="100" description="" />
-  <RelHeight type="float" default="30.4" description="" />
-</Template>

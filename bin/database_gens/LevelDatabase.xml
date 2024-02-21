@@ -1,6 +1,0 @@
-<LevelDatabase>
-  <Entry name="ghz200"     geometry="ghz200"        layout_merge=""     slot="GreenHillZone"     game="Generations" />
-  <Entry name="ghz201"     geometry="ghz200"        layout_merge=""     slot="GreenHillZone"     game="Generations" />
-  <Entry name="ActD_Beach" geometry="ActD_Beach"    layout_merge=""     slot="JungleJoyride"     game="Unleashed" />
-  <Entry name="ActD_Snow"  geometry="ActD_Snow"     layout_merge=""     slot="CoolEdge"          game="Unleashed" />
-</LevelDatabase>

@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <Range type="float" default="300" description="object culling range" />
-  <Ganigani type="target" description="Ganigani registration to put on scaffolding" />
-  <IsSwitchCollision type="bool" description="SwitchCollision or start-up?" />
-</Template>
