@@ -23,4 +23,5 @@
   <Target type="vector" description="" />
   <ToRebirthTime type="float" default="3" description="" />
   <Vel1D type="float" default="10" description="" />
+  <Extra type="model" name="enm_gunbeetle_HD.model" />
 </Template>

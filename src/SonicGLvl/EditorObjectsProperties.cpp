@@ -1721,7 +1721,6 @@ void EditorApplication::addVectorToList(LibGens::Vector3 v3)
 {
 	HWND hVectorList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
 	ObjectNode* first_selection = static_cast<ObjectNode*>(*(selected_nodes.begin()));
-	v3 = first_selection->getObject()->getPosition();
 	float x = v3.x;
 	float y = v3.y;
 	float z = v3.z;

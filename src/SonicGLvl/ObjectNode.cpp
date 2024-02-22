@@ -190,6 +190,7 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 			new_scale.z = scale_f;
 		}
 
+		// Compensate scale of parent node
 		new_scale.x = new_scale.x * scale_x * (1 / scale_x_f);
 		new_scale.y = new_scale.y * scale_y * (1 / scale_y_f);
 		new_scale.z = new_scale.z * scale_z * (1 / scale_z_f);
