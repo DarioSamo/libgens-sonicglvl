@@ -209,6 +209,11 @@ void EditorApplication::rememberCloningNodes()
 	}
 }
 
+list<EditorNode*> EditorApplication::getSelectedNodes()
+{
+	return selected_nodes;
+}
+
 void EditorApplication::cloneSelection() {
 	if (!selected_nodes.size()) return;
 

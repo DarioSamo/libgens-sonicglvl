@@ -353,6 +353,7 @@ class EditorApplication : public BaseApplication {
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
 		void rememberCloningNodes();
+		list<EditorNode*> getSelectedNodes();
 		ObjectNode* getObjectNodeFromEditorNode(EditorNode* node);
 		TrajectoryMode getTrajectoryMode(EditorNode* node);
 		void addTrajectory(TrajectoryMode mode);

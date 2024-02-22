@@ -1668,6 +1668,8 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			}
 		}
 
+		ObjectNode* first_selection = static_cast<ObjectNode*>(*(editor_application->getSelectedNodes().begin()));
+
 		switch ((LPARAM)wParam)
 		{
 		case IDCANCEL:
@@ -1682,7 +1684,7 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			return true;
 
 		case IDB_EDIT_VECTOR_LIST_CREATE:
-			editor_application->addVectorToList();
+			editor_application->addVectorToList(first_selection->getObject()->getPosition());
 			editor_application->updateEditPropertyVectorList(editor_application->getCurrentPropertyVectorList());
 			break;
 
@@ -1720,7 +1722,6 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 void EditorApplication::addVectorToList(LibGens::Vector3 v3)
 {
 	HWND hVectorList = GetDlgItem(hEditPropertyDlg, IDL_EDIT_VECTOR_LIST_LIST);
-	ObjectNode* first_selection = static_cast<ObjectNode*>(*(selected_nodes.begin()));
 	float x = v3.x;
 	float y = v3.y;
 	float z = v3.z;
