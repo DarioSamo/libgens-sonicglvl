@@ -946,7 +946,7 @@ INT_PTR CALLBACK MaterialEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			editor_application->clearMaterialEditorGUI();
 			return true;
 
@@ -1092,7 +1092,7 @@ INT_PTR CALLBACK MaterialEditorPreviewCallback(HWND hDlg, UINT msg, WPARAM wPara
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			return true;
 
 		case WM_COMMAND:

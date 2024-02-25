@@ -235,7 +235,7 @@ INT_PTR CALLBACK findCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam)
 		return true;
 
 	case WM_CLOSE:
-		EndDialog(hDlg, true);
+		DestroyWindow(hDlg);
 		editor_application->closeFindGUI();
 		return true;
 

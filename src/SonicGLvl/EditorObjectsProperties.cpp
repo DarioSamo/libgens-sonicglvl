@@ -1179,7 +1179,7 @@ INT_PTR CALLBACK EditBoolCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			editor_application->clearEditPropertyGUI();
 			return true;
 
@@ -1220,7 +1220,7 @@ INT_PTR CALLBACK EditIntCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			editor_application->clearEditPropertyGUI();
 			return true;
 
@@ -1273,7 +1273,7 @@ INT_PTR CALLBACK EditFloatCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			editor_application->clearEditPropertyGUI();
 			return true;
 
@@ -1326,7 +1326,7 @@ INT_PTR CALLBACK EditStringCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM l
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			editor_application->clearEditPropertyGUI();
 			return true;
 
@@ -1378,7 +1378,7 @@ INT_PTR CALLBACK EditVectorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM l
 				editor_application->updateEditPropertyVectorMode(false);
 			}
 
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 
 			editor_application->clearEditPropertyGUI();
 			return true;
@@ -1869,7 +1869,7 @@ INT_PTR CALLBACK EditIdCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPara
 		return true;
 
 	case WM_CLOSE:
-		EndDialog(hDlg, false);
+		DestroyWindow(hDlg);
 		editor_application->openQueryTargetMode(false);
 		editor_application->clearEditPropertyGUI();
 		return true;
@@ -2010,7 +2010,7 @@ INT_PTR CALLBACK EditIdListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM l
 		return true;
 
 	case WM_CLOSE:
-		EndDialog(hDlg, false);
+		DestroyWindow(hDlg);
 		editor_application->openQueryTargetMode(false);
 		editor_application->clearEditPropertyGUI();
 		return true;

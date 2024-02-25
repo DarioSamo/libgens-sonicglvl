@@ -269,7 +269,7 @@ INT_PTR CALLBACK LookAtPointCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM 
 		return true;
 
 	case WM_CLOSE:
-		EndDialog(hDlg, false);
+		DestroyWindow(hDlg);
 		editor_application->closeLookAtPointGUI();
 		return true;
 

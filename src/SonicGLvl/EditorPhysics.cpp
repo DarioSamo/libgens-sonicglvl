@@ -165,7 +165,7 @@ INT_PTR CALLBACK PhysicsEditorCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARA
 			return true;
 
 		case WM_CLOSE:
-			EndDialog(hDlg, false);
+			DestroyWindow(hDlg);
 			editor_application->clearPhysicsEditorGUI();
 			return true;
 
