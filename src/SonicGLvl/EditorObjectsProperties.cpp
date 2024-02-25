@@ -1624,10 +1624,23 @@ bool EditorApplication::isUpdateVectorList()
 	return is_update_vector_list;
 }
 
-INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
+LibGens::Vector3 getVectorCreationPosition()
+{
+	LibGens::Vector3 vector_creation_position = LibGens::Vector3(0, 0, 0);
 
+	// Try to use the position of the first selected object
+	if (!editor_application->getSelectedNodes().empty())
+	{
+		ObjectNode* first_selection = static_cast<ObjectNode*>(*(editor_application->getSelectedNodes().begin()));
+		vector_creation_position = first_selection->getObject()->getPosition();
+	}
+
+	return vector_creation_position;
+}
+
+INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	HWND list_view = GetDlgItem(hDlg, IDL_EDIT_VECTOR_LIST_LIST);
-	int list_view_index = ListView_GetNextItem(list_view, -1, LVIS_SELECTED | LVIS_FOCUSED);
+	int list_view_index = list_view == NULL ? -1 : ListView_GetNextItem(list_view, -1, LVIS_SELECTED | LVIS_FOCUSED);
 	editor_application->updateVectorListSelection(list_view_index);
 	
 	switch (msg) {
@@ -1638,8 +1651,8 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 		if (IsDlgButtonChecked(hDlg, IDC_EDIT_VECTOR_LIST_EDITING)) {
 			editor_application->updateEditPropertyVectorMode(false);
 		}
-
-		EndDialog(hDlg, false);
+		
+		DestroyWindow(hDlg);
 		editor_application->clearEditPropertyGUI();
 		return true;
 
@@ -1668,8 +1681,6 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			}
 		}
 
-		ObjectNode* first_selection = static_cast<ObjectNode*>(*(editor_application->getSelectedNodes().begin()));
-
 		switch ((LPARAM)wParam)
 		{
 		case IDCANCEL:
@@ -1684,7 +1695,7 @@ INT_PTR CALLBACK EditVectorListCallback(HWND hDlg, UINT msg, WPARAM wParam, LPAR
 			return true;
 
 		case IDB_EDIT_VECTOR_LIST_CREATE:
-			editor_application->addVectorToList(first_selection->getObject()->getPosition());
+			editor_application->addVectorToList(getVectorCreationPosition());
 			editor_application->updateEditPropertyVectorList(editor_application->getCurrentPropertyVectorList());
 			break;
 

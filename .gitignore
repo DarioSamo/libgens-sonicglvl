@@ -191,6 +191,9 @@ FakesAssemblies/
 .vs/
 database
 
+# JetBrains IDE files
+.idea
+
 # Configuration files
 bin/GIAtlasConverter.ini
 bin/HedgehogConverter.ini

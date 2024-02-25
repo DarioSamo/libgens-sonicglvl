@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <Template>
   <ActionRange type="float" default="100" description="" />
-  <AppearType type="float" default="0" description="" />
+  <AppearType type="float" default="0" description="0 Appears instantly. 1 follows the path defined in PositionList before standing in the final position." />
   <AttackInterval type="float" default="4" description="" />
   <AttackRange type="float" default="10" description="" />
   <DebugPointClear type="bool" default="false" description="" />
@@ -19,7 +19,7 @@
   <IsThrowDown type="bool" default="false" description="" />
   <IsTurnToPlayer type="bool" default="true" description="" />
   <MoveSpeed type="float" default="5" description="" />
-  <MoveType type="float" default="2" description="" />
+  <MoveType type="float" default="2" description="Set to 2 to follow the path defined in PositionListMove" />
   <PathIsAccel type="float" default="0" description="" />
   <PathIsAccelMove type="float" default="0" description="" />
   <PathIsBezier type="float" default="1" description="" />
@@ -41,7 +41,7 @@
   <TurnTime type="float" default="1" description="" />
   <TurnToPlayerRate type="float" default="0.1" description="" />
   <Vel1D type="float" default="10" description="" />
-  <Vel1DMove type="float" default="10" description="" />
+  <Vel1DMove type="float" default="10" description="Velocity while moving" />
   <WayPointA type="vector" description="" />
   <WayPointB type="vector" description="" />
   <Extra type="model" name="enm_taker_HD.model" />
