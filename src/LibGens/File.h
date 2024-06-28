@@ -33,8 +33,10 @@
 
 #define LIBGENS_FILE_HEADER_ROOT_ADDRESS_DEFAULT        24
 #define LIBGENS_FILE_HEADER_ROOT_ADDRESS_LOST_WORLD     16
+#define LIBGENS_FILE_HEADER_ROOT_ADDRESS_NEEDLE_ARCHIVE 364
 
 #define LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD        0x0133054A
+#define LIBGENS_FILE_HEADER_ROOT_TYPE_NEEDLE_ARCHIVE	0x52435631
 
 #define LIBGENS_FILE_STRING_BUFFER                      1024
 
@@ -58,6 +60,7 @@ namespace LibGens {
 			unsigned char *comparison_bytes_min;
 			unsigned char *comparison_bytes_max;
 			size_t comparison_size;
+			bool relative_address_mode;
 		public:
 			File(string filename, string mode);
 			void prepareHeader(int root_type);

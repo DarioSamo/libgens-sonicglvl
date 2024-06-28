@@ -28,6 +28,7 @@ namespace LibGens {
 		root_node_address=0;
 		address_read_count = 0;
 		global_offset = 0;
+		relative_address_mode = false;
 
 		if (!file_ptr) {
 			Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
@@ -101,7 +102,13 @@ namespace LibGens {
 	void File::readInt32A(size_t *dest) {
 		if (!readSafeCheck(dest)) return;
 		fread(dest, sizeof(size_t), 1, file_ptr);
-		*dest += root_node_address;
+
+		if (relative_address_mode) {
+			*dest += getCurrentAddress() - 4;
+		}
+		else {
+			*dest += root_node_address;
+		}
 
 		address_read_count++;
 	}
@@ -121,8 +128,14 @@ namespace LibGens {
 	void File::readInt32BEA(size_t *dest) {
 		if (!readSafeCheck(dest)) return;
 		fread(dest, sizeof(size_t), 1, file_ptr);
-		Endian::swap(*dest);
-		*dest += root_node_address;
+
+		if (relative_address_mode) {
+			*dest += getCurrentAddress() - 4;
+		}
+		else {
+			Endian::swap(*dest);
+			*dest += root_node_address;
+		}
 
 		address_read_count++;
 	}
@@ -405,8 +418,16 @@ namespace LibGens {
 		fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_TYPE_ADDRESS + global_offset, SEEK_SET);
 		readInt32BE(&root_node_type);
 
+		relative_address_mode = false;
+
 		if (root_node_type == LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD) {
 			root_node_address = LIBGENS_FILE_HEADER_ROOT_ADDRESS_LOST_WORLD;
+		}
+
+		else if (root_node_type == LIBGENS_FILE_HEADER_ROOT_TYPE_NEEDLE_ARCHIVE) {
+			root_node_type = LIBGENS_FILE_HEADER_ROOT_TYPE_LOST_WORLD;
+			root_node_address = LIBGENS_FILE_HEADER_ROOT_ADDRESS_NEEDLE_ARCHIVE;
+			relative_address_mode = true;
 		}
 
 		else {
