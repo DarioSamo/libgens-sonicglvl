@@ -398,9 +398,9 @@ namespace LibGens {
 		unsigned int value=0;
 		file->readInt32E(&value, big_endian);
 
-		x = ((value&0x00000400 ? -1 : 0) + (float)((value>>2)&0x0FF)  / 256.0f);
-		y = ((value&0x00200000 ? -1 : 0) + (float)((value>>13)&0x0FF) / 256.0f);
-		z = ((value&0x80000000 ? -1 : 0) + (float)((value>>23)&0x0FF) / 256.0f);
+		x = ((value&0x00000400 ? -1 : 0) + (float)((value>>0)&0x3FF)  / 1024.0f);
+		y = ((value&0x00200000 ? -1 : 0) + (float)((value>>11)&0x3FF) / 1024.0f);
+		z = ((value&0x80000000 ? -1 : 0) + (float)((value>>22)&0x1FF) / 512.0f);
 	}
 
 	void Vector3::readNormalForces(File * file, bool big_endian) {
@@ -425,20 +425,20 @@ namespace LibGens {
 		}
 	}
 
-	inline unsigned int packBits360(float value) {
-		if (value < -1.0f) {
-			value = -1.0f;
-		}
-		else if (value > 1.0f) {
-			value = 1.0f;
-		}
+	// taken from meshoptimizer
+	static int quantizeSnorm(float v, int N) {
+		const float scale = float((1 << (N - 1)) - 1);
 
-		unsigned int bits = (unsigned int)(value * 0xFF);
-		return (bits < 0 ? 0x200 + bits : bits) & 0x1FF;
+		float round = (v >= 0 ? 0.5f : -0.5f);
+
+		v = (v >= -1) ? v : -1;
+		v = (v <= +1) ? v : +1;
+
+		return int(v * scale + round) & ((1 << N) - 1);
 	}
 
 	void Vector3::writeNormal360(File *file, bool big_endian) {
-		unsigned int v = packBits360(x) << 2 | packBits360(y) << 13 | packBits360(z) << 23;
+		unsigned int v = quantizeSnorm(x, 11) | quantizeSnorm(y, 11) << 11 | quantizeSnorm(z, 10) << 22;
 
 		if (big_endian) {
 			file->writeInt32BE(&v);
@@ -448,20 +448,8 @@ namespace LibGens {
 		}
 	}
 
-	inline unsigned int packBitsForces(float value) {
-		if (value < -1.0f) {
-			value = -1.0f;
-		}
-		else if (value > 1.0f) {
-			value = 1.0f;
-		}
-
-		unsigned int bits = (unsigned int)(value * 0x1FF);
-		return (bits < 0 ? 0x400 + bits : bits) & 0x3FF;
-	}
-
 	void Vector3::writeNormalForces(File *file, bool big_endian) {
-		unsigned int v = packBitsForces(x) | packBitsForces(y) << 10 | packBitsForces(z) << 20 | (3 << 30);
+		unsigned int v = quantizeSnorm(x, 10) | quantizeSnorm(y, 10) << 10 | quantizeSnorm(z, 10) << 20;
 		
 		if (big_endian) {
 			file->writeInt32BE(&v);
