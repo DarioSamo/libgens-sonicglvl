@@ -288,7 +288,7 @@ namespace LibGens {
 					ObjectElementVector *element_sub = new ObjectElementVector();
 					ObjectElementVector *element_src = (ObjectElementVector *) element;
 					element_sub->setName(element->getName());
-					element_sub->value = element_sub->value;
+					element_sub->value = element_src->value;
 					return element_sub;
 				}
 
