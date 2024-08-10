@@ -100,29 +100,30 @@ void EditorApplication::pasteSelection() {
 }
 
 void EditorApplication::openLevelGUI() {
-	char *filename = (char *) malloc(1024);
+	char* filename = (char*)malloc(1024);
 	strcpy(filename, "");
 
-	OPENFILENAME    ofn;
-    memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize     = sizeof(ofn);
-	ofn.lpstrFilter     = "Level File(#level.ar.00)\0#*.ar.00\0";
-	ofn.nFilterIndex    = 1;
-	ofn.lpstrFile       = filename;
-    ofn.nMaxFile        = 1024;
-    ofn.lpstrTitle      = "Choose the Level Data file";
-    ofn.Flags           = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST |
-                          OFN_LONGNAMES     | OFN_EXPLORER |
-                          OFN_HIDEREADONLY  | OFN_ENABLESIZING;
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFilter = "Level File(#level.ar.00; +#level.ar.00)\0#*.ar.00;+#*.ar.00\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = 1024;
+	ofn.lpstrTitle = "Choose the Level Data file";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST |
+		OFN_LONGNAMES | OFN_EXPLORER |
+		OFN_HIDEREADONLY | OFN_ENABLESIZING;
 
-    if(GetOpenFileName(&ofn)) {
+	if (GetOpenFileName(&ofn)) {
 		chdir(exe_path.c_str());
 		openLevel(ToString(filename));
 	}
 
 	chdir(exe_path.c_str());
-    free(filename);
+	free(filename);
 }
+
 
 
 void EditorApplication::openLostWorldLevelGUI() {

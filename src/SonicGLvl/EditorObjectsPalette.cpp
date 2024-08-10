@@ -180,8 +180,7 @@ void EditorApplication::mouseMovedObjectsPalettePreview(const OIS::MouseEvent &a
 
 void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
 	if (id == OIS::MB_Left) {
-		// Update nodes to be under the mouse
-		mouseMovedObjectsPalettePreview(arg);
+		if (!keyboard->isModifierDown(OIS::Keyboard::Shift)) mouseMovedObjectsPalettePreview(arg);
 		clearSelection();
 
 		HistoryActionWrapper *wrapper = new HistoryActionWrapper();
@@ -223,7 +222,7 @@ void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent 
 
 		updateSelection();
 
-		if (!keyboard->isModifierDown(OIS::Keyboard::Ctrl) && !keyboard->isModifierDown(OIS::Keyboard::Shift)) {
+		if (!keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
 			clearObjectsPalettePreviewGUI();
 		}
 	}
@@ -232,7 +231,6 @@ void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent 
 		clearObjectsPalettePreviewGUI();
 	}
 }
-
 
 void EditorApplication::clearObjectsPalettePreview() {
 	for (list<ObjectNode *>::iterator it=current_palette_nodes.begin(); it!=current_palette_nodes.end(); it++) {
