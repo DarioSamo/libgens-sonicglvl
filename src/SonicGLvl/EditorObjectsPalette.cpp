@@ -180,6 +180,7 @@ void EditorApplication::mouseMovedObjectsPalettePreview(const OIS::MouseEvent &a
 
 void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
 	if (id == OIS::MB_Left) {
+		// Update nodes to be under the mouse if Shift is not pressed
 		if (!keyboard->isModifierDown(OIS::Keyboard::Shift)) mouseMovedObjectsPalettePreview(arg);
 		clearSelection();
 
