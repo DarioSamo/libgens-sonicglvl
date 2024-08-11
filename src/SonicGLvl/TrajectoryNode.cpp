@@ -191,6 +191,44 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	setPosition(new_position);
 }
 
+void TrajectoryNode::getTrajectoryTrickJumper(EditorNode* node, bool second) {
+	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
+	LibGens::Object* object = object_node->getObject();
+
+	std::string speed_key = second ? "SecondSpeed" : "FirstSpeed";
+	std::string pitch_key = second ? "SecondPitch" : "FirstPitch";
+
+	LibGens::ObjectElementFloat* speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(speed_key));
+	LibGens::ObjectElementFloat* pitch_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(pitch_key));
+
+	float speedMult = second ? 1.225f : 1.0f;
+
+	float speed = speed_property->value * speedMult;
+	float pitch = pitch_property->value;
+	float pitch_rad = Ogre::Degree(pitch).valueRadians();
+
+	float vx = speed * Ogre::Math::Cos(pitch_rad);
+	float vy = speed * Ogre::Math::Sin(pitch_rad);
+
+	Ogre::Vector3 direction(0, 0, 1);
+	Ogre::Quaternion obj_rotation = node->getRotation();
+	direction = obj_rotation * direction;
+	direction *= -1;
+
+	float gravity = LIBGENS_MATH_GRAVITY;
+	float time_step = m_total_time;
+
+	Ogre::Vector3 position = node->getPosition();
+	position += direction * (vx * time_step);
+	position.y += (vy * time_step) - (0.5f * gravity * time_step * time_step);
+
+	setPosition(position);
+
+	if (m_total_time >= m_max_time) {
+		resetTime();
+	}
+}
+
 void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 {
 	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
@@ -219,4 +257,14 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
 	setPosition(new_position);
+}
+
+Ogre::Quaternion TrajectoryNode::axisAngle(Ogre::Real angle, Ogre::Vector3 axis)
+{
+	float angleRadians = Ogre::Degree(angle).valueRadians();
+
+	Ogre::Quaternion q;
+	q.FromAngleAxis(Ogre::Radian(angleRadians), axis);
+
+	return q;
 }

@@ -1,4 +1,4 @@
-//=========================================================================
+﻿//=========================================================================
 //	  Copyright (c) 2016 SonicGLvl
 //
 //    This file is part of SonicGLvl, a community-created free level editor 
@@ -22,6 +22,7 @@
 //==================================================================================================================================
 
 #include "EditorApplication.h"
+using namespace Ogre;
 
 EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneManager *axis_scene_manager, Ogre::RenderWindow *window, string camera_name, int zOrder, float left, float top, float width, float height) :
 	moving(false),
@@ -31,8 +32,12 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 	panning_right(false),
 	panning_up(false),
 	panning_down(false),
-	panning_multiplier(0.1),
-	rotation_multiplier(0.1),
+    panning_forward(false),
+	panning_backward(false),
+    shift(false),
+    slow(false),
+	panning_multiplier(0.175),
+	rotation_multiplier(0.085),
 	zooming_multiplier(0.5)
 {
 	if (!scene_manager) {
@@ -45,12 +50,14 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 
 	bg_color = Ogre::ColourValue(0.4, 0.4, 0.4);
 
+    Ogre::Radian fov = Ogre::Radian(Ogre::Degree(62.0f));
 	camera = scene_manager->createCamera(camera_name);
     camera->setPosition(Ogre::Vector3(0,1,0));
     camera->lookAt(Ogre::Vector3(10,1,0));
-    camera->setNearClipDistance(1);
+    camera->setNearClipDistance(0.02);
 	camera->setUseRenderingDistance(true);
 	camera->setFarClipDistance(EDITOR_VIEWPORT_FAR_CLIP_DEFAULT);
+    camera->setFOVy(fov);
 
 	viewport = window->addViewport(camera, zOrder, left, top, width, height);
     viewport->setBackgroundColour(bg_color);
@@ -59,9 +66,10 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 	camera_overlay = axis_scene_manager->createCamera(camera_name);
     camera_overlay->setPosition(Ogre::Vector3(0,1,0));
     camera_overlay->lookAt(Ogre::Vector3(10,1,0));
-    camera_overlay->setNearClipDistance(1);
+    camera_overlay->setNearClipDistance(0.02);
 	camera_overlay->setUseRenderingDistance(true);
 	camera_overlay->setFarClipDistance(EDITOR_VIEWPORT_FAR_CLIP_DEFAULT);
+    camera_overlay->setFOVy(fov);
 	
 	viewport_overlay = window->addViewport(camera_overlay, zOrder+1, left, top, width, height);
     viewport_overlay->setBackgroundColour(Ogre::ColourValue(0,0,0));
@@ -87,63 +95,69 @@ void EditorViewport::resize(float left, float top, float width, float height) {
 
 
 
-bool EditorViewport::keyPressed(const OIS::KeyEvent &arg) {
-	if(arg.key == OIS::KC_LMENU) {
-		rotating = true;
-	}
-
-	if(arg.key == OIS::KC_LCONTROL) {
-		zooming = true;
-	}
-
-	if(arg.key == OIS::KC_LEFT) {
-		panning_left = true;
-	}
-
-	if(arg.key == OIS::KC_RIGHT) {
-		panning_right = true;
-	}
-
-	if(arg.key == OIS::KC_UP) {
-		panning_up = true;
-	}
-
-	if(arg.key == OIS::KC_DOWN) {
-		panning_down = true;
-	}
-
+bool EditorViewport::keyPressed(const OIS::KeyEvent& arg) {
+    switch (arg.key) {
+        case OIS::KC_W:
+            panning_forward = true;
+            break;
+        case OIS::KC_S:
+            panning_backward = true;
+            break;
+        case OIS::KC_A:
+            panning_left = true;
+            break;
+        case OIS::KC_D:
+            panning_right = true;
+            break;
+        case OIS::KC_Q:
+            panning_up = true;
+            break;
+        case OIS::KC_E:
+            panning_down = true;
+            break;
+        case OIS::KC_LSHIFT:
+            shift = true;
+			break;
+        case OIS::KC_LCONTROL:
+            slow = true;
+            break;
+        default:
+            break;
+    }
     return true;
 }
 
-
-bool EditorViewport::keyReleased(const OIS::KeyEvent &arg) {
-	if(arg.key == OIS::KC_LMENU) {
-		rotating = false;
-	}
-
-	if(arg.key == OIS::KC_LCONTROL) {
-		zooming = false;
-	}
-
-	if(arg.key == OIS::KC_LEFT) {
-		panning_left = false;
-	}
-
-	if(arg.key == OIS::KC_RIGHT) {
-		panning_right = false;
-	}
-
-	if(arg.key == OIS::KC_UP) {
-		panning_up = false;
-	}
-
-	if(arg.key == OIS::KC_DOWN) {
-		panning_down = false;
-	}
-
+bool EditorViewport::keyReleased(const OIS::KeyEvent& arg) {
+    switch (arg.key) {
+        case OIS::KC_W:
+            panning_forward = false;
+            break;
+        case OIS::KC_S:
+            panning_backward = false;
+            break;
+        case OIS::KC_A:
+            panning_left = false;
+            break;
+        case OIS::KC_D:
+            panning_right = false;
+            break;
+        case OIS::KC_Q:
+            panning_up = false;
+            break;
+        case OIS::KC_E:
+            panning_down = false;
+            break;
+		case OIS::KC_LSHIFT:
+			shift = false;
+			break;
+        case OIS::KC_LCONTROL:
+            slow = false;
+            break;
+        default:
+            break;
+    }
     return true;
 }
-
 
 void EditorViewport::getEntityInformation(Ogre::Entity *entity, size_t &vertex_count, Ogre::Vector3* &vertices, size_t &index_count, 
 										  unsigned long* &indices, const Ogre::Vector3 &position, const Ogre::Quaternion &orient, const Ogre::Vector3 &scale) {
@@ -328,69 +342,67 @@ Ogre::Entity *EditorViewport::raycastEntity(float raycast_x, float raycast_y, Og
 
 
 void EditorViewport::update() {
-	Ogre::Vector3 camera_panning_movement(0,0,0);
+    if (!rotating) return;
 
-	if (panning_left)  camera_panning_movement.x = -panning_multiplier;
-	if (panning_right) camera_panning_movement.x = panning_multiplier;
-	if (panning_down)  camera_panning_movement.y = -panning_multiplier;
-	if (panning_up)    camera_panning_movement.y = panning_multiplier;
+    Ogre::Vector3 camera_movement(0, 0, 0);
+    float mult = shift ? 5.0f : slow && !shift ? 0.3f : 1.0f;
 
-	if (panning_left || panning_right || panning_down || panning_up) {
-		camera->moveRelative(camera_panning_movement);
-		camera_overlay->moveRelative(camera_panning_movement);
-	}
+    if (panning_forward) camera_movement += camera->getDirection() * panning_multiplier;
+    if (panning_backward) camera_movement -= camera->getDirection() * panning_multiplier;
+    if (panning_left) camera_movement -= camera->getRight() * panning_multiplier;
+    if (panning_right) camera_movement += camera->getRight() * panning_multiplier;
+    if (panning_up) camera_movement -= camera->getUp() * panning_multiplier;
+    if (panning_down) camera_movement += camera->getUp() * panning_multiplier;
+
+    if (!camera_movement.isZeroLength()) {
+        camera->move(camera_movement * mult);
+        camera_overlay->move(camera_movement * mult);
+    }
 }
 
+bool EditorViewport::mouseMoved(const OIS::MouseEvent& arg) {
+    float mouse_movement_x = arg.state.X.rel;
+    float mouse_movement_y = arg.state.Y.rel;
 
-bool EditorViewport::mouseMoved(const OIS::MouseEvent &arg) {
-	if (moving) {
-		float mouse_movement_x=arg.state.X.rel;
-		float mouse_movement_y=arg.state.Y.rel;
+    if (rotating) {
+        camera->yaw(Ogre::Degree(-mouse_movement_x * rotation_multiplier));
+        camera->pitch(Ogre::Degree(-mouse_movement_y * rotation_multiplier));
 
-		// Movement Priority
-		// Zooming > Rotation > Panning
+        camera_overlay->yaw(Ogre::Degree(-mouse_movement_x * rotation_multiplier));
+        camera_overlay->pitch(Ogre::Degree(-mouse_movement_y * rotation_multiplier));
+    }
+    else if (moving) {
+        camera->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier, mouse_movement_y * panning_multiplier, 0));
+        camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier, mouse_movement_y * panning_multiplier, 0));
+    }
 
-		if (zooming) {
-			camera->moveRelative(Ogre::Vector3(0, 0, mouse_movement_y*zooming_multiplier));
-			camera_overlay->moveRelative(Ogre::Vector3(0, 0, mouse_movement_y*zooming_multiplier));
-		}
-		else if (rotating) {
-			camera->yaw(Ogre::Degree(-mouse_movement_x*rotation_multiplier));
-			camera->pitch(Ogre::Degree(-mouse_movement_y*rotation_multiplier));
+    if (arg.state.Z.rel != 0) {
+        float zoom_amount = arg.state.Z.rel * zooming_multiplier * 0.25f;
+        camera->move(camera->getDirection() * zoom_amount);
+        camera_overlay->move(camera->getDirection() * zoom_amount);
+    }
 
-			camera_overlay->yaw(Ogre::Degree(-mouse_movement_x*rotation_multiplier));
-			camera_overlay->pitch(Ogre::Degree(-mouse_movement_y*rotation_multiplier));
-		}
-		else {
-			camera->moveRelative(Ogre::Vector3(-mouse_movement_x*panning_multiplier, mouse_movement_y*panning_multiplier, 0));
-			camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x*panning_multiplier, mouse_movement_y*panning_multiplier, 0));
-		}
-	}
+    float mouse_x = arg.state.X.abs / float(arg.state.width);
+    float mouse_y = arg.state.Y.abs / float(arg.state.height);
 
-	// Raycast to 3D overlay
-	float mouse_x=arg.state.X.abs/float(arg.state.width);
-	float mouse_y=arg.state.Y.abs/float(arg.state.height);
+    convertMouseToLocalScreen(mouse_x, mouse_y);
 
-	convertMouseToLocalScreen(mouse_x, mouse_y);
+    current_entity = raycast(mouse_x, mouse_y, ray_scene_query_overlay, NULL, EDITOR_NODE_AXIS);
 
-	current_entity = raycast(mouse_x, mouse_y, ray_scene_query_overlay, NULL, EDITOR_NODE_AXIS);
-
-	// Raycast to 3D scene if it didn't hit anything in the overlay
-	if (!current_entity) {
-		current_entity = raycast(mouse_x, mouse_y, ray_scene_query, NULL, query_flags);
-	}
+    if (!current_entity) {
+        current_entity = raycast(mouse_x, mouse_y, ray_scene_query, NULL, query_flags);
+    }
     return true;
 }
 
-
 bool EditorViewport::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
-	if (id == OIS::MB_Middle) moving = true;
+	if (id == OIS::MB_Right) rotating = true;
     return true;
 }
 
 
 bool EditorViewport::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
-	if (id == OIS::MB_Middle) moving = false;
+	if (id == OIS::MB_Right) rotating = false;
     return true;
 }
 

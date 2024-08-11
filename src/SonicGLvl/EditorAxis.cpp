@@ -345,7 +345,7 @@ bool EditorAxis::mousePressed(EditorViewport *viewport, const OIS::MouseEvent &a
 		holding = true;
 		return true;
 	}
-	else if (id == OIS::MB_Right && !holding) {
+	else if (id == OIS::MB_Middle && !holding) {
 		mode = !mode;
 		return false;
 	}

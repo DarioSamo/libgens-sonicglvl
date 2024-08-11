@@ -11,7 +11,8 @@ enum TrajectoryMode
 	JUMP_POLE		= 4,
 	JUMP_PANEL		= 8,
 	DASH_RING		= 16,
-	SELECT_CANNON	= 32
+	SELECT_CANNON	= 32,
+	TRICK_JUMPER	= 64
 };
 
 class TrajectoryNode : public EditorNode
@@ -53,5 +54,7 @@ public:
 	float getTrajectoryGravity(float first_speed, float keep_distance, float y_direction);
 	void getTrajectorySpring(EditorNode* node);
 	void getTrajectoryJumpBoard(EditorNode* node, bool boost);
+	void getTrajectoryTrickJumper(EditorNode* node, bool second);
 	void getTrajectoryDashRing(EditorNode* node);
+	Ogre::Quaternion axisAngle(Ogre::Real angle, Ogre::Vector3 axis);
 };

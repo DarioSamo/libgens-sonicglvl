@@ -37,11 +37,15 @@ class EditorViewport {
 		bool moving;
 		bool rotating;
 		bool zooming;
+		bool shift;
+		bool slow;
 
 		bool panning_left;
 		bool panning_right;
 		bool panning_up;
 		bool panning_down;
+		bool panning_forward;
+		bool panning_backward;
 
 		float panning_multiplier;
 		float rotation_multiplier;

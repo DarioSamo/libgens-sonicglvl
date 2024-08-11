@@ -809,107 +809,110 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			updateSelection();
 		}
 
-		if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
-			if(arg.key == OIS::KC_C) {
-				copySelection();
-			}
-
-			if(arg.key == OIS::KC_V) {
-				clearSelection();
-				pasteSelection();
-			}
-
-			if(arg.key == OIS::KC_P) {
-				if (ghost_node) ghost_node->setPlay(true);
-			}
-
-			if(arg.key == OIS::KC_R) {
-				if (ghost_node) {
-					ghost_node->setPlay(false);
-					ghost_node->setTime(0);
+		if (!mouse->getMouseState().buttonDown(OIS::MB_Right)) {
+			if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
+				if (arg.key == OIS::KC_C) {
+					copySelection();
 				}
-			}
 
-			if(arg.key == OIS::KC_F) {
-				if (!hFindObjectDlg)
-					openFindGUI();
-			}
+				if (arg.key == OIS::KC_V) {
+					clearSelection();
+					pasteSelection();
+				}
 
-			if(arg.key == OIS::KC_D) {
-				clearSelection();
-				updateSelection();
-			}
+				if (arg.key == OIS::KC_P) {
+					if (ghost_node) ghost_node->setPlay(true);
+				}
 
-			if(arg.key == OIS::KC_Z) {
-				undoHistory();
-				updateSelection();
-			}
+				if (arg.key == OIS::KC_R) {
+					if (ghost_node) {
+						ghost_node->setPlay(false);
+						ghost_node->setTime(0);
+					}
+				}
 
-			if(arg.key == OIS::KC_Y) {
-				redoHistory();
-				updateSelection();
-			}
+				if (arg.key == OIS::KC_F) {
+					if (!hFindObjectDlg)
+						openFindGUI();
+				}
 
-			if(arg.key == OIS::KC_E) {
-				toggleWorldTransform();
-				updateSelection();
-			}
-
-			if(arg.key == OIS::KC_I) {
-				//SHOW_MSG(ToString(farPlane).c_str());
-			}
-
-			if(arg.key == OIS::KC_A) {
-				//saveXNAnimation();
-				selectAll();
-			}
-
-			if(arg.key == OIS::KC_T) {
-				clearSelection();
-				editor_mode = (editor_mode == EDITOR_NODE_QUERY_TERRAIN ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_TERRAIN);
-			}
-
-			if(arg.key == OIS::KC_I) {
-				showSelectionNames();
-			}
-
-			if(arg.key == OIS::KC_G) {
-				setupGhost();
-				clearSelection();
-				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
-			}
-
-			if (arg.key == OIS::KC_O) {
-				editor_application->openLevelGUI();
-			}
-
-			if (arg.key == OIS::KC_S)
-			{
-				editor_application->saveLevelDataGUI();
-			}
-			if (arg.key == OIS::KC_R)
-			{
-				if (editor_mode == EDITOR_NODE_OBJECT || EDITOR_NODE_QUERY_GHOST)
-				{
-					toggleRotationSnap();
+				if (arg.key == OIS::KC_D) {
+					clearSelection();
 					updateSelection();
 				}
-			}
-		}
-		else if (keyboard->isModifierDown(OIS::Keyboard::Alt))
-		{
-			if (arg.key == OIS::KC_F) {
-				if (camera_manager) {
-					camera_manager->setForceCamera(!camera_manager->getForceCamera());
+
+				if (arg.key == OIS::KC_Z) {
+					undoHistory();
+					updateSelection();
+				}
+
+				if (arg.key == OIS::KC_Y) {
+					redoHistory();
+					updateSelection();
+				}
+
+				if (arg.key == OIS::KC_E) {
+					toggleWorldTransform();
+					updateSelection();
+				}
+
+				if (arg.key == OIS::KC_I) {
+					//SHOW_MSG(ToString(farPlane).c_str());
+				}
+
+				if (arg.key == OIS::KC_A) {
+					//saveXNAnimation();
+
+					selectAll();
+				}
+
+				if (arg.key == OIS::KC_T) {
+					clearSelection();
+					editor_mode = (editor_mode == EDITOR_NODE_QUERY_TERRAIN ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_TERRAIN);
+				}
+
+				if (arg.key == OIS::KC_I) {
+					showSelectionNames();
+				}
+
+				if (arg.key == OIS::KC_G) {
+					setupGhost();
+					clearSelection();
+					editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
+				}
+
+				if (arg.key == OIS::KC_O) {
+					editor_application->openLevelGUI();
+				}
+
+				if (arg.key == OIS::KC_S)
+				{
+					editor_application->saveLevelDataGUI();
+				}
+				if (arg.key == OIS::KC_R)
+				{
+					if (editor_mode == EDITOR_NODE_OBJECT || EDITOR_NODE_QUERY_GHOST)
+					{
+						toggleRotationSnap();
+						updateSelection();
+					}
 				}
 			}
-
-			if (arg.key == OIS::KC_G) 
+			else if (keyboard->isModifierDown(OIS::Keyboard::Alt))
 			{
-				if (editor_mode == EDITOR_NODE_QUERY_GHOST)
+				if (arg.key == OIS::KC_F) {
+					if (camera_manager) {
+						camera_manager->setForceCamera(!camera_manager->getForceCamera());
+					}
+				}
+
+				if (arg.key == OIS::KC_G)
 				{
-					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
-					updateSelection();
+					if (editor_mode == EDITOR_NODE_QUERY_GHOST)
+					{
+						ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
+						updateSelection();
+					}
 				}
 			}
 		}
@@ -1462,17 +1465,19 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 
 	TrajectoryMode mode = NONE;
 
-	if ((object_name ==  "Spring") || (object_name == "AirSpring") || (object_name == "SpringFake") ||
+	if ((object_name == "Spring") || (object_name == "AirSpring") || (object_name == "SpringFake") ||
 		(object_name == "SpringClassic") || (object_name == "SpringClassicYellow"))
 		mode = SPRING;
 	else if (object_name == "WideSpring")
 		mode = WIDE_SPRING;
-	else if (object_name ==  "JumpPole")
+	else if (object_name == "JumpPole")
 		mode = JUMP_POLE;
 	else if ((object_name == "JumpBoard") || (object_name == "JumpBoard3D") || (object_name == "AdlibTrickJump"))
 		mode = JUMP_PANEL;
 	else if ((object_name == "DashRing") || (object_name == "RainbowRing"))
 		mode = DASH_RING;
+	else if ((object_name == "TrickJumper"))
+		mode = TRICK_JUMPER;
 
 	return mode;
 }
@@ -1485,7 +1490,7 @@ void EditorApplication::addTrajectory(TrajectoryMode mode)
 	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
 	
 	// JumpBoards need two nodes. One for normal, and the other for boost
-	if (mode == JUMP_PANEL)
+	if (mode == JUMP_PANEL || mode == TRICK_JUMPER)
 		trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
 }
 
@@ -1516,6 +1521,11 @@ void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
 			case JUMP_PANEL:
 				trajectory_preview_nodes[count++]->getTrajectoryJumpBoard(node, false);
 				trajectory_preview_nodes[count]->getTrajectoryJumpBoard(node, true);
+				break;
+
+			case TRICK_JUMPER:
+				trajectory_preview_nodes[count++]->getTrajectoryTrickJumper(node, false);
+				trajectory_preview_nodes[count]->getTrajectoryTrickJumper(node, true);
 				break;
 
 			case DASH_RING:
