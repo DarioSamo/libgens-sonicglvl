@@ -8,9 +8,9 @@ Current Development Roadmap: http://i.imgur.com/MiHNVrZ.jpg
 All information regarding this repository should be found here: http://forums.sonicretro.org/index.php?showtopic=27333
 
 ## New Camera controls
-Hold down the right mouse button to rotate the camera\n
-WASD while holding down the right mouse button to move\n
-Mouse wheel to zoom without holding down the right mouse button\n
-Mouse wheel to increase/decrease global camera/zoom speed while holding down the right mouse button\n
-Q/E to move up and down\n
-F with the selected object to focus on it\n
+Hold down the right mouse button to rotate the camera<br/>
+WASD while holding down the right mouse button to move<br/>
+Mouse wheel to zoom without holding down the right mouse button<br/>
+Mouse wheel to increase/decrease global camera/zoom speed while holding down the right mouse button<br/>
+Q/E to move up and down<br/>
+F with the selected object to focus on it<br/>
