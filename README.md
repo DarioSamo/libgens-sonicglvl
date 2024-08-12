@@ -15,3 +15,4 @@ Mouse wheel to increase/decrease global camera/zoom speed while holding down the
 Q/E to move up and down<br/>
 F with the selected object to focus on it<br/>
 Press the middle mouse button to switch between *Positioning* and *Rotating* the selected object<br/>
+![SonicGLvl_3yVsM787YQ](https://github.com/user-attachments/assets/2bec9968-35ec-4a11-b005-52f98d27836b)
