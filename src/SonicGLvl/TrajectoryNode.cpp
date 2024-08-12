@@ -201,7 +201,7 @@ void TrajectoryNode::getTrajectoryTrickJumper(EditorNode* node, bool second) {
 	LibGens::ObjectElementFloat* speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(speed_key));
 	LibGens::ObjectElementFloat* pitch_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(pitch_key));
 
-	float speedMult = second ? 1.225f : 1.0f;
+	float speedMult = second ? 1.2f : 1.0f;
 
 	float speed = speed_property->value * speedMult;
 	float pitch = pitch_property->value;
@@ -257,14 +257,4 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
 	setPosition(new_position);
-}
-
-Ogre::Quaternion TrajectoryNode::axisAngle(Ogre::Real angle, Ogre::Vector3 axis)
-{
-	float angleRadians = Ogre::Degree(angle).valueRadians();
-
-	Ogre::Quaternion q;
-	q.FromAngleAxis(Ogre::Radian(angleRadians), axis);
-
-	return q;
 }

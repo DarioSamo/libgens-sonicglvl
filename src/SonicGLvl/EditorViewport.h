@@ -50,6 +50,7 @@ class EditorViewport {
 		float panning_multiplier;
 		float rotation_multiplier;
 		float zooming_multiplier;
+		float global_multiplier;
 		Ogre::uint32 query_flags;
 	public:
 		EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneManager *axis_scene_manager, Ogre::RenderWindow *window, string camera_name, int zOrder=0, float left=0.0f, float top=0.0f, float width=1.0f, float height=1.0f);

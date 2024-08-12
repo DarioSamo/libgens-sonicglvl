@@ -56,5 +56,4 @@ public:
 	void getTrajectoryJumpBoard(EditorNode* node, bool boost);
 	void getTrajectoryTrickJumper(EditorNode* node, bool second);
 	void getTrajectoryDashRing(EditorNode* node);
-	Ogre::Quaternion axisAngle(Ogre::Real angle, Ogre::Vector3 axis);
 };

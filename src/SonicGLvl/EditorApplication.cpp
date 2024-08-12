@@ -810,6 +810,12 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 		}
 
 		if (!mouse->getMouseState().buttonDown(OIS::MB_Right)) {
+
+			if (arg.key == OIS::KC_F) {
+				auto* selectedNode = getSelectedNodes().front();
+				viewport->focusOnPoint(selectedNode->getPosition(), 12.0f, viewport->getCamera()->getDirection());
+			}
+
 			if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
 				if (arg.key == OIS::KC_C) {
 					copySelection();

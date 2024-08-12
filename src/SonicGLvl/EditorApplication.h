@@ -176,7 +176,7 @@ class EditorApplication : public BaseApplication {
 		float farPlaneChange;
 
 		// Viewport
-		EditorViewport* viewport;
+		EditorViewport *viewport;
 		EditorAxis *axis;
 
 		// Node
@@ -359,7 +359,6 @@ class EditorApplication : public BaseApplication {
 		void addTrajectory(TrajectoryMode mode);
 		void removeAllTrajectoryNodes();
 		bool isUpdatePosRot();
-
 
 		void openFindGUI();
 		void closeFindGUI();

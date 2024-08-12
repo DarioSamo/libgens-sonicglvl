@@ -38,7 +38,8 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
     slow(false),
 	panning_multiplier(0.175),
 	rotation_multiplier(0.085),
-	zooming_multiplier(0.5)
+	zooming_multiplier(0.5),
+    global_multiplier(1.0)
 {
 	if (!scene_manager) {
 		return;
@@ -50,7 +51,7 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
 
 	bg_color = Ogre::ColourValue(0.4, 0.4, 0.4);
 
-    Ogre::Radian fov = Ogre::Radian(Ogre::Degree(62.0f));
+    Ogre::Radian fov = Ogre::Radian(Ogre::Degree(70.0f));
 	camera = scene_manager->createCamera(camera_name);
     camera->setPosition(Ogre::Vector3(0,1,0));
     camera->lookAt(Ogre::Vector3(10,1,0));
@@ -117,7 +118,7 @@ bool EditorViewport::keyPressed(const OIS::KeyEvent& arg) {
             break;
         case OIS::KC_LSHIFT:
             shift = true;
-			break;
+	        break;
         case OIS::KC_LCONTROL:
             slow = true;
             break;
@@ -147,9 +148,9 @@ bool EditorViewport::keyReleased(const OIS::KeyEvent& arg) {
         case OIS::KC_E:
             panning_down = false;
             break;
-		case OIS::KC_LSHIFT:
-			shift = false;
-			break;
+        case OIS::KC_LSHIFT:
+	        shift = false;
+	        break;
         case OIS::KC_LCONTROL:
             slow = false;
             break;
@@ -345,7 +346,7 @@ void EditorViewport::update() {
     if (!rotating) return;
 
     Ogre::Vector3 camera_movement(0, 0, 0);
-    float mult = shift ? 5.0f : slow && !shift ? 0.3f : 1.0f;
+    float mult = (shift ? 5.0f : slow && !shift ? 0.3f : 1.0f) * global_multiplier;
 
     if (panning_forward) camera_movement += camera->getDirection() * panning_multiplier;
     if (panning_backward) camera_movement -= camera->getDirection() * panning_multiplier;
@@ -376,11 +377,15 @@ bool EditorViewport::mouseMoved(const OIS::MouseEvent& arg) {
         camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier, mouse_movement_y * panning_multiplier, 0));
     }
 
-    if (arg.state.Z.rel != 0) {
-        float zoom_amount = arg.state.Z.rel * zooming_multiplier * 0.25f;
-        camera->move(camera->getDirection() * zoom_amount);
-        camera_overlay->move(camera->getDirection() * zoom_amount);
+    if (arg.state.Z.rel != 0 && !rotating) {
+        float zoom_amount = arg.state.Z.rel * zooming_multiplier * 0.45f;
+        camera->move(camera->getDirection() * zoom_amount * global_multiplier * 0.2f);
+        camera_overlay->move(camera->getDirection() * zoom_amount * global_multiplier * 0.1f);
     }
+    else if (arg.state.Z.rel != 0 && rotating) {
+        global_multiplier += arg.state.Z.rel * 0.0015f;
+		global_multiplier = Ogre::Math::Clamp(global_multiplier, 0.2f, 5.0f);
+	}
 
     float mouse_x = arg.state.X.abs / float(arg.state.width);
     float mouse_y = arg.state.Y.abs / float(arg.state.height);
@@ -396,7 +401,7 @@ bool EditorViewport::mouseMoved(const OIS::MouseEvent& arg) {
 }
 
 bool EditorViewport::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
-	if (id == OIS::MB_Right) rotating = true;
+    if (id == OIS::MB_Right) rotating = true;
     return true;
 }
 
@@ -405,7 +410,6 @@ bool EditorViewport::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonI
 	if (id == OIS::MB_Right) rotating = false;
     return true;
 }
-
 
 void EditorViewport::focusOnPoint(Ogre::Vector3 point, Ogre::Real distance, Ogre::Vector3 direction) {
 	direction.normalise();
