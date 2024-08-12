@@ -14,3 +14,4 @@ Mouse wheel to zoom without holding down the right mouse button<br/>
 Mouse wheel to increase/decrease global camera/zoom speed while holding down the right mouse button<br/>
 Q/E to move up and down<br/>
 F with the selected object to focus on it<br/>
+Press the middle mouse button to switch between *Positioning* and *Rotating* the selected object<br/>
