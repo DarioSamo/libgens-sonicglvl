@@ -20,6 +20,7 @@ Press the middle mouse button to switch between *Positioning* and *Rotating* the
 
 ## New features
 Possibility to open and save append level archives<br/>
+<br/>
 Ability to insert object(s) from copied XML data without losing its position (Shift + LMB)<br/>
 <br/>
 ![Desktop_2024 08 11_-_20 47 46 11](https://github.com/user-attachments/assets/9a91cc79-4809-4463-8c40-d828f1b35911)
