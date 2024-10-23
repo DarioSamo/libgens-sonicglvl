@@ -55,7 +55,7 @@ namespace LibGens {
 		int slot_count = file->getRootNodeType() >= 5 ? LIBGENS_MODEL_SUBMESH_SLOTS : LIBGENS_MODEL_SUBMESH_ROOT_SLOTS;
 
 		for (int slot=0; slot<slot_count; slot++) {
-			file->goToAddress(header_address + slot*8);
+			file->goToAddress(header_address + slot * file->getAddressSize() * 2);
 
 			// Submesh Table
 			unsigned int submesh_count=0;
@@ -101,7 +101,7 @@ namespace LibGens {
 				file->readInt32BEA(&address);
 				for (size_t i=0; i<submesh_count; i++) {
 					size_t submesh_address=0;
-					file->goToAddress(address + i*4);
+					file->goToAddress(address + i * file->getAddressSize());
 					file->readInt32BEA(&submesh_address);
 					file->goToAddress(submesh_address);
 
@@ -114,7 +114,7 @@ namespace LibGens {
 			else {
 				for (size_t i=0; i<submesh_count; i++) {
 					size_t submesh_address=0;
-					file->goToAddress(submesh_table_address + i*4);
+					file->goToAddress(submesh_table_address + i * file->getAddressSize());
 					file->readInt32BEA(&submesh_address);
 					file->goToAddress(submesh_address);
 

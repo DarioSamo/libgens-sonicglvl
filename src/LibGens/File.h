@@ -30,6 +30,7 @@
 
 #define LIBGENS_FILE_HEADER_ROOT_TYPE_ADDRESS           4
 #define LIBGENS_FILE_HEADER_ROOT_NODE_ADDRESS           12
+#define LIBGENS_FILE_HEADER_OFFSET_TABLE_ADDRESS        16
 
 #define LIBGENS_FILE_HEADER_ROOT_ADDRESS_DEFAULT        24
 #define LIBGENS_FILE_HEADER_ROOT_ADDRESS_LOST_WORLD     16
@@ -61,6 +62,7 @@ namespace LibGens {
 			unsigned char *comparison_bytes_max;
 			size_t comparison_size;
 			bool relative_address_mode;
+			bool address_64_bit_mode;
 		public:
 			File(string filename, string mode);
 			void prepareHeader(int root_type);
@@ -133,6 +135,9 @@ namespace LibGens {
 			int getAddressReadCount();
 			int getRootNodeType();
 			FILE *getPointer();
+
+			bool get64BitAddressMode() const;
+			int getAddressSize() const;
 
 			// Reverse-Engineering functions, just to track down what some values could be by printing their minimum and maximum values
 			void createComparison(size_t sz);

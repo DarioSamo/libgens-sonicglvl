@@ -92,7 +92,7 @@ namespace LibGens {
 
         morphs.reserve(morph_count);
         for (size_t i = 0; i < morph_count; i++) {
-            file->goToAddress(morph_names_address + i * 4);
+            file->goToAddress(morph_names_address + i * file->getAddressSize());
             file->readInt32BEA(&address);
 
             file->goToAddress(address);
@@ -103,7 +103,7 @@ namespace LibGens {
         }
 
         for (size_t i = 0; i < morph_count; i++) {
-            file->goToAddress(morphs_address + i * 4);
+            file->goToAddress(morphs_address + i * file->getAddressSize());
             file->readInt32BEA(&address);
 
             file->goToAddress(address);

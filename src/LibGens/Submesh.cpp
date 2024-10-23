@@ -174,7 +174,7 @@ namespace LibGens {
 
 		// Material Texture Units
 		for (size_t i=0; i<texture_units_size; i++) {
-			file->goToAddress(texture_units_address+i*4);
+			file->goToAddress(texture_units_address + i * file->getAddressSize());
 			size_t texture_unit_address=0;
 			file->readInt32BEA(&texture_unit_address);
 			file->goToAddress(texture_unit_address);

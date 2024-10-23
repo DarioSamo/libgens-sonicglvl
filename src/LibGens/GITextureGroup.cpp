@@ -809,7 +809,7 @@ namespace LibGens {
 		instance_radius.reserve(name_total);
 		for (size_t i=0; i<name_total; i++) {
 			// Names
-			file->goToAddress(name_table_address + i*4);
+			file->goToAddress(name_table_address + i * file->getAddressSize());
 			size_t address=0;
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
@@ -820,7 +820,7 @@ namespace LibGens {
 
 
 			// Spheres
-			file->goToAddress(sphere_table_address + i*4);
+			file->goToAddress(sphere_table_address + i * file->getAddressSize());
 			address=0;
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
@@ -837,7 +837,7 @@ namespace LibGens {
 
 		groups.reserve(gia_total);
 		for (size_t i=0; i<gia_total; i++) {
-			file->goToAddress(gia_table_address + i*4);
+			file->goToAddress(gia_table_address + i * file->getAddressSize());
 			size_t address=0;
 			file->readInt32BEA(&address);
 			file->goToAddress(address);

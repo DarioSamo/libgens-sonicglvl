@@ -64,7 +64,7 @@ namespace LibGens {
 		size_t header_address=file->getCurrentAddress();
 
 		for (size_t slot=0; slot<5; slot++) {
-			file->goToAddress(header_address + slot*8);
+			file->goToAddress(header_address + slot * file->getAddressSize() * 2);
 
 			unsigned int parameters_count=0;
 			size_t parameters_table_address=0;
@@ -74,7 +74,7 @@ namespace LibGens {
 			printf("Reading parameter list #%d with %d elements.\n", slot, parameters_count);
 			
 			for (size_t i=0; i<parameters_count; i++) {
-				file->goToAddress(parameters_table_address + i*4);
+				file->goToAddress(parameters_table_address + i * file->getAddressSize());
 
 				size_t address=0;
 				file->readInt32BEA(&address);
@@ -131,7 +131,7 @@ namespace LibGens {
 		printf("Shader that uses the %s file and has %d parameter files.\n", shader_filename.c_str(), shader_parameter_count);
 
 		for (size_t i=0; i<shader_parameter_count; i++) {
-			file->goToAddress(shader_parameter_table_address + i*4);
+			file->goToAddress(shader_parameter_table_address + i * file->getAddressSize());
 
 			size_t address=0;
 			file->readInt32BEA(&address);
@@ -191,7 +191,7 @@ namespace LibGens {
 		printf("Pixel Shader Set %s (Mode: %s, Flag: %d) with %d Vertex Shader sets.\n", pixel_shader_name.c_str(), rendering_mode.c_str(), shader_flag, vertex_shader_sets_count);
 
 		for (size_t i=0; i<vertex_shader_sets_count; i++) {
-			file->goToAddress(vertex_shader_set_table_address + i*4);
+			file->goToAddress(vertex_shader_set_table_address + i * file->getAddressSize());
 
 			size_t address=0;
 			file->readInt32BEA(&address);
@@ -253,7 +253,7 @@ namespace LibGens {
 		printf("Found %d Pixel Shader Sets in shader list.\n", shader_set_count);
 
 		for (size_t i=0; i<shader_set_count; i++) {
-			file->goToAddress(shader_set_table_address + i*4);
+			file->goToAddress(shader_set_table_address + i * file->getAddressSize());
 
 			size_t address=0;
 			file->readInt32BEA(&address);

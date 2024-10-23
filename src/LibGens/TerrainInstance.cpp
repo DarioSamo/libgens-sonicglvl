@@ -87,7 +87,7 @@ namespace LibGens {
 
 		light_indices.reserve(light_indices_total);
 		for (size_t i=0; i<light_indices_total; i++) {
-			file->goToAddress(light_indices_address + i*4);
+			file->goToAddress(light_indices_address + i * file->getAddressSize());
 			unsigned int identifier=0;
 			file->readInt32BE(&identifier);
 			light_indices.push_back(identifier);
@@ -154,7 +154,7 @@ namespace LibGens {
 
 		elements.reserve(element_count);
 		for (size_t i=0; i<element_count; i++) {
-			file->goToAddress(element_table_address + i*4);
+			file->goToAddress(element_table_address + i * file->getAddressSize());
 
 			size_t element_address=0;
 			file->readInt32BEA(&element_address);
@@ -208,7 +208,7 @@ namespace LibGens {
 
 		size_t header_address=file->getCurrentAddress();
 		for (size_t slot=0; slot<LIBGENS_MODEL_SUBMESH_ROOT_SLOTS; slot++) {
-			file->goToAddress(header_address + slot*8);
+			file->goToAddress(header_address + slot * file->getAddressSize() * 2);
 
 			unsigned int submesh_count=0;
 			size_t submesh_table_address=0;
@@ -217,7 +217,7 @@ namespace LibGens {
 
 			submeshes[slot].reserve(submesh_count);
 			for (size_t i=0; i<submesh_count; i++) {
-				file->goToAddress(submesh_table_address + i*4);
+				file->goToAddress(submesh_table_address + i * file->getAddressSize());
 
 				size_t submesh_address=0;
 				file->readInt32BEA(&submesh_address);
@@ -326,7 +326,7 @@ namespace LibGens {
 		if (file->getRootNodeType() == LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS) {
 			meshes.reserve(instance_mesh_count);
 			for (size_t i=0; i<instance_mesh_count; i++) {
-				file->goToAddress(instance_mesh_address + i*4);
+				file->goToAddress(instance_mesh_address + i * file->getAddressSize());
 
 				size_t mesh_address=0;
 				file->readInt32BEA(&mesh_address);

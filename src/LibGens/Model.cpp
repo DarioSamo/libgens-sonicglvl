@@ -95,7 +95,7 @@ namespace LibGens {
 			meshes.reserve(mesh_count);
 			for (size_t i = 0; i < mesh_count; i++) {
 				size_t mesh_address = 0;
-				file->goToAddress(mesh_table_address + i * 4);
+				file->goToAddress(mesh_table_address + i * file->getAddressSize());
 				file->readInt32BEA(&mesh_address);
 				file->goToAddress(mesh_address);
 
@@ -105,7 +105,7 @@ namespace LibGens {
 				meshes.push_back(mesh);
 			}
 
-			file->goToAddress(header_address + 8);
+			file->goToAddress(header_address + 2 * file->getAddressSize());
 		}
 		else {
 			Mesh* mesh = new Mesh();
@@ -113,7 +113,7 @@ namespace LibGens {
 			mesh->buildAABB();
 			meshes.push_back(mesh);
 
-			file->goToAddress(header_address + 24);
+			file->goToAddress(header_address + 6 * file->getAddressSize());
 		}
 
 		if (!terrain_mode) {
@@ -162,7 +162,7 @@ namespace LibGens {
 
 		if (file->getRootNodeType() >= 4) {
 			for (size_t i = 0; i < morph_model_count; i++) {
-				file->goToAddress(morph_models_address + i * 4);
+				file->goToAddress(morph_models_address + i * file->getAddressSize());
 				size_t address = 0;
 				file->readInt32BEA(&address);
 				file->goToAddress(address);
@@ -175,7 +175,7 @@ namespace LibGens {
 
 		bones.reserve(bone_total);
 		for (size_t i = 0; i < bone_total; i++) {
-			file->goToAddress(bone_definition_table_address + i * 4);
+			file->goToAddress(bone_definition_table_address + i * file->getAddressSize());
 			size_t address = 0;
 			file->readInt32BEA(&address);
 			file->goToAddress(address);

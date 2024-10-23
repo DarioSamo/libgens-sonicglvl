@@ -51,6 +51,7 @@ class EditorNode {
 		bool highlighted;
 	public:
 		EditorNode() {
+			scene_node = NULL;
 			position = Ogre::Vector3::ZERO;
 			rotation = Ogre::Quaternion::IDENTITY;
 			scale    = Ogre::Vector3::UNIT_SCALE;

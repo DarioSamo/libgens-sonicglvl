@@ -106,7 +106,7 @@ namespace LibGens {
 
 		blocks.reserve(instance_count);
 		for (size_t i=0; i<instance_count; i++) {
-			file->goToAddress(instance_table_address + i*4);
+			file->goToAddress(instance_table_address + i * file->getAddressSize());
 			size_t address=0;
 			file->readInt32BEA(&address);
 			file->goToAddress(address);

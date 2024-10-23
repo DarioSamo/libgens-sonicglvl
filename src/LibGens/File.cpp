@@ -29,6 +29,7 @@ namespace LibGens {
 		address_read_count = 0;
 		global_offset = 0;
 		relative_address_mode = false;
+		address_64_bit_mode = false;
 
 		if (!file_ptr) {
 			Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
@@ -101,7 +102,16 @@ namespace LibGens {
 
 	void File::readInt32A(size_t *dest) {
 		if (!readSafeCheck(dest)) return;
+
+		if (address_64_bit_mode) {
+			fixPaddingRead(8);
+		}
+
 		fread(dest, sizeof(size_t), 1, file_ptr);
+
+		if (address_64_bit_mode) {
+			fseek(file_ptr, 4, SEEK_CUR);
+		}
 
 		if (relative_address_mode) {
 			*dest += getCurrentAddress() - 4;
@@ -127,6 +137,12 @@ namespace LibGens {
 	
 	void File::readInt32BEA(size_t *dest) {
 		if (!readSafeCheck(dest)) return;
+
+		if (address_64_bit_mode) {
+			fixPaddingRead(8);
+			fseek(file_ptr, 4, SEEK_CUR);
+		}
+
 		fread(dest, sizeof(size_t), 1, file_ptr);
 
 		if (relative_address_mode) {
@@ -433,6 +449,24 @@ namespace LibGens {
 		else {
 			fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_NODE_ADDRESS + global_offset, SEEK_SET);
 			readInt32BE(&root_node_address);
+
+			fseek(file_ptr, LIBGENS_FILE_HEADER_OFFSET_TABLE_ADDRESS + global_offset, SEEK_SET);
+			unsigned int offset_table_address = 0;
+			readInt32BE(&offset_table_address);
+
+			fseek(file_ptr, offset_table_address + global_offset, SEEK_SET);
+			unsigned int offset_count = 0;
+			readInt32BE(&offset_count);
+			
+			if (offset_count != 0) {
+				unsigned int first_offset = 0;
+				readInt32BE(&first_offset);
+
+				fseek(file_ptr, root_node_address + first_offset + global_offset, SEEK_SET);
+				readInt32BE(&first_offset);
+
+				address_64_bit_mode = (first_offset == 0);
+			}
 		}
 
 		fseek(file_ptr, root_node_address + global_offset, SEEK_SET);
@@ -728,6 +762,13 @@ namespace LibGens {
 		return file_ptr;
 	}
 
+	bool File::get64BitAddressMode() const {
+		return address_64_bit_mode;
+	}
+
+	int File::getAddressSize() const {
+		return address_64_bit_mode ? 8 : 4;
+	}
 	
 	void File::readAddressTableBBIN(size_t table_size) {
 		size_t current_address = root_node_address;

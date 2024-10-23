@@ -128,7 +128,7 @@ namespace LibGens {
 
 		for (size_t i=0; i<names_count; i++) {
 			size_t address=0;
-			file->goToAddress(names_address+i*4);
+			file->goToAddress(names_address + i * file->getAddressSize());
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
 

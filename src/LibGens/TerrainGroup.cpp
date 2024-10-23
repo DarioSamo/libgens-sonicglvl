@@ -100,7 +100,7 @@ namespace LibGens {
 		// Models
 		for (size_t i=0; i<model_count; i++) {
 			size_t model_address=0;
-			file->goToAddress(model_table_address + i*4);
+			file->goToAddress(model_table_address + i * file->getAddressSize());
 			file->readInt32BEA(&model_address);
 			file->goToAddress(model_address);
 
@@ -129,7 +129,7 @@ namespace LibGens {
 			vector<TerrainInstance *> instances_sub;
 
 			size_t instance_address=0;
-			file->goToAddress(instance_table_address + i*4);
+			file->goToAddress(instance_table_address + i * file->getAddressSize());
 			file->readInt32BEA(&instance_address);
 			file->goToAddress(instance_address);
 
@@ -145,7 +145,7 @@ namespace LibGens {
 				size_t instance_name_address=0;
 				string instance_name="";
 
-				file->goToAddress(filename_offset_table + j*4);
+				file->goToAddress(filename_offset_table + j * file->getAddressSize());
 				file->readInt32BEA(&instance_name_address);
 
 				file->goToAddress(instance_name_address);

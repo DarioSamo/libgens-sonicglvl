@@ -98,7 +98,7 @@ namespace LibGens {
 		file->readString(&filename);
 
 		for (size_t i=0; i<instance_total; i++) {
-			file->goToAddress(instances_address + i*4);
+			file->goToAddress(instances_address + i * file->getAddressSize());
 			size_t address=0;
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
@@ -174,7 +174,7 @@ namespace LibGens {
 
 		for (size_t i=0; i<group_count; i++) {
 			size_t group_address=0;
-			file->goToAddress(group_table_address + i*4);
+			file->goToAddress(group_table_address + i * file->getAddressSize());
 			file->readInt32BEA(&group_address);
 			file->goToAddress(group_address);
 			TerrainGroupInfo *group_info = new TerrainGroupInfo();

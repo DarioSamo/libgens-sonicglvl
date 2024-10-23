@@ -164,7 +164,7 @@ namespace LibGens {
 
 		parameters.reserve(parameter_count);
 		for (size_t i = 0; i<(size_t)parameter_count; i++) {
-			file->goToAddress(parameters_address + i * 4);
+			file->goToAddress(parameters_address + i * file->getAddressSize());
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
 			Parameter *parameter = new Parameter();
@@ -175,12 +175,12 @@ namespace LibGens {
 		textures.reserve(texture_count);
 		for (size_t i = 0; i<(size_t)texture_count; i++) {
 			string internal_name = "";
-			file->goToAddress(texset_address + i * 4);
+			file->goToAddress(texset_address + i * file->getAddressSize());
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
 			file->readString(&internal_name);
 
-			file->goToAddress(texture_address + i * 4);
+			file->goToAddress(texture_address + i * file->getAddressSize());
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
 			Texture *texture = new Texture();
@@ -236,7 +236,7 @@ namespace LibGens {
 
 		parameters.reserve(parameter_count);
 		for (size_t i = 0; i<(size_t)parameter_count; i++) {
-			file->goToAddress(parameters_address + i * 4);
+			file->goToAddress(parameters_address + i * file->getAddressSize());
 			file->readInt32BEA(&address);
 			file->goToAddress(address);
 			Parameter *parameter = new Parameter();
@@ -256,7 +256,7 @@ namespace LibGens {
 			textures.reserve(texture_count);
 			for (size_t i = 0; i < texture_count; i++) {
 				string internal_name = "";
-				file->goToAddress(texture_address + i * 4);
+				file->goToAddress(texture_address + i * file->getAddressSize());
 				file->readInt32BEA(&address);
 				file->goToAddress(address);
 				file->readString(&internal_name);
