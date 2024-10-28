@@ -399,11 +399,12 @@ namespace LibGens {
 			lMeshNode = FbxNode::Create(scene, name.c_str());
 			lMesh = FbxMesh::Create(scene, (name + "_mesh").c_str());
 
-			// Create layers
-			// UV2 needs to be in the second layer
-			while (lMesh->CreateLayer() != 1);
+			// UVs need to be in separate layers
+			while (lMesh->CreateLayer() != 3);
 			FbxLayer* lLayer = lMesh->GetLayer(0);
 			FbxLayer* lLayer1 = lMesh->GetLayer(1);
+			FbxLayer* lLayer2 = lMesh->GetLayer(2);
+			FbxLayer* lLayer3 = lMesh->GetLayer(3);
 
 			// Build Transform
 			Vector3 position;
@@ -460,7 +461,17 @@ namespace LibGens {
 			FbxLayerElementUV* lLayerUV2Element = (FbxLayerElementUV*)lLayer1->CreateLayerElementOfType(FbxLayerElement::eUV);
 			lLayerUV2Element->SetName("UVChannel_2");
 			lLayerUV2Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
-			lLayerUV2Element->SetReferenceMode(FbxGeometryElement::eDirect);
+			lLayerUV2Element->SetReferenceMode(FbxGeometryElement::eDirect);	
+			
+			FbxLayerElementUV* lLayerUV3Element = (FbxLayerElementUV*)lLayer2->CreateLayerElementOfType(FbxLayerElement::eUV);
+			lLayerUV3Element->SetName("UVChannel_3");
+			lLayerUV3Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
+			lLayerUV3Element->SetReferenceMode(FbxGeometryElement::eDirect);		
+			
+			FbxLayerElementUV* lLayerUV4Element = (FbxLayerElementUV*)lLayer3->CreateLayerElementOfType(FbxLayerElement::eUV);
+			lLayerUV4Element->SetName("UVChannel_4");
+			lLayerUV4Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
+			lLayerUV4Element->SetReferenceMode(FbxGeometryElement::eDirect);
 			
 			// Create Vertices
 			unsigned int index=0;
@@ -471,6 +482,8 @@ namespace LibGens {
 				Vector3 tangent = (*it)->getTangent();
 				Vector2 uv_0 = (*it)->getUV(0);
 				Vector2 uv_1 = (*it)->getUV(1);
+				Vector2 uv_2 = (*it)->getUV(2);
+				Vector2 uv_3 = (*it)->getUV(3);
 				Color   color = (*it)->getColor();
 
 				lControlPoints[index] = FbxVector4(position.x, position.y, position.z);
@@ -479,6 +492,8 @@ namespace LibGens {
 				lLayerElementTangent->GetDirectArray().Add(FbxVector4(tangent.x, tangent.y, tangent.z));
 				lLayerUVElement->GetDirectArray().Add(FbxVector2(uv_0.x, 1.0-uv_0.y));
 				lLayerUV2Element->GetDirectArray().Add(FbxVector2(uv_1.x, 1.0-uv_1.y));
+				lLayerUV3Element->GetDirectArray().Add(FbxVector2(uv_2.x, 1.0-uv_2.y));
+				lLayerUV4Element->GetDirectArray().Add(FbxVector2(uv_3.x, 1.0-uv_3.y));
 				lLayerElementVertexColor->GetDirectArray().Add(FbxColor(color.r, color.g, color.b, color.a));
 				index++;
 			}
