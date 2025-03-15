@@ -1,7 +1,167 @@
 <LevelDatabase>
-  <Entry name="ghz200"     geometry="ghz200"        layout_merge=""     slot="GreenHillZone"     game="Generations" />
-  <Entry name="ghz201"     geometry="ghz200"        layout_merge=""     slot="GreenHillZone"     game="Generations" />
-  <Entry name="cte200"     geometry="cte200"        layout_merge=""     slot="CityEscapeZone"    game="Generations" />
-  <Entry name="ActD_Beach" geometry="ActD_Beach"    layout_merge=""     slot="JungleJoyride"     game="Unleashed" />
-  <Entry name="ActD_Snow"  geometry="ActD_Snow"     layout_merge=""     slot="CoolEdge"          game="Unleashed" />
+  <Entry name="ghz200"     											geometry="ghz200"        										layout_merge=""     	slot="GreenHillZone"     		game="Generations" />
+  <Entry name="ghz201"     											geometry="ghz200"        										layout_merge=""     	slot="GreenHillZone"     		game="Generations" />
+  <Entry name="ghz202"     											geometry="ghz200"        										layout_merge=""     	slot="GreenHillZone"     		game="Generations" />
+  <Entry name="ghz203"     											geometry="ghz200"        										layout_merge=""     	slot="GreenHillZone"     		game="Generations" />
+  <Entry name="ghz204"     											geometry="ghz200"        										layout_merge=""     	slot="GreenHillZone"     		game="Generations" />
+  <Entry name="ghz205"     											geometry="ghz200"        										layout_merge=""     	slot="GreenHillZone"     		game="Generations" />
+  <Entry name="cte200"     											geometry="cte200"        											layout_merge=""     	slot="CityEscapeZone"    	game="Generations" />
+
+  <Entry name="ActD_MykonosAct1"  							geometry="ActD_MykonosAct1"     						layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Day Act 1-->
+  <Entry name="ActD_MykonosAct2"  							geometry="ActD_MykonosAct2"     						layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Day Act 2-->
+  <Entry name="ActD_SubMykonos_01"  						geometry="ActD_SubMykonos_01"     					layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Day Act 3-->
+  <Entry name="ActD_SubMykonos_02"  						geometry="ActD_SubMykonos_02"     					layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Day Act 4 (DLC)-->
+  <Entry name="ActD_SubMykonos_04"  						geometry="ActD_MykonosAct1"     						layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Day Act 1-2 (DLC)-->
+  <Entry name="ActD_SubMykonos_05"  						geometry="ActD_MykonosAct2"     						layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Day Act 2-2 (DLC)-->
+  <Entry name="ActN_MykonosEvil"								geometry="ActN_MykonosEvil"     							layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Night Act 1-->
+  <Entry name="ActN_SubMykonos_01"  						geometry="ActN_SubMykonos_01"     					layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Night Act 2-->
+  <Entry name="ActN_Mission_Mykonos"						geometry="ActN_MykonosEvil"     							layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Night NPC Missions-->
+  <Entry name="ActN_SubMykonos_03"  						geometry="ActN_MykonosEvil"     							layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Night Act 1-2 (DLC)-->
+  <Entry name="ActN_SubMykonos_04"  						geometry="ActN_MykonosEvil"     							layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Windmill Isle Night Act 1-2 (DLC)-->
+  <Entry name="Town_Mykonos"  									geometry="Town_Mykonos"     								layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Apotos Day Town-->
+  <Entry name="Town_Mykonos_Night"  						geometry="Town_Mykonos_Night"     					layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Apotos Night Town-->
+  <Entry name="Town_MykonosETF"  							geometry="Town_MykonosETF"     						layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Apotos Day Entrance Stage-->
+  <Entry name="Town_MykonosETF_Night"  					geometry="Town_MykonosETF_Night"     				layout_merge=""     	slot="Apotos"          			game="Unleashed" /> 	<!-- Apotos Night Entrance Stage-->
+
+  <Entry name="ActD_EU"												geometry="ActD_EU"												layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 1-->
+  <Entry name="ActD_SubEU_01"  									geometry="ActD_SubEU_01"     								layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 2-->
+  <Entry name="ActD_SubEU_02"  									geometry="ActD_SubEU_02"     								layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 3-->
+  <Entry name="ActD_SubEU_05"  									geometry="ActD_EU"												layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 1-2 (DLC)-->
+  <Entry name="ActD_SubEU_06"  									geometry="ActD_SubEU_01"     								layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 2-2 (DLC)-->
+  <Entry name="ActD_SubEU_03"  									geometry="ActD_SubEU_03"     								layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 4 (DLC)-->
+  <Entry name="ActD_SubEU_04"  									geometry="ActD_SubEU_04"     								layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Day Act 5 (DLC)-->
+  <Entry name="ActN_EUEvil"  										geometry="ActN_EUEvil"     									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Night Act 1-->
+  <Entry name="ActN_MissionEU_01"							geometry="ActN_EUEvil"     									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Night NPC Mission 1-->
+  <Entry name="ActN_MissionEU_02"							geometry="ActN_EUEvil"     									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Night NPC Mission 2 (Unused?)-->
+  <Entry name="ActN_MissionEU_03"							geometry="ActN_EUEvil"     									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Night NPC Mission 3 (Unused?)-->
+  <Entry name="ActN_SubEU_02"									geometry="ActN_EUEvil"     									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Night Act 1-2 (DLC)-->
+  <Entry name="ActN_SubEU_01"									geometry="ActN_SubEU_01"									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Rooftop Run Night Act 2 (DLC)-->
+  <Entry name="Town_EuropeanCity"  							geometry="Town_EuropeanCity"     						layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Spagonia Day Town-->
+  <Entry name="Town_EuropeanCity_Night"  				geometry="Town_EuropeanCity_Night"     			layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Spagonia Night Town-->
+  <Entry name="Town_EuropeanCityETF"  						geometry="Town_EuropeanCityETF"						layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Spagonia Day Entrance Stage-->
+  <Entry name="Town_EuropeanCityETF_Night"				geometry="Town_EuropeanCityETF_Night"			layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Spagonia Night Entrance Stage-->
+  <Entry name="Town_EULabo"  									geometry="Town_EULabo"     								layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Spagonia Day Lab-->
+  <Entry name="Town_EULabo_Night"  							geometry="Town_EULabo_Night"     						layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Spagonia Night Lab-->
+  <Entry name="ExStageTails1"  										geometry="ExStageTails1"     									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Tornado Defense Act 1-->
+  <Entry name="BossEggRayBird"									geometry="BossEggRayBird"									layout_merge=""     	slot="Spagonia"          		game="Unleashed" /> 	<!-- Egg Devil Ray-->
+
+  <Entry name="ActD_Africa"  										geometry="ActD_Africa"     									layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 1-->
+  <Entry name="ActD_SubAfrica_01"  							geometry="ActD_SubAfrica_01"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 2-->
+  <Entry name="ActD_SubAfrica_03"  							geometry="ActD_SubAfrica_03"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 3-->
+  <Entry name="ActD_SubAfrica_02"  							geometry="ActD_SubAfrica_02"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 4 (DLC)-->
+  <Entry name="ActD_SubAfrica_04"  							geometry="BossEggBeetle"     								layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 5 (DLC)-->
+  <Entry name="ActD_SubAfrica_05"								geometry="ActD_Africa"     									layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 1-2 (DLC)-->
+  <Entry name="ActD_SubAfrica_06"								geometry="ActD_SubAfrica_03"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Day Act 3-2 (DLC)-->
+  <Entry name="ActN_AfricaEvil"  									geometry="ActN_AfricaEvil"     								layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Night Act 1-->
+  <Entry name="ActN_SubAfrica_01"  							geometry="ActN_SubAfrica_01"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Night Act 2-->
+  <Entry name="ActN_AfricaEvil"  									geometry="ActN_AfricaEvil"     								layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Night NPC Missions-->
+  <Entry name="ActN_SubAfrica_02"  							geometry="ActN_SubAfrica_02"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Night Act 3 (DLC)-->
+  <Entry name="ActN_SubAfrica_03"  							geometry="ActN_SubAfrica_03"     						layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Savannah Citadel Night Act 4 (DLC)-->
+  <Entry name="Town_Africa"  										geometry="Town_Africa"     									layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Mazuri Day Town-->
+  <Entry name="Town_Africa_Night"								geometry="Town_Africa_Night"								layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Mazuri Night Town-->
+  <Entry name="Town_AfricaETF"  									geometry="Town_AfricaETF"     								layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Mazuri Day Entrance Stage-->
+  <Entry name="Town_AfricaETF_Night"  						geometry="Town_AfricaETF_Night"     					layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Mazuri Night Entrance Stage-->
+  <Entry name="BossEggBeetle"  									geometry="BossEggBeetle"     								layout_merge=""     	slot="Mazuri"          			game="Unleashed" /> 	<!-- Egg Beetle-->
+
+  <Entry name="ActD_China"			 								geometry="ActD_China"    										layout_merge=""     	slot="ChunNan"     				game="Unleashed" /> 	<!-- Dragon Road Day Act 1-->
+  <Entry name="ActD_SubChina_03"  							geometry="ActD_SubChina_03"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Day Act 2-->
+  <Entry name="ActD_SubChina_04"  							geometry="ActD_SubChina_04"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Day Act 3-->
+  <Entry name="ActD_SubChina_01"  							geometry="ActD_SubChina_01"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Day Act 4 (DLC)-->
+  <Entry name="ActD_SubChina_02"  							geometry="ActD_SubChina_02"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Day Act 5 (DLC)-->
+  <Entry name="ActD_SubChina_05"  							geometry="ActD_China"    										layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Day Act 1-2 (DLC)-->
+  <Entry name="ActD_SubChina_06"  							geometry="ActD_SubChina_03"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Day Act 2-2 (DLC)-->
+  <Entry name="ActN_ChinaEvil" 									geometry="ActN_ChinaEvil"    								layout_merge=""     	slot="ChunNan"     				game="Unleashed" /> 	<!-- Dragon Road Night Act 1-->
+  <Entry name="ActN_SubChina_01"  							geometry="ActN_SubChina_01"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Night Act 2-->
+  <Entry name="ActN_Mission_China"							geometry="ActN_ChinaEvil"    								layout_merge=""     	slot="ChunNan"     				game="Unleashed" /> 	<!-- Dragon Road Night NPC Missions-->
+  <Entry name="ActN_SubChina_02"  							geometry="ActN_SubChina_02"     						layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Night Act 3 (DLC)-->
+  <Entry name="ActN_SubChina_03"  							geometry="ActN_ChinaEvil"    								layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dragon Road Night Act 1-2 (DLC)-->
+  <Entry name="Town_China"  										geometry="Town_China"     									layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Chun-nan Day Town-->
+  <Entry name="Town_China_Night"								geometry="Town_China_Night"     							layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Chun-nan Night Town-->
+  <Entry name="Town_ChinaETF"  									geometry="Town_ChinaETF"     								layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Chun-nan Day Entrance Stage-->
+  <Entry name="Town_ChinaETF_Night"  						geometry="Town_ChinaETF_Night"     					layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Chun-nan Night Entrance Stage-->
+  <Entry name="BossPhoenix"  										geometry="BossPhoenix"     									layout_merge=""     	slot="ChunNan"          		game="Unleashed" /> 	<!-- Dark Gaia Phoenix-->
+
+  <Entry name="ActD_Snow"  										geometry="ActD_Snow"     									layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Day Act 1-->
+  <Entry name="ActD_SubSnow_01"  							geometry="ActD_SubSnow_01"								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Day Act 2-->
+  <Entry name="ActD_SubSnow_02"  							geometry="ActD_SubSnow_02"								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Day Act 3 (DLC)-->
+  <Entry name="ActD_SubSnow_03"  							geometry="ActD_SubSnow_03"								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Day Act 4 (DLC)-->
+  <Entry name="ActD_SubSnow_04"  							geometry="ActD_Snow"     									layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Day Act 1-2 (DLC)-->
+  <Entry name="ActD_SubSnow_05"  							geometry="ActD_SubSnow_01"								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Day Act 2-2 (DLC)-->
+  <Entry name="ActN_SnowEvil"  									geometry="ActN_SnowEvil"     								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Night Act 1-->
+  <Entry name="ActN_Mission_Snow"							geometry="ActN_SnowEvil"     								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Night NPC Missions-->
+  <Entry name="ActN_SubSnow_01"								geometry="ActN_SubSnow_01"								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Night Act 2 (DLC)-->
+  <Entry name="ActN_SubSnow_02"								geometry="ActN_SubSnow_02"								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Cool Edge Night Act 3 (DLC)-->
+  <Entry name="Town_Snow"  										geometry="Town_Snow"     									layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Holoska Day Town-->
+  <Entry name="Town_Snow_Night"  								geometry="Town_Snow_Night"     							layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Holoska Night Town-->
+  <Entry name="Town_SnowETF"  									geometry="Town_SnowETF"     								layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Holoska Day Entrance Stage-->
+  <Entry name="Town_SnowETF_Night"  						geometry="Town_SnowETF_Night"     					layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Holoska Night Entrance Stage-->
+  <Entry name="BossDarkGaiaMoray"  							geometry="BossDarkGaiaMoray"     						layout_merge=""     	slot="Holoska"          			game="Unleashed" /> 	<!-- Dark Moray-->
+
+  <Entry name="ActD_Petra"											geometry="ActD_Petra"     										layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Day Act 1-->
+  <Entry name="ActD_SubPetra_03"  								geometry="ActD_SubPetra_03"     							layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Day Act 2-->
+  <Entry name="ActD_SubPetra_02"  								geometry="ActD_SubPetra_02"     							layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Day Act 3 (DLC)-->
+  <Entry name="ActD_SubPetra_04"  								geometry="ActD_Petra"     										layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Day Act 1-2 (DLC)-->
+  <Entry name="ActN_PetraEvil"  									geometry="ActN_PetraEvil"     								layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Night Act 1-->
+  <Entry name="ActN_Mission_Petra"								geometry="ActN_PetraEvil"     								layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Night NPC Missions-->
+  <Entry name="ActN_SubPetra_03"								geometry="ActN_PetraEvil"     								layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Night Act 2 (DLC)-->
+  <Entry name="ActN_SubPetra_02"								geometry="ActN_SubPetra_02"								layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Arid Sands Night Act 3 (DLC)-->
+  <Entry name="Town_PetraCapital"  								geometry="Town_PetraCapital"     							layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Shamar Day Town-->
+  <Entry name="Town_PetraCapital_Night"  					geometry="Town_PetraCapital_Night"     				layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Shamar Night Town-->
+  <Entry name="Town_PetraCapitalETF"  						geometry="Town_PetraCapitalETF"     					layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Shamar Day Entrance Stage-->
+  <Entry name="Town_PetraCapitalETF_Night"  				geometry="Town_PetraCapitalETF_Night"     			layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Shamar Night Entrance Stage-->
+  <Entry name="Town_PetraLabo"  								geometry="Town_PetraLabo"     							layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Shamar Day Lab-->
+  <Entry name="Town_PetraLabo_Night"  						geometry="Town_PetraLabo_Night"     					layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Shamar Night Lab-->
+  <Entry name="BossPetra"  											geometry="BossPetra"     										layout_merge=""     	slot="Shamar"          			game="Unleashed" /> 	<!-- Dark Guardian-->
+
+  <Entry name="ActD_NY"  											geometry="ActD_NY"     										layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Day Act 1-->
+  <Entry name="ActD_SubNY_01"									geometry="ActD_SubNY_01"									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Day Act 2-->
+  <Entry name="ActD_SubNY_02"									geometry="ActD_SubNY_02"									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Day Act 3 (DLC)-->
+  <Entry name="ActD_SubNY_03"									geometry="ActD_NY"     										layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Day Act 1-2 (DLC)-->
+  <Entry name="ActN_NYEvil"  										geometry="ActN_NYEvil"     									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Night Act 1-->
+  <Entry name="ActN_Mission_NY"								geometry="ActN_NYEvil"     									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Night NPC Missions-->
+  <Entry name="ActN_SubNY_02"									geometry="ActN_NYEvil"     									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Night Act 2 (DLC)-->
+  <Entry name="ActN_SubNY_01"									geometry="ActN_SubNY_01"									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Skyscraper Scamper Night Act 3 (DLC)-->
+  <Entry name="Town_NYCity"  										geometry="Town_NYCity"     									layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Empire City Day Town-->
+  <Entry name="Town_NYCity_Night"  							geometry="Town_NYCity_Night"     						layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Empire City Night Town-->
+  <Entry name="Town_NYCityETF"  								geometry="Town_NYCityETF"     							layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Empire City Day Entrance Stage-->
+  <Entry name="Town_NYCityETF_Night"  						geometry="Town_NYCityETF_Night"     					layout_merge=""     	slot="EmpireCity"          		game="Unleashed" /> 	<!-- Empire City Night Entrance Stage-->
+
+  <Entry name="ActD_Beach" 										geometry="ActD_Beach"    									layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Day Act 1-->
+  <Entry name="ActD_SubBeach_02"  							geometry="ActD_SubBeach_02"     						layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Day Act 2-->
+  <Entry name="ActD_SubBeach_04"  							geometry="ActD_SubBeach_04"     						layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Day Act 3-->
+  <Entry name="ActD_SubBeach_01"  							geometry="ActD_SubBeach_01"     						layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Day Act 4 (DLC)-->
+  <Entry name="ActD_SubBeach_03"  							geometry="ActD_SubBeach_03"     						layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Day Act 5 (DLC)-->
+  <Entry name="ActD_SubBeach_05"  							geometry="ActD_Beach"    									layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Day Act 1-2 (DLC)-->
+  <Entry name="ActN_BeachEvil" 									geometry="ActN_BeachEvil"    								layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Night Act 1-->
+  <Entry name="ActN_SubBeach_01"  							geometry="ActN_SubBeach_01"     						layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Night Act 2-->
+  <Entry name="ActN_Mission_Beach"  							geometry="ActN_BeachEvil"    								layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Night NPC Missions-->
+  <Entry name="ActN_SubBeach_02"  							geometry="ActN_BeachEvil"    								layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Night Act 3 (DLC)-->
+  <Entry name="ActN_SubBeach_03"  							geometry="ActN_BeachEvil"    								layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Jungle Joyride Night Act 1-2 (DLC)-->
+  <Entry name="Town_SouthEastAsia"  							geometry="Town_SouthEastAsia"     						layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Adabat Day Town-->
+  <Entry name="Town_SouthEastAsia_Night"  				geometry="Town_SouthEastAsia_Night"     			layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Adabat Night Town-->
+  <Entry name="Town_SouthEastAsiaETF"  					geometry="Town_SouthEastAsiaETF"     				layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Adabat Day Entrance Stage-->
+  <Entry name="Town_SouthEastAsiaETF_Night"  			geometry="Town_SouthEastAsiaETF_Night"     		layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Adabat Night Entrance Stage-->
+  <Entry name="BossEggLancer"  									geometry="BossEggLancer"     								layout_merge=""     	slot="Adabat"          			game="Unleashed" /> 	<!-- Egg Lancer-->
+
+  <Entry name="Act_EggmanLand" 								geometry="Act_EggmanLand"    							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Eggmanland-->
+  <Entry name="ActD_EggmanLand" 								geometry="Act_EggmanLand"    							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Eggmanland Day (Part)-->
+  <Entry name="ActN_EggmanLand"								geometry="Act_EggmanLand"    							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Eggmanland Night (Part)-->
+  <Entry name="Town_EggManBase"  							geometry="Town_EggManBase"     						layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Eggmanland Town-->
+  <Entry name="ExStageTails2"  										geometry="ExStageTails2"     									layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Tornado Defense Act 2-->
+  <Entry name="BossEggDragoon"  								geometry="BossEggDragoon"     							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Egg Dragoon-->
+  <Entry name="BossDarkGaia1_1Air"  							geometry="BossDarkGaia1_1Air"     						layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Dark Gaia Flying Phase-->
+  <Entry name="BossDarkGaia1_1Run"							geometry="BossDarkGaia1_1Run"							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Dark Gaia Running Phase 1-->
+  <Entry name="BossDarkGaia1_2Run"							geometry="BossDarkGaia1_2Run"							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Dark Gaia Running Phase 2-->
+  <Entry name="BossDarkGaia1_3Run"							geometry="BossDarkGaia1_3Run"							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Dark Gaia Running Phase 3-->
+  <Entry name="BossFinalDarkGaia"  								geometry="BossFinalDarkGaia"     							layout_merge=""     	slot="EggmanLand"     		game="Unleashed" /> 	<!-- Perfect Dark Gaia-->
+
+  <Entry name="Event_afr_hideout"  								geometry="Event_afr_hideout"     							layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_egb_hidout_exterior"  				geometry="Event_egb_hidout_exterior"     			layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_M2_01_professor_room_new"  	geometry="Event_M2_01_professor_room_new"   layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_M4_01_egb_hideout"  				geometry="Event_M4_01_egb_hideout"     			layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_M6_01_temple"  						geometry="Event_M6_01_temple"							layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_M8_02_egbHall"  						geometry="Event_M8_02_egbHall"     					layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_M8_03"  										geometry="Event_M8_03"     									layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_M8_16_myk"  								geometry="Event_M8_16_myk"     							layout_merge=""     	slot="Event"          				game="Unleashed" />
+  <Entry name="Event_temple"										geometry="Event_temple"     									layout_merge=""     	slot="Event"          				game="Unleashed" />
 </LevelDatabase>
