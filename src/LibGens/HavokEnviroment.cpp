@@ -39,8 +39,19 @@ namespace LibGens {
 	}
 
 	HavokEnviroment::HavokEnviroment(int bufferSize) {
-		hkMemoryRouter * memoryRouter = hkMemoryInitUtil::initDefault( hkMallocAllocator::m_defaultMallocAllocator, hkMemorySystem::FrameInfo(bufferSize));
+		//hkMemoryRouter * memoryRouter = hkMemoryInitUtil::initDefault( hkMallocAllocator::m_defaultMallocAllocator, hkMemorySystem::FrameInfo(bufferSize));
+		//hkBaseSystem::init(memoryRouter, HavokErrorReport);
+#ifndef Release2005
+		hkMemoryRouter* memoryRouter = hkMemoryInitUtil::initDefault(hkMallocAllocator::m_defaultMallocAllocator, hkMemorySystem::FrameInfo(bufferSize));
 		hkBaseSystem::init(memoryRouter, HavokErrorReport);
+#else
+		hkMemoryBlockServer* server = new hkSystemMemoryBlockServer(256 * 1024 * 1024);
+		hkMemory* memoryManager = new hkFreeListMemory(server);
+		hkThreadMemory* threadMemory = new hkThreadMemory(memoryManager, 16);
+		threadMemory->setStackArea(new uint8_t[1024 * 1024], 1024 * 1024);
+
+		hkBaseSystem::init(memoryManager, threadMemory, HavokErrorReport);
+#endif
 	}
 
 	
@@ -55,19 +66,38 @@ namespace LibGens {
 			string filename=(*it) + physics_name + LIBGENS_HAVOK_PHYSICS_EXTENSION;
 
 			if (File::check(filename)) {
+#ifndef Release2005
 				hkSerializeUtil::ErrorDetails loadError;
 				hkResource *data = hkSerializeUtil::load(filename.c_str(), &loadError);
 				if (!(loadError.id == loadError.ERRORID_NONE && data != NULL)) {
 					Error::addMessage(Error::FILE_NOT_FOUND, "Couldn't load " + filename + " Havok file. Reason: " + ToString(loadError.defaultMessage.cString()));
 					continue;
 				}
-
 				hkRootLevelContainer *container = data->getContents<hkRootLevelContainer>();
+#else
+				hkIstream stream(filename.c_str());
+				if (!stream.isOk()){
+					Error::addMessage(Error::FILE_NOT_FOUND, "Couldn't load " + filename + " Havok file. Reason: UNKNOWN");
+					continue;
+				}
+
+				hkBinaryPackfileReader* reader = new hkBinaryPackfileReader();
+
+				if (reader->loadEntireFile(stream.getStreamReader()) != HK_SUCCESS){
+					continue;
+				}
+
+				hkRootLevelContainer* container = (hkRootLevelContainer*)reader->getContents("hkRootLevelContainer");
+#endif
 				if (container) {
-					hkpPhysicsData *physics = container->findObject<hkpPhysicsData>();
+					hkpPhysicsData *physics = (hkpPhysicsData*)container->findObjectByType("hkpPhysicsData");
 
 					if (physics) {
+#ifndef Release2005
 						HavokPhysicsCache *physics_cache_entry = new HavokPhysicsCache(data, filename, physics_name, physics);
+#else
+						HavokPhysicsCache *physics_cache_entry = new HavokPhysicsCache(container, filename, physics_name, physics);
+#endif
 						physics_cache.push_back(physics_cache_entry);
 						return physics_cache_entry;
 					}
@@ -81,6 +111,8 @@ namespace LibGens {
 
 
 	HavokSkeletonCache *HavokEnviroment::getSkeleton(string skeleton_name) {
+		// TODO: implement for havok 550
+#ifndef Release2005
 		for (list<HavokSkeletonCache *>::iterator it=skeleton_cache.begin(); it!=skeleton_cache.end(); it++) {
 			if ((*it)->getName() == skeleton_name) {
 				return (*it);
@@ -116,12 +148,14 @@ namespace LibGens {
 				}
 			}
 		}
-
+#endif
 		return NULL;
 	}
 
 	
 	HavokAnimationCache *HavokEnviroment::getAnimation(string animation_name) {
+		// TODO: implement for havok 550
+#ifndef Release2005
 		for (list<HavokAnimationCache *>::iterator it=animation_cache.begin(); it!=animation_cache.end(); it++) {
 			if ((*it)->getName() == animation_name) {
 				return (*it);
@@ -156,7 +190,7 @@ namespace LibGens {
 				}
 			}
 		}
-
+#endif
 		return NULL;
 	}
 

@@ -1,5 +1,7 @@
 #include "HKPropertyDialog.h"
 
+#include "hash.h"
+
 HKPropertyDialog::HKPropertyDialog(QWidget *parent_widget, HKPropertyTag *tag) : QDialog(parent_widget) {
 	setupUi(this);
 	this->tag = tag;
@@ -51,6 +53,7 @@ void HKPropertyDialog::newKeyTriggered() {
 	value.key = 0;
 	value.value = 0;
 	value.bitwise = HKBitwise_SET;
+	value.name = "";
 
 	QModelIndexList indexes = tb_keys->selectionModel()->selection().indexes();
 	int select_index = 0;
@@ -79,11 +82,13 @@ void HKPropertyDialog::deleteKeyTriggered() {
 void HKPropertyDialog::keyChangedTriggered(int row, int column) {
 	if (column < 2) {
 		QTableWidgetItem *item = tb_keys->item(row, column);
-		int item_v = item->text().toInt();
-		if (column == 0)
-			values[row].key = item_v;
-		else
-			values[row].value = item_v;
+		if (column == 0) {
+			values[row].name = item->text();
+			values[row].key  = hhStrHash(item->text().toStdString().c_str());
+		}
+		else {
+			values[row].value = item->text().toInt();
+		}
 	}
 }
 
@@ -111,7 +116,7 @@ void HKPropertyDialog::updateKeysTableTriggered() {
 	
 	int row = 0;
 	foreach(const HKPropertyValue &value, values) {
-		QTableWidgetItem *key_item = new QTableWidgetItem(QString("%1").arg(value.key));
+		QTableWidgetItem *key_item = new QTableWidgetItem(QString("%1").arg(value.name));
 		QTableWidgetItem *value_item = new QTableWidgetItem(QString("%1").arg(value.value));
 		QTableWidgetItem *bitwise_item = new QTableWidgetItem(QString("%1").arg(value.bitwise == HKBitwise_SET ? "SET" : "OR"));
 		key_item->setToolTip("key");

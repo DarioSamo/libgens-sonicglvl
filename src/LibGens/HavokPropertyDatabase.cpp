@@ -122,7 +122,17 @@ namespace LibGens {
 
 	void HavokPropertyDatabaseGroup::applyProperties(hkpRigidBody *rigid_body) {
 		for (list<HavokPropertyDatabaseEntry *>::iterator it=entries.begin(); it!=entries.end(); it++) {
+#ifndef Release2005
 			rigid_body->setProperty((*it)->getKey(), hkpPropertyValue((int)(*it)->getValue()));
+#else
+			unsigned key            =  (*it)->getKey();
+			hkpPropertyValue value  =  hkpPropertyValue((int)(*it)->getValue());
+			bool hasProperty = rigid_body->hasProperty(key);
+			if (hasProperty)
+				rigid_body->editProperty(key, value);
+			else
+				rigid_body->addProperty(key, value);
+#endif
 		}
 	}
 

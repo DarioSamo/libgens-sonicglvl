@@ -31,6 +31,8 @@
 #include <QFile>
 #include <QListWidgetItem>
 #include <QScrollBar>
+
+#include "hash.h"
 #include "assimp/Importer.hpp"
 #include "assimp/importerdesc.h"
 
@@ -51,9 +53,9 @@ const QString HKWindow::LogPath = "HavokConverter.log";
 HKWindow::HKWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);
 	cb_mode->addItem("Collision");
-	//cb_mode->addItem("Rigid Bodies"); // TO IMPLEMENT
+	cb_mode->addItem("Rigid Bodies"); // IN PROGRESS
 	//cb_mode->addItem("Animation"); // TO IMPLEMENT
-	cb_mode->setCurrentIndex(0);
+	cb_mode->setCurrentIndex(converter_settings.mode % 2);
 	havok_enviroment = NULL;
 
 	connect(action_open_settings, SIGNAL(triggered()), this, SLOT(openSettingsTriggered()));
@@ -116,6 +118,8 @@ void HKWindow::closeEvent(QCloseEvent *event) {
 		event->ignore();
 }
 
+
+
 void HKWindow::loadSettings(QString filename) {
 	QSettings settings(filename, QSettings::IniFormat);
 	converter_settings.model_source_paths = settings.value("model_source_paths", QString()).toString().split(";");
@@ -145,7 +149,8 @@ void HKWindow::loadSettings(QString filename) {
 		int key_count = key_list.size() / 3;
 		for (int k = 0; k < key_count; k++) {
 			HKPropertyValue value;
-			value.key = key_list[k * 3].toInt();
+			value.name = key_list[k * 3];
+			value.key = hhStrHash(key_list[k * 3].toStdString().c_str());
 			value.value = key_list[k * 3 + 1].toInt();
 			value.bitwise = (HKBitwise) key_list[k * 3 + 2].toInt();
 			tag.values.append(value);
@@ -175,7 +180,7 @@ void HKWindow::saveSettings(QString filename) {
 	foreach(const HKPropertyTag &tag, converter_settings.property_tags) {
 		QString values_str = "";
 		foreach(const HKPropertyValue &value, tag.values)
-			values_str += QString("%1 %2 %3 ").arg(value.key).arg(value.value).arg((int) value.bitwise);
+			values_str += QString("%1 %2 %3 ").arg(value.name).arg(value.value).arg((int) value.bitwise);
 		
 		property_tag_string += QString("%1|%2|%3|").arg(tag.tag).arg(tag.description).arg(values_str);
 	}
@@ -455,7 +460,7 @@ void HKWindow::updateTagsTableTriggered() {
 	foreach(const HKPropertyTag &tag, converter_settings.property_tags) {
 		QString values_str = tag.values.isEmpty() ? "{ Empty }" : QString();
 		foreach(const HKPropertyValue &value, tag.values) {
-			values_str += QString("%1: %2 (%3); ").arg(value.key).arg(value.value).arg(value.bitwise == HKBitwise_SET ? "SET" : "OR");
+			values_str += QString("%1: %2 (%3); ").arg(value.name).arg(value.value).arg(value.bitwise == HKBitwise_SET ? "SET" : "OR");
 		}
 		
 		QTableWidgetItem *tag_item = new QTableWidgetItem(tag.tag);

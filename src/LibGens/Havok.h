@@ -22,10 +22,21 @@
 #include <Common/Base/hkBase.h>
 #include <Common/Base/System/hkBaseSystem.h>
 #include <Common/Base/System/Error/hkDefaultError.h>
+#ifndef Release2005
 #include <Common/Base/Memory/System/Util/hkMemoryInitUtil.h>
-#include <Common/Base/Monitor/hkMonitorStream.h>
 #include <Common/Base/Memory/System/hkMemorySystem.h>
 #include <Common/Base/Memory/Allocator/Malloc/hkMallocAllocator.h>
+#else
+#include <Common/Base/Memory/Memory/FreeList/hkLargeBlockAllocator.h>
+#include <Common/Base/Memory/Memory/FreeList/hkFreeListMemory.h>
+#include <Common/Base/Memory/Memory/FreeList/SystemMemoryBlockServer/hkSystemMemoryBlockServer.h>
+#include <Common/Base/Memory/Memory/Pool/hkPoolMemory.h>
+#include <Common/Base/Memory/MemoryClasses/hkMemoryClassDefinitions.h>
+#endif
+
+
+
+#include <Common/Base/Monitor/hkMonitorStream.h>
 #include <Common/Base/System/Io/IStream/hkIStream.h>
 #include <Common/Base/Reflection/hkClass.h>
 #include <Common/Base/Reflection/Registry/hkTypeInfoRegistry.h>
@@ -34,7 +45,11 @@
 
 #include <Common/Serialize/Util/hkStructureLayout.h>
 #include <Common/Serialize/Util/hkRootLevelContainer.h>
+#ifndef Release2005
 #include <Common/Serialize/Util/hkSerializeUtil.h>
+#else
+#include <Common/Serialize/Packfile/Binary/hkBinaryPackfileReader.h>
+#endif
 #include <Common/Serialize/Packfile/Binary/hkBinaryPackfileWriter.h>
 #include <Physics/Utilities/Serialize/hkpPhysicsData.h>
 #include <Physics/Utilities/Dynamics/Inertia/hkpInertiaTensorComputer.h>
@@ -43,10 +58,13 @@
 #include <Physics/Dynamics/Entity/hkpRigidBodyCinfo.h>
 #include <Physics/Collide/hkpCollide.h>
 #include <Physics/Collide/Shape/hkpShape.h>
+#ifndef Release2005
 #include <Physics/Collide/Shape/hkpShapeBuffer.h>
+#endif
 #include <Physics/Collide/Shape/hkpShapeContainer.h>
 #include <Physics/Collide/Shape/hkpShapeType.h>
 #include <Physics/Collide/Shape/Convex/Box/hkpBoxShape.h>
+#include <Physics/Collide/Shape/Convex/ConvexVertices/hkpConvexVerticesShape.h>
 #include <Physics/Collide/Shape/Compound/Collection/StorageExtendedMesh/hkpStorageExtendedMeshShape.h>
 #include <Physics/Collide/Util/Welding/hkpMeshWeldingUtility.h>
 
@@ -70,17 +88,21 @@
 #include <Physics/Utilities/Collide/ShapeUtils/ShapeConverter/hkpShapeConverter.h>
 
 // Animation includes
+#ifndef Release2005
 #include <Animation/Animation/Animation/Quantized/hkaQuantizedAnimation.h>
 #include <Animation/Animation/Animation/Mirrored/hkaMirroredAnimation.h>
 #include <Animation/Animation/Animation/Mirrored/hkaMirroredSkeleton.h>
 #include <Animation/Animation/Animation/SplineCompressed/hkaSplineCompressedAnimation.h>
+#endif
 #include <Animation/Animation/Animation/Util/hkaAdditiveAnimationUtility.h>
 #include <Animation/Animation/hkaAnimationContainer.h>
 #include <Animation/Animation/Playback/Control/Default/hkaDefaultAnimationControl.h>
 #include <Animation/Animation/Playback/hkaAnimatedSkeleton.h>
 #include <Animation/Animation/Playback/Multithreaded/hkaMultithreadedAnimationUtils.h>
+#ifndef Release2005
 #include <Animation/Animation/Playback/Multithreaded/Common/hkaCommonAnimation.h>
 #include <Animation/Animation/Playback/Multithreaded/SampleAndCombine/hkaAnimationSampleAndCombineJobQueueUtils.h>
+#endif
 #include <Animation/Animation/Rig/hkaPose.h>
 #include <Animation/Animation/Rig/hkaSkeletonUtils.h>
 
