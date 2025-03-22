@@ -27,11 +27,19 @@ namespace LibGens {
 		protected:
 			string name;
 			hkpPhysicsData *physics;
+#ifndef Release2005
 			hkResource *data;
+#else
+			hkRootLevelContainer* container;
+#endif
 			string extra;
 			string path;
 		public:
+#ifndef Release2005
 			HavokPhysicsCache(hkResource *data_p, string path_p, string name_p, hkpPhysicsData *physics_p);
+#else
+			HavokPhysicsCache(hkRootLevelContainer *container_p, string path_p, string name_p, hkpPhysicsData *physics_p);
+#endif
 			string getName();
 			hkpPhysicsData *getPhysics();
 			void setExtra(string v);

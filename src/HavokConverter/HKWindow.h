@@ -25,8 +25,10 @@
 #include "assimp/scene.h"
 #include "LibGens.h"
 #include <unordered_set>
+#include <Physics/Collide/Shape/Convex/hkpConvexShape.h>
 
 class hkpShape;
+class hkpConvexVerticesShape;
 class hkpRigidBody;
 class hkpWorld;
 class hkpStaticCompoundShape;
@@ -35,6 +37,7 @@ class hkpBvCompressedMeshShape;
 class hkVector4;
 
 namespace LibGens {
+	class Tags;
 	class HavokEnviroment;
 };
 
@@ -89,6 +92,7 @@ private:
 	void logNodeTree(aiNode *node, QString prefix);
 	void beep();
 	hkpShape *convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale);
+	hkpConvexShape* convertMeshToConvexShape(aiMesh* mesh, LibGens::Vector3 scale, LibGens::Tags& tags);
 	QList<hkpRigidBody *> convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::unordered_set<std::string>& names);
 	void convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::unordered_set<std::string>& names);
 #ifdef HAVOKCONVERTER_LOST_WORLD

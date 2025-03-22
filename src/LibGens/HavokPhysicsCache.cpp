@@ -21,8 +21,13 @@
 #include "HavokPhysicsCache.h"
 
 namespace LibGens {
+#ifndef Release2005
 	HavokPhysicsCache::HavokPhysicsCache(hkResource *data_p, string path_p, string name_p, hkpPhysicsData *physics_p) {
 		data = data_p;
+#else
+	HavokPhysicsCache::HavokPhysicsCache(hkRootLevelContainer * container_p, string path_p, string name_p, hkpPhysicsData *physics_p) {
+		container = container_p;
+#endif
 		path = path_p;
 		name = name_p;
 		physics = physics_p;
@@ -50,11 +55,13 @@ namespace LibGens {
 	}
 	
 	bool HavokPhysicsCache::save() {
+#ifndef Release2005
 		if (!data) {
 			return false;
 		}
 
 		hkRootLevelContainer *container = data->getContents<hkRootLevelContainer>();
+#endif
 
 		if (!container) {
 			return false;
@@ -72,6 +79,9 @@ namespace LibGens {
 	}
 
 	HavokPhysicsCache::~HavokPhysicsCache() {
+#ifndef Release2005
 		delete data;
+#else
+#endif
 	}
 };
