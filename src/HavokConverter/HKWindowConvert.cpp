@@ -43,6 +43,7 @@
 #include <Physics/Collide/Shape/Convex/ConvexVertices/hkpConvexVerticesConnectivity.h>
 #include <Physics/Collide/Shape/Convex/ConvexVertices/hkpConvexVerticesConnectivityUtil.h>
 #include <Physics/Collide/Shape/Convex/Sphere/hkpSphereShape.h>
+#include <Physics/Collide/Shape/Convex/Capsule/hkpCapsuleShape.h>
 #include <Physics/Collide/Shape/Convex/Cylinder/hkpCylinderShape.h>
 
 // TODO: Migrate
@@ -102,9 +103,9 @@ bool HKWindow::convert() {
 	LibGens::Vector3 position(converter_settings.position_x, converter_settings.position_y, converter_settings.position_z);
 	LibGens::Vector3 scale(converter_settings.scale_x * 0.01, converter_settings.scale_y * 0.01, converter_settings.scale_z * 0.01);
 	LibGens::Quaternion rotation_x, rotation_y, rotation_z;
-	rotation_x.fromAngleAxis(converter_settings.rotation_x * LIBGENS_MATH_RAD_TO_DEGREE, LibGens::Vector3(1.0f, 0.0f, 0.0f));
-	rotation_y.fromAngleAxis(converter_settings.rotation_y * LIBGENS_MATH_RAD_TO_DEGREE, LibGens::Vector3(0.0f, 1.0f, 0.0f));
-	rotation_z.fromAngleAxis(converter_settings.rotation_z * LIBGENS_MATH_RAD_TO_DEGREE, LibGens::Vector3(0.0f, 0.0f, 1.0f));
+	rotation_x.fromAngleAxis(converter_settings.rotation_x * LIBGENS_MATH_DEGREE_TO_RAD, LibGens::Vector3(1.0f, 0.0f, 0.0f));
+	rotation_y.fromAngleAxis(converter_settings.rotation_y * LIBGENS_MATH_DEGREE_TO_RAD, LibGens::Vector3(0.0f, 1.0f, 0.0f));
+	rotation_z.fromAngleAxis(converter_settings.rotation_z * LIBGENS_MATH_DEGREE_TO_RAD, LibGens::Vector3(0.0f, 0.0f, 1.0f));
 	LibGens::Quaternion orientation = rotation_x * rotation_y * rotation_z;
 	global_transform.makeTransform(position, scale, orientation);
 
@@ -180,7 +181,6 @@ bool HKWindow::convert() {
 		logProgress(ProgressFatal, "Could not open output file for writing!");
 		return false;
 	}
-
 	// Create root level container and push the physics data on to it.
 	hkRootLevelContainer *root_level_container = new hkRootLevelContainer();
 	hkArray<hkRootLevelContainer::NamedVariant> namedVariants;
@@ -190,16 +190,15 @@ bool HKWindow::convert() {
 	logProgress(ProgressNormal, QString("Conversion finished with %1 compressed shapes.").arg(shapes.getSize()));
 #else
 	// Create physics data.
-	static hkpPhysicsData* physics_data = new hkpPhysicsData();
-
+	hkpPhysicsData* physics_data = new hkpPhysicsData();
 	// Populate physics data with the world we created.
 	world->lock();
 	hkpPhysicsSystem* system = world->getWorldAsOneSystem();
+
+
 	system->setName("Default Physics System");
 	physics_data->addPhysicsSystem(system);
-
 	logProgress(ProgressNormal, QString("Physics system with %1 rigid bodies.").arg(system->getRigidBodies().getSize()));
-
 	namedVariants.pushBack(hkRootLevelContainer::NamedVariant("Physics Data", physics_data, &hkpPhysicsDataClass));
 
 #ifndef HAVOKCONVERTER_UNLEASHED
@@ -209,26 +208,22 @@ bool HKWindow::convert() {
 	ToPtrArray(namedVariants, root_level_container->m_namedVariants, root_level_container->m_numNamedVariants);
 #endif // HAVOKCONVERTER_UNLEASHED
 #endif // HAVOKCONVERTER_LOST_WORLD
-	
 	// Serialize root level container to a binary packfile.
 	hkPackfileWriter::Options pack_options;
-
 #ifndef HAVOKCONVERTER_UNLEASHED
-	pack_options.m_writeMetaInfo = false;
 	hkSerializeUtil::SaveOptions options;
+	pack_options.m_writeMetaInfo = false;
 	options.useBinary(true);
 	hkResult result = hkSerializeUtil::savePackfile(root_level_container, hkRootLevelContainerClass, outfile.getStreamWriter(), pack_options, HK_NULL, options);
+
 #else
 
-	hkBinaryPackfileWriter* writer = new hkBinaryPackfileWriter();
+hkBinaryPackfileWriter* writer = new hkBinaryPackfileWriter();
 	writer->setContents(root_level_container, hkRootLevelContainerClass);
 	pack_options.m_layout = hkStructureLayout::GccPs3LayoutRules; // PS3 also works on Xbox 360, but not vice versa.
 	hkResult result = writer->save(outfile.getStreamWriter(), pack_options);
-
 	physics_data->removeReference();
 #endif
-
-	//logProgress(ProgressNormal, QString("Variant info: %1").arg(writer->));
 
 	bool convertResult = result == HK_SUCCESS;
 	if (convertResult)  {
@@ -240,6 +235,7 @@ bool HKWindow::convert() {
 
 #ifndef HAVOKCONVERTER_LOST_WORLD
 	system->removeReference();
+
 	world->unlock();
 	delete world;
 #endif // !HAVOKCONVERTER_LOST_WORLD
@@ -257,7 +253,6 @@ void HKWindow::logNodeTree(aiNode *node, QString prefix) {
 		}
 	}
 }
-
 
 hkpShape *HKWindow::convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale) {
 	// Get triangle count.
@@ -347,8 +342,6 @@ hkpConvexShape* HKWindow::convertMeshToConvexShape(aiMesh* mesh, LibGens::Vector
 		vertex_buffer[vertex_count++] = 0.0f;
 	}
 
-	//const LibGens::Vector3 offset = position - aabb.center();
-
 	// Can't make a switch statement out of tags, so we just have to check for each tag we care about in sequence and go from there.
 	// The first time our tag matches our desired tag, we have our convex shape, so just return.
 
@@ -365,7 +358,7 @@ hkpConvexShape* HKWindow::convertMeshToConvexShape(aiMesh* mesh, LibGens::Vector
 			// This cheap method will work OKAY for now, but won't guarantee a fit around the object.
 			return new hkpSphereShape(aabb.sizeMax() * 0.5f);
 		}
-		if (tag.getKey() == "CYLINDER" || tag.getKey() == "CYL") {
+		if (tag.getKey() == "CYLINDER" || tag.getKey() == "CYL" || tag.getKey() == "CAPSULE") {
 
 			// This is a bit involved, but worth it.
 			// Idea: Get the longest extent to define the axis of the cylinder, then second longest to get the radius.
@@ -391,14 +384,14 @@ hkpConvexShape* HKWindow::convertMeshToConvexShape(aiMesh* mesh, LibGens::Vector
 				return min;
 			};
 
-			enum CylAxis {
+			enum LongAxis {
 				NONE,
 				AxisX,
 				AxisY,
 				AxisZ
 			};
 
-			CylAxis axis = NONE;
+			LongAxis axis = NONE;
 			string axisValue = tag.getValue(0, "");
 			if (axisValue == "X" || axisValue == "x")
 				axis = AxisX;
@@ -437,7 +430,7 @@ hkpConvexShape* HKWindow::convertMeshToConvexShape(aiMesh* mesh, LibGens::Vector
 
 				// Determine automatically by getting the longest or shortest axis & assuming that's the polar axis.
 				// If longest axis is the polar axis, get the SECOND longest axis as the radius. Else, just get the longest axis.
-				// It's a h4ck method for sure, but better than nothing.
+				// It's a hack method for sure, but better than nothing.
 				case NONE: {
 					start = hkVector4(size_x, 0, 0);
 					end   = hkVector4(-size_x, 0, 0);
@@ -480,6 +473,10 @@ hkpConvexShape* HKWindow::convertMeshToConvexShape(aiMesh* mesh, LibGens::Vector
 					break;
 				}
 			}
+
+			// TODO: Maybe don't get this tag twice...
+			if (tag.getKey() == "CAPSULE")
+				return new hkpCapsuleShape(start, end, radius);
 
 			return new hkpCylinderShape(start, end, radius);
 		}
@@ -525,6 +522,7 @@ QList<hkpRigidBody *> HKWindow::convertNodeToRigidBodies(const aiScene *scene, a
 
 			if (tag.getKey() == "BOX"
 				|| tag.getKey() == "SPHERE"
+				|| tag.getKey() == "CAPSULE"
 				|| tag.getKey() == "CYLINDER"
 				|| tag.getKey() == "CYL")
 				return true;
