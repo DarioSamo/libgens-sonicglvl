@@ -523,7 +523,7 @@ namespace LibGens {
 								}
 							}
 						}
-						else if ((sub_element_name==LIBGENS_MATH_AXIS_X_TEXT) || (sub_element_name==LIBGENS_MATH_AXIS_Y_TEXT) || (sub_element_name==LIBGENS_MATH_AXIS_Z_TEXT)) {
+						else if ((sub_element_name==LIBGENS_MATH_AXIS_X_TEXT) || (sub_element_name==LIBGENS_MATH_AXIS_Y_TEXT) || (sub_element_name==LIBGENS_MATH_AXIS_Z_TEXT) || (sub_element_name== LIBGENS_MATH_AXIS_W_TEXT)) {
 							ObjectElementVector *element=new ObjectElementVector();
 							element->setName(element_name);
 							element->value.readXML(pElem);
