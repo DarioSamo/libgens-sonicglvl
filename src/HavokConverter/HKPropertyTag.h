@@ -12,6 +12,7 @@ enum HKBitwise {
 struct HKPropertyValue {
 	int key, value;
 	HKBitwise bitwise;
+	QString name;
 };
 
 struct HKPropertyTag {

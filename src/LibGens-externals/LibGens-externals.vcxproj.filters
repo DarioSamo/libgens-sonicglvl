@@ -86,5 +86,8 @@
     <ClInclude Include="tristripper\detail\types.h">
       <Filter>Externals\tristripper\detail</Filter>
     </ClInclude>
+    <ClInclude Include="hash.h">
+      <Filter>Externals</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

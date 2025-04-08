@@ -111,8 +111,13 @@ namespace LibGens {
 
 	FbxNode *FBX::addHavokBone(FbxNode *parent_node, unsigned int parent_index, vector<FbxNode *> &skeleton_bones, hkaSkeleton *skeleton) {
 		FbxNode *root_bone=NULL;
+#ifndef Release2005
 		for (int b=0; b<skeleton->m_bones.getSize(); b++) {
-			hkaBone &bone           = skeleton->m_bones[b];
+			hkaBone& bone = skeleton->m_bones[b];
+#else
+		for (int b=0; b<skeleton->m_numBones; b++) {
+			hkaBone &bone           = *skeleton->m_bones[b];
+#endif
 			string bone_name        = bone.m_name;
 			size_t model_bone_index = 0;
 			bool found=false;
@@ -217,6 +222,7 @@ namespace LibGens {
 
 
 	void FBX::addHavokAnimation(vector<FbxNode *> &skeleton_bones, hkaSkeleton *skeleton, hkaAnimationBinding *animation_binding, hkaAnimation *animation, const string& animation_name) {
+#ifndef Release2005
 		// Create an animation control
 		hkaDefaultAnimationControl* ac = new hkaDefaultAnimationControl(animation_binding);
 
@@ -370,6 +376,7 @@ namespace LibGens {
 			if (lCurve[0] && lCurve[1] && lCurve[2] && lFilter.NeedApply(lCurve, 3))
 				lFilter.Apply(lCurve, 3);
 		}
+#endif
 	}
 
 	FbxMesh *FBX::addTerrainInstance(TerrainInstance *instance) {
@@ -399,12 +406,11 @@ namespace LibGens {
 			lMeshNode = FbxNode::Create(scene, name.c_str());
 			lMesh = FbxMesh::Create(scene, (name + "_mesh").c_str());
 
-			// UVs need to be in separate layers
-			while (lMesh->CreateLayer() != 3);
+			// Create layers
+			// UV2 needs to be in the second layer
+			while (lMesh->CreateLayer() != 1);
 			FbxLayer* lLayer = lMesh->GetLayer(0);
 			FbxLayer* lLayer1 = lMesh->GetLayer(1);
-			FbxLayer* lLayer2 = lMesh->GetLayer(2);
-			FbxLayer* lLayer3 = lMesh->GetLayer(3);
 
 			// Build Transform
 			Vector3 position;
@@ -461,17 +467,7 @@ namespace LibGens {
 			FbxLayerElementUV* lLayerUV2Element = (FbxLayerElementUV*)lLayer1->CreateLayerElementOfType(FbxLayerElement::eUV);
 			lLayerUV2Element->SetName("UVChannel_2");
 			lLayerUV2Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
-			lLayerUV2Element->SetReferenceMode(FbxGeometryElement::eDirect);	
-			
-			FbxLayerElementUV* lLayerUV3Element = (FbxLayerElementUV*)lLayer2->CreateLayerElementOfType(FbxLayerElement::eUV);
-			lLayerUV3Element->SetName("UVChannel_3");
-			lLayerUV3Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
-			lLayerUV3Element->SetReferenceMode(FbxGeometryElement::eDirect);		
-			
-			FbxLayerElementUV* lLayerUV4Element = (FbxLayerElementUV*)lLayer3->CreateLayerElementOfType(FbxLayerElement::eUV);
-			lLayerUV4Element->SetName("UVChannel_4");
-			lLayerUV4Element->SetMappingMode(FbxGeometryElement::eByControlPoint);
-			lLayerUV4Element->SetReferenceMode(FbxGeometryElement::eDirect);
+			lLayerUV2Element->SetReferenceMode(FbxGeometryElement::eDirect);
 			
 			// Create Vertices
 			unsigned int index=0;
@@ -482,8 +478,6 @@ namespace LibGens {
 				Vector3 tangent = (*it)->getTangent();
 				Vector2 uv_0 = (*it)->getUV(0);
 				Vector2 uv_1 = (*it)->getUV(1);
-				Vector2 uv_2 = (*it)->getUV(2);
-				Vector2 uv_3 = (*it)->getUV(3);
 				Color   color = (*it)->getColor();
 
 				lControlPoints[index] = FbxVector4(position.x, position.y, position.z);
@@ -492,8 +486,6 @@ namespace LibGens {
 				lLayerElementTangent->GetDirectArray().Add(FbxVector4(tangent.x, tangent.y, tangent.z));
 				lLayerUVElement->GetDirectArray().Add(FbxVector2(uv_0.x, 1.0-uv_0.y));
 				lLayerUV2Element->GetDirectArray().Add(FbxVector2(uv_1.x, 1.0-uv_1.y));
-				lLayerUV3Element->GetDirectArray().Add(FbxVector2(uv_2.x, 1.0-uv_2.y));
-				lLayerUV4Element->GetDirectArray().Add(FbxVector2(uv_3.x, 1.0-uv_3.y));
 				lLayerElementVertexColor->GetDirectArray().Add(FbxColor(color.r, color.g, color.b, color.a));
 				index++;
 			}
@@ -552,7 +544,11 @@ namespace LibGens {
 			
 			if (havok_skeleton) {
 				vector<FbxNode *> skeleton_bones;
+#ifndef Release2005
 				skeleton_bones.resize(havok_skeleton->m_bones.getSize(), NULL);
+#else
+				skeleton_bones.resize(havok_skeleton->m_numBones, NULL);
+#endif
 
 				addHavokSkeleton(skeleton_bones, havok_skeleton);
 

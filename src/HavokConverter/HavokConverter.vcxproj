@@ -9,6 +9,10 @@
       <Configuration>Release 2012</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release 2005|Win32">
+      <Configuration>Release 2005</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -17,24 +21,36 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B8991F66-9805-4714-929E-078F0A351494}</ProjectGuid>
     <RootNamespace>HedgehogConverter</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 2005|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -48,6 +64,9 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release 2005|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>../../bin/</OutDir>
@@ -55,6 +74,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 2012|Win32'">
     <OutDir>../../bin/</OutDir>
     <TargetName>$(ProjectName) - LostWorld</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 2005|Win32'">
+    <OutDir>../../bin/</OutDir>
+    <TargetName>$(ProjectName) - Unleashed</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <OutDir>..\..\bin\$(Configuration)\</OutDir>
@@ -105,6 +128,24 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../depends/qt/lib;../../depends/assimp/lib;../../depends/allegro/lib;../../depends/fbxsdk/lib/vs2010/x86/release;../../depends/hk2012_2_0_r1/Lib/win32_vs2010_noSimd/release_dll;../../depends/pthreads/lib/x86;../../lib/Release 2012;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;assimp-vc100-mt.lib;libfbxsdk-mt.lib;allegro-5.0.10-monolith-mt.lib;LibGens.lib;LibGens-externals.lib;libfbxsdk-md.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkcdInternal.lib;hkcdCollide.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release 2005|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/allegro/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/pthreads/include;../../depends/fbxsdk/include;../../depends/hk550/Source;../LibGens;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>HAVOKCONVERTER_UNLEASHED;HAVE_STRUCT_TIMESPEC;Release2005;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>../../depends/qt/lib;../../depends/assimp/lib;../../depends/allegro/lib;../../depends/fbxsdk/lib/vs2010/x86/release;../../depends/hk550/Lib/win32_net_8-0\release_multithreaded_dll;../../depends/pthreads/lib/x86;../../lib/Release 2005;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc100-mt.lib;libfbxsdk-mt.lib;LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;allegro-5.0.10-monolith-mt.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
