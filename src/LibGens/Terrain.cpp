@@ -22,7 +22,6 @@
 #include "TerrainInstance.h"
 #include "MaterialLibrary.h"
 #include "TerrainGroup.h"
-#include "VRMap.h"
 
 namespace LibGens {
 	TerrainAutodraw::TerrainAutodraw(string filename) {
@@ -234,26 +233,6 @@ namespace LibGens {
 
 		return instances;
 	}
-
-	VRMap *Terrain::generateVRMap(float unit_size, float saturation_multiplier, float brightness_offset) {
-		VRMap *map=new VRMap();
-		list<VRMapSample *> *list=map->getSampleListPointer();
-
-		for (std::vector<TerrainGroup *>::iterator it=groups.begin(); it!=groups.end(); it++) {
-			std::list<TerrainInstance *> group_instances=(*it)->getInstances();
-
-			for (std::list<TerrainInstance *>::iterator it_i=group_instances.begin(); it_i!=group_instances.end(); it_i++) {
-				string map=(*it_i)->getName() + "_completemap";
-				Bitmap *bitmap=Bitmap::getBitmap(map, gia_folder);
-				(*it_i)->createSamplePoints(list, bitmap, unit_size, saturation_multiplier, brightness_offset);
-
-				if (bitmap) Bitmap::deleteBitmap(bitmap);
-			}
-		}
-
-		return map;
-	}
-
 
 	void Terrain::generateGroups(unsigned int cell_size) {
 		if (!instances_to_organize.size()) return;

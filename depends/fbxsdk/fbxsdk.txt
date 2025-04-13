@@ -1,6 +1,5 @@
 Autodesk FBX SDK
 http://www.autodesk.com/products/fbx/overview
-https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2015 (FBX SDK 2015.1 VS2010 or newer)
-http://images.autodesk.com/adsk/files/fbx20151_fbxsdk_vs2010_win.exe
+https://www.autodesk.com/content/dam/autodesk/www/adn/fbx/2020-3-2/fbx202032_fbxsdk_vs2019_win.exe
 
 Put include and lib folder here.

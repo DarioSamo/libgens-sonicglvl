@@ -495,7 +495,7 @@ void EditorLevel::loadTerrain(Ogre::SceneManager *scene_manager, list<TerrainNod
 
 		direct_light     = new LibGens::Light(terrain_data_folder + "/" + "Direct01.light");
 
-		printf("Terrain Folder: %s\n", terrain_data_folder);
+		printf("Terrain Folder: %s\n", terrain_data_folder.c_str());
 
 		material_library = new LibGens::MaterialLibrary(terrain_data_folder + "/");
 

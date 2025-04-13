@@ -25,18 +25,3 @@
 #include "HavokPropertyDatabase.h"
 #include <Common/Base/keycode.cxx>
 #include <Common/Base/Config/hkProductFeatures.cxx>
-
-// Keycode
-
-// This excludes libraries that are not going to be linked
-// from the project configuration, even if the keycodes are
-// present
-#define HK_FEATURE_REFLECTION_PHYSICS
-#define HK_FEATURE_REFLECTION_ANIMATION
-#define HK_FEATURE_REFLECTION_BEHAVIOUR
-#define HK_CLASSES_FILE <Common/Serialize/Classlist/hkClasses.h>
-#define HK_EXCLUDE_FEATURE_MemoryTracker
-#define HK_EXCLUDE_FEATURE_RegisterVersionPatches 
-
-namespace LibGens {
-};

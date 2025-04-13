@@ -194,8 +194,5 @@ database
 # JetBrains IDE files
 .idea
 
-# Configuration files
-bin/GIAtlasConverter.ini
-bin/HedgehogConverter.ini
-bin/HavokConverter.ini
-bin/ogre.cfg
+# Qt files
+qrc_*.cpp

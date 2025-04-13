@@ -1251,10 +1251,10 @@ bool EditorApplication::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 
 	if (terrain_streamer) {
 		Ogre::Vector3 v = viewport->getCamera()->getPosition();
-		pthread_mutex_lock(terrain_streamer->getMutex());
+		terrain_streamer->getMutex().lock();
 		terrain_streamer->setPosition(LibGens::Vector3(v.x, v.y, v.z));
 		terrain_streamer->setCheck(true);
-		pthread_mutex_unlock(terrain_streamer->getMutex());
+		terrain_streamer->getMutex().unlock();
 	}
 
 	// Update Terrain

@@ -95,7 +95,6 @@ namespace LibGens {
 	};
 
 	class Model;
-	class VRMapSample;
 	class LightList;
 
 	class TerrainInstance {
@@ -109,9 +108,6 @@ namespace LibGens {
 			string filename;
 
 			vector<TerrainInstanceMesh *> meshes;
-
-			list<VRMapSample *> samples;
-			vector<vector<vector<vector<VRMapSample *> > > > grid;
 		public:
 			TerrainInstance();
 			TerrainInstance(string name_p, Model *model_p, Matrix4 matrix_p);
@@ -174,8 +170,6 @@ namespace LibGens {
 
 			void setPosition(Vector3 v);
 			void setRotation(Quaternion v);
-
-			void createSamplePoints(list<VRMapSample *> *list, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
 
 			~TerrainInstance();
 	};

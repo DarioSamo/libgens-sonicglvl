@@ -457,12 +457,6 @@ namespace LibGens {
 		return faces;
 	}
 
-	void Model::createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size, float saturation_multiplier, float brightness_offset) {
-		for (std::vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
-			(*it)->createSamplePoints(list, matrix, bitmap, unit_size, saturation_multiplier, brightness_offset);
-		}
-	}
-
 	void Model::addMesh(Mesh *mesh) {
 		if (mesh) {
 			meshes.push_back(mesh);

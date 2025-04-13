@@ -1,0 +1,10 @@
+SonicGlvl.Mod/
+RelWithDebInfo/
+*.exe
+*.pdb
+*.dll
+*.ini
+*.log
+
+!nvdxt.exe
+!HavokConverter_LW.ini

@@ -24,11 +24,6 @@ namespace LibGens {
 	int initialize() {
 		// Initialize Subsystems
 		Error::initialize();
-
-		// Initialize Allegro
-		al_init();
-		al_init_image_addon();
-		al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
 		return 1;
 	}
 };

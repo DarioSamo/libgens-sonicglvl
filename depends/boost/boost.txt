@@ -1,0 +1,15 @@
+boost
+https://www.boost.org/
+https://archives.boost.io/release/1.87.0/source/boost_1_87_0.7z
+
+Download Boost 1.87 and extract the boost folder into this directory.
+
+Make sure the boost folder is placed alongside .gitignore and boost.txt:
+
+boost/
+├── .gitignore
+├── boost.txt
+├── boost/
+│   ├── algorithm/
+│   ├── align/
+│   └── ...
