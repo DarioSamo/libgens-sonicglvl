@@ -57,7 +57,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp-vc100-mt.lib;LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/qt/lib;../../lib/$(Configuration);../../depends/fbxsdk/lib/vs2010/x86/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -78,7 +78,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/qt/lib;../../lib/Release;../../depends/fbxsdk/lib/vs2019/x86/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc100-mt.lib;LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -141,7 +141,7 @@
       <DLL Include="..\..\depends\qt\bin\Qt5Gui.dll" />
       <DLL Include="..\..\depends\qt\bin\Qt5Widgets.dll" />
       <DLL Include="..\..\depends\qt\bin\Qt5Xml.dll" />
-      <DLL Include="..\..\depends\assimp\bin\assimp-vc100-mt.dll" />
+      <DLL Include="..\..\depends\assimp\bin\assimp-vc143-mt.dll" />
     </ItemGroup>
     <ItemGroup>
       <PlatformDLL Include="..\..\depends\qt\bin\platforms\qwindows.dll" />
