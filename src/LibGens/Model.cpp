@@ -119,15 +119,20 @@ namespace LibGens {
 		if (!terrain_mode) {
 			readSkeleton(file);
 		}
-		else if (file->getRootNodeType() >= 5) {
-			size_t mesh_name_address = 0;
+		else 
+		{
+			if (file->getRootNodeType() >= 5) {
+				size_t mesh_name_address = 0;
 
-			file->readInt32BEA(&mesh_name_address);
-			file->readInt32BE(&has_instances);
+				file->readInt32BEA(&mesh_name_address);
+				file->readInt32BE(&has_instances);
 
-			// Read Name
-			file->goToAddress(mesh_name_address);
-			file->readString(&name);
+				// Read Name
+				file->goToAddress(mesh_name_address);
+				file->readString(&name);
+			}
+
+			buildAABB();
 		}
 	}
 
