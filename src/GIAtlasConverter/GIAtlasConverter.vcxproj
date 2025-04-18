@@ -58,7 +58,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../../depends/ogre/lib;../../depends/qt/lib;../../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -76,7 +76,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../depends/ogre/lib;../../depends/qt/lib;../../lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

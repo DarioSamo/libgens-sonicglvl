@@ -110,8 +110,15 @@ namespace LibGens {
 			if (ar_pack && ar_pack_file) {
 				ArFile *entry=ar_pack->getFile(model_name+LIBGENS_TERRAIN_MODEL_EXTENSION);
 				if (entry) {
-					ar_pack_file->setGlobalOffset(entry->getAbsoluteDataAddress());
-					Model *model=new Model(ar_pack_file, true);
+					Model *model;
+					if (entry->getData()) {
+						File ar_data_file(entry->getData(), entry->getSize());
+						model = new Model(&ar_data_file, true);
+					}
+					else {
+						ar_pack_file->setGlobalOffset(entry->getAbsoluteDataAddress());
+						model = new Model(ar_pack_file, true);
+					}
 					model->setName(model_name);
 					models.push_back(model);
 				}
@@ -154,8 +161,15 @@ namespace LibGens {
 				if (ar_pack && ar_pack_file) {
 					ArFile *entry=ar_pack->getFile(instance_name+LIBGENS_TERRAIN_INSTANCE_EXTENSION);
 					if (entry) {
-						ar_pack_file->setGlobalOffset(entry->getAbsoluteDataAddress());
-						TerrainInstance *instance=new TerrainInstance(ar_pack_file, &models);
+						TerrainInstance *instance;
+						if (entry->getData()) {
+							File ar_data_file(entry->getData(), entry->getSize());
+							instance = new TerrainInstance(&ar_data_file, &models);
+						}
+						else {
+							ar_pack_file->setGlobalOffset(entry->getAbsoluteDataAddress());
+							instance = new TerrainInstance(ar_pack_file, &models);
+						}
 						instances_sub.push_back(instance);
 					}
 				}

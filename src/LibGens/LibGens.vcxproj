@@ -66,7 +66,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ALLEGRO_NO_MAGIC_MAIN;LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -83,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>ALLEGRO_NO_MAGIC_MAIN;LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -105,7 +105,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../depends/fbxsdk/include;../../depends/hk2012_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk2012_2_0_r1/Source;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>ALLEGRO_NO_MAGIC_MAIN;LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -126,6 +126,7 @@
     <ClCompile Include="AnimationSet.cpp" />
     <ClCompile Include="AR.cpp" />
     <ClCompile Include="ArchiveTree.cpp" />
+    <ClCompile Include="Compression.cpp" />
     <ClCompile Include="BIXF.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="Endian.cpp" />
@@ -195,6 +196,7 @@
     <ClInclude Include="AnimationSet.h" />
     <ClInclude Include="AR.h" />
     <ClInclude Include="ArchiveTree.h" />
+    <ClInclude Include="Compression.h" />
     <ClInclude Include="BIXF.h" />
     <ClInclude Include="Bone.h" />
     <ClInclude Include="Endian.h" />

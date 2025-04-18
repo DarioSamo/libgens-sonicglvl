@@ -21,25 +21,257 @@
 #include "Model.h"
 
 namespace LibGens {
-	File::File(string filename, string mode) {
-		file_ptr=fopen(filename.c_str(), mode.c_str());
+	class FileImpl {
+	public:
+		virtual ~FileImpl() {}
+		virtual size_t read(void* buffer, size_t buffer_size) = 0;
+		virtual char* gets(char* buffer, int max_count) = 0;
+		virtual size_t write(const void* buffer, size_t size) = 0;
+		virtual long tell() = 0;
+		virtual void seek(long offset, int origin) = 0;
+		virtual bool eof() = 0;
+		virtual void close() = 0;
+	};
 
-		path=filename;
-		root_node_address=0;
+	class DiskFile : public FileImpl {
+	public:
+		FILE* file;
+
+		DiskFile(FILE* file_p) : file(file_p) {
+		}
+
+		size_t read(void* buffer, size_t size) override {
+			return fread(buffer, 1, size, file);
+		}
+
+		char* gets(char* buffer, int max_count) override {
+			return fgets(buffer, max_count, file);
+		}
+
+		size_t write(const void* buffer, size_t size) override {
+			return fwrite(buffer, 1, size, file);
+		}
+
+		long tell() override {
+			return ftell(file);
+		}
+
+		void seek(long offset, int origin) override {
+			fseek(file, offset, origin);
+		}
+
+		bool eof() override {
+			return feof(file) != 0;
+		}
+
+		void close() override {
+			fclose(file);
+		}
+	};
+
+	struct ReadOnlyMemoryFile : public FileImpl {
+	public:
+		const void* data;
+		size_t data_size;
+		size_t data_offset;
+
+		ReadOnlyMemoryFile(const void* data_p, size_t data_size_p)
+			: data(data_p), data_size(data_size_p), data_offset(0) {
+		}
+
+		~ReadOnlyMemoryFile() override {
+		}
+
+		size_t read(void* buffer, size_t size) override {
+			size_t available = data_size - data_offset;
+			if (size > available) {
+				size = available;
+			}
+
+			memcpy(buffer, reinterpret_cast<const unsigned char*>(data) + data_offset, size);
+			data_offset += size;
+
+			return size;
+		}
+
+		char* gets(char* buffer, int max_count) override {
+			// Unimplemented!
+			__debugbreak();
+			return nullptr;
+		}
+
+		size_t write(const void* buffer, size_t size) override {
+			// Unsupported!
+			__debugbreak();
+			return 0xFFFFFFFF;
+		}
+
+		long tell() override {
+			return static_cast<long>(data_offset);
+		}
+
+		void seek(long offset, int origin) override {
+			switch (origin) {
+			case SEEK_SET:
+				if (offset < data_size) {
+					data_offset = offset;
+				}
+				else {
+					data_offset = data_size;
+				}
+				break;
+
+			case SEEK_CUR:
+				if ((data_offset + offset) < data_size) {
+					data_offset += offset;
+				}
+				else {
+					data_offset = data_size;
+				}
+				break;
+
+			case SEEK_END:
+				if ((-offset) < data_size) {
+					data_offset = data_size + offset;
+				}
+				else {
+					data_offset = 0;
+				}
+				break;
+			}
+		}
+
+		bool eof() override {
+			return data_offset >= data_size;
+		}
+
+		void close() override {
+		}
+	};
+
+	struct MemoryFile : public FileImpl {
+	public:
+		vector<unsigned char> data;
+		size_t data_offset;
+
+		MemoryFile()
+			: data_offset(0) {
+		}
+
+		~MemoryFile() override {
+		}
+
+		size_t read(void* buffer, size_t size) override {
+			size_t available = data.size() - data_offset;
+			if (size > available) {
+				size = available;
+			}
+
+			memcpy(buffer, &data[data_offset], size);
+			data_offset += size;
+
+			return size;
+		}
+
+		char* gets(char* buffer, int max_count) override {
+			// Unimplemented!
+			__debugbreak();
+			return nullptr;
+		}
+
+		size_t write(const void* buffer, size_t size) override {
+			if (data.size() < (data_offset + size)) {
+				data.resize(data_offset + size);
+			}
+
+			memcpy(&data[data_offset], buffer, size);
+			data_offset += size;
+
+			return size;
+		}
+
+		long tell() override {
+			return static_cast<long>(data_offset);
+		}
+
+		void seek(long offset, int origin) override {
+			switch (origin) {
+			case SEEK_SET:
+				if (offset < data.size()) {
+					data_offset = offset;
+				}
+				else {
+					data_offset = data.size();
+				}
+				break;
+
+			case SEEK_CUR:
+				if ((data_offset + offset) < data.size()) {
+					data_offset += offset;
+				}
+				else {
+					data_offset = data.size();
+				}
+				break;
+
+			case SEEK_END:
+				if ((-offset) < data.size()) {
+					data_offset = data.size() + offset;
+				}
+				else {
+					data_offset = 0;
+				}
+				break;
+			}
+		}
+
+		bool eof() override {
+			return data_offset >= data.size();
+		}
+
+		void close() override {
+		}
+	};
+
+	void File::init() {
+		file_impl = NULL;
+		root_node_address = 0;
 		address_read_count = 0;
 		global_offset = 0;
 		relative_address_mode = false;
 		address_64_bit_mode = false;
+	}
 
-		if (!file_ptr) {
+	File::File(string filename, string mode) {
+		init();
+
+		FILE* file=fopen(filename.c_str(), mode.c_str());
+		if (!file) {
 			Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
 			return;
 		}
+
+		file_impl = new DiskFile(file);
+		path = filename;
+	}
+
+	File::File(const void* data, size_t data_size) {
+		init();
+		file_impl = new ReadOnlyMemoryFile(data, data_size);
+	}
+
+	File::File() {
+		init();
+		file_impl = new MemoryFile();
+	}
+
+	File::~File() {
+		delete file_impl;
 	}
 
 	int File::endOfFile() {
-		if (file_ptr) {
-			return feof(file_ptr);
+		if (file_impl) {
+			return file_impl->eof();
 		}
 		else {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_READ_FILE_NULL);
@@ -48,13 +280,13 @@ namespace LibGens {
 	}
 
 	bool File::valid() {
-		if (file_ptr) return true;
+		if (file_impl) return true;
 		else return false;
 	}
 
 	void File::close() {
-		if (file_ptr) {
-			fclose(file_ptr);
+		if (file_impl) {
+			file_impl->close();
 		}
 		else {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_CLOSING);
@@ -62,7 +294,7 @@ namespace LibGens {
 	}
 
 	bool File::readSafeCheck(void *dest) {
-		if (!file_ptr) {
+		if (!file_impl) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_READ_FILE_NULL);
 			return false;
 		}
@@ -74,30 +306,30 @@ namespace LibGens {
 		return true;
 	}
 
-	void File::read(void *dest, size_t sz) {
-		if (!readSafeCheck(dest)) return;
-		fread(dest, sz, 1, file_ptr);
+	size_t File::read(void *dest, size_t sz) {
+		if (!readSafeCheck(dest)) return 0;
+		return file_impl->read(dest, sz);
 	}
 
 	void File::readInt16(unsigned short *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(short), 1, file_ptr);
+		file_impl->read(dest, sizeof(short));
 	}
 	
 	void File::readInt16BE(unsigned short *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(short), 1, file_ptr);
+		file_impl->read(dest, sizeof(short));
 		Endian::swap(*dest);
 	}
 
 	void File::readInt32(unsigned int *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(int), 1, file_ptr);
+		file_impl->read(dest, sizeof(int));
 	}
 
 	void File::readInt32(int *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(int), 1, file_ptr);
+		file_impl->read(dest, sizeof(int));
 	}
 
 	void File::readInt32A(size_t *dest) {
@@ -107,10 +339,10 @@ namespace LibGens {
 			fixPaddingRead(8);
 		}
 
-		fread(dest, sizeof(size_t), 1, file_ptr);
+		file_impl->read(dest, sizeof(size_t));
 
 		if (address_64_bit_mode) {
-			fseek(file_ptr, 4, SEEK_CUR);
+			file_impl->seek(4, SEEK_CUR);
 		}
 
 		if (relative_address_mode) {
@@ -125,13 +357,13 @@ namespace LibGens {
 
 	void File::readInt32BE(unsigned int *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(int), 1, file_ptr);
+		file_impl->read(dest, sizeof(int));
 		Endian::swap(*dest);
 	}
 
 	void File::readInt32BE(int *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(int), 1, file_ptr);
+		file_impl->read(dest, sizeof(int));
 		Endian::swap(*dest);
 	}
 	
@@ -140,10 +372,10 @@ namespace LibGens {
 
 		if (address_64_bit_mode) {
 			fixPaddingRead(8);
-			fseek(file_ptr, 4, SEEK_CUR);
+			file_impl->seek(4, SEEK_CUR);
 		}
 
-		fread(dest, sizeof(size_t), 1, file_ptr);
+		file_impl->read(dest, sizeof(size_t));
 
 		if (relative_address_mode) {
 			*dest += getCurrentAddress() - 4;
@@ -159,7 +391,7 @@ namespace LibGens {
 	void File::readFloat8(float *dest) {
 		if (!readSafeCheck(dest)) return;
 		unsigned char v=0;
-		fread(&v, sizeof(char), 1, file_ptr);
+		file_impl->read(&v, sizeof(char));
 		*dest = v / 256.0f;
 	}
 
@@ -183,18 +415,18 @@ namespace LibGens {
 
 	void File::readFloat32(float *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(int), 1, file_ptr);
+		file_impl->read(dest, sizeof(int));
 	}
 
 	void File::readFloat32BE(float *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(int), 1, file_ptr);
+		file_impl->read(dest, sizeof(int));
 		Endian::swap(*((unsigned int *) dest));
 	}
 
 	void File::readUChar(unsigned char *dest) {
 		if (!readSafeCheck(dest)) return;
-		fread(dest, sizeof(char), 1, file_ptr);
+		file_impl->read(dest, sizeof(char));
 	}
 
 	void File::readString(string *dest) {
@@ -202,14 +434,14 @@ namespace LibGens {
 		char c=1;
 		*dest = "";
 		while (c && !endOfFile()) {
-			fread(&c, sizeof(char), 1, file_ptr);
+			file_impl->read(&c, sizeof(char));
 			if (c) *dest += c;
 		}
 	}
 
 	bool File::readLine(string *dest) {
 		char string_buffer[LIBGENS_FILE_STRING_BUFFER];
-		if (fgets(string_buffer, LIBGENS_FILE_STRING_BUFFER, file_ptr)) {
+		if (file_impl->gets(string_buffer, LIBGENS_FILE_STRING_BUFFER)) {
 			size_t ln = strlen(string_buffer) - 1;
 			if (string_buffer[ln] == '\n') {
 				string_buffer[ln] = '\0';
@@ -227,7 +459,7 @@ namespace LibGens {
 		char c=1;
 		*dest = "";
 		for (size_t i=0; i<n; i++) {
-			fread(&c, sizeof(char), 1, file_ptr);
+			file_impl->read(&c, sizeof(char));
 			if (c) *dest += c;
 		}
 	}
@@ -263,35 +495,35 @@ namespace LibGens {
 		else readFloat32(dest);
 	}
 
-	void File::write(void *dest, size_t sz) {
-		if (!readSafeCheck(dest)) return;
-		fwrite(dest, sz, 1, file_ptr);
+	size_t File::write(void *dest, size_t sz) {
+		if (!readSafeCheck(dest)) return 0;
+		return file_impl->write(dest, sz);
 	}
 	
 	void File::writeString(const char *dest) {
 		if (!readSafeCheck((void *) dest)) return;
 
-		fwrite(dest, sizeof(char), strlen(dest), file_ptr);
+		file_impl->write(dest, strlen(dest));
 	}
 
 	void File::writeString(string *dest) {
 		if (!readSafeCheck(dest)) return;
 
 		if (!dest->size()) writeNull(1);
-		else fwrite(dest->c_str(), sizeof(char), dest->size()+1, file_ptr);
+		else file_impl->write(dest->c_str(), dest->size()+1);
 	}
 
 	void File::writeUChar(unsigned char *dest) {
 		if (!readSafeCheck(dest)) return;
 
-		fwrite(dest, sizeof(char), 1, file_ptr);
+		file_impl->write(dest, sizeof(char));
 	}
 
 	void File::writeInt16(unsigned short *dest) {
 		if (!readSafeCheck(dest)) return;
 
 		unsigned short target=*dest;
-		fwrite(&target, sizeof(short), 1, file_ptr);
+		file_impl->write(&target, sizeof(short));
 	}
 
 	void File::writeInt16BE(unsigned short *dest) {
@@ -299,13 +531,13 @@ namespace LibGens {
 
 		unsigned short target=*dest;
 		Endian::swap(target);
-		fwrite(&target, sizeof(short), 1, file_ptr);
+		file_impl->write(&target, sizeof(short));
 	}
 
 	void File::writeInt32(unsigned int *dest) {
 		if (!readSafeCheck(dest)) return;
 
-		fwrite(dest, sizeof(int), 1, file_ptr);
+		file_impl->write(dest, sizeof(int));
 	}
 
 	void File::writeInt32A(size_t *dest, bool add_to_table) {
@@ -314,7 +546,7 @@ namespace LibGens {
 		if (add_to_table) final_address_table.push_back(getCurrentAddress()-root_node_address);
 
 		unsigned int target=(*dest) - root_node_address;
-		fwrite(&target, sizeof(int), 1, file_ptr);
+		file_impl->write(&target, sizeof(int));
 	}
 
 	void File::writeInt32BE(int *dest) {
@@ -322,7 +554,7 @@ namespace LibGens {
 
 		int target=*dest;
 		Endian::swap(target);
-		fwrite(&target, sizeof(int), 1, file_ptr);
+		file_impl->write(&target, sizeof(int));
 	}
 
 	void File::writeInt32BE(unsigned int *dest) {
@@ -330,7 +562,7 @@ namespace LibGens {
 
 		unsigned int target=*dest;
 		Endian::swap(target);
-		fwrite(&target, sizeof(int), 1, file_ptr);
+		file_impl->write(&target, sizeof(int));
 	}
 
 	void File::writeInt32BEA(size_t *dest) {
@@ -340,7 +572,7 @@ namespace LibGens {
 
 		unsigned int target=(*dest) - root_node_address;
 		Endian::swap(target);
-		fwrite(&target, sizeof(int), 1, file_ptr);
+		file_impl->write(&target, sizeof(int));
 	}
 
 	void File::writeFloat8(float *dest) {
@@ -363,7 +595,7 @@ namespace LibGens {
 
 	void File::writeFloat32(float *dest) {
 		if (!readSafeCheck(dest)) return;
-		fwrite(dest, sizeof(float), 1, file_ptr);
+		file_impl->write(dest, sizeof(float));
 	}
 
 	void File::writeFloat32BE(float *dest) {
@@ -371,7 +603,7 @@ namespace LibGens {
 
 		float target=*dest;
 		Endian::swap(*((unsigned int *) &target));
-		fwrite(&target, sizeof(float), 1, file_ptr);
+		file_impl->write(&target, sizeof(float));
 	}
 
 	void File::writeFloat32E(float *dest, bool big_endian) {
@@ -382,7 +614,7 @@ namespace LibGens {
 	void File::writeNull(size_t size) {
 		unsigned char zero=0;
 		for (size_t i=0; i<size; i++) {
-			fwrite(&zero, sizeof(char), 1, file_ptr);
+			file_impl->write(&zero, sizeof(char));
 		}
 	}
 
@@ -396,7 +628,7 @@ namespace LibGens {
 		}
 
 		size_t zero=0;
-		for (size_t c=0; c<extra; c++) fwrite(&zero, sizeof(char), 1, file_ptr);
+		for (size_t c=0; c<extra; c++) file_impl->write(&zero, sizeof(char));
 		return extra;
 	}
 
@@ -413,25 +645,25 @@ namespace LibGens {
 	}
 
 	size_t File::getFileSize() {
-		if (!file_ptr) {
+		if (!file_impl) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_HEADER);
 			return 0;
 		}
 
 		size_t address=getCurrentAddress();
-		fseek(file_ptr, 0, SEEK_END);
-		size_t sz=ftell(file_ptr);
+		file_impl->seek(0, SEEK_END);
+		size_t sz= file_impl->tell();
 		goToAddress(address);
 		return sz;
 	}
 
 	void File::readHeader() {
-		if (!file_ptr) {
+		if (!file_impl) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_HEADER);
 			return;
 		}
 
-		fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_TYPE_ADDRESS + global_offset, SEEK_SET);
+		file_impl->seek(LIBGENS_FILE_HEADER_ROOT_TYPE_ADDRESS + global_offset, SEEK_SET);
 		readInt32BE(&root_node_type);
 
 		relative_address_mode = false;
@@ -447,14 +679,14 @@ namespace LibGens {
 		}
 
 		else {
-			fseek(file_ptr, LIBGENS_FILE_HEADER_ROOT_NODE_ADDRESS + global_offset, SEEK_SET);
+			file_impl->seek(LIBGENS_FILE_HEADER_ROOT_NODE_ADDRESS + global_offset, SEEK_SET);
 			readInt32BE(&root_node_address);
 
-			fseek(file_ptr, LIBGENS_FILE_HEADER_OFFSET_TABLE_ADDRESS + global_offset, SEEK_SET);
+			file_impl->seek(LIBGENS_FILE_HEADER_OFFSET_TABLE_ADDRESS + global_offset, SEEK_SET);
 			unsigned int offset_table_address = 0;
 			readInt32BE(&offset_table_address);
 
-			fseek(file_ptr, offset_table_address + global_offset, SEEK_SET);
+			file_impl->seek(offset_table_address + global_offset, SEEK_SET);
 			unsigned int offset_count = 0;
 			readInt32BE(&offset_count);
 			
@@ -462,14 +694,14 @@ namespace LibGens {
 				unsigned int first_offset = 0;
 				readInt32BE(&first_offset);
 
-				fseek(file_ptr, root_node_address + first_offset + global_offset, SEEK_SET);
+				file_impl->seek(root_node_address + first_offset + global_offset, SEEK_SET);
 				readInt32BE(&first_offset);
 
 				address_64_bit_mode = (first_offset == 0);
 			}
 		}
 
-		fseek(file_ptr, root_node_address + global_offset, SEEK_SET);
+		file_impl->seek(root_node_address + global_offset, SEEK_SET);
 	}
 
 	void File::prepareHeader(int root_type) {
@@ -486,7 +718,7 @@ namespace LibGens {
 	}
 
 	void File::writeHeader(bool no_extra_foot) {
-		if (!file_ptr) {
+		if (!file_impl) {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_HEADER);
 			return;
 		}
@@ -530,8 +762,8 @@ namespace LibGens {
 	}
 
 	size_t File::getCurrentAddress() {
-		if (file_ptr) {
-			return ftell(file_ptr)-global_offset;
+		if (file_impl) {
+			return file_impl->tell()-global_offset;
 		}
 		else {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_GET_ADDRESS);
@@ -540,8 +772,8 @@ namespace LibGens {
 	}
 
 	void File::goToAddress(size_t address) {
-		if (file_ptr) {
-			fseek(file_ptr, address+global_offset, SEEK_SET);
+		if (file_impl) {
+			file_impl->seek(address+global_offset, SEEK_SET);
 		}
 		else {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_BOOKMARK);
@@ -549,8 +781,17 @@ namespace LibGens {
 	}
 
 	void File::moveAddress(size_t address) {
-		if (file_ptr) {
-			fseek(file_ptr, address, SEEK_CUR);
+		if (file_impl) {
+			file_impl->seek(address, SEEK_CUR);
+		}
+		else {
+			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_BOOKMARK);
+		}
+	}
+
+	void File::seek(long offset, int origin) {
+		if (file_impl) {
+			file_impl->seek(offset, origin);
 		}
 		else {
 			Error::addMessage(Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_FILE_BOOKMARK);
@@ -614,7 +855,6 @@ namespace LibGens {
 
 		final_address_table = new_address_table;
 	}
-
 
 	void File::createComparison(size_t sz) {
 		comparison_bytes = new unsigned char[sz];
@@ -731,7 +971,7 @@ namespace LibGens {
 	}
 
 	void File::goToEnd() {
-		fseek(file_ptr, 0L, SEEK_END);
+		file_impl->seek(0L, SEEK_END);
 	}
 
 	void File::setRootNodeAddress(size_t v) {
@@ -756,10 +996,6 @@ namespace LibGens {
 
 	int File::getRootNodeType() {
 		return root_node_type;
-	}
-
-	FILE *File::getPointer() {
-		return file_ptr;
 	}
 
 	bool File::get64BitAddressMode() const {

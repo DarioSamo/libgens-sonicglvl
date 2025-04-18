@@ -30,6 +30,7 @@
 #include "TerrainInstance.h"
 #include "FreeImage.h"
 #include "Path.h"
+#include "Compression.h"
 
 const int GIWindow::MinimumTextureSize = 4;
 
@@ -116,27 +117,15 @@ bool GIWindow::convert() {
 	// Extract existing Stage.pfd into a temporary directory and remove all the gia- files if on Pre-Render mode.
 	{
 		LibGens::ArPack stage_ar_pack(stage_pfd_filename.toStdString());
-		stage_ar_pack.extract(stage_temp_path.toStdString() + "/", ".cab");
+		stage_ar_pack.extract(stage_temp_path.toStdString() + "/");
 		logProgress(ProgressNormal, "Extracted " + stage_pfd_filename + " to " + stage_temp_path + ".");
-
-		QStringList entry_list = QDir(stage_temp_path).entryList(QStringList() << "*.cab");
-		foreach(QString entry, entry_list) {
-			QString entry_filename = stage_temp_path + "/" + entry;
-			expandFileCAB(entry_filename, entry_filename.left(entry_filename.size() - 4));
-		}
 	}
 
 	// Extract existing Stage-Add.pfd into a temporary directory and  if on Pre-Render mode.
 	{
 		LibGens::ArPack stage_add_ar_pack(stage_add_pfd_filename.toStdString());
-		stage_add_ar_pack.extract(stage_add_temp_path.toStdString() + "/", ".cab");
+		stage_add_ar_pack.extract(stage_add_temp_path.toStdString() + "/");
 		logProgress(ProgressNormal, "Extracted " + stage_add_pfd_filename + " to " + stage_add_temp_path + ".");
-
-		QStringList entry_list = QDir(stage_add_temp_path).entryList(QStringList() << "*.cab");
-		foreach(QString entry, entry_list) {
-			QString entry_filename = stage_add_temp_path + "/" + entry;
-			expandFileCAB(entry_filename, entry_filename.left(entry_filename.size() - 4));
-		}
 	}
 
 	unsigned int total_pre_render_size = 0;
@@ -199,9 +188,16 @@ bool GIWindow::convert() {
 				string model_name = models[m]->getName();
 				LibGens::ArFile *ar_file = group_ar_pack.getFile(model_name + LIBGENS_TERRAIN_MODEL_EXTENSION);
 				if (ar_file) {
-					ar_pack_file->setGlobalOffset(ar_file->getAbsoluteDataAddress());
+					LibGens::Model *model;
+					if (ar_file->getData()) {
+						LibGens::File ar_data_file(ar_file->getData(), ar_file->getSize());
+						model = new LibGens::Model(&ar_data_file, true);
+					}
+					else {
+						ar_pack_file->setGlobalOffset(ar_file->getAbsoluteDataAddress());
+						model = new LibGens::Model(ar_pack_file, true);
+					}
 
-					LibGens::Model *model = new LibGens::Model(ar_pack_file, true);
 					LibGens::AABB aabb = model->getAABB();
 					model_aabbs[model_name] = aabb;
 					logProgress(ProgressNormal, QString("Loaded %1.terrain-model from group's AR Pack. AABB: [%2, %3, %4][%5, %6, %7]").arg(model_name.c_str()).arg(aabb.start.x).arg(aabb.start.y).arg(aabb.start.z).arg(aabb.end.x).arg(aabb.end.y).arg(aabb.end.z));
@@ -224,9 +220,17 @@ bool GIWindow::convert() {
 
 				LibGens::ArFile *ar_file = group_ar_pack.getFile(instance_name + LIBGENS_TERRAIN_INSTANCE_EXTENSION);
 				if (ar_file) {
-					ar_pack_file->setGlobalOffset(ar_file->getAbsoluteDataAddress());
+					LibGens::TerrainInstance *instance;
 
-					LibGens::TerrainInstance *instance = new LibGens::TerrainInstance(ar_pack_file);
+					if (ar_file->getData()) {
+						LibGens::File ar_data_file(ar_file->getData(), ar_file->getSize());
+						instance = new LibGens::TerrainInstance(&ar_data_file);
+					}
+					else {
+						ar_pack_file->setGlobalOffset(ar_file->getAbsoluteDataAddress());
+						instance = new LibGens::TerrainInstance(ar_pack_file);
+					}
+
 					string model_name = instance->getModelName();
 					if (model_aabbs.contains(model_name)) {
 						LibGens::Matrix4 instance_matrix = instance->getMatrix();
@@ -443,8 +447,14 @@ bool GIWindow::convert() {
 			logProgress(ProgressNormal, QString("Reading atlasinfo file from group AR Pack."));
 			LibGens::ArFile *atlasinfo_file = group_ar_pack->getFile(LIBGENS_GI_TEXTURE_GROUP_ATLASINFO_FILE);
 			if (atlasinfo_file) {
-				group_ar_file->setGlobalOffset(atlasinfo_file->getAbsoluteDataAddress());
-				group->readAtlasinfo(group_ar_file);
+				if (atlasinfo_file->getData()) {
+					LibGens::File ar_data_file(atlasinfo_file->getData(), atlasinfo_file->getSize());
+					group->readAtlasinfo(&ar_data_file);
+				}
+				else {
+					group_ar_file->setGlobalOffset(atlasinfo_file->getAbsoluteDataAddress());
+					group->readAtlasinfo(group_ar_file);
+				}
 			}
 
 			group_ar_file->close();
@@ -1040,26 +1050,26 @@ unsigned int GIWindow::nextPowerOfTwo(unsigned int v) {
 }
 
 void GIWindow::compressFileCAB(QString filename) {
-	logProgress(ProgressNormal, "Compressing " + filename + "...");
-	QStringList arguments;
-	arguments << filename << filename;
-	QProcess compression_process;
-	compression_process.start("makecab", arguments);
-	compression_process.waitForFinished();
-	QString conversion_output = compression_process.readAllStandardOutput();
-	logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
-}
+	bool should_compress = false;
 
-void GIWindow::expandFileCAB(QString filename, QString new_filename) {
-	logProgress(ProgressNormal, "Decompressing " + filename + "...");
-	QStringList arguments;
-	arguments << filename << new_filename;
-	QProcess expand_process;
-	expand_process.start("expand", arguments);
-	expand_process.waitForFinished();
-	QString expand_output = expand_process.readAllStandardOutput();
-	logProgress(ProgressNormal, QString("Expand Output: " + expand_output));
-	QFile::remove(filename);
+	LibGens::File file(filename.toStdString(), "rb");
+	if (file.valid()) {
+		unsigned int signature = 0;
+		file.readInt32(&signature);
+		file.close();
+		should_compress = (signature != LibGens::COMPRESSION_CAB);
+	}
+
+	if (should_compress) {
+		logProgress(ProgressNormal, "Compressing " + filename + "...");
+		QStringList arguments;
+		arguments << filename << filename;
+		QProcess compression_process;
+		compression_process.start("makecab", arguments);
+		compression_process.waitForFinished();
+		QString conversion_output = compression_process.readAllStandardOutput();
+		logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
+	}
 }
 
 bool GIWindow::packGenerations(QString output_path, QString output_name, QString path, QString stage_path, QString stage_add_path) {

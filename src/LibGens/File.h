@@ -47,9 +47,11 @@
 #define LIBGENS_FILE_WRITE_BINARY                       "wb"
 
 namespace LibGens {
+	class FileImpl;
+
 	class File {
 		protected:
-			FILE *file_ptr;
+			FileImpl *file_impl;
 			string name;
 			string path;
 			int root_node_type;
@@ -63,8 +65,14 @@ namespace LibGens {
 			size_t comparison_size;
 			bool relative_address_mode;
 			bool address_64_bit_mode;
+
+			void init();
 		public:
-			File(string filename, string mode);
+			File(string filename, string mode); // DiskFile, read/write
+			File(const void* data, size_t data_size); // ReadOnlyMemoryFile, readonly
+			File(); // MemoryFile, read/write
+			~File();
+
 			void prepareHeader(int root_type);
 			void writeHeader(bool no_extra_foot=false);
 			void readHeader();
@@ -72,6 +80,7 @@ namespace LibGens {
 			list<size_t> getAddressTable();
 			void addAddressToTable();
 			void sortAddressTable();
+			void seek(long offset, int origin);
 			void goToAddress(size_t address);
 			void goToEnd();
 			void moveAddress(size_t address);
@@ -83,7 +92,7 @@ namespace LibGens {
 			// BE: Big Endian
 			// BEA: Big Endian Address (Offset by Root Node automatically)
 			bool readSafeCheck(void *dest);
-			void read(void *dest, size_t sz);
+			size_t read(void *dest, size_t sz);
 			void readInt16(unsigned short *dest);
 			void readInt16BE(unsigned short *dest);
 			void readInt32(unsigned int *dest);
@@ -107,7 +116,7 @@ namespace LibGens {
 			void readFloat16E(float *dest, bool big_endian);
 			void readFloat32E(float *dest, bool big_endian);
 			bool readLine(string *dest);
-			void write(void *dest, size_t sz);
+			size_t write(void *dest, size_t sz);
 			void writeString(const char *dest);
 			void writeString(string *dest);
 			void writeUChar(unsigned char *dest);
@@ -134,7 +143,6 @@ namespace LibGens {
 
 			int getAddressReadCount();
 			int getRootNodeType();
-			FILE *getPointer();
 
 			bool get64BitAddressMode() const;
 			int getAddressSize() const;

@@ -543,8 +543,14 @@ namespace LibGens {
 		if (ar_pack && ar_pack_file) {
 			ArFile *entry=ar_pack->getFile(LIBGENS_GI_TEXTURE_GROUP_ATLASINFO_FILE);
 			if (entry) {
-				ar_pack_file->setGlobalOffset(entry->getAbsoluteDataAddress());
-				readAtlasinfo(ar_pack_file, group_folder, instance_names);
+				if (entry->getData()) {
+					File ar_data_file(entry->getData(), entry->getSize());
+					readAtlasinfo(&ar_data_file, group_folder, instance_names);
+				}
+				else {
+					ar_pack_file->setGlobalOffset(entry->getAbsoluteDataAddress());
+					readAtlasinfo(ar_pack_file, group_folder, instance_names);
+				}
 			 }
 		}
 
