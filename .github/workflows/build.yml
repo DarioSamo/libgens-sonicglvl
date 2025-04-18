@@ -3,7 +3,7 @@ name: Build libgens-sonicglvl
 on:
   push:
     branches:
-      - compiler-upgrade
+      - master
 
 jobs:
   build:
@@ -50,8 +50,9 @@ jobs:
       - name: Compress artifact
         run: |
           Remove-Item -Path bin\.gitignore
-          Remove-Item -Path cache\.gitignore
           Remove-Item -Recurse -Force -Include *.pdb -Path bin
+          Remove-Item -Path cache\.gitignore
+          Remove-Item -Path database\CONTRIBUTING.txt
           Compress-Archive -Path bin, cache, database -DestinationPath libgens-sonicglvl.zip
         shell: pwsh
 
@@ -61,7 +62,7 @@ jobs:
           path: libgens-sonicglvl.zip
 
       - name: Upload nightly release
-        if: github.repository == 'blueskythlikesclouds/libgens-sonicglvl' && github.ref == 'refs/heads/compiler-upgrade'
+        if: github.repository == 'DarioSamo/libgens-sonicglvl' && github.ref == 'refs/heads/master'
         uses: andelf/nightly-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
