@@ -1,0 +1,74 @@
+name: Build libgens-sonicglvl
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Checkout private repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.PRIVATE_REPO }}
+          token: ${{ secrets.PRIVATE_REPO_TOKEN }}
+          path: ./private
+      
+      - name: Install dependencies
+        run: 7z x ./private/depends.7z -odepends
+
+      - name: Install Boost
+        run: |
+          Invoke-WebRequest "https://archives.boost.io/release/1.87.0/source/boost_1_87_0.7z" -OutFile "boost_1_87_0.7z"
+          7z x boost_1_87_0.7z boost_1_87_0/boost/*
+          Move-Item -Path "boost_1_87_0\boost" -Destination "depends\boost"
+        shell: pwsh
+
+      - name: Install FBX SDK
+        run: |
+          Invoke-WebRequest "https://www.autodesk.com/content/dam/autodesk/www/adn/fbx/2020-3-2/fbx202032_fbxsdk_vs2019_win.exe" -OutFile "fbx202032_fbxsdk_vs2019_win.exe"
+          Start-Process -Wait "fbx202032_fbxsdk_vs2019_win.exe" "/S /D=${{ github.workspace }}\depends\fbxsdk"
+        shell: pwsh
+
+      - name: Setup MSVC environment
+        uses: microsoft/setup-msbuild@v2
+
+      #- name: Restore NuGet Packages
+      #  run: nuget restore src\libgens-sonicglvl.sln
+
+      - name: Build project
+        run: |
+          msbuild /p:Configuration="Release 2012" src\libgens-sonicglvl.sln
+          msbuild /p:Configuration=Release src\libgens-sonicglvl.sln
+
+      - name: Compress artifact
+        run: |
+          Remove-Item -Path bin\.gitignore
+          Remove-Item -Recurse -Force -Include *.pdb -Path bin
+          Remove-Item -Path cache\.gitignore
+          Remove-Item -Path database\CONTRIBUTING.txt
+          Compress-Archive -Path bin, cache, database -DestinationPath libgens-sonicglvl.zip
+        shell: pwsh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: libgens-sonicglvl.zip
+
+      - name: Upload nightly release
+        if: github.repository == 'DarioSamo/libgens-sonicglvl' && github.ref == 'refs/heads/master'
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nightly
+          name: 'Nightly Release $$'
+          body: 'Nightly release based on ${{ github.sha }}'
+          prerelease: true
+          files: libgens-sonicglvl.zip

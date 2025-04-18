@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,12 +40,12 @@
 #ifndef QWIZARD_H
 #define QWIZARD_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtWidgets/qdialog.h>
 
+QT_REQUIRE_CONFIG(wizard);
+
 QT_BEGIN_NAMESPACE
-
-
-#ifndef QT_NO_WIZARD
 
 class QAbstractButton;
 class QWizardPage;
@@ -48,7 +54,6 @@ class QWizardPrivate;
 class Q_WIDGETS_EXPORT QWizard : public QDialog
 {
     Q_OBJECT
-    Q_FLAGS(WizardOptions)
     Q_PROPERTY(WizardStyle wizardStyle READ wizardStyle WRITE setWizardStyle)
     Q_PROPERTY(WizardOptions options READ options WRITE setOptions)
     Q_PROPERTY(Qt::TextFormat titleFormat READ titleFormat WRITE setTitleFormat)
@@ -113,8 +118,9 @@ public:
     Q_ENUM(WizardOption)
 
     Q_DECLARE_FLAGS(WizardOptions, WizardOption)
+    Q_FLAG(WizardOptions)
 
-    explicit QWizard(QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    explicit QWizard(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags());
     ~QWizard();
 
     int addPage(QWizardPage *page);
@@ -122,7 +128,10 @@ public:
     void removePage(int id);
     QWizardPage *page(int id) const;
     bool hasVisitedPage(int id) const;
-    QList<int> visitedPages() const;    // ### Qt 6: visitedIds()?
+#if QT_DEPRECATED_SINCE(5, 15)
+    QT_DEPRECATED_VERSION_X_5_15("Use visitedIds() instead") QList<int> visitedPages() const;
+#endif
+    QList<int> visitedIds() const;
     QList<int> pageIds() const;
     void setStartId(int id);
     int startId() const;
@@ -162,8 +171,8 @@ public:
     void setDefaultProperty(const char *className, const char *property,
                             const char *changedSignal);
 
-    void setVisible(bool visible) Q_DECL_OVERRIDE;
-    QSize sizeHint() const Q_DECL_OVERRIDE;
+    void setVisible(bool visible) override;
+    QSize sizeHint() const override;
 
 Q_SIGNALS:
     void currentIdChanged(int id);
@@ -178,13 +187,17 @@ public Q_SLOTS:
     void restart();
 
 protected:
-    bool event(QEvent *event) Q_DECL_OVERRIDE;
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-#ifdef Q_OS_WIN
-    bool nativeEvent(const QByteArray &eventType, void * message, long * result);
+    bool event(QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
+#if defined(Q_OS_WIN) || defined(Q_CLANG_QDOC)
+#  if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result) override;
+#  else
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+#  endif
 #endif
-    void done(int result) Q_DECL_OVERRIDE;
+    void done(int result) override;
     virtual void initializePage(int id);
     virtual void cleanupPage(int id);
 
@@ -209,7 +222,7 @@ class Q_WIDGETS_EXPORT QWizardPage : public QWidget
     Q_PROPERTY(QString subTitle READ subTitle WRITE setSubTitle)
 
 public:
-    explicit QWizardPage(QWidget *parent = 0);
+    explicit QWizardPage(QWidget *parent = nullptr);
     ~QWizardPage();
 
     void setTitle(const QString &title);
@@ -237,8 +250,8 @@ Q_SIGNALS:
 protected:
     void setField(const QString &name, const QVariant &value);
     QVariant field(const QString &name) const;
-    void registerField(const QString &name, QWidget *widget, const char *property = 0,
-                       const char *changedSignal = 0);
+    void registerField(const QString &name, QWidget *widget, const char *property = nullptr,
+                       const char *changedSignal = nullptr);
     QWizard *wizard() const;
 
 private:
@@ -252,7 +265,5 @@ private:
 };
 
 QT_END_NAMESPACE
-
-#endif // QT_NO_WIZARD
 
 #endif // QWIZARD_H

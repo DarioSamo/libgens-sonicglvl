@@ -338,15 +338,6 @@ namespace LibGens {
 		return faces;
 	}
 
-	
-	void Mesh::createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size, float saturation_multiplier, float brightness_offset) {
-		for (size_t slot=0; slot<LIBGENS_MODEL_SUBMESH_SLOTS; slot++) {
-			for (std::vector<Submesh *>::iterator it=submeshes[slot].begin(); it!=submeshes[slot].end(); it++) {
-				(*it)->createSamplePoints(list, matrix, bitmap, unit_size, saturation_multiplier, brightness_offset);
-			}
-		}
-	}
-
 	void Mesh::addSubmesh(Submesh *submesh, size_t slot) {
 		if (slot < LIBGENS_MODEL_SUBMESH_SLOTS) {
 			submeshes[slot].push_back(submesh);

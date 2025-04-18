@@ -330,7 +330,7 @@ bool GIWindow::convert() {
 				QString bitmap_filename = bitmap_name + ".png";
 				QString texture_filename = bitmap_name + ".dds";
 
-				FreeImage_Save(FIF_PNG, atlas_bitmap, bitmap_filename.toUtf8().constData());
+				FreeImage_Save(FIF_PNG, atlas_bitmap, bitmap_filename.toStdString().c_str());
 				FreeImage_Unload(atlas_bitmap);
 
 				// Convert the bitmap to dds
@@ -511,16 +511,16 @@ bool GIWindow::convert() {
 				for (list<LibGens::GITexture *>::iterator it = gi_textures.begin(); it != gi_textures.end(); it++) {
 					string texture_name = (*it)->getName();
 					QString texture_filename = QString("%1/%2.dds").arg(group_temp_path).arg(texture_name.c_str());
-					const char *texture_filename_c = texture_filename.toUtf8().constData();
+					string texture_filename_c = texture_filename.toStdString();
 
 					// Use FreeImage to convert the DDS to a png properly, since Qt doesn't load the alpha channels like it should.
 					FIBITMAP *bitmap = NULL;
-					FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(texture_filename_c);
+					FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(texture_filename_c.c_str());
 					if (fif == FIF_UNKNOWN)
-						fif = FreeImage_GetFIFFromFilename(texture_filename_c);
+						fif = FreeImage_GetFIFFromFilename(texture_filename_c.c_str());
 
 					if (fif != FIF_UNKNOWN) {
-						bitmap = FreeImage_Load(fif, texture_filename_c);
+						bitmap = FreeImage_Load(fif, texture_filename_c.c_str());
 					}
 
 					// Load the converter texture and use it to extract information from there.
@@ -752,7 +752,7 @@ bool GIWindow::convert() {
 						}
 					}
 
-					FreeImage_Save(FIF_PNG, atlas_bitmap, atlas_image_filename.toUtf8().constData());
+					FreeImage_Save(FIF_PNG, atlas_bitmap, atlas_image_filename.toStdString().c_str());
 					FreeImage_Unload(atlas_bitmap);
 
 					const QString temp_texture = "temp.dds";

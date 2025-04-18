@@ -36,7 +36,7 @@ struct ModelRecord {
 struct SceneData {
 	QMap<QString, ModelRecord> model_map;
 	list<LibGens::Material *> materials;
-	QMap<int, LibGens::TerrainInstance *> instances;
+	QMultiMap<int, LibGens::TerrainInstance *> instances;
 	QMap<string, unsigned int> model_size_map;
 };
 

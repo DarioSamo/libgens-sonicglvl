@@ -37,6 +37,9 @@
 #include <fbxsdk/fileio/fbxiosettings.h>
 #include <commdlg.h>
 #include <commctrl.h>
+#include <thread>
+#include <mutex>
+#include <direct.h>
 #include "Havok.h"
 
 #if defined _M_IX86

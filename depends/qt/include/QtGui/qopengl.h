@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,7 +40,7 @@
 #ifndef QOPENGL_H
 #define QOPENGL_H
 
-#include <QtCore/qglobal.h>
+#include <QtGui/qtguiglobal.h>
 
 #ifndef QT_NO_OPENGL
 
@@ -43,7 +49,7 @@
 # include <QtCore/qt_windows.h>
 #endif
 
-// Note: Mac OSX is a "controlled platform" for OpenGL ABI so we
+// Note: Apple is a "controlled platform" for OpenGL ABI so we
 // use the system provided headers there. Controlled means that the
 // headers always match the actual driver implementation so there
 // is no possibility of drivers exposing additional functionality
@@ -58,7 +64,7 @@
 // which the system headers do not.
 
 #if defined(QT_OPENGL_ES_2)
-# if defined(Q_OS_MAC) // iOS
+# if defined(Q_OS_IOS) || defined(Q_OS_TVOS)
 #  if defined(QT_OPENGL_ES_3)
 #   include <OpenGLES/ES3/gl.h>
 #   include <OpenGLES/ES3/glext.h>
@@ -75,29 +81,40 @@
 */
 typedef void* GLeglImageOES;
 
-# else // "uncontrolled" ES2 platforms
+# elif !defined(Q_OS_DARWIN) // "uncontrolled" ES2 platforms
 
-// In "es2" builds (QT_OPENGL_ES_2) additional defines indicate if ES
-// 3.0 or higher is available. In this case include the corresponding
-// header. These are backwards compatible and it should be safe to
-// include headers on top of each other, meaning that applications can
-// include gl2.h even if gl31.h gets included here.
+// In "es2" builds (QT_OPENGL_ES_2) additional defines indicate GLES 3.0 or
+// higher is available *at build time*. In this case include the corresponding
+// header. These are backwards compatible and it should be safe to include
+// headers on top of each other, meaning that applications can include gl2.h
+// even if gl31.h gets included here.
 
-// This compile time differentation is important inside Qt because,
-// unlike desktop GL, GLES is different when it comes to versioning
-// and extensions: Standard functions that are new in a given version
-// are always available in a version-specific header and are not
-// guaranteed to be dynamically resolvable via eglGetProcAddress (and
-// are typically not available as extensions even if they were part of
-// an extension for a previous version).
+// NB! The fact that Qt was built against an SDK with GLES 2 only does not mean
+// applications cannot be deployed on a GLES 3 system. Therefore
+// QOpenGLFunctions and friends must do everything dynamically and must not rely
+// on these macros, except in special cases for controlled build/run environments.
 
-#  if defined(QT_OPENGL_ES_3_1)
+// Some Khronos headers use the ext proto guard in the standard headers as well,
+// which is bad. Work it around, but avoid spilling over to the ext header.
+#  ifndef GL_GLEXT_PROTOTYPES
+#   define GL_GLEXT_PROTOTYPES
+#   define QGL_TEMP_GLEXT_PROTO
+#  endif
+
+#  if defined(QT_OPENGL_ES_3_2)
+#   include <GLES3/gl32.h>
+#  elif defined(QT_OPENGL_ES_3_1)
 #   include <GLES3/gl31.h>
 #  elif defined(QT_OPENGL_ES_3)
 #   include <GLES3/gl3.h>
 #  else
 #   include <GLES2/gl2.h>
 #endif
+
+#  ifdef QGL_TEMP_GLEXT_PROTO
+#   undef GL_GLEXT_PROTOTYPES
+#   undef QGL_TEMP_GLEXT_PROTO
+# endif
 
 /*
    Some GLES2 implementations (like the one on Harmattan) are missing the
@@ -112,28 +129,29 @@ typedef char GLchar;
 #else // non-ES2 platforms
 # if defined(Q_OS_MAC)
 #  include <OpenGL/gl.h>
-#  if MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7
-#   define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
-#   include <OpenGL/gl3.h>
-#  endif
+#  define GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED
+#  include <OpenGL/gl3.h>
 #  include <OpenGL/glext.h>
 # else
 #  define GL_GLEXT_LEGACY // Prevents GL/gl.h from #including system glext.h
-#  include <GL/gl.h>
+// Some Khronos headers use the ext proto guard in the standard headers as well,
+// which is bad. Work it around, but avoid spilling over to the ext header.
+#  ifndef GL_GLEXT_PROTOTYPES
+#   define GL_GLEXT_PROTOTYPES
+#   include <GL/gl.h>
+#   undef GL_GLEXT_PROTOTYPES
+#  else
+#   include <GL/gl.h>
+#  endif
 #  include <QtGui/qopenglext.h>
 # endif // Q_OS_MAC
 #endif // QT_OPENGL_ES_2
 
-// Desktops, apart from Mac OS X prior to 10.7 can support OpenGL 3.
-// Desktops, apart from Mac OS X prior to 10.9 can support OpenGL 4.
+// Desktops can support OpenGL 4.
 #if !defined(QT_OPENGL_ES_2)
-# if !defined(Q_OS_MAC) || (defined(Q_OS_MAC) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
-#  define QT_OPENGL_3
-#  define QT_OPENGL_3_2
-# endif
-# if !defined(Q_OS_MAC) || (defined(Q_OS_MAC) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_9)
-#  define QT_OPENGL_4
-# endif
+#define QT_OPENGL_3
+#define QT_OPENGL_3_2
+#define QT_OPENGL_4
 # if !defined(Q_OS_MAC)
 #  define QT_OPENGL_4_3
 # endif
@@ -183,7 +201,11 @@ typedef ptrdiff_t GLsizeiptrARB;
 #ifndef GL_ARB_shader_objects
 /* GL types for program/shader text and shader object handles */
 typedef char GLcharARB;
+# ifdef Q_OS_DARWIN
+typedef void *GLhandleARB;
+# else
 typedef unsigned int GLhandleARB;
+# endif // Q_OS_DARWIN
 #endif
 
 /* GL type for "half" precision (s10e5) float data in host memory */
@@ -213,15 +235,11 @@ typedef long long int int64_t;
 typedef unsigned long long int uint64_t;
 #endif /* __arch64__ */
 #endif /* __STDC__ */
-#elif defined( __VMS ) || defined(__sgi)
-#include <inttypes.h>
-#elif defined(__SCO__) || defined(__USLC__)
-#include <stdint.h>
 #elif defined(__UNIXOS2__) || defined(__SOL64__)
 typedef long int int32_t;
 typedef long long int int64_t;
 typedef unsigned long long int uint64_t;
-#elif defined(_WIN32) && (defined(__GNUC__) || (defined(_MSC_VER) && _MSC_VER >= 1600))
+#elif defined(_WIN32) && (defined(__GNUC__) || defined(_MSC_VER))
 #include <stdint.h>
 #elif defined(_WIN32)
 typedef __int32 int32_t;

@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "PipeClient.h"
 #include <Windows.h>
-#include <pthread.h>
 
 void* thread_client(void* handle);
 BYTE pipe_buffer[0x400];
@@ -17,9 +16,9 @@ PipeClient::PipeClient()
 
 PipeClient::~PipeClient()
 {
-	if (client_running)
+	if (client_running && message_thread.joinable())
 	{
-		pthread_kill(message_thread, 0);
+		message_thread.join();
 	}
 	Disconnect();
 }
@@ -37,7 +36,7 @@ bool PipeClient::Connect()
 	if (hServer != INVALID_HANDLE_VALUE && hClient != INVALID_HANDLE_VALUE)
 	{
 		connected = true;
-		pthread_create(&message_thread, NULL, thread_client, this);
+		message_thread = std::thread(thread_client, this);
 	}
 
 	return false;

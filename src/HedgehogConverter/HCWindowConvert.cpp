@@ -732,7 +732,7 @@ bool HCWindow::convert() {
 			delete terrain;
 
 			LibGens::TerrainBlock *terrain_block = new LibGens::TerrainBlock();
-			terrain_block->build(terrain_groups.toVector().toStdVector());
+			terrain_block->build(std::vector<LibGens::TerrainGroup*>(terrain_groups.begin(), terrain_groups.end()));
 
 			string terrain_block_filename = temp_path.toStdString() + "/terrain-block.tbst";
 			terrain_block->save(terrain_block_filename.c_str());
@@ -832,7 +832,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 		LibGens::Matrix4 instance_matrix;
 		for (int x = 0; x < 4; x++)
 			for (int y = 0; y < 4; y++)
-				instance_matrix[x][y] = node_matrix.m[x][y];
+				instance_matrix[x][y] = node_matrix[x][y];
 
 		instance_matrix = global_transform * instance_matrix;
 
@@ -862,7 +862,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 			for (unsigned int m = 0; m < meshes; m++) {
 				mesh_indices.append(node->mMeshes[m]);
 			}
-			qSort(mesh_indices);
+			std::sort(mesh_indices.begin(), mesh_indices.end());
 
 			QString model_name = node->mName.C_Str();
 			if (converter_settings.remove_model_tags)
@@ -1131,7 +1131,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 			instance->addMesh(instance_mesh);
 
 			instance->save(instance_filename.toStdString());
-			scene_data.instances.insertMulti(parent_group_id, instance);
+			scene_data.instances.insert(parent_group_id, instance);
 
 			logProgress(ProgressNormal, QString("Saved instance to %1.").arg(instance_filename));
 			logProgress(ProgressNormal, QString("Instance AABB: [%1, %2, %3][%4, %5, %6].").arg(instance_aabb.start.x).arg(instance_aabb.start.y).arg(instance_aabb.start.z).arg(instance_aabb.end.x).arg(instance_aabb.end.y).arg(instance_aabb.end.z));

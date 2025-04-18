@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include <fbxsdk.h>
+#include <fbxsdk/fileio/fbxiosettings.h>
+
 #define LIBGENS_FBX_DEFAULT_SCENE_NAME_IMPORT    "FBXImport"
 #define LIBGENS_FBX_DEFAULT_SCENE_NAME_EXPORT    "FBXExport"
 

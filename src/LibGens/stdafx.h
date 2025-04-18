@@ -19,6 +19,8 @@
 
 using namespace std;
 
+#include <Windows.h>
+
 #include <stack>
 #include <list>
 #include <set>
@@ -28,20 +30,12 @@ using namespace std;
 #include <map>
 #include <algorithm>
 #include <ctype.h>
-#include <pthread.h>
-#include "allegro5/allegro.h"
-#include "allegro5/allegro_image.h"
-#if defined(_WIN32) || defined(WIN32)
-#include <fbxsdk.h>
-#include <fbxsdk/fileio/fbxiosettings.h>
-#endif
 
 // Common Headers only should be pre-compiled
 #include "half/half.h"
 #include "sha1/sha1.h"
 #include "tinyxml/tinyxml.h"
 #include "MathGens.h"
-#include "Bitmap.h"
 #include "Error.h"
 #include "Endian.h"
 #include "File.h"

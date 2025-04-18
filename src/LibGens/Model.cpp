@@ -119,15 +119,20 @@ namespace LibGens {
 		if (!terrain_mode) {
 			readSkeleton(file);
 		}
-		else if (file->getRootNodeType() >= 5) {
-			size_t mesh_name_address = 0;
+		else 
+		{
+			if (file->getRootNodeType() >= 5) {
+				size_t mesh_name_address = 0;
 
-			file->readInt32BEA(&mesh_name_address);
-			file->readInt32BE(&has_instances);
+				file->readInt32BEA(&mesh_name_address);
+				file->readInt32BE(&has_instances);
 
-			// Read Name
-			file->goToAddress(mesh_name_address);
-			file->readString(&name);
+				// Read Name
+				file->goToAddress(mesh_name_address);
+				file->readString(&name);
+			}
+
+			buildAABB();
 		}
 	}
 
@@ -455,12 +460,6 @@ namespace LibGens {
 		}
 
 		return faces;
-	}
-
-	void Model::createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size, float saturation_multiplier, float brightness_offset) {
-		for (std::vector<Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
-			(*it)->createSamplePoints(list, matrix, bitmap, unit_size, saturation_multiplier, brightness_offset);
-		}
 	}
 
 	void Model::addMesh(Mesh *mesh) {

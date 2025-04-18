@@ -7,7 +7,7 @@ class PipeClient
 protected:
 	HANDLE hServer;
 	HANDLE hClient;
-	pthread_t message_thread;
+	std::thread message_thread;
 	DWORD connected;
 	std::vector<void(*) (PipeClient* client, PipeMessage* msg)> processors;
 

@@ -46,9 +46,6 @@
     <ClCompile Include="TerrainInstance.cpp">
       <Filter>Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="Bitmap.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
     <ClCompile Include="Level.cpp">
       <Filter>Level</Filter>
     </ClCompile>
@@ -90,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>Model</Filter>
-    </ClCompile>
-    <ClCompile Include="VRMap.cpp">
-      <Filter>Terrain</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Shader</Filter>
@@ -224,9 +218,6 @@
     <ClInclude Include="TerrainGroup.h">
       <Filter>Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="Bitmap.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Level</Filter>
     </ClInclude>
@@ -268,9 +259,6 @@
     </ClInclude>
     <ClInclude Include="Vertex.h">
       <Filter>Model</Filter>
-    </ClInclude>
-    <ClInclude Include="VRMap.h">
-      <Filter>Terrain</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Shader</Filter>

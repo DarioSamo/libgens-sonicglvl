@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,12 +40,12 @@
 #ifndef QTABLEVIEW_H
 #define QTABLEVIEW_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtWidgets/qabstractitemview.h>
 
+QT_REQUIRE_CONFIG(tableview);
+
 QT_BEGIN_NAMESPACE
-
-
-#ifndef QT_NO_TABLEVIEW
 
 class QHeaderView;
 class QTableViewPrivate;
@@ -51,16 +57,18 @@ class Q_WIDGETS_EXPORT QTableView : public QAbstractItemView
     Q_PROPERTY(Qt::PenStyle gridStyle READ gridStyle WRITE setGridStyle)
     Q_PROPERTY(bool sortingEnabled READ isSortingEnabled WRITE setSortingEnabled)
     Q_PROPERTY(bool wordWrap READ wordWrap WRITE setWordWrap)
+#if QT_CONFIG(abstractbutton)
     Q_PROPERTY(bool cornerButtonEnabled READ isCornerButtonEnabled WRITE setCornerButtonEnabled)
+#endif
 
 public:
-    explicit QTableView(QWidget *parent = 0);
+    explicit QTableView(QWidget *parent = nullptr);
     ~QTableView();
 
-    void setModel(QAbstractItemModel *model) Q_DECL_OVERRIDE;
-    void setRootIndex(const QModelIndex &index) Q_DECL_OVERRIDE;
-    void setSelectionModel(QItemSelectionModel *selectionModel) Q_DECL_OVERRIDE;
-    void doItemsLayout() Q_DECL_OVERRIDE;
+    void setModel(QAbstractItemModel *model) override;
+    void setRootIndex(const QModelIndex &index) override;
+    void setSelectionModel(QItemSelectionModel *selectionModel) override;
+    void doItemsLayout() override;
 
     QHeaderView *horizontalHeader() const;
     QHeaderView *verticalHeader() const;
@@ -96,19 +104,20 @@ public:
     void setWordWrap(bool on);
     bool wordWrap() const;
 
+#if QT_CONFIG(abstractbutton)
     void setCornerButtonEnabled(bool enable);
     bool isCornerButtonEnabled() const;
+#endif
 
-    QRect visualRect(const QModelIndex &index) const Q_DECL_OVERRIDE;
-    void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible) Q_DECL_OVERRIDE;
-    QModelIndex indexAt(const QPoint &p) const Q_DECL_OVERRIDE;
+    QRect visualRect(const QModelIndex &index) const override;
+    void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible) override;
+    QModelIndex indexAt(const QPoint &p) const override;
 
     void setSpan(int row, int column, int rowSpan, int columnSpan);
     int rowSpan(int row, int column) const;
     int columnSpan(int row, int column) const;
     void clearSpans();
 
-    void sortByColumn(int column, Qt::SortOrder order);
 
 public Q_SLOTS:
     void selectRow(int row);
@@ -121,7 +130,11 @@ public Q_SLOTS:
     void resizeRowsToContents();
     void resizeColumnToContents(int column);
     void resizeColumnsToContents();
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X ("Use QTableView::sortByColumn(int column, Qt::SortOrder order) instead")
     void sortByColumn(int column);
+#endif
+    void sortByColumn(int column, Qt::SortOrder order);
     void setShowGrid(bool show);
 
 protected Q_SLOTS:
@@ -134,37 +147,37 @@ protected Q_SLOTS:
 
 protected:
     QTableView(QTableViewPrivate &, QWidget *parent);
-    void scrollContentsBy(int dx, int dy) Q_DECL_OVERRIDE;
+    void scrollContentsBy(int dx, int dy) override;
 
-    QStyleOptionViewItem viewOptions() const Q_DECL_OVERRIDE;
-    void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
+    QStyleOptionViewItem viewOptions() const override;
+    void paintEvent(QPaintEvent *e) override;
 
-    void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
+    void timerEvent(QTimerEvent *event) override;
 
-    int horizontalOffset() const Q_DECL_OVERRIDE;
-    int verticalOffset() const Q_DECL_OVERRIDE;
-    QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) Q_DECL_OVERRIDE;
+    int horizontalOffset() const override;
+    int verticalOffset() const override;
+    QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) override;
 
-    void setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags command) Q_DECL_OVERRIDE;
-    QRegion visualRegionForSelection(const QItemSelection &selection) const Q_DECL_OVERRIDE;
-    QModelIndexList selectedIndexes() const Q_DECL_OVERRIDE;
+    void setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags command) override;
+    QRegion visualRegionForSelection(const QItemSelection &selection) const override;
+    QModelIndexList selectedIndexes() const override;
 
-    void updateGeometries() Q_DECL_OVERRIDE;
+    void updateGeometries() override;
 
-    QSize viewportSizeHint() const Q_DECL_OVERRIDE;
+    QSize viewportSizeHint() const override;
 
-    int sizeHintForRow(int row) const Q_DECL_OVERRIDE;
-    int sizeHintForColumn(int column) const Q_DECL_OVERRIDE;
+    int sizeHintForRow(int row) const override;
+    int sizeHintForColumn(int column) const override;
 
-    void verticalScrollbarAction(int action) Q_DECL_OVERRIDE;
-    void horizontalScrollbarAction(int action) Q_DECL_OVERRIDE;
+    void verticalScrollbarAction(int action) override;
+    void horizontalScrollbarAction(int action) override;
 
-    bool isIndexHidden(const QModelIndex &index) const Q_DECL_OVERRIDE;
+    bool isIndexHidden(const QModelIndex &index) const override;
 
     void selectionChanged(const QItemSelection &selected,
-                          const QItemSelection &deselected) Q_DECL_OVERRIDE;
+                          const QItemSelection &deselected) override;
     void currentChanged(const QModelIndex &current,
-                          const QModelIndex &previous) Q_DECL_OVERRIDE;
+                          const QModelIndex &previous) override;
 
 private:
     friend class QAccessibleItemView;
@@ -178,9 +191,8 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _q_updateSpanInsertedColumns(QModelIndex,int,int))
     Q_PRIVATE_SLOT(d_func(), void _q_updateSpanRemovedRows(QModelIndex,int,int))
     Q_PRIVATE_SLOT(d_func(), void _q_updateSpanRemovedColumns(QModelIndex,int,int))
+    Q_PRIVATE_SLOT(d_func(), void _q_sortIndicatorChanged(int column, Qt::SortOrder order))
 };
-
-#endif // QT_NO_TABLEVIEW
 
 QT_END_NAMESPACE
 

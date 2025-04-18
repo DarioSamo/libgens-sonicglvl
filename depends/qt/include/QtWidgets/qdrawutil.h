@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,6 +40,7 @@
 #ifndef QDRAWUTIL_H
 #define QDRAWUTIL_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtCore/qnamespace.h>
 #include <QtCore/qstring.h> // char*->QString conversion
 #include <QtCore/qmargins.h>
@@ -63,42 +70,42 @@ Q_WIDGETS_EXPORT void qDrawShadeLine(QPainter *p, const QPoint &p1, const QPoint
 Q_WIDGETS_EXPORT void qDrawShadeRect(QPainter *p, int x, int y, int w, int h,
                               const QPalette &pal, bool sunken = false,
                               int lineWidth = 1, int midLineWidth = 0,
-                              const QBrush *fill = 0);
+                              const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawShadeRect(QPainter *p, const QRect &r,
                               const QPalette &pal, bool sunken = false,
                               int lineWidth = 1, int midLineWidth = 0,
-                              const QBrush *fill = 0);
+                              const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawShadePanel(QPainter *p, int x, int y, int w, int h,
                                const QPalette &pal, bool sunken = false,
-                               int lineWidth = 1, const QBrush *fill = 0);
+                               int lineWidth = 1, const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawShadePanel(QPainter *p, const QRect &r,
                                const QPalette &pal, bool sunken = false,
-                               int lineWidth = 1, const QBrush *fill = 0);
+                               int lineWidth = 1, const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawWinButton(QPainter *p, int x, int y, int w, int h,
                               const QPalette &pal, bool sunken = false,
-                              const QBrush *fill = 0);
+                              const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawWinButton(QPainter *p, const QRect &r,
                               const QPalette &pal, bool sunken = false,
-                              const QBrush *fill = 0);
+                              const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawWinPanel(QPainter *p, int x, int y, int w, int h,
                               const QPalette &pal, bool sunken = false,
-                             const QBrush *fill = 0);
+                             const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawWinPanel(QPainter *p, const QRect &r,
                               const QPalette &pal, bool sunken = false,
-                             const QBrush *fill = 0);
+                             const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawPlainRect(QPainter *p, int x, int y, int w, int h, const QColor &,
-                              int lineWidth = 1, const QBrush *fill = 0);
+                              int lineWidth = 1, const QBrush *fill = nullptr);
 
 Q_WIDGETS_EXPORT void qDrawPlainRect(QPainter *p, const QRect &r, const QColor &,
-                              int lineWidth = 1, const QBrush *fill = 0);
+                              int lineWidth = 1, const QBrush *fill = nullptr);
 
 
 
@@ -112,7 +119,7 @@ struct QTileRules
     Qt::TileRule vertical;
 };
 
-#ifndef Q_QDOC
+#ifndef Q_CLANG_QDOC
 // For internal use only.
 namespace QDrawBorderPixmap
 {
@@ -144,8 +151,8 @@ Q_WIDGETS_EXPORT void qDrawBorderPixmap(QPainter *painter,
                                     const QRect &sourceRect,
                                     const QMargins &sourceMargins,
                                     const QTileRules &rules = QTileRules()
-#ifndef Q_QDOC
-                                    , QDrawBorderPixmap::DrawingHints hints = 0
+#ifndef Q_CLANG_QDOC
+                                    , QDrawBorderPixmap::DrawingHints hints = QDrawBorderPixmap::DrawingHints()
 #endif
                                     );
 

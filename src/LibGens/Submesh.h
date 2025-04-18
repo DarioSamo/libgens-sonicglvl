@@ -29,7 +29,6 @@
 namespace LibGens {
 	class Vertex;
 	class VertexFormat;
-	class VRMapSample;
 	enum Topology;
 
 	struct Polygon {
@@ -73,7 +72,6 @@ namespace LibGens {
 			string getMaterialName();
 			void setMaterialName(string v);
 			void setVertexFormat(VertexFormat *v);
-			void createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
 			void addBone(unsigned short bone);
 			unsigned short getBone(unsigned int index);
 			vector<unsigned short> getBoneTable();

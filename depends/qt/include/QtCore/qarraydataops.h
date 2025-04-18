@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -43,6 +49,11 @@ QT_BEGIN_NAMESPACE
 
 namespace QtPrivate {
 
+QT_WARNING_PUSH
+#if defined(Q_CC_GNU) && Q_CC_GNU >= 700
+QT_WARNING_DISABLE_GCC("-Wstringop-overflow")
+#endif
+
 template <class T>
 struct QPodArrayOps
     : QTypedArrayData<T>
@@ -54,7 +65,7 @@ struct QPodArrayOps
         Q_ASSERT(newSize > uint(this->size));
         Q_ASSERT(newSize <= this->alloc);
 
-        ::memset(this->end(), 0, (newSize - this->size) * sizeof(T));
+        ::memset(static_cast<void *>(this->end()), 0, (newSize - this->size) * sizeof(T));
         this->size = int(newSize);
     }
 
@@ -65,7 +76,8 @@ struct QPodArrayOps
         Q_ASSERT(b < e);
         Q_ASSERT(size_t(e - b) <= this->alloc - uint(this->size));
 
-        ::memcpy(this->end(), b, (e - b) * sizeof(T));
+        ::memcpy(static_cast<void *>(this->end()), static_cast<const void *>(b),
+                 (e - b) * sizeof(T));
         this->size += e - b;
     }
 
@@ -94,7 +106,7 @@ struct QPodArrayOps
     void destroyAll() // Call from destructors, ONLY!
     {
         Q_ASSERT(this->isMutable());
-        Q_ASSERT(this->ref.atomic.load() == 0);
+        Q_ASSERT(this->ref.atomic.loadRelaxed() == 0);
 
         // As this is to be called only from destructor, it doesn't need to be
         // exception safe; size not updated.
@@ -109,8 +121,9 @@ struct QPodArrayOps
         Q_ASSERT(e <= where || b > this->end()); // No overlap
         Q_ASSERT(size_t(e - b) <= this->alloc - uint(this->size));
 
-        ::memmove(where + (e - b), where, (static_cast<const T*>(this->end()) - where) * sizeof(T));
-        ::memcpy(where, b, (e - b) * sizeof(T));
+        ::memmove(static_cast<void *>(where + (e - b)), static_cast<void *>(where),
+                  (static_cast<const T*>(this->end()) - where) * sizeof(T));
+        ::memcpy(static_cast<void *>(where), static_cast<const void *>(b), (e - b) * sizeof(T));
         this->size += (e - b);
     }
 
@@ -121,10 +134,12 @@ struct QPodArrayOps
         Q_ASSERT(b >= this->begin() && b < this->end());
         Q_ASSERT(e > this->begin() && e < this->end());
 
-        ::memmove(b, e, (static_cast<T *>(this->end()) - e) * sizeof(T));
+        ::memmove(static_cast<void *>(b), static_cast<void *>(e),
+                  (static_cast<T *>(this->end()) - e) * sizeof(T));
         this->size -= (e - b);
     }
 };
+QT_WARNING_POP
 
 template <class T>
 struct QGenericArrayOps
@@ -139,7 +154,7 @@ struct QGenericArrayOps
 
         T *const begin = this->begin();
         do {
-            new (begin + this->size) T();
+            new (begin + this->size) T;
         } while (uint(++this->size) != newSize);
     }
 
@@ -189,7 +204,7 @@ struct QGenericArrayOps
         // As this is to be called only from destructor, it doesn't need to be
         // exception safe; size not updated.
 
-        Q_ASSERT(this->ref.atomic.load() == 0);
+        Q_ASSERT(this->ref.atomic.loadRelaxed() == 0);
 
         const T *const b = this->begin();
         const T *i = this->end();
@@ -313,7 +328,8 @@ struct QMovableArrayOps
                 , end(finish)
                 , displace(diff)
             {
-                ::memmove(begin + displace, begin, (end - begin) * sizeof(T));
+                ::memmove(static_cast<void *>(begin + displace), static_cast<void *>(begin),
+                          (end - begin) * sizeof(T));
             }
 
             void commit() { displace = 0; }
@@ -321,7 +337,8 @@ struct QMovableArrayOps
             ~ReversibleDisplace()
             {
                 if (displace)
-                    ::memmove(begin, begin + displace, (end - begin) * sizeof(T));
+                    ::memmove(static_cast<void *>(begin), static_cast<void *>(begin + displace),
+                              (end - begin) * sizeof(T));
             }
 
             T *const begin;
@@ -378,7 +395,7 @@ struct QMovableArrayOps
 
             ~Mover()
             {
-                ::memmove(destination, source, n * sizeof(T));
+                ::memmove(static_cast<void *>(destination), static_cast<const void *>(source), n * sizeof(T));
                 size -= (source - destination);
             }
 
@@ -403,18 +420,18 @@ struct QArrayOpsSelector
 
 template <class T>
 struct QArrayOpsSelector<T,
-    typename QEnableIf<
-        !QTypeInfo<T>::isComplex && !QTypeInfo<T>::isStatic
-    >::Type>
+    typename std::enable_if<
+        !QTypeInfoQuery<T>::isComplex && QTypeInfoQuery<T>::isRelocatable
+    >::type>
 {
     typedef QPodArrayOps<T> Type;
 };
 
 template <class T>
 struct QArrayOpsSelector<T,
-    typename QEnableIf<
-        QTypeInfo<T>::isComplex && !QTypeInfo<T>::isStatic
-    >::Type>
+    typename std::enable_if<
+        QTypeInfoQuery<T>::isComplex && QTypeInfoQuery<T>::isRelocatable
+    >::type>
 {
     typedef QMovableArrayOps<T> Type;
 };

@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -36,10 +42,10 @@
 
 #include <QtCore/qglobal.h>
 
-#ifndef QT_NO_QFUTURE
-
 #include <QtCore/qfutureinterface.h>
 #include <QtCore/qstring.h>
+
+QT_REQUIRE_CONFIG(future);
 
 QT_BEGIN_NAMESPACE
 
@@ -59,13 +65,12 @@ public:
     explicit QFuture(QFutureInterface<T> *p) // internal
         : d(*p)
     { }
-    QFuture(const QFuture &other)
-        : d(other.d)
-    { }
-    ~QFuture()
-    { }
+#if defined(Q_CLANG_QDOC)
+    ~QFuture() { }
+    QFuture(const QFuture<T> &) { }
+    QFuture<T> & operator=(const QFuture<T> &) { }
+#endif
 
-    inline QFuture &operator=(const QFuture &other);
     bool operator==(const QFuture &other) const { return (d == other.d); }
     bool operator!=(const QFuture &other) const { return (d != other.d); }
 
@@ -106,32 +111,79 @@ public:
         typedef const T &reference;
 
         inline const_iterator() {}
-        inline const_iterator(QFuture const * const _future, int _index) : future(_future), index(_index) {}
+        inline const_iterator(QFuture const * const _future, int _index)
+        : future(_future), index(advanceIndex(_index, 0)) { }
         inline const_iterator(const const_iterator &o) : future(o.future), index(o.index)  {}
         inline const_iterator &operator=(const const_iterator &o)
         { future = o.future; index = o.index; return *this; }
         inline const T &operator*() const { return future->d.resultReference(index); }
         inline const T *operator->() const { return future->d.resultPointer(index); }
-
-        inline bool operator!=(const const_iterator &other) const
+        inline bool operator!=(const const_iterator &other) const { return index != other.index; }
+        inline bool operator==(const const_iterator &o) const { return !operator!=(o); }
+        inline const_iterator &operator++()
+        { index = advanceIndex(index, 1); return *this; }
+        inline const_iterator &operator--()
+        { index = advanceIndex(index, -1); return *this; }
+        inline const_iterator operator++(int)
         {
-            if (index == -1 && other.index == -1) // comparing end != end?
-                return false;
-            if (other.index == -1)
-                return (future->isRunning() || (index < future->resultCount()));
-            return (index != other.index);
+            const_iterator r = *this;
+            index = advanceIndex(index, 1);
+            return r;
+        }
+        inline const_iterator operator--(int)
+        {
+            const_iterator r = *this;
+            index = advanceIndex(index, -1);
+            return r;
+        }
+        inline const_iterator operator+(int j) const
+        { return const_iterator(future, advanceIndex(index, j)); }
+        inline const_iterator operator-(int j) const
+        { return const_iterator(future, advanceIndex(index, -j)); }
+        inline const_iterator &operator+=(int j)
+        { index = advanceIndex(index, j); return *this; }
+        inline const_iterator &operator-=(int j)
+        { index = advanceIndex(index, -j); return *this; }
+        friend inline const_iterator operator+(int j, const_iterator k)
+        { return const_iterator(k.future, k.advanceIndex(k.index, j)); }
+
+    private:
+        /*! \internal
+
+            Advances the iterator index \a idx \a n steps, waits for the
+            result at the target index, and returns the target index.
+
+            The index may be -1, indicating the end iterator, either
+            as the argument or as the return value. The end iterator
+            may be decremented.
+
+            The caller is responsible for not advancing the iterator
+            before begin() or past end(), with the exception that
+            attempting to advance a non-end iterator past end() for
+            a running future is allowed and will return the end iterator.
+
+            Note that n == 0 is valid and will wait for the result
+            at the given index.
+        */
+        int advanceIndex(int idx, int n) const
+        {
+            // The end iterator can be decremented, leave as-is for other cases
+            if (idx == -1 && n >= 0)
+                return idx;
+
+            // Special case for decrementing the end iterator: wait for
+            // finished to get the total result count.
+            if (idx == -1 && future->isRunning())
+                future->d.waitForFinished();
+
+            // Wait for result at target index
+            const int targetIndex = (idx == -1) ? future->resultCount() + n : idx + n;
+            future->d.waitForResult(targetIndex);
+
+            // After waiting there is either a result or the end was reached
+            return (targetIndex < future->resultCount()) ? targetIndex : -1;
         }
 
-        inline bool operator==(const const_iterator &o) const { return !operator!=(o); }
-        inline const_iterator &operator++() { ++index; return *this; }
-        inline const_iterator operator++(int) { const_iterator r = *this; ++index; return r; }
-        inline const_iterator &operator--() { --index; return *this; }
-        inline const_iterator operator--(int) { const_iterator r = *this; --index; return r; }
-        inline const_iterator operator+(int j) const { return const_iterator(future, index + j); }
-        inline const_iterator operator-(int j) const { return const_iterator(future, index - j); }
-        inline const_iterator &operator+=(int j) { index += j; return *this; }
-        inline const_iterator &operator-=(int j) { index -= j; return *this; }
-    private:
         QFuture const * future;
         int index;
     };
@@ -149,13 +201,6 @@ private:
 public: // Warning: the d pointer is not documented and is considered private.
     mutable QFutureInterface<T> d;
 };
-
-template <typename T>
-inline QFuture<T> &QFuture<T>::operator=(const QFuture<T> &other)
-{
-    d = other.d;
-    return *this;
-}
 
 template <typename T>
 inline T QFuture<T>::result() const
@@ -189,13 +234,7 @@ public:
     explicit QFuture(QFutureInterfaceBase *p) // internal
         : d(*p)
     { }
-    QFuture(const QFuture &other)
-        : d(other.d)
-    { }
-    ~QFuture()
-    { }
 
-    QFuture &operator=(const QFuture &other);
     bool operator==(const QFuture &other) const { return (d == other.d); }
     bool operator!=(const QFuture &other) const { return (d != other.d); }
 
@@ -242,12 +281,6 @@ public:
     mutable QFutureInterfaceBase d;
 };
 
-inline QFuture<void> &QFuture<void>::operator=(const QFuture<void> &other)
-{
-    d = other.d;
-    return *this;
-}
-
 inline QFuture<void> QFutureInterface<void>::future()
 {
     return QFuture<void>(this);
@@ -260,7 +293,5 @@ QFuture<void> qToVoidFuture(const QFuture<T> &future)
 }
 
 QT_END_NAMESPACE
-
-#endif // QT_NO_QFUTURE
 
 #endif // QFUTURE_H

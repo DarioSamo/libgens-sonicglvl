@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,12 +40,12 @@
 #ifndef QMENUBAR_H
 #define QMENUBAR_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtWidgets/qmenu.h>
 
+QT_REQUIRE_CONFIG(menubar);
+
 QT_BEGIN_NAMESPACE
-
-
-#ifndef QT_NO_MENUBAR
 
 class QMenuBarPrivate;
 class QStyleOptionMenuItem;
@@ -54,12 +60,38 @@ class Q_WIDGETS_EXPORT QMenuBar : public QWidget
     Q_PROPERTY(bool nativeMenuBar READ isNativeMenuBar WRITE setNativeMenuBar)
 
 public:
-    explicit QMenuBar(QWidget *parent = 0);
+    explicit QMenuBar(QWidget *parent = nullptr);
     ~QMenuBar();
 
     using QWidget::addAction;
     QAction *addAction(const QString &text);
     QAction *addAction(const QString &text, const QObject *receiver, const char* member);
+
+#ifdef Q_CLANG_QDOC
+    template<typename Obj, typename PointerToMemberFunctionOrFunctor>
+    QAction *addAction(const QString &text, const Obj *receiver, PointerToMemberFunctionOrFunctor method);
+    template<typename Functor>
+    QAction *addAction(const QString &text, Functor functor);
+#else
+    // addAction(QString): Connect to a QObject slot / functor or function pointer (with context)
+    template<typename Obj, typename Func1>
+    inline typename std::enable_if<!std::is_same<const char*, Func1>::value
+        && QtPrivate::IsPointerToTypeDerivedFromQObject<Obj*>::Value, QAction *>::type
+        addAction(const QString &text, const Obj *object, Func1 slot)
+    {
+        QAction *result = addAction(text);
+        connect(result, &QAction::triggered, object, std::move(slot));
+        return result;
+    }
+    // addAction(QString): Connect to a functor or function pointer (without context)
+    template <typename Func1>
+    inline QAction *addAction(const QString &text, Func1 slot)
+    {
+        QAction *result = addAction(text);
+        connect(result, &QAction::triggered, std::move(slot));
+        return result;
+    }
+#endif // !Q_CLANG_QDOC
 
     QAction *addMenu(QMenu *menu);
     QMenu *addMenu(const QString &title);
@@ -79,9 +111,9 @@ public:
     void setDefaultUp(bool);
     bool isDefaultUp() const;
 
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
-    int heightForWidth(int) const;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
+    int heightForWidth(int) const override;
 
     QRect actionGeometry(QAction *) const;
     QAction *actionAt(const QPoint &) const;
@@ -89,14 +121,7 @@ public:
     void setCornerWidget(QWidget *w, Qt::Corner corner = Qt::TopRightCorner);
     QWidget *cornerWidget(Qt::Corner corner = Qt::TopRightCorner) const;
 
-#ifdef Q_OS_WINCE
-    void setDefaultAction(QAction *);
-    QAction *defaultAction() const;
-
-    static void wceCommands(uint command);
-    static void wceRefresh();
-#endif
-#ifdef Q_OS_OSX
+#if defined(Q_OS_MACOS) || defined(Q_CLANG_QDOC)
     NSMenu* toNSMenu();
 #endif
 
@@ -104,27 +129,27 @@ public:
     void setNativeMenuBar(bool nativeMenuBar);
     QPlatformMenuBar *platformMenuBar();
 public Q_SLOTS:
-    virtual void setVisible(bool visible);
+    void setVisible(bool visible) override;
 
 Q_SIGNALS:
     void triggered(QAction *action);
     void hovered(QAction *action);
 
 protected:
-    void changeEvent(QEvent *);
-    void keyPressEvent(QKeyEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mousePressEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void leaveEvent(QEvent *);
-    void paintEvent(QPaintEvent *);
-    void resizeEvent(QResizeEvent *);
-    void actionEvent(QActionEvent *);
-    void focusOutEvent(QFocusEvent *);
-    void focusInEvent(QFocusEvent *);
-    void timerEvent(QTimerEvent *);
-    bool eventFilter(QObject *, QEvent *);
-    bool event(QEvent *);
+    void changeEvent(QEvent *) override;
+    void keyPressEvent(QKeyEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
+    void mousePressEvent(QMouseEvent *) override;
+    void mouseMoveEvent(QMouseEvent *) override;
+    void leaveEvent(QEvent *) override;
+    void paintEvent(QPaintEvent *) override;
+    void resizeEvent(QResizeEvent *) override;
+    void actionEvent(QActionEvent *) override;
+    void focusOutEvent(QFocusEvent *) override;
+    void focusInEvent(QFocusEvent *) override;
+    void timerEvent(QTimerEvent *) override;
+    bool eventFilter(QObject *, QEvent *) override;
+    bool event(QEvent *) override;
     void initStyleOption(QStyleOptionMenuItem *option, const QAction *action) const;
 
 private:
@@ -135,16 +160,10 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _q_internalShortcutActivated(int))
     Q_PRIVATE_SLOT(d_func(), void _q_updateLayout())
 
-#ifdef Q_OS_WINCE
-    Q_PRIVATE_SLOT(d_func(), void _q_updateDefaultAction())
-#endif
-
     friend class QMenu;
     friend class QMenuPrivate;
     friend class QWindowsStyle;
 };
-
-#endif // QT_NO_MENUBAR
 
 QT_END_NAMESPACE
 

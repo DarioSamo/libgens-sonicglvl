@@ -139,26 +139,13 @@ namespace LibGens {
 			}
 	};
 
-	struct CubeParameter;
-	class VRMap;
-
 	class LightField {
 		protected:
 			LightFieldCube *cube;
 			vector<ColorPoint *> color_palette;
 			list<SamplingPoint *> sampling_points;
 			AABB world_aabb;
-			unsigned int sample_treshold;
-			float sample_affect_distance;
-			float min_world_cube_size;
-			float grid_size;
-			VRMap *vrmap;
-			stack<CubeParameter *> cube_stack;
-			vector< stack<CubeParameter *> > thread_stacks;
-			bool *thread_status;
 
-			int w, h, d;
-			vector<vector<vector<vector<SamplingPoint *> > > > grid;
 		public:
 			LightField() : world_aabb(), cube(NULL), color_palette() {
 			}
@@ -167,20 +154,6 @@ namespace LibGens {
 			void read(File *file);
 			void save(string filename);
 			void write(File *file);
-
-			void generate(VRMap *vrmap, Color ambient_color, unsigned int sample_treshold, float sample_affect_distance, float min_world_cube_size, unsigned int threads=1);
-			void generateCubeProc(CubeParameter *object);
-
-			SamplingPoint *createSamplingPoint(Vector3 point);
-			void paintSamplingPoints(VRMap *vrmap, Color ambient_color, float sample_affect_distance);
-
-			void setThreadStatus(unsigned int thread, bool v) {
-				thread_status[thread] = v;
-			}
-
-			void pushThreadStack(unsigned int thread, CubeParameter *object) {
-				thread_stacks[thread].push(object);
-			}
 
 			ColorPoint *createColorPoint(unsigned char rgb[8][3], unsigned char flag);
 	};

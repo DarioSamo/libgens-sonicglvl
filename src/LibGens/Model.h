@@ -31,7 +31,6 @@ namespace LibGens {
 	class MorphModel;
 	class Bone;
 	class Vertex;
-	class VRMapSample;
 	class SampleChunkProperty;
 
 	enum Topology {
@@ -76,7 +75,6 @@ namespace LibGens {
 			list<string> getMaterialNames();
 			vector<unsigned int> getMaterialMappings(list<string> &material_names);
 			void getTotalData(list<Vertex *> &vertex_list, list<unsigned int> &face_list, list<string> &material_names, vector<unsigned int> &material_mappings);
-			void createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
 			void addMesh(Mesh *mesh);
 			void cloneMesh(Mesh *mesh, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);
 			void mergeModel(Model *model, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom);

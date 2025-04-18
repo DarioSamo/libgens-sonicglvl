@@ -22,7 +22,6 @@
 #include "Model.h"
 #include "Vertex.h"
 #include "VertexFormat.h"
-#include "VRMap.h"
 
 namespace LibGens {
 	Submesh::Submesh() {
@@ -393,44 +392,6 @@ namespace LibGens {
 		if (faces[faces.size()-1]==0xFFFF) faces.resize(faces.size()-1);
 
 		buildAABB();
-	}
-
-	
-	void Submesh::createSamplePoints(list<VRMapSample *> *list, Matrix4 &matrix, Bitmap *bitmap, float unit_size, float saturation_multiplier, float brightness_offset) {
-		for (size_t i=0; i<faces_vectors.size(); i++) {
-			Vertex *va=vertices[(size_t)faces_vectors[i].a];
-			Vertex *vb=vertices[(size_t)faces_vectors[i].b];
-			Vertex *vc=vertices[(size_t)faces_vectors[i].c];
-			Vector3 a=va->getTPosition(matrix);
-			Vector3 b=vb->getTPosition(matrix);
-			Vector3 c=vc->getTPosition(matrix);
-
-			Triangle tri(a, b, c);
-			points.clear();
-
-			//printf("Starting to generate points\n");
-			tri.generatePoints(&points, unit_size);
-
-			//printf("Painting points\n");
-
-			for (size_t j=0; j<points.size(); j++) {
-				VRMapSample *sample=new VRMapSample();
-				sample->point=points[j];
-
-				Vector2 uv_bar=points[j].toBarycentric(a, b, c);
-				Vector2 t2 = vb->getUV(1) - va->getUV(1);
-				Vector2 t1 = vc->getUV(1) - va->getUV(1);
-				Vector2 uv = va->getUV(1) + t1*uv_bar.x + t2*uv_bar.y;
-
-				Color color;
-				color = bitmap->pickColor(uv);
-				color.setSaturation(saturation_multiplier);
-				sample->color = Color8(color.r*255.0f, color.g*255.0f, color.b*255.0f, color.a*255.0f);
-				list->push_back(sample);
-			}
-
-			//printf("%d\n", points.size());
-		}
 	}
 
 	void Submesh::fixVertexFormatForPC() {

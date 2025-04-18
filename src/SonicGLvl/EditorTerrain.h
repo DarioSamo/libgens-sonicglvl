@@ -42,9 +42,9 @@ class TerrainStreamer {
 		LibGens::Terrain *terrain;
 		LibGens::GITextureGroupInfo *gi_group_info;
 
-		pthread_t *thread;
-		pthread_mutex_t camera_mutex;
-		pthread_mutex_t instance_mutex;
+		std::thread thread;
+		std::mutex camera_mutex;
+		std::mutex instance_mutex;
 		vector<LibGens::TerrainGroup *> terrain_groups;
 		LibGens::Vector3 position;
 		bool check;
@@ -59,6 +59,7 @@ class TerrainStreamer {
 		float terrain_streamer_distance;
 	public:
 		TerrainStreamer(LibGens::Terrain *terrain_p, LibGens::GITextureGroupInfo *gi_group_info_p, Ogre::SceneManager *scene_manager_p, bool start_loading=true);
+		~TerrainStreamer();
 		void createNodesFromTerrainGroup(LibGens::TerrainGroup *terrain_group);
 
 		void start();
@@ -71,12 +72,12 @@ class TerrainStreamer {
 			terrain_nodes_list=v;
 		}
 
-		pthread_mutex_t *getMutex() {
-			return &camera_mutex;
+		std::mutex &getMutex() {
+			return camera_mutex;
 		}
 
-		pthread_mutex_t *getInstanceMutex() {
-			return &instance_mutex;
+		std::mutex &getInstanceMutex() {
+			return instance_mutex;
 		}
 
 		void setPosition(LibGens::Vector3 v) {

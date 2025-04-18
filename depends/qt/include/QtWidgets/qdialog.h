@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,7 +40,10 @@
 #ifndef QDIALOG_H
 #define QDIALOG_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtWidgets/qwidget.h>
+
+QT_REQUIRE_CONFIG(dialog);
 
 QT_BEGIN_NAMESPACE
 
@@ -51,23 +60,24 @@ class Q_WIDGETS_EXPORT QDialog : public QWidget
     Q_PROPERTY(bool modal READ isModal WRITE setModal)
 
 public:
-    explicit QDialog(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    explicit QDialog(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~QDialog();
 
     enum DialogCode { Rejected, Accepted };
 
     int result() const;
 
-    void setVisible(bool visible);
+    void setVisible(bool visible) override;
 
-    void setOrientation(Qt::Orientation orientation);
-    Qt::Orientation orientation() const;
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use show/hide on the affected widget instead") void setOrientation(Qt::Orientation orientation);
+    QT_DEPRECATED_X("Use show/hide on the affected widget instead") Qt::Orientation orientation() const;
+    QT_DEPRECATED_X("Use show/hide on the affected widget instead") void setExtension(QWidget* extension);
+    QT_DEPRECATED_X("Use show/hide on the affected widget instead") QWidget* extension() const;
+#endif
 
-    void setExtension(QWidget* extension);
-    QWidget* extension() const;
-
-    QSize sizeHint() const;
-    QSize minimumSizeHint() const;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     void setSizeGripEnabled(bool);
     bool isSizeGripEnabled() const;
@@ -87,30 +97,25 @@ public Q_SLOTS:
     virtual void accept();
     virtual void reject();
 
-    void showExtension(bool);
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use show/hide on the affected widget instead") void showExtension(bool);
+#endif
 
 protected:
-    QDialog(QDialogPrivate &, QWidget *parent, Qt::WindowFlags f = 0);
+    QDialog(QDialogPrivate &, QWidget *parent, Qt::WindowFlags f = Qt::WindowFlags());
 
-#if defined(Q_OS_WINCE)
-    bool event(QEvent *e);
-#endif
-    void keyPressEvent(QKeyEvent *);
-    void closeEvent(QCloseEvent *);
-    void showEvent(QShowEvent *);
-    void resizeEvent(QResizeEvent *);
+    void keyPressEvent(QKeyEvent *) override;
+    void closeEvent(QCloseEvent *) override;
+    void showEvent(QShowEvent *) override;
+    void resizeEvent(QResizeEvent *) override;
 #ifndef QT_NO_CONTEXTMENU
-    void contextMenuEvent(QContextMenuEvent *);
+    void contextMenuEvent(QContextMenuEvent *) override;
 #endif
-    bool eventFilter(QObject *, QEvent *);
+    bool eventFilter(QObject *, QEvent *) override;
     void adjustPosition(QWidget*);
 private:
     Q_DECLARE_PRIVATE(QDialog)
     Q_DISABLE_COPY(QDialog)
-
-#ifdef Q_OS_WINCE_WM
-    Q_PRIVATE_SLOT(d_func(), void _q_doneAction())
-#endif
 };
 
 QT_END_NAMESPACE

@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -67,8 +73,10 @@ public:
     inline void translate(const QPoint &p);
     inline void translate(int dx, int dy);
 
-    Q_DECL_CONSTEXPR inline QLine translated(const QPoint &p) const Q_REQUIRED_RESULT;
-    Q_DECL_CONSTEXPR inline QLine translated(int dx, int dy) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QLine translated(const QPoint &p) const;
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QLine translated(int dx, int dy) const;
+
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QPoint center() const;
 
     inline void setP1(const QPoint &p1);
     inline void setP2(const QPoint &p2);
@@ -159,6 +167,11 @@ Q_DECL_CONSTEXPR inline QLine QLine::translated(int adx, int ady) const
     return translated(QPoint(adx, ady));
 }
 
+Q_DECL_CONSTEXPR inline QPoint QLine::center() const
+{
+    return QPoint(int((qint64(pt1.x()) + pt2.x()) / 2), int((qint64(pt1.y()) + pt2.y()) / 2));
+}
+
 inline void QLine::setP1(const QPoint &aP1)
 {
     pt1 = aP1;
@@ -202,13 +215,14 @@ class Q_CORE_EXPORT QLineF {
 public:
 
     enum IntersectType { NoIntersection, BoundedIntersection, UnboundedIntersection };
+    using IntersectionType = IntersectType;
 
     Q_DECL_CONSTEXPR inline QLineF();
     Q_DECL_CONSTEXPR inline QLineF(const QPointF &pt1, const QPointF &pt2);
     Q_DECL_CONSTEXPR inline QLineF(qreal x1, qreal y1, qreal x2, qreal y2);
     Q_DECL_CONSTEXPR inline QLineF(const QLine &line) : pt1(line.p1()), pt2(line.p2()) { }
 
-    static QLineF fromPolar(qreal length, qreal angle) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT static QLineF fromPolar(qreal length, qreal angle);
 
     Q_DECL_CONSTEXPR bool isNull() const;
 
@@ -232,20 +246,26 @@ public:
 
     qreal angleTo(const QLineF &l) const;
 
-    QLineF unitVector() const Q_REQUIRED_RESULT;
-    Q_DECL_CONSTEXPR inline QLineF normalVector() const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QLineF unitVector() const;
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QLineF normalVector() const;
 
-    // ### Qt 6: rename intersects() or intersection() and rename IntersectType IntersectionType
+    IntersectionType intersects(const QLineF &l, QPointF *intersectionPoint) const;
+
+#if QT_DEPRECATED_SINCE(5, 14)
+    QT_DEPRECATED_VERSION_X(5, 14, "Use intersects() instead")
     IntersectType intersect(const QLineF &l, QPointF *intersectionPoint) const;
-
+    QT_DEPRECATED_X("Use qMin(l1.angleTo(l2), l2.angleTo(l1)) instead")
     qreal angle(const QLineF &l) const;
+#endif
 
     Q_DECL_CONSTEXPR inline QPointF pointAt(qreal t) const;
     inline void translate(const QPointF &p);
     inline void translate(qreal dx, qreal dy);
 
-    Q_DECL_CONSTEXPR inline QLineF translated(const QPointF &p) const Q_REQUIRED_RESULT;
-    Q_DECL_CONSTEXPR inline QLineF translated(qreal dx, qreal dy) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QLineF translated(const QPointF &p) const;
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QLineF translated(qreal dx, qreal dy) const;
+
+    Q_REQUIRED_RESULT Q_DECL_CONSTEXPR inline QPointF center() const;
 
     inline void setP1(const QPointF &p1);
     inline void setP2(const QPointF &p2);
@@ -351,12 +371,19 @@ Q_DECL_CONSTEXPR inline QLineF QLineF::translated(qreal adx, qreal ady) const
     return translated(QPointF(adx, ady));
 }
 
+Q_DECL_CONSTEXPR inline QPointF QLineF::center() const
+{
+    return QPointF(0.5 * pt1.x() + 0.5 * pt2.x(), 0.5 * pt1.y() + 0.5 * pt2.y());
+}
+
 inline void QLineF::setLength(qreal len)
 {
     if (isNull())
         return;
-    QLineF v = unitVector();
-    pt2 = QPointF(pt1.x() + v.dx() * len, pt1.y() + v.dy() * len);
+    Q_ASSERT(length() > 0);
+    const QLineF v = unitVector();
+    len /= v.length(); // In case it's not quite exactly 1.
+    pt2 = QPointF(pt1.x() + len * v.dx(), pt1.y() + len * v.dy());
 }
 
 Q_DECL_CONSTEXPR inline QPointF QLineF::pointAt(qreal t) const

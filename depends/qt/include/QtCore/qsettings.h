@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -39,10 +45,7 @@
 #include <QtCore/qstring.h>
 #include <QtCore/qscopedpointer.h>
 
-QT_BEGIN_NAMESPACE
-QT_END_NAMESPACE
-
-#ifndef QT_NO_SETTINGS
+QT_REQUIRE_CONFIG(settings);
 
 #include <ctype.h>
 
@@ -74,10 +77,18 @@ public:
         AccessError,
         FormatError
     };
+#ifndef QT_NO_QOBJECT
+    Q_ENUM(Status)
+#endif
 
     enum Format {
         NativeFormat,
         IniFormat,
+
+#if defined(Q_OS_WIN) || defined(Q_CLANG_QDOC)
+        Registry32Format,
+        Registry64Format,
+#endif
 
         InvalidFormat = 16,
         CustomFormat1,
@@ -97,21 +108,28 @@ public:
         CustomFormat15,
         CustomFormat16
     };
+#ifndef QT_NO_QOBJECT
+    Q_ENUM(Format)
+#endif
 
     enum Scope {
         UserScope,
         SystemScope
     };
+#ifndef QT_NO_QOBJECT
+    Q_ENUM(Scope)
+#endif
 
 #ifndef QT_NO_QOBJECT
     explicit QSettings(const QString &organization,
-                       const QString &application = QString(), QObject *parent = 0);
+                       const QString &application = QString(), QObject *parent = nullptr);
     QSettings(Scope scope, const QString &organization,
-              const QString &application = QString(), QObject *parent = 0);
+              const QString &application = QString(), QObject *parent = nullptr);
     QSettings(Format format, Scope scope, const QString &organization,
-              const QString &application = QString(), QObject *parent = 0);
-    QSettings(const QString &fileName, Format format, QObject *parent = 0);
-    explicit QSettings(QObject *parent = 0);
+              const QString &application = QString(), QObject *parent = nullptr);
+    QSettings(const QString &fileName, Format format, QObject *parent = nullptr);
+    explicit QSettings(QObject *parent = nullptr);
+    explicit QSettings(Scope scope, QObject *parent = nullptr);
 #else
     explicit QSettings(const QString &organization,
                        const QString &application = QString());
@@ -120,12 +138,17 @@ public:
     QSettings(Format format, Scope scope, const QString &organization,
               const QString &application = QString());
     QSettings(const QString &fileName, Format format);
+#  ifndef QT_BUILD_QMAKE
+    explicit QSettings(Scope scope = UserScope);
+#  endif
 #endif
     ~QSettings();
 
     void clear();
     void sync();
     Status status() const;
+    bool isAtomicSyncRequired() const;
+    void setAtomicSyncRequired(bool enable);
 
     void beginGroup(const QString &prefix);
     void endGroup();
@@ -156,7 +179,7 @@ public:
     QString organizationName() const;
     QString applicationName() const;
 
-#ifndef QT_NO_TEXTCODEC
+#if QT_CONFIG(textcodec)
     void setIniCodec(QTextCodec *codec);
     void setIniCodec(const char *codecName);
     QTextCodec *iniCodec() const;
@@ -164,8 +187,12 @@ public:
 
     static void setDefaultFormat(Format format);
     static Format defaultFormat();
-    static void setSystemIniPath(const QString &dir); // ### Qt 6: remove (use setPath() instead)
-    static void setUserIniPath(const QString &dir);   // ### Qt 6: remove (use setPath() instead)
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use QSettings::setPath() instead")
+    static void setSystemIniPath(const QString &dir);
+    QT_DEPRECATED_X("Use QSettings::setPath() instead")
+    static void setUserIniPath(const QString &dir);
+#endif
     static void setPath(Format format, Scope scope, const QString &path);
 
     typedef QMap<QString, QVariant> SettingsMap;
@@ -177,7 +204,7 @@ public:
 
 protected:
 #ifndef QT_NO_QOBJECT
-    bool event(QEvent *event) Q_DECL_OVERRIDE;
+    bool event(QEvent *event) override;
 #endif
 
 private:
@@ -185,7 +212,5 @@ private:
 };
 
 QT_END_NAMESPACE
-
-#endif // QT_NO_SETTINGS
 
 #endif // QSETTINGS_H

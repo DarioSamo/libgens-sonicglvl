@@ -1,31 +1,37 @@
 /****************************************************************************
 **
 ** Copyright (C) 2013 Klaralvdalens Datakonsult AB (KDAB).
-** Contact: http://www.qt.io/licensing/
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,7 +40,7 @@
 #ifndef QOPENGLABSTRACTTEXTURE_H
 #define QOPENGLABSTRACTTEXTURE_H
 
-#include <QtCore/qglobal.h>
+#include <QtGui/qtguiglobal.h>
 
 #ifndef QT_NO_OPENGL
 
@@ -44,11 +50,13 @@
 
 QT_BEGIN_NAMESPACE
 
+class QDebug;
 class QOpenGLTexturePrivate;
 class QOpenGLPixelTransferOptions;
 
 class Q_GUI_EXPORT QOpenGLTexture
 {
+    Q_GADGET
 public:
     enum Target {
         Target1D                   = 0x0DE0,    // GL_TEXTURE_1D
@@ -63,6 +71,7 @@ public:
         TargetRectangle            = 0x84F5,    // GL_TEXTURE_RECTANGLE
         TargetBuffer               = 0x8C2A     // GL_TEXTURE_BUFFER
     };
+    Q_ENUM(Target)
 
     enum BindingTarget {
         BindingTarget1D                    = 0x8068,   // GL_TEXTURE_BINDING_1D
@@ -77,16 +86,19 @@ public:
         BindingTargetRectangle             = 0x84F6,   // GL_TEXTURE_BINDING_RECTANGLE
         BindingTargetBuffer                = 0x8C2C    // GL_TEXTURE_BINDING_BUFFER
     };
+    Q_ENUM(BindingTarget)
 
     enum MipMapGeneration {
         GenerateMipMaps,
         DontGenerateMipMaps
     };
+    Q_ENUM(MipMapGeneration)
 
     enum TextureUnitReset {
         ResetTextureUnit,
         DontResetTextureUnit
     };
+    Q_ENUM(TextureUnitReset)
 
     enum TextureFormat {
         NoFormat               = 0,         // GL_NONE
@@ -196,6 +208,35 @@ public:
         SRGB8_PunchThrough_Alpha1_ETC2 = 0x9277, // GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2
         RGBA8_ETC2_EAC         = 0x9278,    // GL_COMPRESSED_RGBA8_ETC2_EAC
         SRGB8_Alpha8_ETC2_EAC  = 0x9279,    // GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC
+        RGB8_ETC1              = 0x8D64,    // GL_ETC1_RGB8_OES
+        RGBA_ASTC_4x4          = 0x93B0,    // GL_COMPRESSED_RGBA_ASTC_4x4_KHR
+        RGBA_ASTC_5x4          = 0x93B1,    // GL_COMPRESSED_RGBA_ASTC_5x4_KHR
+        RGBA_ASTC_5x5          = 0x93B2,    // GL_COMPRESSED_RGBA_ASTC_5x5_KHR
+        RGBA_ASTC_6x5          = 0x93B3,    // GL_COMPRESSED_RGBA_ASTC_6x5_KHR
+        RGBA_ASTC_6x6          = 0x93B4,    // GL_COMPRESSED_RGBA_ASTC_6x6_KHR
+        RGBA_ASTC_8x5          = 0x93B5,    // GL_COMPRESSED_RGBA_ASTC_8x5_KHR
+        RGBA_ASTC_8x6          = 0x93B6,    // GL_COMPRESSED_RGBA_ASTC_8x6_KHR
+        RGBA_ASTC_8x8          = 0x93B7,    // GL_COMPRESSED_RGBA_ASTC_8x8_KHR
+        RGBA_ASTC_10x5         = 0x93B8,    // GL_COMPRESSED_RGBA_ASTC_10x5_KHR
+        RGBA_ASTC_10x6         = 0x93B9,    // GL_COMPRESSED_RGBA_ASTC_10x6_KHR
+        RGBA_ASTC_10x8         = 0x93BA,    // GL_COMPRESSED_RGBA_ASTC_10x8_KHR
+        RGBA_ASTC_10x10        = 0x93BB,    // GL_COMPRESSED_RGBA_ASTC_10x10_KHR
+        RGBA_ASTC_12x10        = 0x93BC,    // GL_COMPRESSED_RGBA_ASTC_12x10_KHR
+        RGBA_ASTC_12x12        = 0x93BD,    // GL_COMPRESSED_RGBA_ASTC_12x12_KHR
+        SRGB8_Alpha8_ASTC_4x4  = 0x93D0,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR
+        SRGB8_Alpha8_ASTC_5x4  = 0x93D1,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR
+        SRGB8_Alpha8_ASTC_5x5  = 0x93D2,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR
+        SRGB8_Alpha8_ASTC_6x5  = 0x93D3,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR
+        SRGB8_Alpha8_ASTC_6x6  = 0x93D4,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR
+        SRGB8_Alpha8_ASTC_8x5  = 0x93D5,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR
+        SRGB8_Alpha8_ASTC_8x6  = 0x93D6,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR
+        SRGB8_Alpha8_ASTC_8x8  = 0x93D7,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR
+        SRGB8_Alpha8_ASTC_10x5 = 0x93D8,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR
+        SRGB8_Alpha8_ASTC_10x6 = 0x93D9,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR
+        SRGB8_Alpha8_ASTC_10x8 = 0x93DA,    // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR
+        SRGB8_Alpha8_ASTC_10x10 = 0x93DB,   // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR
+        SRGB8_Alpha8_ASTC_12x10 = 0x93DC,   // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR
+        SRGB8_Alpha8_ASTC_12x12 = 0x93DD,   // GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR
 
         // sRGB formats
         SRGB8                  = 0x8C41,    // GL_SRGB8
@@ -215,6 +256,7 @@ public:
         LuminanceAlphaFormat   = 0x190A
 
     };
+    Q_ENUM(TextureFormat)
 
     // This is not used externally yet but is reserved to allow checking of
     // compatibility between texture formats
@@ -249,6 +291,7 @@ public:
         CubeMapPositiveZ = 0x8519,  // GL_TEXTURE_CUBE_MAP_POSITIVE_Z
         CubeMapNegativeZ = 0x851A   // GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
     };
+    Q_ENUM(CubeMapFace)
 
     enum PixelFormat {
         NoSourceFormat = 0,         // GL_NONE
@@ -271,6 +314,7 @@ public:
         Luminance      = 0x1909,    // GL_LUMINANCE
         LuminanceAlpha = 0x190A     // GL_LUMINANCE_ALPHA
     };
+    Q_ENUM(PixelFormat)
 
     enum PixelType {
         NoPixelType        = 0,         // GL_NONE
@@ -300,6 +344,7 @@ public:
         UInt32_D24S8       = 0x84FA,    // GL_UNSIGNED_INT_24_8
         Float32_D32_UInt32_S8_X24 = 0x8DAD // GL_FLOAT_32_UNSIGNED_INT_24_8_REV
     };
+    Q_ENUM(PixelType)
 
     enum SwizzleComponent {
         SwizzleRed   = 0x8E42,  // GL_TEXTURE_SWIZZLE_R
@@ -307,6 +352,7 @@ public:
         SwizzleBlue  = 0x8E44,  // GL_TEXTURE_SWIZZLE_B
         SwizzleAlpha = 0x8E45   // GL_TEXTURE_SWIZZLE_A
     };
+    Q_ENUM(SwizzleComponent)
 
     enum SwizzleValue {
         RedValue   = 0x1903, // GL_RED
@@ -316,6 +362,7 @@ public:
         ZeroValue  = 0,      // GL_ZERO
         OneValue   = 1       // GL_ONE
     };
+    Q_ENUM(SwizzleValue)
 
     enum WrapMode {
         Repeat         = 0x2901, // GL_REPEAT
@@ -323,12 +370,14 @@ public:
         ClampToEdge    = 0x812F, // GL_CLAMP_TO_EDGE
         ClampToBorder  = 0x812D  // GL_CLAMP_TO_BORDER
     };
+    Q_ENUM(WrapMode)
 
     enum CoordinateDirection {
         DirectionS = 0x2802, // GL_TEXTURE_WRAP_S
         DirectionT = 0x2803, // GL_TEXTURE_WRAP_T
         DirectionR = 0x8072  // GL_TEXTURE_WRAP_R
     };
+    Q_ENUM(CoordinateDirection)
 
     // Features
     enum Feature {
@@ -353,6 +402,7 @@ public:
 #endif
     };
     Q_DECLARE_FLAGS(Features, Feature)
+    Q_ENUM(Feature)
 
     explicit QOpenGLTexture(Target target);
     explicit QOpenGLTexture(const QImage& image, MipMapGeneration genMipMaps = GenerateMipMaps);
@@ -409,54 +459,86 @@ public:
 #if QT_DEPRECATED_SINCE(5, 3)
     QT_DEPRECATED void setData(int mipLevel, int layer, CubeMapFace cubeFace,
                                PixelFormat sourceFormat, PixelType sourceType,
-                               void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                               void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
     QT_DEPRECATED void setData(int mipLevel, int layer,
                                PixelFormat sourceFormat, PixelType sourceType,
-                               void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                               void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
     QT_DEPRECATED void setData(int mipLevel,
                                PixelFormat sourceFormat, PixelType sourceType,
-                               void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                               void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
     QT_DEPRECATED void setData(PixelFormat sourceFormat, PixelType sourceType,
-                               void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                               void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
 #endif // QT_DEPRECATED_SINCE(5, 3)
 
     void setData(int mipLevel, int layer, CubeMapFace cubeFace,
                  PixelFormat sourceFormat, PixelType sourceType,
-                 const void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+    void setData(int mipLevel, int layer, int layerCount, CubeMapFace cubeFace,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
     void setData(int mipLevel, int layer,
                  PixelFormat sourceFormat, PixelType sourceType,
-                 const void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
     void setData(int mipLevel,
                  PixelFormat sourceFormat, PixelType sourceType,
-                 const void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
     void setData(PixelFormat sourceFormat, PixelType sourceType,
-                 const void *data, const QOpenGLPixelTransferOptions * const options = 0);
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+
+    void setData(int xOffset, int yOffset, int zOffset,
+                 int width, int height, int depth,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+    void setData(int xOffset, int yOffset, int zOffset,
+                 int width, int height, int depth, int mipLevel,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+    void setData(int xOffset, int yOffset, int zOffset,
+                 int width, int height, int depth,
+                 int mipLevel, int layer,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+    void setData(int xOffset, int yOffset, int zOffset,
+                 int width, int height, int depth,
+                 int mipLevel, int layer,
+                 CubeMapFace cubeFace,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
+    void setData(int xOffset, int yOffset, int zOffset,
+                 int width, int height, int depth,
+                 int mipLevel, int layer,
+                 CubeMapFace cubeFace, int layerCount,
+                 PixelFormat sourceFormat, PixelType sourceType,
+                 const void *data, const QOpenGLPixelTransferOptions * const options = nullptr);
 
     // Compressed data upload
     // ### Qt 6: remove the non-const void * overloads
 #if QT_DEPRECATED_SINCE(5, 3)
     QT_DEPRECATED void setCompressedData(int mipLevel, int layer, CubeMapFace cubeFace,
                                          int dataSize, void *data,
-                                         const QOpenGLPixelTransferOptions * const options = 0);
+                                         const QOpenGLPixelTransferOptions * const options = nullptr);
     QT_DEPRECATED void setCompressedData(int mipLevel, int layer,
                                          int dataSize, void *data,
-                                         const QOpenGLPixelTransferOptions * const options = 0);
+                                         const QOpenGLPixelTransferOptions * const options = nullptr);
     QT_DEPRECATED void setCompressedData(int mipLevel, int dataSize, void *data,
-                                         const QOpenGLPixelTransferOptions * const options = 0);
+                                         const QOpenGLPixelTransferOptions * const options = nullptr);
     QT_DEPRECATED void setCompressedData(int dataSize, void *data,
-                                         const QOpenGLPixelTransferOptions * const options = 0);
+                                         const QOpenGLPixelTransferOptions * const options = nullptr);
 #endif // QT_DEPRECATED_SINCE(5, 3)
 
     void setCompressedData(int mipLevel, int layer, CubeMapFace cubeFace,
                            int dataSize, const void *data,
-                           const QOpenGLPixelTransferOptions * const options = 0);
+                           const QOpenGLPixelTransferOptions * const options = nullptr);
+    void setCompressedData(int mipLevel, int layer, int layerCount, CubeMapFace cubeFace,
+                           int dataSize, const void *data,
+                           const QOpenGLPixelTransferOptions * const options = nullptr);
     void setCompressedData(int mipLevel, int layer,
                            int dataSize, const void *data,
-                           const QOpenGLPixelTransferOptions * const options = 0);
+                           const QOpenGLPixelTransferOptions * const options = nullptr);
     void setCompressedData(int mipLevel, int dataSize, const void *data,
-                           const QOpenGLPixelTransferOptions * const options = 0);
+                           const QOpenGLPixelTransferOptions * const options = nullptr);
     void setCompressedData(int dataSize, const void *data,
-                           const QOpenGLPixelTransferOptions * const options = 0);
+                           const QOpenGLPixelTransferOptions * const options = nullptr);
 
     // Helpful overloads for setData
     void setData(const QImage& image, MipMapGeneration genMipMaps = GenerateMipMaps);
@@ -486,6 +568,7 @@ public:
         DepthMode   = 0x1902,   // GL_DEPTH_COMPONENT
         StencilMode = 0x1901    // GL_STENCIL_INDEX
     };
+    Q_ENUM(DepthStencilMode)
 
     void setDepthStencilMode(DepthStencilMode mode);
     DepthStencilMode depthStencilMode() const;
@@ -500,6 +583,7 @@ public:
         CompareAlways       = 0x0207,   // GL_ALWAYS
         CompareNever        = 0x0200    // GL_NEVER
     };
+    Q_ENUM(ComparisonFunction)
 
     void setComparisonFunction(ComparisonFunction function);
     ComparisonFunction comparisonFunction() const;
@@ -521,6 +605,7 @@ public:
         LinearMipMapNearest     = 0x2701,   // GL_LINEAR_MIPMAP_NEAREST
         LinearMipMapLinear      = 0x2703    // GL_LINEAR_MIPMAP_LINEAR
     };
+    Q_ENUM(Filter)
 
     void setMinificationFilter(Filter filter);
     Filter minificationFilter() const;
@@ -555,6 +640,10 @@ public:
     void setLevelofDetailBias(float bias);
     float levelofDetailBias() const;
 
+#ifndef QT_NO_DEBUG_STREAM
+    friend Q_GUI_EXPORT QDebug operator<<(QDebug dbg, const QOpenGLTexture *t);
+#endif
+
 private:
     Q_DISABLE_COPY(QOpenGLTexture)
     Q_DECLARE_PRIVATE(QOpenGLTexture)
@@ -562,6 +651,10 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QOpenGLTexture::Features)
+
+#ifndef QT_NO_DEBUG_STREAM
+Q_GUI_EXPORT QDebug operator<<(QDebug debug, const QOpenGLTexture *t);
+#endif
 
 QT_END_NAMESPACE
 

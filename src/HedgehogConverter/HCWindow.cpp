@@ -281,7 +281,7 @@ void HCWindow::logProgress(ProgressType progress_type, QString message) {
 	QFile log_file(LogPath);
     log_file.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream stream(&log_file);
-    stream << log_file_message << endl << flush;
+    stream << log_file_message << Qt::endl << Qt::flush;
 
 	QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
 }

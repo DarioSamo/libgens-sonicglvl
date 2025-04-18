@@ -1,31 +1,38 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2017 The Qt Company Ltd.
+** Copyright (C) 2016 Intel Corporation.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -43,6 +50,10 @@ QT_BEGIN_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_GCC("-Wextra")
 
+#ifdef Q_CLANG_QDOC
+#  undef QT_BASIC_ATOMIC_HAS_CONSTRUCTORS
+#endif
+
 // High-level atomic integer operations
 template <typename T>
 class QAtomicInteger : public QBasicAtomicInteger<T>
@@ -50,15 +61,15 @@ class QAtomicInteger : public QBasicAtomicInteger<T>
 public:
     // Non-atomic API
 #ifdef QT_BASIC_ATOMIC_HAS_CONSTRUCTORS
-    constexpr QAtomicInteger(T value = 0) Q_DECL_NOTHROW : QBasicAtomicInteger<T>(value) {}
+    constexpr QAtomicInteger(T value = 0) noexcept : QBasicAtomicInteger<T>(value) {}
 #else
-    inline QAtomicInteger(T value = 0) Q_DECL_NOTHROW
+    inline QAtomicInteger(T value = 0) noexcept
     {
         this->_q_value = value;
     }
 #endif
 
-    inline QAtomicInteger(const QAtomicInteger &other) Q_DECL_NOTHROW
+    inline QAtomicInteger(const QAtomicInteger &other) noexcept
 #ifdef QT_BASIC_ATOMIC_HAS_CONSTRUCTORS
         : QBasicAtomicInteger<T>()
 #endif
@@ -66,16 +77,18 @@ public:
         this->storeRelease(other.loadAcquire());
     }
 
-    inline QAtomicInteger &operator=(const QAtomicInteger &other) Q_DECL_NOTHROW
+    inline QAtomicInteger &operator=(const QAtomicInteger &other) noexcept
     {
         this->storeRelease(other.loadAcquire());
         return *this;
     }
 
-#ifdef Q_QDOC
+#ifdef Q_CLANG_QDOC
     T load() const;
+    T loadRelaxed() const;
     T loadAcquire() const;
     void store(T newValue);
+    void storeRelaxed(T newValue);
     void storeRelease(T newValue);
 
     operator T() const;
@@ -152,7 +165,7 @@ public:
 #ifdef QT_BASIC_ATOMIC_HAS_CONSTRUCTORS
     constexpr
 #endif
-    QAtomicInt(int value = 0) Q_DECL_NOTHROW : QAtomicInteger<int>(value) {}
+    QAtomicInt(int value = 0) noexcept : QAtomicInteger<int>(value) {}
 };
 
 // High-level atomic pointer operations
@@ -161,19 +174,22 @@ class QAtomicPointer : public QBasicAtomicPointer<T>
 {
 public:
 #ifdef QT_BASIC_ATOMIC_HAS_CONSTRUCTORS
-    constexpr QAtomicPointer(T *value = 0) Q_DECL_NOTHROW : QBasicAtomicPointer<T>(value) {}
+    constexpr QAtomicPointer(T *value = nullptr) noexcept : QBasicAtomicPointer<T>(value) {}
 #else
-    inline QAtomicPointer(T *value = 0) Q_DECL_NOTHROW
+    inline QAtomicPointer(T *value = nullptr) noexcept
     {
-        this->store(value);
+        this->storeRelaxed(value);
     }
 #endif
-    inline QAtomicPointer(const QAtomicPointer<T> &other) Q_DECL_NOTHROW
+    inline QAtomicPointer(const QAtomicPointer<T> &other) noexcept
+#ifdef QT_BASIC_ATOMIC_HAS_CONSTRUCTORS
+        : QBasicAtomicPointer<T>()
+#endif
     {
         this->storeRelease(other.loadAcquire());
     }
 
-    inline QAtomicPointer<T> &operator=(const QAtomicPointer<T> &other) Q_DECL_NOTHROW
+    inline QAtomicPointer<T> &operator=(const QAtomicPointer<T> &other) noexcept
     {
         this->storeRelease(other.loadAcquire());
         return *this;
@@ -182,7 +198,9 @@ public:
 #ifdef Q_QDOC
     T *load() const;
     T *loadAcquire() const;
+    T *loadRelaxed() const;
     void store(T *newValue);
+    void storeRelaxed(T *newValue);
     void storeRelease(T *newValue);
 
     static Q_DECL_CONSTEXPR bool isTestAndSetNative();
@@ -245,7 +263,7 @@ inline void qAtomicAssign(T *&d, T *x)
 template <typename T>
 inline void qAtomicDetach(T *&d)
 {
-    if (d->ref.load() == 1)
+    if (d->ref.loadRelaxed() == 1)
         return;
     T *x = d;
     d = new T(*d);

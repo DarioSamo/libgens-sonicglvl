@@ -21,7 +21,6 @@
 
 void *updateTerrainStreamerExt(void *arg) {
     ((TerrainStreamer *)(arg))->update();
-	pthread_exit(0);
 	return NULL;
 }
 
@@ -33,11 +32,11 @@ void TerrainStreamer::update() {
 	while (!finished) {
 		Sleep(5);
 
-		pthread_mutex_lock(&camera_mutex);
+		camera_mutex.lock();
 		bool check_state=check;
 		bool all_loaded=true;
 		LibGens::Vector3 position_state=position;
-		pthread_mutex_unlock(&camera_mutex);
+		camera_mutex.unlock();
 
 		LibGens::TerrainGroup *current_winner=NULL;
 		float current_distance=terrain_streamer_distance;
@@ -56,17 +55,17 @@ void TerrainStreamer::update() {
 			(*winner_it)->load();
 			printf("Terrain group %s loaded!\n", (*winner_it)->getName().c_str());
 
-			pthread_mutex_lock(&instance_mutex);
+			instance_mutex.lock();
 			terrain_groups_to_load.push(*winner_it);
-			pthread_mutex_unlock(&instance_mutex);
+			instance_mutex.unlock();
 			terrain_groups.erase(winner_it);
 		}
 
 
-		pthread_mutex_lock(&camera_mutex);
+		camera_mutex.lock();
 		check = false;
 		if (!terrain_groups.size()) finished = true;
-		pthread_mutex_unlock(&camera_mutex);
+		camera_mutex.unlock();
 	}
 }
 
@@ -74,7 +73,7 @@ bool TerrainStreamer::updateScene() {
 	bool scene_updated=false;
 	LibGens::MaterialLibrary *terrain_material_library=terrain->getMaterialLibrary();
 
-	pthread_mutex_lock(&instance_mutex);
+	instance_mutex.lock();
 	while (!terrain_groups_to_load.empty()) {
 		scene_updated = true;
 
@@ -88,7 +87,7 @@ bool TerrainStreamer::updateScene() {
 			if (terrain_nodes_list) terrain_nodes_list->push_back(terrain_node);
 		}
 	}
-	pthread_mutex_unlock(&instance_mutex);
+	instance_mutex.unlock();
 	return scene_updated;
 }
 
@@ -100,9 +99,6 @@ TerrainStreamer::TerrainStreamer(LibGens::Terrain *terrain_p, LibGens::GITexture
 	gi_group_info = gi_group_info_p;
 
 	scene_manager = scene_manager_p;
-	thread = new pthread_t;
-	camera_mutex   = PTHREAD_MUTEX_INITIALIZER;
-	instance_mutex = PTHREAD_MUTEX_INITIALIZER;
 	terrain_groups = terrain->getGroups();
 	check = true;
 	finished = false;
@@ -117,8 +113,14 @@ TerrainStreamer::TerrainStreamer(LibGens::Terrain *terrain_p, LibGens::GITexture
 	if (start_loading) start();
 }
 
+TerrainStreamer::~TerrainStreamer() {
+	if (thread.joinable()) {
+		thread.join();
+	}
+}
+
 void TerrainStreamer::start() {
-	pthread_create(thread, NULL, updateTerrainStreamerExt, this);
+	thread = std::thread(updateTerrainStreamerExt, this);
 }
 
 

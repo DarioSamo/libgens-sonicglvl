@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -76,6 +82,82 @@ private:
         Data p;
     };
 };
+
+class QStaticByteArrayMatcherBase
+{
+    Q_DECL_ALIGN(16)
+    struct Skiptable {
+        uchar data[256];
+    } m_skiptable;
+protected:
+    explicit Q_DECL_RELAXED_CONSTEXPR QStaticByteArrayMatcherBase(const char *pattern, uint n) noexcept
+        : m_skiptable(generate(pattern, n)) {}
+    // compiler-generated copy/more ctors/assignment operators are ok!
+    // compiler-generated dtor is ok!
+
+    Q_CORE_EXPORT int indexOfIn(const char *needle, uint nlen, const char *haystack, int hlen, int from) const noexcept;
+
+private:
+    static Q_DECL_RELAXED_CONSTEXPR Skiptable generate(const char *pattern, uint n) noexcept
+    {
+        const auto uchar_max = (std::numeric_limits<uchar>::max)();
+        uchar max = n > uchar_max ? uchar_max : n;
+        Skiptable table = {
+            // this verbose initialization code aims to avoid some opaque error messages
+            // even on powerful compilers such as GCC 5.3. Even though for GCC a loop
+            // format can be found that v5.3 groks, it's probably better to go with this
+            // for the time being:
+            {
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+                max, max, max, max, max, max, max, max,   max, max, max, max, max, max, max, max,
+            }
+        };
+        pattern += n - max;
+        while (max--)
+            table.data[uchar(*pattern++)] = max;
+        return table;
+    }
+};
+
+template <uint N>
+class QStaticByteArrayMatcher : QStaticByteArrayMatcherBase
+{
+    char m_pattern[N];
+    Q_STATIC_ASSERT_X(N > 2, "QStaticByteArrayMatcher makes no sense for finding a single-char pattern");
+public:
+    explicit Q_DECL_RELAXED_CONSTEXPR QStaticByteArrayMatcher(const char (&patternToMatch)[N]) noexcept
+        : QStaticByteArrayMatcherBase(patternToMatch, N - 1), m_pattern()
+    {
+        for (uint i = 0; i < N; ++i)
+            m_pattern[i] = patternToMatch[i];
+    }
+
+    int indexIn(const QByteArray &haystack, int from = 0) const noexcept
+    { return this->indexOfIn(m_pattern, N - 1, haystack.data(), haystack.size(), from); }
+    int indexIn(const char *haystack, int hlen, int from = 0) const noexcept
+    { return this->indexOfIn(m_pattern, N - 1, haystack, hlen, from); }
+
+    QByteArray pattern() const { return QByteArray(m_pattern, int(N - 1)); }
+};
+
+template <uint N>
+Q_DECL_RELAXED_CONSTEXPR QStaticByteArrayMatcher<N> qMakeStaticByteArrayMatcher(const char (&pattern)[N]) noexcept
+{ return QStaticByteArrayMatcher<N>(pattern); }
 
 QT_END_NAMESPACE
 

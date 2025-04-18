@@ -35,7 +35,6 @@ namespace LibGens {
 	class Model;
 	class MaterialLibrary;
 	class TerrainInstance;
-	class VRMap;
 
 	class TerrainAutodraw {
 		protected:
@@ -83,8 +82,6 @@ namespace LibGens {
 
 			void generateGroups(unsigned int cell_size);
 			vector<TerrainGroup *> getGroups();
-
-			VRMap *generateVRMap(float unit_size=1.0f, float saturation_multiplier=1.0f, float brightness_offset=0.0f);
 
 			void addModel(Model *v) {
 				models_to_organize.push_back(v);
