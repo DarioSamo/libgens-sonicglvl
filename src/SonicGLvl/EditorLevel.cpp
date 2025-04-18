@@ -245,41 +245,6 @@ void EditorLevel::cleanTerrainResources() {
 	return;
 }
 
-
-void detectAndUncompressFile(string filename, string target_filename) {
-	// Open file and read header to detect compression type
-	if (!LibGens::File::check(filename)) {
-		return;
-	}
-
-	LibGens::File compressed_file(filename, LIBGENS_FILE_READ_BINARY);
-
-	unsigned char header_bytes[4]={0,0,0,0};
-	compressed_file.read(header_bytes, 4);
-
-
-	// MSCF = CAB Compression
-	if ((header_bytes[0] == 0x4D) && (header_bytes[1] == 0x53) && (header_bytes[2] == 0x43) && (header_bytes[3] == 0x46)) {
-		compressed_file.close();
-
-		string command=ToString(SONICGLVL_LEVEL_CAB_PACKED_COMMAND) + " \"" + filename + "\" \"" + target_filename + "\"";
-		system(command.c_str());
-	}
-	// Xbox Compression
-	else if ((header_bytes[0] == 0x0F) && (header_bytes[1] == 0xF5) && (header_bytes[2] == 0x12)) {
-		compressed_file.close();
-
-		string command=ToString(SONICGLVL_LEVEL_XBOX_PACKED_COMMAND) + "/Y \"" + filename + "\" \"" + target_filename + "\"";
-		system(command.c_str());
-	}
-	// No known compression, clone file
-	else {
-		compressed_file.clone(target_filename);
-		compressed_file.close();
-	}
-}
-
-
 void EditorLevel::unpackTerrain() {
 	string main_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE;
 	string main_add_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE_ADD;
@@ -310,16 +275,14 @@ void EditorLevel::unpackTerrain() {
 		CreateDirectory(gi_cache_folder.c_str(), NULL);
 
 		vector<string> unpacked_files;
-		stage_data_ar_pack->extract(terrain_cache_folder + "/", SONICGLVL_LEVEL_PACKED_COMPRESSED, "", &unpacked_files);
+		stage_data_ar_pack->extract(terrain_cache_folder + "/", "", "", &unpacked_files);
 
 		for (size_t i=0; i<unpacked_files.size(); i++) {
 			string uncompressed_filename=unpacked_files[i];
-			uncompressed_filename.resize(uncompressed_filename.size()-4);
-			string new_folder=uncompressed_filename;
-
-			detectAndUncompressFile(unpacked_files[i], uncompressed_filename);
 
 			if (uncompressed_filename.find("gia-") != string::npos) {
+				printf("Extracting %s\n", uncompressed_filename.c_str());
+
 				LibGens::ArPack *gia_ar_pack=new LibGens::ArPack(uncompressed_filename);
 				gia_ar_pack->extract(gi_cache_folder + "/", "", stage_data_ar_pack->getFileByIndex(i)->getName() + "-");
 				delete gia_ar_pack;

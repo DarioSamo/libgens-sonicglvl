@@ -186,6 +186,9 @@
     <ClCompile Include="MorphModel.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="Compression.cpp">
+      <Filter>Packfile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -369,6 +372,9 @@
     </ClInclude>
     <ClInclude Include="MorphModel.h">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Compression.h">
+      <Filter>Packfile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

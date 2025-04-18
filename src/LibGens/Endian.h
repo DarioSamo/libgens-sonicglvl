@@ -21,6 +21,7 @@
 
 class Endian {
 public:
+	static void swap(unsigned long long& x);
 	static void swap(unsigned int& x);
 	static void swap(int& x);
 	static void swap(unsigned short& x);

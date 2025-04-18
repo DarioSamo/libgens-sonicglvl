@@ -43,9 +43,6 @@
 #define SONICGLVL_LEVEL_PACKED_COMPRESSED      ".cab"
 #define SONICGLVL_LEVEL_PACKED_UNCOMPRESSED    ".pre"
 
-#define SONICGLVL_LEVEL_CAB_PACKED_COMMAND     "%WINDIR%\\System32\\expand"
-#define SONICGLVL_LEVEL_XBOX_PACKED_COMMAND    "xbdecompress"
-
 #define SONICGLVL_LEVEL_HASH_ROOT              "Hashes"
 #define SONICGLVL_LEVEL_HASH_DATA              "Data"
 #define SONICGLVL_LEVEL_HASH_TERRAIN           "Terrain"

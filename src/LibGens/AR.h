@@ -61,6 +61,7 @@ namespace LibGens {
 		public:
 			ArPack(unsigned int padding_p=0x40);
 			ArPack(string filename, bool data=true);
+			void read(File* file, bool data=true);
 			void save(string filename, unsigned int padding_p=0x40);
 			void saveARL(string filename);
 			void savePFI(string filename);

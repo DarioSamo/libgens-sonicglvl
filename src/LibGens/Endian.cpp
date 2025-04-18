@@ -19,20 +19,18 @@
 
 #include "Endian.h"
 
+void Endian::swap(unsigned long long& x) {
+	x = _byteswap_uint64(x);
+}
+
 void Endian::swap(unsigned int& x) {
-	x = (x>>24) |
-	((x<<8) & 0x00FF0000) |
-	((x>>8) & 0x0000FF00) |
-	(x<<24);
+	x = _byteswap_ulong(x);
 }
 
 void Endian::swap(int& x) {
-	x = (x>>24) |
-	((x<<8) & 0x00FF0000) |
-	((x>>8) & 0x0000FF00) |
-	(x<<24);
+	swap(reinterpret_cast<unsigned int&>(x));
 }
 
 void Endian::swap(unsigned short& x) {
-	x = (x>>8) | (x<<8);
+	x = _byteswap_ushort(x);
 }

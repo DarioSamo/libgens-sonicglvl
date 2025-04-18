@@ -18,6 +18,7 @@
 //=========================================================================
 
 #include "AR.h"
+#include "Compression.h"
 
 namespace LibGens {
 	ArFile::ArFile() {
@@ -142,35 +143,7 @@ namespace LibGens {
 		
 		File file(filename, LIBGENS_FILE_READ_BINARY);
 		if (file.valid()) {
-			unsigned int ar_flag_0=0;
-			unsigned int ar_flag_1=0;
-			unsigned int ar_flag_2=0;
-
-			file.readInt32(&ar_flag_0);
-			file.readInt32(&ar_flag_1);
-			file.readInt32(&ar_flag_2);
-
-			if ((ar_flag_0 != 0) || (ar_flag_1 != 0x10) || (ar_flag_2 != 0x14)) {
-				Error::addMessage(Error::EXCEPTION, LIBGENS_AR_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_AR_H_ERROR_READ_FILE_AFTER);
-				return;
-			}
-
-			file.readInt32(&padding);
-			files.clear();
-
-			while (!file.endOfFile()) {
-				ArFile *ar_file = new ArFile();
-				ar_file->read(&file, data);
-				
-				if (ar_file->getData()) {
-					SHA1Input(&sha1_context, ar_file->getData(), ar_file->getSize());
-				}
-
-				files.push_back(ar_file);
-
-				if (file.getCurrentAddress() >= file.getFileSize()) break;
-			}
-
+			read(&file);
 			file.close();
 
 			size_t pos=filename.find(LIBGENS_AR_MULTIPLE_START);
@@ -202,7 +175,6 @@ namespace LibGens {
 		}
 	}
 
-
 	void ArPack::merge(ArPack *pack) {
 		size_t file_count=pack->files.size();
 		for (size_t i=0; i<file_count; i++) {
@@ -214,6 +186,43 @@ namespace LibGens {
 		delete pack;
 	}
 
+	void ArPack::read(File* file, bool data) {
+		unsigned int ar_header_0 = 0;
+		unsigned int ar_header_1 = 0;
+		unsigned int ar_header_2 = 0;
+
+		file->readInt32(&ar_header_0);
+
+		if ((ar_header_0 == COMPRESSION_CAB) || (ar_header_0 == COMPRESSION_X)) {
+			file->goToAddress(0);
+
+			File out_file;
+			Compression::decompress(file, &out_file, CompressionType(ar_header_0));
+
+			out_file.goToAddress(0);
+			read(&out_file);
+
+			return;
+		}
+
+		file->readInt32(&ar_header_1);
+		file->readInt32(&ar_header_2);
+		file->readInt32(&padding);
+		files.clear();
+
+		while (!file->endOfFile()) {
+			ArFile* ar_file = new ArFile();
+			ar_file->read(file, data);
+
+			if (ar_file->getData()) {
+				SHA1Input(&sha1_context, ar_file->getData(), ar_file->getSize());
+			}
+
+			files.push_back(ar_file);
+
+			if (file->getCurrentAddress() >= file->getFileSize()) break;
+		}
+	}
 
 	void ArPack::save(string filename, unsigned int padding_p) {
 		bool split_file_mode=false;
@@ -250,12 +259,12 @@ namespace LibGens {
 
 		File *current_file=new LibGens::File(filename, LIBGENS_FILE_WRITE_BINARY);
 		if (current_file->valid()) {
-			unsigned int ar_flag_0=0;
-			unsigned int ar_flag_1=0x10;
-			unsigned int ar_flag_2=0x14;
-			current_file->writeInt32(&ar_flag_0);
-			current_file->writeInt32(&ar_flag_1);
-			current_file->writeInt32(&ar_flag_2);
+			unsigned int ar_header_0=0;
+			unsigned int ar_header_1=0x10;
+			unsigned int ar_header_2=0x14;
+			current_file->writeInt32(&ar_header_0);
+			current_file->writeInt32(&ar_header_1);
+			current_file->writeInt32(&ar_header_2);
 			current_file->writeInt32(&padding);
 
 			
@@ -282,9 +291,9 @@ namespace LibGens {
 						break;
 					}
 					else {
-						current_file->writeInt32(&ar_flag_0);
-						current_file->writeInt32(&ar_flag_1);
-						current_file->writeInt32(&ar_flag_2);
+						current_file->writeInt32(&ar_header_0);
+						current_file->writeInt32(&ar_header_1);
+						current_file->writeInt32(&ar_header_2);
 						current_file->writeInt32(&padding);
 						ar_split_index++;
 					}
