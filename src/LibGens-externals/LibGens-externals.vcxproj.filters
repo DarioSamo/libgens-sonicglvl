@@ -4,9 +4,6 @@
     <Filter Include="Externals">
       <UniqueIdentifier>{9713a720-75e4-4057-af98-af21c57bb260}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Externals\half">
-      <UniqueIdentifier>{a84f3c1a-4e0c-41f2-b801-6907560d61b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Externals\sha1">
       <UniqueIdentifier>{06f55bc1-9d1f-41f4-b1a3-5cf226eea8fd}</UniqueIdentifier>
     </Filter>
@@ -21,9 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="half\half.cpp">
-      <Filter>Externals\half</Filter>
-    </ClCompile>
     <ClCompile Include="sha1\sha1.cpp">
       <Filter>Externals\sha1</Filter>
     </ClCompile>
@@ -50,9 +44,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="half\half.h">
-      <Filter>Externals\half</Filter>
-    </ClInclude>
     <ClInclude Include="sha1\sha1.h">
       <Filter>Externals\sha1</Filter>
     </ClInclude>

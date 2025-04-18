@@ -47,6 +47,17 @@
 
 const int HCWindow::BaseUnassignedGroupIndex = 0x800000;
 
+static string normalizeName(string input) {
+	string output = input;
+	for (size_t i = 0; i < input.size(); i++) {
+		if (output[i] == '.') {
+			output[i] = '_';
+		}
+	}
+
+	return output;
+}
+
 QString HCWindow::temporaryDirTemplate() {
 	return converter_settings.terrain_output_path + "/HedgehogConverter-temp-XXXXXX";
 }
@@ -60,10 +71,17 @@ bool HCWindow::convert() {
 	QString texture_source_path = converter_settings.texture_source_path;
 	QString terrain_output_path = converter_settings.terrain_output_path;
 
-	QTemporaryDir dir(temporaryDirTemplate());
+	QTemporaryDir temp_configuration_dir(temporaryDirTemplate());
+	QTemporaryDir temp_resources_dir(temporaryDirTemplate());
+	QTemporaryDir temp_terrain_dir(temporaryDirTemplate());
 	QTemporaryDir temp_texture_dir(temporaryDirTemplate());
-    if (!dir.isValid()) {
-		logProgress(ProgressFatal, "Cannot create temporal directory on System!");
+	if (!temp_configuration_dir.isValid()) {
+		logProgress(ProgressFatal, "Cannot create temporal configuration directory on System!");
+		return false;
+	}
+
+	if (!temp_resources_dir.isValid()) {
+		logProgress(ProgressFatal, "Cannot create temporal resources directory on System!");
 		return false;
 	}
 
@@ -72,17 +90,29 @@ bool HCWindow::convert() {
 		return false;
 	}
 
-	QString temp_path = dir.path();
-	QString temp_texture_path = temp_texture_dir.path();
-	QDir temp_dir(temp_path);
+	QString configuration_path = temp_configuration_dir.path();
+	QString resources_path = temp_resources_dir.path();
+	QString terrain_path = temp_terrain_dir.path();
+	QString embedded_texture_path = temp_texture_dir.path();
+	QDir configuration_dir(configuration_path);
+	QDir resources_dir(resources_path);
 	QStringList texture_search_paths;
-	texture_search_paths.append(temp_texture_path);
+	texture_search_paths.append(embedded_texture_path);
 
 	//*************************
 	//  Verifications
 	//*************************
-	logProgress(ProgressNormal, "Writing all temporary files to " + temp_path + ".");
-	logProgress(ProgressNormal, "Writing all temporary textures to " + temp_texture_path + ".");
+	logProgress(ProgressNormal, "Writing all temporary resources to " + resources_path + ".");
+	logProgress(ProgressNormal, "Writing all temporary textures to " + embedded_texture_path + ".");
+
+	if (converter_settings.game_engine == Unleashed) {
+		// Configuration path goes unused for other games that aren't Unleashed.
+		logProgress(ProgressNormal, "Writing all temporary configuration to " + configuration_path + ".");
+	}
+	else {
+		temp_configuration_dir.remove();
+		configuration_path = resources_path;
+	}
 
 	if (model_source_paths.isEmpty()) {
 		logProgress(ProgressFatal, "Source model paths can't be empty!");
@@ -106,8 +136,13 @@ bool HCWindow::convert() {
 		return false;
 	}
 
-	QString output_name = QDir(terrain_output_path).dirName();
+	QDir terrain_output_dir(terrain_output_path);
+	QString output_name = terrain_output_dir.dirName();
 	texture_search_paths.append(texture_source_path);
+
+	QDir game_output_dir = terrain_output_dir;
+	game_output_dir.cdUp();
+	game_output_dir.cdUp();
 
 	//**************************************
 	//  Extract and delete existing files
@@ -118,32 +153,49 @@ bool HCWindow::convert() {
 		if (converter_settings.game_engine == Generations) {
 			QString existing_ar_file = terrain_output_path + "/" + output_name + ".ar.00";
 			if (QFileInfo(existing_ar_file).exists()) {
-				logProgress(ProgressNormal, "Found " + existing_ar_file + ". Extracting files into temporary directory " + temp_path);
+				logProgress(ProgressNormal, "Found " + existing_ar_file + ". Extracting files into temporary directory " + resources_path);
 				LibGens::ArPack ar_pack(existing_ar_file.toStdString());
-				ar_pack.extract(temp_path.toStdString() + "/");
+				ar_pack.extract(resources_path.toStdString() + "/");
 			}
 			else {
 				logProgress(ProgressWarning, "No existing file detected named " + existing_ar_file + " to merge with. Creating files from scratch.");
 			}
 		}
 		else if (converter_settings.game_engine == Unleashed) {
-			logProgress(ProgressFatal, "Mer-ng existing files is not implemented for Unleashed engine yet!");
-			return false;
+			QString existing_configuration_ar_file = game_output_dir.path() + "/#" + output_name + ".ar.00";
+			if (QFileInfo(existing_configuration_ar_file).exists()) {
+				logProgress(ProgressNormal, "Found " + existing_configuration_ar_file + ". Extracting files into temporary directory " + configuration_path);
+				LibGens::ArPack ar_pack(existing_configuration_ar_file.toStdString());
+				ar_pack.extract(configuration_path.toStdString() + "/");
+			}
+			else {
+				logProgress(ProgressWarning, "No existing file detected named " + existing_configuration_ar_file + " to merge with. Creating files from scratch.");
+			}
+
+			QString existing_resources_ar_file = game_output_dir.path() + "/" + output_name + ".ar.00";
+			if (QFileInfo(existing_resources_ar_file).exists()) {
+				logProgress(ProgressNormal, "Found " + existing_resources_ar_file + ". Extracting files into temporary directory " + resources_path);
+				LibGens::ArPack ar_pack(existing_resources_ar_file.toStdString());
+				ar_pack.extract(resources_path.toStdString() + "/");
+			}
+			else {
+				logProgress(ProgressWarning, "No existing file detected named " + existing_resources_ar_file + " to merge with. Creating files from scratch.");
+			}
 		}
 		else if (converter_settings.game_engine == LostWorld) {
 			QString existing_pac_file = terrain_output_path + "/" + output_name + "_trr_cmn.pac";
 			if (QFileInfo(existing_pac_file).exists()) {
-				logProgress(ProgressNormal, "Found " + existing_pac_file + ". Extracting files into temporary directory " + temp_path);
+				logProgress(ProgressNormal, "Found " + existing_pac_file + ". Extracting files into temporary directory " + resources_path);
 
 				LibGens::PacSet pac_set(existing_pac_file.toStdString());
-				pac_set.extract(temp_path.toStdString() + "/");
+				pac_set.extract(resources_path.toStdString() + "/");
 
 				// Delete all terrain models and instances, as well as GI textures with their same base names from the temporary directory.
 				logProgress(ProgressNormal, "Deleting previous terrain files from temporary directory...");
 
-				QStringList entry_list = temp_dir.entryList(QStringList() << "*.terrain-instanceinfo" << "*.terrain-model");
+				QStringList entry_list = resources_dir.entryList(QStringList() << "*.terrain-instanceinfo" << "*.terrain-model");
 				foreach(QString entry, entry_list) {
-					QString remove_filename = temp_path + "/" + entry;
+					QString remove_filename = resources_path + "/" + entry;
 					bool removed_file = QFile::remove(remove_filename);
 					if (removed_file) {
 						logProgress(ProgressNormal, "Removed " + remove_filename + " before merging existing files.");
@@ -192,7 +244,7 @@ bool HCWindow::convert() {
 	QStringList textures_to_convert;
 
 	// Load all materials from temporary directory into memory
-	QStringList material_entry_list = temp_dir.entryList(QStringList() << "*.material");
+	QStringList material_entry_list = resources_dir.entryList(QStringList() << "*.material");
 	foreach(QString material_filename, material_entry_list) {
 		LibGens::Material *load_material = new LibGens::Material(material_filename.toStdString());
 		scene_data.materials.push_back(load_material);
@@ -280,7 +332,7 @@ bool HCWindow::convert() {
 						light->setPosition(LibGens::Vector3(direction.x, direction.y, direction.z));
 						light->setColor(LibGens::Vector3(color.r, color.g, color.b));
 						light_list.addLight(light);
-						light->save(temp_path.toStdString() + "/" + light->getName() + LIBGENS_LIGHT_EXTENSION);
+						light->save(configuration_path.toStdString() + "/" + light->getName() + LIBGENS_LIGHT_EXTENSION);
 						logProgress(ProgressNormal, QString("Saved and added diffuse directional light %1.").arg(scene_light->mName.C_Str()));
 					}
 					else {
@@ -297,7 +349,7 @@ bool HCWindow::convert() {
 		}
 
 		// Save light list file even if it's empty to prevent crash when it's missing.
-		std::string light_list_file_path = temp_path.toStdString() + "/" + LIBGENS_LIGHT_LIST_FILENAME;
+		std::string light_list_file_path = configuration_path.toStdString() + "/" + LIBGENS_LIGHT_LIST_FILENAME;
 
 		if (light_list.getLightCount() || !LibGens::File::check(light_list_file_path)) {
 			light_list.save(light_list_file_path);
@@ -314,7 +366,7 @@ bool HCWindow::convert() {
 				logProgress(ProgressNormal, QString("Texture #%1: %2x%3 Pixels (%4 Hint)").arg(t).arg(texture->mWidth).arg(texture->mHeight).arg(texture->achFormatHint));
 
 				if (texture->mWidth && !texture->mHeight) {
-					QString texture_filename = QString("%1/%2%3.%4").arg(temp_texture_path).arg(EmbedTexturePrefix).arg(t).arg(texture->achFormatHint);
+					QString texture_filename = QString("%1/%2%3.%4").arg(embedded_texture_path).arg(EmbedTexturePrefix).arg(t).arg(texture->achFormatHint);
 					logProgress(ProgressNormal, QString("Texture #%1 is compressed. Saving to %2....").arg(t).arg(texture_filename));
 
 					LibGens::File file(texture_filename.toStdString(), LIBGENS_FILE_WRITE_BINARY);
@@ -356,7 +408,8 @@ bool HCWindow::convert() {
 				aiMaterial *src_material = scene->mMaterials[m];
 				aiString src_material_name;
 				src_material->Get(AI_MATKEY_NAME, src_material_name);
-				string material_name = src_material_name.C_Str();
+
+				string material_name = normalizeName(src_material_name.C_Str());
 				LibGens::Tags tags(material_name);
 				if (converter_settings.remove_material_tags) {
 					material_name = tags.getName();
@@ -393,10 +446,10 @@ bool HCWindow::convert() {
 				aiString src_material_name;
 				src_material->Get(AI_MATKEY_NAME, src_material_name);
 
-				string material_name = src_material_name.C_Str();
+				string material_name = normalizeName(src_material_name.C_Str());
 				LibGens::Tags tags(material_name);
 				if (converter_settings.remove_material_tags) {
-					logProgress(ProgressNormal, QString("Detected material #%1 %2 tags with base name %3 for material %4.").arg(m).arg(tags.getTagCount()).arg(tags.getName().c_str()).arg(src_material_name.C_Str()));
+					logProgress(ProgressNormal, QString("Detected material #%1 %2 tags with base name %3 for material %4.").arg(m).arg(tags.getTagCount()).arg(tags.getName().c_str()).arg(material_name.c_str()));
 					material_name = tags.getName();
 				}
 
@@ -579,8 +632,14 @@ bool HCWindow::convert() {
 					}
 				}
 
-				QString material_filename = QString("%1/%2.material").arg(temp_path).arg(material_name.c_str());
-				material->save(material_filename.toStdString());
+				QString material_filename = QString("%1/%2.material").arg(resources_path).arg(material_name.c_str());
+				if (converter_settings.game_engine == Unleashed) {
+					material->save(material_filename.toStdString(), LIBGENS_MATERIAL_ROOT_UNLEASHED);
+				}
+				else {
+					material->save(material_filename.toStdString());
+				}
+
 				logProgress(ProgressNormal, "Saved material to " + material_filename + ".");
 
 				scene_data.materials.push_back(material);
@@ -598,7 +657,7 @@ bool HCWindow::convert() {
 		logProgress(ProgressNormal, "Converting scene node tree...");
 		scene_data.model_map.clear();
 
-		bool conversion_result = convertSceneNode(scene, scene->mRootNode, temp_path, scene_data, global_transform);
+		bool conversion_result = convertSceneNode(scene, scene->mRootNode, terrain_path, scene_data, global_transform);
 		if (!conversion_result) {
 			logProgress(ProgressFatal, QString("Couldn't convert node tree properly. Check progress log for what errors to fix."));
 			return false;
@@ -618,7 +677,7 @@ bool HCWindow::convert() {
 				if (QFileInfo(source_file).exists()) {
 					textures_to_copy.removeAll(texture_filename);
 
-					QString output_file = temp_path + "/" + QFileInfo(texture_filename).fileName();
+					QString output_file = resources_path + "/" + QFileInfo(texture_filename).fileName();
 
 					QFile::remove(output_file);
 					if (QFile::copy(source_file, output_file)) {
@@ -639,7 +698,7 @@ bool HCWindow::convert() {
 		foreach(QString texture_search_path, texture_search_paths) {
 			foreach(QString texture_filename, textures_to_convert) {
 				QString source_file = texture_search_path + "/" + QFileInfo(texture_filename).fileName();
-				QString output_file = temp_path + "/" + QFileInfo(texture_filename).baseName() + ".dds";
+				QString output_file = resources_path + "/" + QFileInfo(texture_filename).baseName() + ".dds";
 
 				if (QFileInfo(source_file).exists()) {
 					textures_to_convert.removeAll(texture_filename);
@@ -691,9 +750,9 @@ bool HCWindow::convert() {
 			// Delete all terrain groups and terrain files inside.
 			logProgress(ProgressNormal, "Deleting previous terrain files from temporary directory...");
 
-			QStringList entry_list = temp_dir.entryList(QStringList() << "*.terrain" << "*.terrain-group" << "*.vt" << "*.tbst");
+			QStringList entry_list = configuration_dir.entryList(QStringList() << "*.terrain" << "*.terrain-group" << "*.vt" << "*.tbst");
 			foreach(QString entry, entry_list) {
-				QString remove_filename = temp_path + "/" + entry;
+				QString remove_filename = configuration_path + "/" + entry;
 				bool removed_file = QFile::remove(remove_filename);
 				if (removed_file) {
 					logProgress(ProgressNormal, "Removed " + remove_filename + " before merging existing files.");
@@ -708,7 +767,7 @@ bool HCWindow::convert() {
 			LibGens::Terrain *terrain = new LibGens::Terrain();
 			foreach(LibGens::TerrainGroup *group, terrain_groups) {
 				group->setName(QString("tg-%1").arg(group_index, 4, 10, QChar('0')).toStdString());
-				string group_filename = temp_path.toStdString() + "/" + group->getName() + ".terrain-group";
+				string group_filename = configuration_path.toStdString() + "/" + group->getName() + ".terrain-group";
 				group->save(group_filename);
 				logProgress(ProgressNormal, QString("Saved terrain group to %1 and creating group info.").arg(group_filename.c_str()));
 
@@ -725,7 +784,7 @@ bool HCWindow::convert() {
 				group_index++;
 			}
 
-			string terrain_filename = temp_path.toStdString() + "/terrain.terrain";
+			string terrain_filename = configuration_path.toStdString() + "/terrain.terrain";
 			terrain->save(terrain_filename);
 			logProgress(ProgressNormal, QString("Saved terrain to %1.").arg(terrain_filename.c_str()));
 
@@ -734,14 +793,14 @@ bool HCWindow::convert() {
 			LibGens::TerrainBlock *terrain_block = new LibGens::TerrainBlock();
 			terrain_block->build(std::vector<LibGens::TerrainGroup*>(terrain_groups.begin(), terrain_groups.end()));
 
-			string terrain_block_filename = temp_path.toStdString() + "/terrain-block.tbst";
+			string terrain_block_filename = configuration_path.toStdString() + "/terrain-block.tbst";
 			terrain_block->save(terrain_block_filename.c_str());
 			logProgress(ProgressNormal, QString("Saved terrain block to %1.").arg(terrain_block_filename.c_str()));
 
 			delete terrain_block;
 
 			// Save an empty gi-texture.gi-texture-group-info file to prevent crash when it's missing.
-			string output_gi_texture_file_path = temp_path.toStdString() + "/gi-texture.gi-texture-group-info";
+			string output_gi_texture_file_path = configuration_path.toStdString() + "/gi-texture.gi-texture-group-info";
 
 			if (!converter_settings.merge_existing || !LibGens::File::check(output_gi_texture_file_path)) {
 				LibGens::GITextureGroupInfo gi_texture_group_info;
@@ -755,7 +814,7 @@ bool HCWindow::convert() {
 				gi_texture_group_info.save(output_gi_texture_file_path);
 				logProgress(ProgressNormal, QString("Saved GI texture group info to %1").arg(output_gi_texture_file_path.c_str()));
 
-				string output_gi_lim_file_path = temp_path.toStdString() + "/gi-lim.gil";
+				string output_gi_lim_file_path = configuration_path.toStdString() + "/gi-lim.gil";
 				gi_texture_group_info.saveMipLevelLimitFile(output_gi_lim_file_path, false, false, true);
 				logProgress(ProgressNormal, QString("Saved GI mip level limit file to %1").arg(output_gi_lim_file_path.c_str()));
 			}
@@ -777,14 +836,15 @@ bool HCWindow::convert() {
 	// Packing routines for each game engine
 	if (converter_settings.game_engine == Generations) {
 		logProgress(ProgressNormal, "Packing for Generations engine...");
-		pack_result = packGenerations(terrain_groups, terrain_output_path, output_name, temp_path);
+		pack_result = packGenerations(terrain_groups, terrain_output_path, output_name, terrain_path, resources_path);
 	}
 	else if (converter_settings.game_engine == Unleashed) {
-		logProgress(ProgressFatal, "Packing for Unleashed game engine not implemented yet!");
+		logProgress(ProgressNormal, "Packing for Unleashed engine...");
+		pack_result = packUnleashed(terrain_groups, terrain_output_path, output_name, terrain_path, configuration_path, resources_path);
 	}
 	else if (converter_settings.game_engine == LostWorld) {
 		logProgress(ProgressNormal, "Packing for Lost World engine...");
-		pack_result = packLostWorld(terrain_output_path, output_name, temp_path);
+		pack_result = packLostWorld(terrain_output_path, output_name, terrain_path);
 	}
 	else {
 		logProgress(ProgressFatal, "No valid game engine detected.");
@@ -916,7 +976,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 					aiString src_material_name;
 					src_material->Get(AI_MATKEY_NAME, src_material_name);
 
-					string material_name = src_material_name.C_Str();
+					string material_name = normalizeName(src_material_name.C_Str());
 					LibGens::Tags material_tags(material_name);
 					if (converter_settings.remove_material_tags) {
 						material_name = material_tags.getName();
@@ -940,35 +1000,60 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 							uv_channels = 4; // Cannot have more than 4.
 
 						// Build vertex format based on the vertex attributes the mesh contains.
-					    LibGens::VertexFormat vertex_format;
+						LibGens::VertexFormat vertex_format;
 						unsigned int vertex_size = 0;
 
 						vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::POSITION, 0));
 						vertex_size += 12;
 
-						if (src_mesh->mNormals) {
-						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::NORMAL, 0));
-						    vertex_size += 12;
-						}
+						if (converter_settings.game_engine == Unleashed) {
+							if (src_mesh->mNormals) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::DEC3N_360, LibGens::NORMAL, 0));
+								vertex_size += 4;
+							}
 
-						if (src_mesh->mTangents) {
-						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::TANGENT, 0));
-						    vertex_size += 12;
-						}
+							if (src_mesh->mTangents) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::DEC3N_360, LibGens::TANGENT, 0));
+								vertex_size += 4;
+							}
 
-						if (src_mesh->mBitangents) {
-						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::BINORMAL, 0));
-						    vertex_size += 12;
-						}
+							if (src_mesh->mBitangents) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::DEC3N_360, LibGens::BINORMAL, 0));
+								vertex_size += 4;
+							}
 
-						for (int uv = 0; uv < uv_channels; uv++) {
-						    vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT2, LibGens::UV, uv));
-							vertex_size += 8;
-						}
+							for (int uv = 0; uv < uv_channels; uv++) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT2_HALF, LibGens::UV, uv));
+								vertex_size += 4;
+							}
 
-						// Color should always be added as there's nearly no shader that does not utilize it.
-						vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT4, LibGens::COLOR, 0));
-						vertex_size += 16;
+							vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::UBYTE4N, LibGens::COLOR, 0));
+							vertex_size += 4;
+						}
+						else {
+							if (src_mesh->mNormals) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::NORMAL, 0));
+								vertex_size += 12;
+							}
+
+							if (src_mesh->mTangents) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::TANGENT, 0));
+								vertex_size += 12;
+							}
+
+							if (src_mesh->mBitangents) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT3, LibGens::BINORMAL, 0));
+								vertex_size += 12;
+							}
+
+							for (int uv = 0; uv < uv_channels; uv++) {
+								vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT2, LibGens::UV, uv));
+								vertex_size += 8;
+							}
+
+							vertex_format.addElement(LibGens::VertexFormatElement(vertex_size, LibGens::FLOAT4, LibGens::COLOR, 0));
+							vertex_size += 16;
+						}
 
 						vertex_format.setSize(vertex_size);
 
@@ -977,7 +1062,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 							vertex->setPosition(LibGens::Vector3(src_mesh->mVertices[v].x, src_mesh->mVertices[v].y, src_mesh->mVertices[v].z));
 
 							if (src_mesh->mNormals)
-							    vertex->setNormal(LibGens::Vector3(src_mesh->mNormals[v].x, src_mesh->mNormals[v].y, src_mesh->mNormals[v].z));
+								vertex->setNormal(LibGens::Vector3(src_mesh->mNormals[v].x, src_mesh->mNormals[v].y, src_mesh->mNormals[v].z));
 
 							if (src_mesh->mTangents)
 								vertex->setTangent(LibGens::Vector3(src_mesh->mTangents[v].x, src_mesh->mTangents[v].y, src_mesh->mTangents[v].z));
@@ -985,9 +1070,9 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 							if (src_mesh->mBitangents)
 								vertex->setBinormal(LibGens::Vector3(-src_mesh->mBitangents[v].x, -src_mesh->mBitangents[v].y, -src_mesh->mBitangents[v].z));
 
-						    for (int uv=0; uv < uv_channels; uv++) {
+							for (int uv=0; uv < uv_channels; uv++) {
 								if (src_mesh->mTextureCoords[uv]) {
-								    vertex->setUV(LibGens::Vector2(src_mesh->mTextureCoords[uv][v].x, 1.0f - src_mesh->mTextureCoords[uv][v].y), uv);
+									vertex->setUV(LibGens::Vector2(src_mesh->mTextureCoords[uv][v].x, 1.0f - src_mesh->mTextureCoords[uv][v].y), uv);
 								}
 							}
 
@@ -1199,7 +1284,7 @@ bool HCWindow::packLostWorld(QString output_path, QString output_name, QString p
 	return true;
 }
 
-bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_name, QString path) {
+bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_add_path, QString output_name, QString terrain_path, QString configuration_path, Compression compression) {
 	if (terrain_groups.size()) {
 		logProgress(ProgressNormal, "Saving terrain groups for Stage.pfd...");
 
@@ -1211,7 +1296,7 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 			LibGens::ArPack existing_stage_pfd_pack(output_stage_pfd_path);
 			logProgress(ProgressNormal, QString("Extracting %1.").arg(output_stage_pfd_path.c_str()));
 			existing_stage_pfd_pack.extract(stage_pfd_path.toStdString() + "/");
-		
+
 			logProgress(ProgressNormal, QString("Removing existing terrain groups from %1.").arg(stage_pfd_path));
 			QStringList entry_list = QDir(stage_pfd_path).entryList(QStringList() << "tg-*.ar");
 			foreach(QString entry, entry_list) {
@@ -1235,7 +1320,7 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 		}
 
 		// Save Terrain Group AR Files
-		foreach(LibGens::TerrainGroup *group, terrain_groups) {
+		foreach(LibGens::TerrainGroup * group, terrain_groups) {
 			QString group_filename = QString("%1/%2.ar").arg(stage_pfd_path).arg(group->getName().c_str());
 			LibGens::ArPack tg_ar;
 
@@ -1243,7 +1328,7 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 			list<LibGens::TerrainInstance *> instances = group->getInstances();
 			for (vector<LibGens::Model *>::iterator it = models.begin(); it != models.end(); it++) {
 				string model_name = (*it)->getName() + ".terrain-model";
-				string model_filename = path.toStdString() + "/" + model_name;
+				string model_filename = terrain_path.toStdString() + "/" + model_name;
 				LibGens::File model_file(model_filename, LIBGENS_FILE_READ_BINARY);
 				if (model_file.valid()) {
 					model_file.close();
@@ -1255,7 +1340,7 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 
 			for (list<LibGens::TerrainInstance *>::iterator it = instances.begin(); it != instances.end(); it++) {
 				string instance_name = (*it)->getName() + ".terrain-instanceinfo";
-				string instance_filename = path.toStdString() + "/" + instance_name;
+				string instance_filename = terrain_path.toStdString() + "/" + instance_name;
 				LibGens::File instance_file(instance_filename, LIBGENS_FILE_READ_BINARY);
 				if (instance_file.valid()) {
 					instance_file.close();
@@ -1267,15 +1352,17 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 
 			tg_ar.save(group_filename.toStdString());
 
-			logProgress(ProgressNormal, QString("Compressing %1 with CAB Compression.").arg(group_filename));
+			if (compression == CABCompression) {
+				logProgress(ProgressNormal, QString("Compressing %1 with CAB Compression.").arg(group_filename));
 
-			QStringList arguments;
-			arguments << group_filename << group_filename;
-			QProcess conversion_process;
-			conversion_process.start("makecab", arguments);
-			conversion_process.waitForFinished();
-			QString conversion_output = conversion_process.readAllStandardOutput();
-			logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
+				QStringList arguments;
+				arguments << group_filename << group_filename;
+				QProcess conversion_process;
+				conversion_process.start("makecab", arguments);
+				conversion_process.waitForFinished();
+				QString conversion_output = conversion_process.readAllStandardOutput();
+				logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
+			}
 
 			stage_pfd_pack.addFile(group_filename.toStdString());
 			logProgress(ProgressNormal, "Saving terrain group to " + group_filename + "...");
@@ -1284,43 +1371,74 @@ bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, Q
 		// Save PFD files
 		stage_pfd_pack.save(output_stage_pfd_path, 0x800);
 		logProgress(ProgressNormal, "Packed Stage.pfd");
-		stage_pfd_pack.savePFI(path.toStdString() + "/Stage.pfi");
+		stage_pfd_pack.savePFI(configuration_path.toStdString() + "/Stage.pfi");
 		logProgress(ProgressNormal, "Saved Stage.pfi");
 
-		string output_stage_add_pfd_path = output_path.toStdString() + "/Stage-Add.pfd";
+		string output_stage_add_pfd_path = output_add_path.toStdString() + "/Stage-Add.pfd";
 		if (!converter_settings.merge_existing || !LibGens::File::check(output_stage_add_pfd_path)) {
 			LibGens::ArPack stage_add_pfd_pack;
-
 			stage_add_pfd_pack.save(output_stage_add_pfd_path, 0x800);
 			logProgress(ProgressNormal, "Packed Stage-Add.pfd");
-			stage_add_pfd_pack.savePFI(path.toStdString() + "/Stage-Add.pfi");
+			stage_add_pfd_pack.savePFI(configuration_path.toStdString() + "/Stage-Add.pfi");
 			logProgress(ProgressNormal, "Saved Stage-Add.pfi");
 		}
 	}
 
-	// Delete all terrain model and instances from the resources directory
-	QDir temp_dir(path);
-	QStringList entry_list = temp_dir.entryList(QStringList() << "*.terrain-instanceinfo" << "*.terrain-model");
-	foreach(QString entry, entry_list) {
-		QString remove_filename = path + "/" + entry;
-		bool removed_file = QFile::remove(remove_filename);
-		if (removed_file) {
-			logProgress(ProgressNormal, "Removed " + remove_filename + " before packing resource files.");
-		}
-		else {
-			logProgress(ProgressError, "Couldn't remove " + remove_filename + " before packing resource files.");
-		}
+	return true;
+}
+
+bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_name, QString terrain_path, QString resources_path) {
+	if (!packTerrainGroups(terrain_groups, output_path, output_path, output_name, terrain_path, resources_path, CABCompression)) {
+		return false;
 	}
 
-	// Finally, pack the resources directory
+	// Pack the resources directory.
 	LibGens::ArPack resources_pack;
-	entry_list = temp_dir.entryList(QStringList() << "*");
+	QStringList entry_list = QDir(resources_path).entryList(QStringList() << "*");
 	foreach(QString entry, entry_list) {
-		resources_pack.addFile((path + "/" + entry).toStdString());
+		resources_pack.addFile((resources_path + "/" + entry).toStdString());
 	}
 
 	QString resources_pack_filename = QString("%1/%2.ar.00").arg(output_path).arg(output_name);
 	resources_pack.save(resources_pack_filename.toStdString());
 	logProgress(ProgressNormal, "Saved " + resources_pack_filename + ".");
+
+	return true;
+}
+
+bool HCWindow::packUnleashed(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_name, QString terrain_path, QString configuration_path, QString resources_path) {
+	QDir game_output_dir = output_path;
+	game_output_dir.cdUp();
+	game_output_dir.cdUp();
+
+	QString output_add_path = game_output_dir.path() + "/Additional/" + output_name;
+	QDir().mkpath(output_add_path);
+	if (!packTerrainGroups(terrain_groups, output_path, output_add_path, output_name, terrain_path, configuration_path, NoCompression)) {
+		return false;
+	}
+
+
+	// Pack the configuration directory.
+	LibGens::ArPack configuration_pack;
+	QStringList configuration_entry_list = QDir(configuration_path).entryList(QStringList() << "*");
+	foreach(QString entry, configuration_entry_list) {
+		configuration_pack.addFile((configuration_path + "/" + entry).toStdString());
+	}
+
+	QString configuration_pack_filename = QString("%1/#%2.ar.00").arg(game_output_dir.path()).arg(output_name);
+	configuration_pack.save(configuration_pack_filename.toStdString());
+	logProgress(ProgressNormal, "Saved " + configuration_pack_filename + ".");
+
+	// Pack the resources directory.
+	LibGens::ArPack resources_pack;
+	QStringList resources_entry_list = QDir(resources_path).entryList(QStringList() << "*");
+	foreach(QString entry, resources_entry_list) {
+		resources_pack.addFile((resources_path + "/" + entry).toStdString());
+	}
+
+	QString resources_pack_filename = QString("%1/%2.ar.00").arg(game_output_dir.path()).arg(output_name);
+	resources_pack.save(resources_pack_filename.toStdString());
+	logProgress(ProgressNormal, "Saved " + resources_pack_filename + ".");
+
 	return true;
 }

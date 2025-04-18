@@ -395,13 +395,31 @@ namespace LibGens {
 		*dest = v / 256.0f;
 	}
 
+	// from meshoptimizer
+	union FloatBits {
+		float f;
+		unsigned int ui;
+	};
+
+	float dequantizeHalf(unsigned short h) {
+		unsigned int s = unsigned(h & 0x8000) << 16;
+		int em = h & 0x7fff;
+
+		int r = (em + (112 << 10)) << 13;
+		r = (em < (1 << 10)) ? 0 : r;
+		r += (em >= (31 << 10)) ? (112 << 23) : 0;
+
+		FloatBits u;
+		u.ui = s | r;
+		return u.f;
+	}
+
 	void File::readFloat16(float *dest) {
 		if (!readSafeCheck(dest)) return;
 		
 		unsigned short v=0;
 		readInt16(&v);
-		unsigned int f=half_to_float(v);
-		*dest = *(float*)&(f);
+		*dest = dequantizeHalf(v);
 	}
 
 	void File::readFloat16BE(float *dest) {
@@ -409,8 +427,7 @@ namespace LibGens {
 		
 		unsigned short v=0;
 		readInt16BE(&v);
-		unsigned int f=half_to_float(v);
-		*dest = *(float*)&(f);
+		*dest = dequantizeHalf(v);
 	}
 
 	void File::readFloat32(float *dest) {
@@ -575,6 +592,22 @@ namespace LibGens {
 		file_impl->write(&target, sizeof(int));
 	}
 
+	// from meshoptimizer
+	unsigned short quantizeHalf(float v) {
+		FloatBits u = { v };
+		unsigned int ui = u.ui;
+
+		int s = (ui >> 16) & 0x8000;
+		int em = ui & 0x7fffffff;
+
+		int h = (em - (112 << 23) + (1 << 12)) >> 13;
+		h = (em < (113 << 23)) ? 0 : h;
+		h = (em >= (143 << 23)) ? 0x7c00 : h;
+		h = (em > (255 << 23)) ? 0x7e00 : h;
+
+		return (unsigned short)(s | h);
+	}
+
 	void File::writeFloat8(float *dest) {
 		if (!readSafeCheck(dest)) return;
 		unsigned char v = (int)((*dest) * 256.0f);
@@ -583,13 +616,13 @@ namespace LibGens {
 
 	void File::writeFloat16(float* dest) {
 		if (!readSafeCheck(dest)) return;
-		unsigned short v = half_from_float(*dest);
+		unsigned short v = quantizeHalf(*dest);
 		writeInt16(&v);
 	}
 
 	void File::writeFloat16BE(float* dest) {
 		if (!readSafeCheck(dest)) return;
-		unsigned short v = half_from_float(*dest);
+		unsigned short v = quantizeHalf(*dest);
 		writeInt16BE(&v);
 	}
 
