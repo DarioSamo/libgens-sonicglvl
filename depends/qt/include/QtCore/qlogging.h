@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -57,19 +63,19 @@ class QMessageLogContext
 {
     Q_DISABLE_COPY(QMessageLogContext)
 public:
-    Q_DECL_CONSTEXPR QMessageLogContext() : version(2), line(0), file(0), function(0), category(0) {}
-    Q_DECL_CONSTEXPR QMessageLogContext(const char *fileName, int lineNumber, const char *functionName, const char *categoryName)
-        : version(2), line(lineNumber), file(fileName), function(functionName), category(categoryName) {}
+    Q_DECL_CONSTEXPR QMessageLogContext() noexcept = default;
+    Q_DECL_CONSTEXPR QMessageLogContext(const char *fileName, int lineNumber, const char *functionName, const char *categoryName) noexcept
+        : line(lineNumber), file(fileName), function(functionName), category(categoryName) {}
 
-    void copy(const QMessageLogContext &logContext);
-
-    int version;
-    int line;
-    const char *file;
-    const char *function;
-    const char *category;
+    int version = 2;
+    int line = 0;
+    const char *file = nullptr;
+    const char *function = nullptr;
+    const char *category = nullptr;
 
 private:
+    QMessageLogContext &copyContextFrom(const QMessageLogContext &logContext) noexcept;
+
     friend class QMessageLogger;
     friend class QDebug;
 };
@@ -90,7 +96,9 @@ public:
     void noDebug(const char *, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(2, 3)
     {}
     void info(const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(2, 3);
+    Q_DECL_COLD_FUNCTION
     void warning(const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(2, 3);
+    Q_DECL_COLD_FUNCTION
     void critical(const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
     typedef const QLoggingCategory &(*CategoryFunction)();
@@ -99,15 +107,20 @@ public:
     void debug(CategoryFunction catFunc, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
     void info(const QLoggingCategory &cat, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
     void info(CategoryFunction catFunc, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
+    Q_DECL_COLD_FUNCTION
     void warning(const QLoggingCategory &cat, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
+    Q_DECL_COLD_FUNCTION
     void warning(CategoryFunction catFunc, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
+    Q_DECL_COLD_FUNCTION
     void critical(const QLoggingCategory &cat, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
+    Q_DECL_COLD_FUNCTION
     void critical(CategoryFunction catFunc, const char *msg, ...) const Q_ATTRIBUTE_FORMAT_PRINTF(3, 4);
 
 #ifndef Q_CC_MSVC
     Q_NORETURN
 #endif
-    void fatal(const char *msg, ...) const Q_DECL_NOTHROW Q_ATTRIBUTE_FORMAT_PRINTF(2, 3);
+    Q_DECL_COLD_FUNCTION
+    void fatal(const char *msg, ...) const noexcept Q_ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
 #ifndef QT_NO_DEBUG_STREAM
     QDebug debug() const;
@@ -123,7 +136,7 @@ public:
     QDebug critical(const QLoggingCategory &cat) const;
     QDebug critical(CategoryFunction catFunc) const;
 
-    QNoDebug noDebug() const Q_DECL_NOTHROW;
+    QNoDebug noDebug() const noexcept;
 #endif // QT_NO_DEBUG_STREAM
 
 private:
@@ -139,13 +152,13 @@ private:
 #endif
 
 #ifdef QT_MESSAGELOGCONTEXT
-  #define QT_MESSAGELOG_FILE __FILE__
+  #define QT_MESSAGELOG_FILE static_cast<const char *>(__FILE__)
   #define QT_MESSAGELOG_LINE __LINE__
-  #define QT_MESSAGELOG_FUNC Q_FUNC_INFO
+  #define QT_MESSAGELOG_FUNC static_cast<const char *>(Q_FUNC_INFO)
 #else
-  #define QT_MESSAGELOG_FILE Q_NULLPTR
+  #define QT_MESSAGELOG_FILE nullptr
   #define QT_MESSAGELOG_LINE 0
-  #define QT_MESSAGELOG_FUNC Q_NULLPTR
+  #define QT_MESSAGELOG_FUNC nullptr
 #endif
 
 #define qDebug QMessageLogger(QT_MESSAGELOG_FILE, QT_MESSAGELOG_LINE, QT_MESSAGELOG_FUNC).debug
@@ -172,8 +185,8 @@ private:
 Q_CORE_EXPORT void qt_message_output(QtMsgType, const QMessageLogContext &context,
                                      const QString &message);
 
-Q_CORE_EXPORT void qErrnoWarning(int code, const char *msg, ...);
-Q_CORE_EXPORT void qErrnoWarning(const char *msg, ...);
+Q_CORE_EXPORT Q_DECL_COLD_FUNCTION void qErrnoWarning(int code, const char *msg, ...);
+Q_CORE_EXPORT Q_DECL_COLD_FUNCTION void qErrnoWarning(const char *msg, ...);
 
 #if QT_DEPRECATED_SINCE(5, 0)// deprecated. Use qInstallMessageHandler instead!
 typedef void (*QtMsgHandler)(QtMsgType, const char *);

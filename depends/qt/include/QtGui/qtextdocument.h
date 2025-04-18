@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2019 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,6 +40,7 @@
 #ifndef QTEXTDOCUMENT_H
 #define QTEXTDOCUMENT_H
 
+#include <QtGui/qtguiglobal.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qsize.h>
 #include <QtCore/qrect.h>
@@ -68,7 +75,7 @@ namespace Qt
     Q_GUI_EXPORT bool mightBeRichText(const QString&);
     Q_GUI_EXPORT QString convertFromPlainText(const QString &plain, WhiteSpaceMode mode = WhiteSpacePre);
 
-#ifndef QT_NO_TEXTCODEC
+#if QT_CONFIG(textcodec) || defined(Q_CLANG_QDOC)
     Q_GUI_EXPORT QTextCodec *codecForHtml(const QByteArray &ba);
 #endif
 }
@@ -109,11 +116,11 @@ class Q_GUI_EXPORT QTextDocument : public QObject
     Q_PROPERTY(QUrl baseUrl READ baseUrl WRITE setBaseUrl NOTIFY baseUrlChanged)
 
 public:
-    explicit QTextDocument(QObject *parent = 0);
-    explicit QTextDocument(const QString &text, QObject *parent = 0);
+    explicit QTextDocument(QObject *parent = nullptr);
+    explicit QTextDocument(const QString &text, QObject *parent = nullptr);
     ~QTextDocument();
 
-    QTextDocument *clone(QObject *parent = 0) const;
+    QTextDocument *clone(QObject *parent = nullptr) const;
 
     bool isEmpty() const;
     virtual void clear();
@@ -144,6 +151,25 @@ public:
     void setHtml(const QString &html);
 #endif
 
+#if QT_CONFIG(textmarkdownwriter) || QT_CONFIG(textmarkdownreader)
+    enum MarkdownFeature {
+        MarkdownNoHTML = 0x0020 | 0x0040,
+        MarkdownDialectCommonMark = 0,
+        MarkdownDialectGitHub = 0x0004 | 0x0008 | 0x0400 | 0x0100 | 0x0200 | 0x0800
+    };
+    Q_DECLARE_FLAGS(MarkdownFeatures, MarkdownFeature)
+    Q_FLAG(MarkdownFeatures)
+#endif
+
+#if QT_CONFIG(textmarkdownwriter)
+    QString toMarkdown(MarkdownFeatures features = MarkdownDialectGitHub) const;
+#endif
+
+#if QT_CONFIG(textmarkdownreader)
+    void setMarkdown(const QString &markdown, MarkdownFeatures features = MarkdownDialectGitHub);
+#endif
+
+    QString toRawText() const;
     QString toPlainText() const;
     void setPlainText(const QString &text);
 
@@ -157,17 +183,17 @@ public:
     };
     Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
-    QTextCursor find(const QString &subString, int from = 0, FindFlags options = 0) const;
-    QTextCursor find(const QString &subString, const QTextCursor &cursor, FindFlags options = 0) const;
+    QTextCursor find(const QString &subString, int from = 0, FindFlags options = FindFlags()) const;
+    QTextCursor find(const QString &subString, const QTextCursor &cursor, FindFlags options = FindFlags()) const;
 
 #ifndef QT_NO_REGEXP
-    QTextCursor find(const QRegExp &expr, int from = 0, FindFlags options = 0) const;
-    QTextCursor find(const QRegExp &expr, const QTextCursor &cursor, FindFlags options = 0) const;
+    QTextCursor find(const QRegExp &expr, int from = 0, FindFlags options = FindFlags()) const;
+    QTextCursor find(const QRegExp &expr, const QTextCursor &cursor, FindFlags options = FindFlags()) const;
 #endif
 
-#ifndef QT_NO_REGULAREXPRESSION
-    QTextCursor find(const QRegularExpression &expr, int from = 0, FindFlags options = 0) const;
-    QTextCursor find(const QRegularExpression &expr, const QTextCursor &cursor, FindFlags options = 0) const;
+#if QT_CONFIG(regularexpression)
+    QTextCursor find(const QRegularExpression &expr, int from = 0, FindFlags options = FindFlags()) const;
+    QTextCursor find(const QRegularExpression &expr, const QTextCursor &cursor, FindFlags options = FindFlags()) const;
 #endif
 
     QTextFrame *frameAt(int pos) const;
@@ -195,15 +221,20 @@ public:
 
     bool isModified() const;
 
+#ifndef QT_NO_PRINTER
     void print(QPagedPaintDevice *printer) const;
+#endif
 
     enum ResourceType {
+        UnknownResource = 0,
         HtmlResource  = 1,
         ImageResource = 2,
         StyleSheetResource = 3,
+        MarkdownResource = 4,
 
         UserResource  = 100
     };
+    Q_ENUM(ResourceType)
 
     QVariant resource(int type, const QUrl &name) const;
     void addResource(int type, const QUrl &name, const QVariant &resource);

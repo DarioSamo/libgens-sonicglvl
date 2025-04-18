@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,6 +40,7 @@
 #ifndef QTEXTFORMAT_H
 #define QTEXTFORMAT_H
 
+#include <QtGui/qtguiglobal.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qfont.h>
 #include <QtCore/qshareddata.h>
@@ -110,6 +117,7 @@ private:
     friend Q_GUI_EXPORT QDataStream &operator<<(QDataStream &, const QTextLength &);
     friend Q_GUI_EXPORT QDataStream &operator>>(QDataStream &, QTextLength &);
 };
+Q_DECLARE_TYPEINFO(QTextLength, QT_VERSION >= QT_VERSION_CHECK(6,0,0) ? Q_PRIMITIVE_TYPE : Q_RELOCATABLE_TYPE);
 
 inline QTextLength::QTextLength(Type atype, qreal avalue)
     : lengthType(atype), fixedValueOrPercentage(avalue) {}
@@ -167,6 +175,11 @@ public:
         LineHeightType = 0x1049,
         BlockNonBreakableLines = 0x1050,
         BlockTrailingHorizontalRulerWidth = 0x1060,
+        HeadingLevel = 0x1070,
+        BlockQuoteLevel = 0x1080,
+        BlockCodeLanguage = 0x1090,
+        BlockCodeFence = 0x1091,
+        BlockMarker = 0x10A0,
 
         // character properties
         FirstFontProperty = 0x1FE0,
@@ -179,6 +192,8 @@ public:
         FontStyleStrategy = 0x1FE4,
         FontKerning = 0x1FE5,
         FontHintingPreference = 0x1FE6,
+        FontFamilies = 0x1FE7,
+        FontStyleName = 0x1FE8,
         FontFamily = 0x2000,
         FontPointSize = 0x2001,
         FontSizeAdjustment = 0x2002,
@@ -227,6 +242,7 @@ public:
         TableCellSpacing = 0x4102,
         TableCellPadding = 0x4103,
         TableHeaderRowCount = 0x4104,
+        TableBorderCollapse = 0x4105,
 
         // table cell properties
         TableCellRowSpan = 0x4810,
@@ -237,10 +253,28 @@ public:
         TableCellLeftPadding = 0x4814,
         TableCellRightPadding = 0x4815,
 
+        TableCellTopBorder = 0x4816,
+        TableCellBottomBorder = 0x4817,
+        TableCellLeftBorder = 0x4818,
+        TableCellRightBorder = 0x4819,
+
+        TableCellTopBorderStyle = 0x481a,
+        TableCellBottomBorderStyle = 0x481b,
+        TableCellLeftBorderStyle = 0x481c,
+        TableCellRightBorderStyle = 0x481d,
+
+        TableCellTopBorderBrush = 0x481e,
+        TableCellBottomBorderBrush = 0x481f,
+        TableCellLeftBorderBrush = 0x4820,
+        TableCellRightBorderBrush = 0x4821,
+
         // image properties
         ImageName = 0x5000,
+        ImageTitle = 0x5001,
+        ImageAltText = 0x5002,
         ImageWidth = 0x5010,
         ImageHeight = 0x5011,
+        ImageQuality = 0x5014,
 
         // internal
         /*
@@ -418,15 +452,25 @@ public:
     inline QString fontFamily() const
     { return stringProperty(FontFamily); }
 
+    inline void setFontFamilies(const QStringList &families)
+    { setProperty(FontFamilies, QVariant(families)); }
+    inline QVariant fontFamilies() const
+    { return property(FontFamilies); }
+
+    inline void setFontStyleName(const QString &styleName)
+    { setProperty(FontStyleName, styleName); }
+    inline QVariant fontStyleName() const
+    { return property(FontStyleName); }
+
     inline void setFontPointSize(qreal size)
     { setProperty(FontPointSize, size); }
     inline qreal fontPointSize() const
     { return doubleProperty(FontPointSize); }
 
     inline void setFontWeight(int weight)
-    { if (weight == QFont::Normal) weight = 0; setProperty(FontWeight, weight); }
+    { setProperty(FontWeight, weight); }
     inline int fontWeight() const
-    { int weight = intProperty(FontWeight); if (weight == 0) weight = QFont::Normal; return weight; }
+    { return hasProperty(FontWeight) ? intProperty(FontWeight) : QFont::Normal; }
     inline void setFontItalic(bool italic)
     { setProperty(FontItalic, italic); }
     inline bool fontItalic() const
@@ -530,9 +574,13 @@ public:
     inline QString anchorHref() const
     { return stringProperty(AnchorHref); }
 
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use setAnchorNames() instead")
     inline void setAnchorName(const QString &name)
     { setAnchorNames(QStringList(name)); }
+    QT_DEPRECATED_X("Use anchorNames() instead")
     QString anchorName() const;
+#endif
 
     inline void setAnchorNames(const QStringList &names)
     { setProperty(AnchorName, names); }
@@ -579,6 +627,12 @@ public:
         LineDistanceHeight = 4
     };
 
+    enum class MarkerType {
+        NoMarker = 0,
+        Unchecked = 1,
+        Checked = 2
+    };
+
     QTextBlockFormat();
 
     bool isValid() const { return isBlockFormat(); }
@@ -616,6 +670,11 @@ public:
     inline int indent() const
     { return intProperty(BlockIndent); }
 
+    inline void setHeadingLevel(int alevel)
+    { setProperty(HeadingLevel, alevel); }
+    inline int headingLevel() const
+    { return intProperty(HeadingLevel); }
+
     inline void setLineHeight(qreal height, int heightType)
     { setProperty(LineHeight, height); setProperty(LineHeightType, heightType); }
     inline qreal lineHeight(qreal scriptLineHeight, qreal scaling) const;
@@ -636,6 +695,11 @@ public:
 
     void setTabPositions(const QList<QTextOption::Tab> &tabs);
     QList<QTextOption::Tab> tabPositions() const;
+
+    inline void setMarker(MarkerType marker)
+    { setProperty(BlockMarker, int(marker)); }
+    inline MarkerType marker() const
+    { return MarkerType(intProperty(BlockMarker)); }
 
 protected:
     explicit QTextBlockFormat(const QTextFormat &fmt);
@@ -740,6 +804,10 @@ public:
     inline qreal height() const
     { return doubleProperty(ImageHeight); }
 
+    inline void setQuality(int quality = 100);
+    inline int quality() const
+    { return intProperty(ImageQuality); }
+
 protected:
     explicit QTextImageFormat(const QTextFormat &format);
     friend class QTextFormat;
@@ -755,6 +823,9 @@ inline void QTextImageFormat::setWidth(qreal awidth)
 
 inline void QTextImageFormat::setHeight(qreal aheight)
 { setProperty(ImageHeight, aheight); }
+
+inline void QTextImageFormat::setQuality(int aquality)
+{ setProperty(ImageQuality, aquality); }
 
 class Q_GUI_EXPORT QTextFrameFormat : public QTextFormat
 {
@@ -911,6 +982,11 @@ public:
     inline int headerRowCount() const
     { return intProperty(TableHeaderRowCount); }
 
+    inline void setBorderCollapse(bool borderCollapse)
+    { setProperty(TableBorderCollapse, borderCollapse); }
+    inline bool borderCollapse() const
+    { return boolProperty(TableBorderCollapse); }
+
 protected:
     explicit QTextTableFormat(const QTextFormat &fmt);
     friend class QTextFormat;
@@ -951,6 +1027,72 @@ public:
     inline qreal rightPadding() const;
 
     inline void setPadding(qreal padding);
+
+    inline void setTopBorder(qreal width)
+    { setProperty(TableCellTopBorder, width); }
+    inline qreal topBorder() const
+    { return doubleProperty(TableCellTopBorder); }
+
+    inline void setBottomBorder(qreal width)
+    { setProperty(TableCellBottomBorder, width); }
+    inline qreal bottomBorder() const
+    { return doubleProperty(TableCellBottomBorder); }
+
+    inline void setLeftBorder(qreal width)
+    { setProperty(TableCellLeftBorder, width); }
+    inline qreal leftBorder() const
+    { return doubleProperty(TableCellLeftBorder); }
+
+    inline void setRightBorder(qreal width)
+    { setProperty(TableCellRightBorder, width); }
+    inline qreal rightBorder() const
+    { return doubleProperty(TableCellRightBorder); }
+
+    inline void setBorder(qreal width);
+
+    inline void setTopBorderStyle(QTextFrameFormat::BorderStyle style)
+    { setProperty(TableCellTopBorderStyle, style); }
+    inline QTextFrameFormat::BorderStyle topBorderStyle() const
+    { return static_cast<QTextFrameFormat::BorderStyle>(intProperty(TableCellTopBorderStyle)); }
+
+    inline void setBottomBorderStyle(QTextFrameFormat::BorderStyle style)
+    { setProperty(TableCellBottomBorderStyle, style); }
+    inline QTextFrameFormat::BorderStyle bottomBorderStyle() const
+    { return static_cast<QTextFrameFormat::BorderStyle>(intProperty(TableCellBottomBorderStyle)); }
+
+    inline void setLeftBorderStyle(QTextFrameFormat::BorderStyle style)
+    { setProperty(TableCellLeftBorderStyle, style); }
+    inline QTextFrameFormat::BorderStyle leftBorderStyle() const
+    { return static_cast<QTextFrameFormat::BorderStyle>(intProperty(TableCellLeftBorderStyle)); }
+
+    inline void setRightBorderStyle(QTextFrameFormat::BorderStyle style)
+    { setProperty(TableCellRightBorderStyle, style); }
+    inline QTextFrameFormat::BorderStyle rightBorderStyle() const
+    { return static_cast<QTextFrameFormat::BorderStyle>(intProperty(TableCellRightBorderStyle)); }
+
+    inline void setBorderStyle(QTextFrameFormat::BorderStyle style);
+
+    inline void setTopBorderBrush(const QBrush &brush)
+    { setProperty(TableCellTopBorderBrush, brush); }
+    inline QBrush topBorderBrush() const
+    { return brushProperty(TableCellTopBorderBrush); }
+
+    inline void setBottomBorderBrush(const QBrush &brush)
+    { setProperty(TableCellBottomBorderBrush, brush); }
+    inline QBrush bottomBorderBrush() const
+    { return brushProperty(TableCellBottomBorderBrush); }
+
+    inline void setLeftBorderBrush(const QBrush &brush)
+    { setProperty(TableCellLeftBorderBrush, brush); }
+    inline QBrush leftBorderBrush() const
+    { return brushProperty(TableCellLeftBorderBrush); }
+
+    inline void setRightBorderBrush(const QBrush &brush)
+    { setProperty(TableCellRightBorderBrush, brush); }
+    inline QBrush rightBorderBrush() const
+    { return brushProperty(TableCellRightBorderBrush); }
+
+    inline void setBorderBrush(const QBrush &brush);
 
 protected:
     explicit QTextTableCellFormat(const QTextFormat &fmt);
@@ -1007,6 +1149,29 @@ inline void QTextTableCellFormat::setPadding(qreal padding)
     setRightPadding(padding);
 }
 
+inline void QTextTableCellFormat::setBorder(qreal width)
+{
+    setTopBorder(width);
+    setBottomBorder(width);
+    setLeftBorder(width);
+    setRightBorder(width);
+}
+
+inline void QTextTableCellFormat::setBorderStyle(QTextFrameFormat::BorderStyle style)
+{
+    setTopBorderStyle(style);
+    setBottomBorderStyle(style);
+    setLeftBorderStyle(style);
+    setRightBorderStyle(style);
+}
+
+inline void QTextTableCellFormat::setBorderBrush(const QBrush &brush)
+{
+    setTopBorderBrush(brush);
+    setBottomBorderBrush(brush);
+    setLeftBorderBrush(brush);
+    setRightBorderBrush(brush);
+}
 
 QT_END_NAMESPACE
 

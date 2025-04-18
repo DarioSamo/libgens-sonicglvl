@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,13 +40,13 @@
 #ifndef QTEXTBROWSER_H
 #define QTEXTBROWSER_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtWidgets/qtextedit.h>
 #include <QtCore/qurl.h>
 
+QT_REQUIRE_CONFIG(textbrowser);
+
 QT_BEGIN_NAMESPACE
-
-
-#ifndef QT_NO_TEXTBROWSER
 
 class QTextBrowserPrivate;
 
@@ -49,6 +55,7 @@ class Q_WIDGETS_EXPORT QTextBrowser : public QTextEdit
     Q_OBJECT
 
     Q_PROPERTY(QUrl source READ source WRITE setSource)
+    Q_PROPERTY(QTextDocument::ResourceType sourceType READ sourceType)
     Q_OVERRIDE(bool modified SCRIPTABLE false)
     Q_OVERRIDE(bool readOnly DESIGNABLE false SCRIPTABLE false)
     Q_OVERRIDE(bool undoRedoEnabled DESIGNABLE false SCRIPTABLE false)
@@ -57,15 +64,16 @@ class Q_WIDGETS_EXPORT QTextBrowser : public QTextEdit
     Q_PROPERTY(bool openLinks READ openLinks WRITE setOpenLinks)
 
 public:
-    explicit QTextBrowser(QWidget* parent = 0);
+    explicit QTextBrowser(QWidget* parent = nullptr);
     virtual ~QTextBrowser();
 
     QUrl source() const;
+    QTextDocument::ResourceType sourceType() const;
 
     QStringList searchPaths() const;
     void setSearchPaths(const QStringList &paths);
 
-    virtual QVariant loadResource(int type, const QUrl &name) Q_DECL_OVERRIDE;
+    virtual QVariant loadResource(int type, const QUrl &name) override;
 
     bool isBackwardAvailable() const;
     bool isForwardAvailable() const;
@@ -82,7 +90,12 @@ public:
     void setOpenLinks(bool open);
 
 public Q_SLOTS:
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     virtual void setSource(const QUrl &name);
+    void setSource(const QUrl &name, QTextDocument::ResourceType type);
+#else
+    void setSource(const QUrl &name, QTextDocument::ResourceType type = QTextDocument::UnknownResource);
+#endif
     virtual void backward();
     virtual void forward();
     virtual void home();
@@ -94,18 +107,25 @@ Q_SIGNALS:
     void historyChanged();
     void sourceChanged(const QUrl &);
     void highlighted(const QUrl &);
+#if QT_DEPRECATED_SINCE(5, 15)
+    QT_DEPRECATED_VERSION_X_5_15("Use QTextBrowser::highlighted(QUrl) instead")
     void highlighted(const QString &);
+#endif
     void anchorClicked(const QUrl &);
 
 protected:
-    bool event(QEvent *e) Q_DECL_OVERRIDE;
-    virtual void keyPressEvent(QKeyEvent *ev) Q_DECL_OVERRIDE;
-    virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
-    virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
-    virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
-    virtual void focusOutEvent(QFocusEvent *ev) Q_DECL_OVERRIDE;
-    virtual bool focusNextPrevChild(bool next) Q_DECL_OVERRIDE;
-    virtual void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
+    bool event(QEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *ev) override;
+    virtual void mouseMoveEvent(QMouseEvent *ev) override;
+    virtual void mousePressEvent(QMouseEvent *ev) override;
+    virtual void mouseReleaseEvent(QMouseEvent *ev) override;
+    virtual void focusOutEvent(QFocusEvent *ev) override;
+    virtual bool focusNextPrevChild(bool next) override;
+    virtual void paintEvent(QPaintEvent *e) override;
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    virtual
+#endif
+    void doSetSource(const QUrl &name, QTextDocument::ResourceType type = QTextDocument::UnknownResource);
 
 private:
     Q_DISABLE_COPY(QTextBrowser)
@@ -114,8 +134,6 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _q_activateAnchor(const QString &))
     Q_PRIVATE_SLOT(d_func(), void _q_highlightLink(const QString &))
 };
-
-#endif // QT_NO_TEXTBROWSER
 
 QT_END_NAMESPACE
 

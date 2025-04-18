@@ -36,12 +36,6 @@ jobs:
           Start-Process -Wait "fbx202032_fbxsdk_vs2019_win.exe" "/S /D=${{ github.workspace }}\depends\fbxsdk"
         shell: pwsh
 
-      - name: Install Visual C++ 2010 Redistributable
-        run: |
-          Invoke-WebRequest "https://download.microsoft.com/download/1/6/5/165255e7-1014-4d0a-b094-b6a430a6bffc/vcredist_x86.exe" -OutFile "vcredist_x86.exe"
-          Start-Process -Wait "vcredist_x86.exe" "/quiet /norestart"
-        shell: pwsh
-
       - name: Setup MSVC environment
         uses: microsoft/setup-msbuild@v2
 

@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,6 +40,7 @@
 #ifndef QPAINTER_H
 #define QPAINTER_H
 
+#include <QtGui/qtguiglobal.h>
 #include <QtCore/qnamespace.h>
 #include <QtCore/qrect.h>
 #include <QtCore/qpoint.h>
@@ -65,7 +72,6 @@ class QPen;
 class QPolygon;
 class QTextItem;
 class QTextEngine;
-class QMatrix;
 class QTransform;
 class QStaticText;
 class QGlyphRun;
@@ -76,19 +82,23 @@ class Q_GUI_EXPORT QPainter
 {
     Q_DECLARE_PRIVATE(QPainter)
     Q_GADGET
-    Q_FLAGS(RenderHint RenderHints)
 
 public:
     enum RenderHint {
         Antialiasing = 0x01,
         TextAntialiasing = 0x02,
         SmoothPixmapTransform = 0x04,
-        HighQualityAntialiasing = 0x08,
-        NonCosmeticDefaultPen = 0x10,
-        Qt4CompatiblePainting = 0x20
+#if QT_DEPRECATED_SINCE(5, 14)
+        HighQualityAntialiasing Q_DECL_ENUMERATOR_DEPRECATED_X("Use Antialiasing instead") = 0x08,
+        NonCosmeticDefaultPen Q_DECL_ENUMERATOR_DEPRECATED_X("Default pen is non-cosmetic now") = 0x10,
+#endif
+        Qt4CompatiblePainting = 0x20,
+        LosslessImageRendering = 0x40,
     };
+    Q_FLAG(RenderHint)
 
     Q_DECLARE_FLAGS(RenderHints, RenderHint)
+    Q_FLAG(RenderHints)
 
     class PixmapFragment {
     public:
@@ -123,7 +133,10 @@ public:
     bool end();
     bool isActive() const;
 
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use begin(QPaintDevice*) instead")
     void initFrom(const QPaintDevice *device);
+#endif
 
     enum CompositionMode {
         CompositionMode_SourceOver,
@@ -223,27 +236,39 @@ public:
     void restore();
 
     // XForm functions
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use setTransform() instead")
     void setMatrix(const QMatrix &matrix, bool combine = false);
+    QT_DEPRECATED_X("Use transform() instead")
     const QMatrix &matrix() const;
+    QT_DEPRECATED_X("Use deviceTransform() instead")
     const QMatrix &deviceMatrix() const;
+    QT_DEPRECATED_X("Use resetTransform() instead")
     void resetMatrix();
+#endif
 
     void setTransform(const QTransform &transform, bool combine = false);
     const QTransform &transform() const;
     const QTransform &deviceTransform() const;
     void resetTransform();
 
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use setWorldTransform() instead")
     void setWorldMatrix(const QMatrix &matrix, bool combine = false);
+    QT_DEPRECATED_X("Use worldTransform() instead")
     const QMatrix &worldMatrix() const;
+    QT_DEPRECATED_X("Use combinedTransform() instead")
+    QMatrix combinedMatrix() const;
+    QT_DEPRECATED_X("Use setWorldMatrixEnabled() instead")
+    void setMatrixEnabled(bool enabled);
+    QT_DEPRECATED_X("Use worldMatrixEnabled() instead")
+    bool matrixEnabled() const;
+#endif
 
     void setWorldTransform(const QTransform &matrix, bool combine = false);
     const QTransform &worldTransform() const;
 
-    QMatrix combinedMatrix() const;
     QTransform combinedTransform() const;
-
-    void setMatrixEnabled(bool enabled);
-    bool matrixEnabled() const;
 
     void setWorldMatrixEnabled(bool enabled);
     bool worldMatrixEnabled() const;
@@ -346,9 +371,14 @@ public:
     inline void drawRoundedRect(const QRect &rect, qreal xRadius, qreal yRadius,
                                 Qt::SizeMode mode = Qt::AbsoluteSize);
 
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use drawRoundedRect(..., Qt::RelativeSize) instead")
     void drawRoundRect(const QRectF &r, int xround = 25, int yround = 25);
-    inline void drawRoundRect(int x, int y, int w, int h, int = 25, int = 25);
-    inline void drawRoundRect(const QRect &r, int xround = 25, int yround = 25);
+    QT_DEPRECATED_X("Use drawRoundedRect(..., Qt::RelativeSize) instead")
+    void drawRoundRect(int x, int y, int w, int h, int = 25, int = 25);
+    QT_DEPRECATED_X("Use drawRoundedRect(..., Qt::RelativeSize) instead")
+    void drawRoundRect(const QRect &r, int xround = 25, int yround = 25);
+#endif
 
     void drawTiledPixmap(const QRectF &rect, const QPixmap &pm, const QPointF &offset = QPointF());
     inline void drawTiledPixmap(int x, int y, int w, int h, const QPixmap &, int sx=0, int sy=0);
@@ -374,7 +404,7 @@ public:
     inline void drawPixmap(int x, int y, int w, int h, const QPixmap &pm);
 
     void drawPixmapFragments(const PixmapFragment *fragments, int fragmentCount,
-                             const QPixmap &pixmap, PixmapFragmentHints hints = 0);
+                             const QPixmap &pixmap, PixmapFragmentHints hints = PixmapFragmentHints());
 
     void drawImage(const QRectF &targetRect, const QImage &image, const QRectF &sourceRect,
                    Qt::ImageConversionFlags flags = Qt::AutoColor);
@@ -408,9 +438,9 @@ public:
 
     void drawText(const QPointF &p, const QString &str, int tf, int justificationPadding);
 
-    void drawText(const QRectF &r, int flags, const QString &text, QRectF *br=0);
-    void drawText(const QRect &r, int flags, const QString &text, QRect *br=0);
-    inline void drawText(int x, int y, int w, int h, int flags, const QString &text, QRect *br=0);
+    void drawText(const QRectF &r, int flags, const QString &text, QRectF *br = nullptr);
+    void drawText(const QRect &r, int flags, const QString &text, QRect *br = nullptr);
+    inline void drawText(int x, int y, int w, int h, int flags, const QString &text, QRect *br = nullptr);
 
     void drawText(const QRectF &r, const QString &text, const QTextOption &o = QTextOption());
 
@@ -440,6 +470,10 @@ public:
     inline void fillRect(const QRect &r, Qt::BrushStyle style);
     inline void fillRect(const QRectF &r, Qt::BrushStyle style);
 
+    inline void fillRect(int x, int y, int w, int h, QGradient::Preset preset);
+    inline void fillRect(const QRect &r, QGradient::Preset preset);
+    inline void fillRect(const QRectF &r, QGradient::Preset preset);
+
     void eraseRect(const QRectF &);
     inline void eraseRect(int x, int y, int w, int h);
     inline void eraseRect(const QRect &);
@@ -451,10 +485,15 @@ public:
 
     QPaintEngine *paintEngine() const;
 
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use QWidget::render() instead")
     static void setRedirected(const QPaintDevice *device, QPaintDevice *replacement,
                               const QPoint& offset = QPoint());
-    static QPaintDevice *redirected(const QPaintDevice *device, QPoint *offset = 0);
+    QT_DEPRECATED_X("Use QWidget::render() instead")
+    static QPaintDevice *redirected(const QPaintDevice *device, QPoint *offset = nullptr);
+    QT_DEPRECATED_X("Use QWidget::render() instead")
     static void restoreRedirected(const QPaintDevice *device);
+#endif
 
     void beginNativePainting();
     void endNativePainting();
@@ -480,6 +519,7 @@ private:
     friend class QPreviewPaintEngine;
     friend class QTextEngine;
 };
+Q_DECLARE_TYPEINFO(QPainter::PixmapFragment, Q_RELOCATABLE_TYPE);
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QPainter::RenderHints)
 
@@ -615,16 +655,6 @@ inline void QPainter::drawPoints(const QPolygon &points)
     drawPoints(points.constData(), points.size());
 }
 
-inline void QPainter::drawRoundRect(int x, int y, int w, int h, int xRnd, int yRnd)
-{
-    drawRoundRect(QRectF(x, y, w, h), xRnd, yRnd);
-}
-
-inline void QPainter::drawRoundRect(const QRect &rect, int xRnd, int yRnd)
-{
-    drawRoundRect(QRectF(rect), xRnd, yRnd);
-}
-
 inline void QPainter::drawRoundedRect(int x, int y, int w, int h, qreal xRadius, qreal yRadius,
                             Qt::SizeMode mode)
 {
@@ -737,6 +767,20 @@ inline void QPainter::fillRect(const QRectF &r, Qt::BrushStyle style)
     fillRect(r, QBrush(style));
 }
 
+inline void QPainter::fillRect(int x, int y, int w, int h, QGradient::Preset p)
+{
+    fillRect(QRect(x, y, w, h), QGradient(p));
+}
+
+inline void QPainter::fillRect(const QRect &r, QGradient::Preset p)
+{
+    fillRect(r, QGradient(p));
+}
+
+inline void QPainter::fillRect(const QRectF &r, QGradient::Preset p)
+{
+    fillRect(r, QGradient(p));
+}
 
 inline void QPainter::setBrushOrigin(int x, int y)
 {

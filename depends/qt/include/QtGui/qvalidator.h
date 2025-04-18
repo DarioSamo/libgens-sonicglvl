@@ -1,32 +1,38 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
+** Copyright (C) 2016 The Qt Company Ltd.
 ** Copyright (C) 2012 Klarälvdalens Datakonsult AB, a KDAB Group company, info@kdab.com, author Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
-** Contact: http://www.qt.io/licensing/
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -35,10 +41,13 @@
 #ifndef QVALIDATOR_H
 #define QVALIDATOR_H
 
+#include <QtGui/qtguiglobal.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qregexp.h>
-#include <QtCore/qregularexpression.h>
+#if QT_CONFIG(regularexpression)
+#  include <QtCore/qregularexpression.h>
+#endif
 #include <QtCore/qlocale.h>
 
 QT_BEGIN_NAMESPACE
@@ -52,7 +61,7 @@ class Q_GUI_EXPORT QValidator : public QObject
 {
     Q_OBJECT
 public:
-    explicit QValidator(QObject * parent = 0);
+    explicit QValidator(QObject * parent = nullptr);
     ~QValidator();
 
     enum State {
@@ -60,6 +69,7 @@ public:
         Intermediate,
         Acceptable
     };
+    Q_ENUM(State)
 
     void setLocale(const QLocale &locale);
     QLocale locale() const;
@@ -86,12 +96,12 @@ class Q_GUI_EXPORT QIntValidator : public QValidator
     Q_PROPERTY(int top READ top WRITE setTop NOTIFY topChanged)
 
 public:
-    explicit QIntValidator(QObject * parent = 0);
-    QIntValidator(int bottom, int top, QObject *parent = 0);
+    explicit QIntValidator(QObject * parent = nullptr);
+    QIntValidator(int bottom, int top, QObject *parent = nullptr);
     ~QIntValidator();
 
-    QValidator::State validate(QString &, int &) const Q_DECL_OVERRIDE;
-    void fixup(QString &input) const Q_DECL_OVERRIDE;
+    QValidator::State validate(QString &, int &) const override;
+    void fixup(QString &input) const override;
 
     void setBottom(int);
     void setTop(int);
@@ -123,8 +133,8 @@ class Q_GUI_EXPORT QDoubleValidator : public QValidator
     Q_PROPERTY(Notation notation READ notation WRITE setNotation NOTIFY notationChanged)
 
 public:
-    explicit QDoubleValidator(QObject * parent = 0);
-    QDoubleValidator(double bottom, double top, int decimals, QObject *parent = 0);
+    explicit QDoubleValidator(QObject * parent = nullptr);
+    QDoubleValidator(double bottom, double top, int decimals, QObject *parent = nullptr);
     ~QDoubleValidator();
 
     enum Notation {
@@ -132,7 +142,7 @@ public:
         ScientificNotation
     };
     Q_ENUM(Notation)
-    QValidator::State validate(QString &, int &) const Q_DECL_OVERRIDE;
+    QValidator::State validate(QString &, int &) const override;
 
     virtual void setRange(double bottom, double top, int decimals = 0);
     void setBottom(double);
@@ -167,11 +177,11 @@ class Q_GUI_EXPORT QRegExpValidator : public QValidator
     Q_PROPERTY(QRegExp regExp READ regExp WRITE setRegExp NOTIFY regExpChanged)
 
 public:
-    explicit QRegExpValidator(QObject *parent = 0);
-    explicit QRegExpValidator(const QRegExp& rx, QObject *parent = 0);
+    explicit QRegExpValidator(QObject *parent = nullptr);
+    explicit QRegExpValidator(const QRegExp& rx, QObject *parent = nullptr);
     ~QRegExpValidator();
 
-    virtual QValidator::State validate(QString& input, int& pos) const Q_DECL_OVERRIDE;
+    virtual QValidator::State validate(QString& input, int& pos) const override;
 
     void setRegExp(const QRegExp& rx);
     const QRegExp& regExp() const { return r; }
@@ -187,7 +197,7 @@ private:
 
 #endif // QT_NO_REGEXP
 
-#ifndef QT_NO_REGULAREXPRESSION
+#if QT_CONFIG(regularexpression)
 
 class QRegularExpressionValidatorPrivate;
 
@@ -197,11 +207,11 @@ class Q_GUI_EXPORT QRegularExpressionValidator : public QValidator
     Q_PROPERTY(QRegularExpression regularExpression READ regularExpression WRITE setRegularExpression NOTIFY regularExpressionChanged)
 
 public:
-    explicit QRegularExpressionValidator(QObject *parent = 0);
-    explicit QRegularExpressionValidator(const QRegularExpression &re, QObject *parent = 0);
+    explicit QRegularExpressionValidator(QObject *parent = nullptr);
+    explicit QRegularExpressionValidator(const QRegularExpression &re, QObject *parent = nullptr);
     ~QRegularExpressionValidator();
 
-    virtual QValidator::State validate(QString &input, int &pos) const Q_DECL_OVERRIDE;
+    virtual QValidator::State validate(QString &input, int &pos) const override;
 
     QRegularExpression regularExpression() const;
 
@@ -216,7 +226,7 @@ private:
     Q_DECLARE_PRIVATE(QRegularExpressionValidator)
 };
 
-#endif // QT_NO_REGULAREXPRESSION
+#endif // QT_CONFIG(regularexpression)
 
 #endif // QT_NO_VALIDATOR
 

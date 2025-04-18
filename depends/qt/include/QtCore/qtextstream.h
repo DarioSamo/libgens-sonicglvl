@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -92,7 +98,7 @@ public:
     explicit QTextStream(const QByteArray &array, QIODevice::OpenMode openMode = QIODevice::ReadOnly);
     virtual ~QTextStream();
 
-#ifndef QT_NO_TEXTCODEC
+#if QT_CONFIG(textcodec)
     void setCodec(QTextCodec *codec);
     void setCodec(const char *codecName);
     QTextCodec *codec() const;
@@ -178,7 +184,9 @@ public:
     QTextStream &operator<<(float f);
     QTextStream &operator<<(double f);
     QTextStream &operator<<(const QString &s);
+    QTextStream &operator<<(QStringView s);
     QTextStream &operator<<(QLatin1String s);
+    QTextStream &operator<<(const QStringRef &s);
     QTextStream &operator<<(const QByteArray &array);
     QTextStream &operator<<(const char *c);
     QTextStream &operator<<(const void *ptr);
@@ -205,8 +213,8 @@ typedef void (QTextStream::*QTSMFC)(QChar); // manipulator w/QChar argument
 class Q_CORE_EXPORT QTextStreamManipulator
 {
 public:
-    QTextStreamManipulator(QTSMFI m, int a) { mf = m; mc = 0; arg = a; }
-    QTextStreamManipulator(QTSMFC m, QChar c) { mf = 0; mc = m; ch = c; arg = -1; }
+    Q_DECL_CONSTEXPR QTextStreamManipulator(QTSMFI m, int a) noexcept : mf(m), mc(nullptr), arg(a), ch() {}
+    Q_DECL_CONSTEXPR QTextStreamManipulator(QTSMFC m, QChar c) noexcept : mf(nullptr), mc(m), arg(-1), ch(c) {}
     void exec(QTextStream &s) { if (mf) { (s.*mf)(arg); } else { (s.*mc)(ch); } }
 
 private:
@@ -225,6 +233,7 @@ inline QTextStream &operator<<(QTextStream &s, QTextStreamFunction f)
 inline QTextStream &operator<<(QTextStream &s, QTextStreamManipulator m)
 { m.exec(s); return s; }
 
+namespace Qt {
 Q_CORE_EXPORT QTextStream &bin(QTextStream &s);
 Q_CORE_EXPORT QTextStream &oct(QTextStream &s);
 Q_CORE_EXPORT QTextStream &dec(QTextStream &s);
@@ -256,6 +265,45 @@ Q_CORE_EXPORT QTextStream &reset(QTextStream &s);
 Q_CORE_EXPORT QTextStream &bom(QTextStream &s);
 
 Q_CORE_EXPORT QTextStream &ws(QTextStream &s);
+
+} // namespace Qt
+
+#if QT_DEPRECATED_SINCE(5, 15)
+// This namespace only exists for 'using namespace' declarations.
+namespace QTextStreamFunctions {
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::bin") QTextStream &bin(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::oct") QTextStream &oct(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::dec") QTextStream &dec(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::hex") QTextStream &hex(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::showbase") QTextStream &showbase(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::forcesign") QTextStream &forcesign(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::forcepoint") QTextStream &forcepoint(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::noshowbase") QTextStream &noshowbase(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::noforcesign") QTextStream &noforcesign(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::noforcepoint") QTextStream &noforcepoint(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::uppercasebase") QTextStream &uppercasebase(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::uppercasedigits") QTextStream &uppercasedigits(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::lowercasebase") QTextStream &lowercasebase(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::lowercasedigits") QTextStream &lowercasedigits(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::fixed") QTextStream &fixed(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::scientific") QTextStream &scientific(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::left") QTextStream &left(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::right") QTextStream &right(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::center") QTextStream &center(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::endl") QTextStream &endl(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::flush") QTextStream &flush(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::reset") QTextStream &reset(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::bom") QTextStream &bom(QTextStream &s);
+Q_CORE_EXPORT QT_DEPRECATED_VERSION_X(5, 15, "Use Qt::ws") QTextStream &ws(QTextStream &s);
+} // namespace QTextStreamFunctions
+
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_CLANG("-Wheader-hygiene")
+// We use 'using namespace' as that doesn't cause
+// conflicting definitions compiler errors.
+using namespace QTextStreamFunctions;
+QT_WARNING_POP
+#endif // QT_DEPRECATED_SINCE(5, 15)
 
 inline QTextStreamManipulator qSetFieldWidth(int width)
 {

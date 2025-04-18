@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -33,8 +39,8 @@
 #ifndef QTRANSFORM_H
 #define QTRANSFORM_H
 
+#include <QtGui/qtguiglobal.h>
 #include <QtGui/qmatrix.h>
-#include <QtGui/qpainterpath.h>
 #include <QtGui/qpolygon.h>
 #include <QtGui/qregion.h>
 #include <QtGui/qwindowdefs.h>
@@ -44,8 +50,8 @@
 
 QT_BEGIN_NAMESPACE
 
-
 class QVariant;
+class QPainterPath;
 
 class Q_GUI_EXPORT QTransform
 {
@@ -66,7 +72,22 @@ public:
                qreal h31, qreal h32, qreal h33 = 1.0);
     QTransform(qreal h11, qreal h12, qreal h21,
                qreal h22, qreal dx, qreal dy);
+#if QT_DEPRECATED_SINCE(5, 15)
     explicit QTransform(const QMatrix &mtx);
+#endif // QT_DEPRECATED_SINCE(5, 15)
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    // ### Qt 6: remove; the compiler-generated ones are fine!
+    QTransform &operator=(QTransform &&other) noexcept // = default
+    { memcpy(static_cast<void *>(this), static_cast<void *>(&other), sizeof(QTransform)); return *this; }
+    QTransform &operator=(const QTransform &) noexcept; // = default
+    QTransform(QTransform &&other) noexcept // = default
+        : affine(Qt::Uninitialized)
+    { memcpy(static_cast<void *>(this), static_cast<void *>(&other), sizeof(QTransform)); }
+    QTransform(const QTransform &other) noexcept // = default
+        : affine(Qt::Uninitialized)
+    { memcpy(static_cast<void *>(this), static_cast<const void *>(&other), sizeof(QTransform)); }
+#endif
 
     bool isAffine() const;
     bool isIdentity() const;
@@ -78,7 +99,10 @@ public:
     TransformationType type() const;
 
     inline qreal determinant() const;
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use determinant() instead")
     qreal det() const;
+#endif
 
     qreal m11() const;
     qreal m12() const;
@@ -96,9 +120,9 @@ public:
                    qreal m21, qreal m22, qreal m23,
                    qreal m31, qreal m32, qreal m33);
 
-    QTransform inverted(bool *invertible = 0) const Q_REQUIRED_RESULT;
-    QTransform adjoint() const Q_REQUIRED_RESULT;
-    QTransform transposed() const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QTransform inverted(bool *invertible = nullptr) const;
+    Q_REQUIRED_RESULT QTransform adjoint() const;
+    Q_REQUIRED_RESULT QTransform transposed() const;
 
     QTransform &translate(qreal dx, qreal dy);
     QTransform &scale(qreal sx, qreal sy);
@@ -118,8 +142,6 @@ public:
     QTransform &operator*=(const QTransform &);
     QTransform operator*(const QTransform &o) const;
 
-    QTransform &operator=(const QTransform &);
-
     operator QVariant() const;
 
     void reset();
@@ -137,7 +159,9 @@ public:
     void map(int x, int y, int *tx, int *ty) const;
     void map(qreal x, qreal y, qreal *tx, qreal *ty) const;
 
+#if QT_DEPRECATED_SINCE(5, 15)
     const QMatrix &toAffine() const;
+#endif // QT_DEPRECATED_SINCE(5, 15)
 
     QTransform &operator*=(qreal div);
     QTransform &operator/=(qreal div);
@@ -155,7 +179,9 @@ private:
         , m_13(h13), m_23(h23), m_33(h33)
         , m_type(TxNone)
         , m_dirty(TxProject)
-        , d(Q_NULLPTR)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        , d(nullptr)
+#endif
     {
     }
     inline QTransform(bool)
@@ -163,7 +189,9 @@ private:
         , m_13(0), m_23(0), m_33(1)
         , m_type(TxNone)
         , m_dirty(TxNone)
-        , d(Q_NULLPTR)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        , d(nullptr)
+#endif
     {
     }
     inline TransformationType inline_type() const;
@@ -174,11 +202,14 @@ private:
 
     mutable uint m_type : 5;
     mutable uint m_dirty : 5;
-
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     class Private;
     Private *d;
+#endif
 };
 Q_DECLARE_TYPEINFO(QTransform, Q_MOVABLE_TYPE);
+
+Q_GUI_EXPORT Q_DECL_CONST_FUNCTION uint qHash(const QTransform &key, uint seed = 0) noexcept;
 
 /******* inlines *****/
 inline QTransform::TransformationType QTransform::inline_type() const
@@ -221,10 +252,12 @@ inline qreal QTransform::determinant() const
     return affine._m11*(m_33*affine._m22-affine._dy*m_23) -
         affine._m21*(m_33*affine._m12-affine._dy*m_13)+affine._dx*(m_23*affine._m12-affine._m22*m_13);
 }
+#if QT_DEPRECATED_SINCE(5, 13)
 inline qreal QTransform::det() const
 {
     return determinant();
 }
+#endif
 inline qreal QTransform::m11() const
 {
     return affine._m11;
@@ -269,6 +302,11 @@ inline qreal QTransform::dy() const
 {
     return affine._dy;
 }
+
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_CLANG("-Wfloat-equal")
+QT_WARNING_DISABLE_GCC("-Wfloat-equal")
+QT_WARNING_DISABLE_INTEL(1572)
 
 inline QTransform &QTransform::operator*=(qreal num)
 {
@@ -327,6 +365,8 @@ inline QTransform &QTransform::operator-=(qreal num)
     return *this;
 }
 
+QT_WARNING_POP
+
 inline bool qFuzzyCompare(const QTransform& t1, const QTransform& t2)
 {
     return qFuzzyCompare(t1.m11(), t2.m11())
@@ -367,8 +407,6 @@ inline QPolygonF operator *(const QPolygonF &a, const QTransform &m)
 { return m.map(a); }
 inline QRegion operator *(const QRegion &r, const QTransform &m)
 { return m.map(r); }
-inline QPainterPath operator *(const QPainterPath &p, const QTransform &m)
-{ return m.map(p); }
 
 inline QTransform operator *(const QTransform &a, qreal n)
 { QTransform t(a); t *= n; return t; }

@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtWidgets module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,12 +40,12 @@
 #ifndef QTABBAR_H
 #define QTABBAR_H
 
+#include <QtWidgets/qtwidgetsglobal.h>
 #include <QtWidgets/qwidget.h>
 
+QT_REQUIRE_CONFIG(tabbar);
+
 QT_BEGIN_NAMESPACE
-
-
-#ifndef QT_NO_TABBAR
 
 class QIcon;
 class QTabBarPrivate;
@@ -65,7 +71,7 @@ class Q_WIDGETS_EXPORT QTabBar: public QWidget
     Q_PROPERTY(bool changeCurrentOnDrag READ changeCurrentOnDrag WRITE setChangeCurrentOnDrag)
 
 public:
-    explicit QTabBar(QWidget* parent=0);
+    explicit QTabBar(QWidget *parent = nullptr);
     ~QTabBar();
 
     enum Shape { RoundedNorth, RoundedSouth, RoundedWest, RoundedEast,
@@ -97,7 +103,10 @@ public:
     void moveTab(int from, int to);
 
     bool isTabEnabled(int index) const;
-    void setTabEnabled(int index, bool);
+    void setTabEnabled(int index, bool enabled);
+
+    bool isTabVisible(int index) const;
+    void setTabVisible(int index, bool visible);
 
     QString tabText(int index) const;
     void setTabText(int index, const QString &text);
@@ -109,14 +118,14 @@ public:
     void setTabIcon(int index, const QIcon &icon);
 
     Qt::TextElideMode elideMode() const;
-    void setElideMode(Qt::TextElideMode);
+    void setElideMode(Qt::TextElideMode mode);
 
 #ifndef QT_NO_TOOLTIP
     void setTabToolTip(int index, const QString &tip);
     QString tabToolTip(int index) const;
 #endif
 
-#ifndef QT_NO_WHATSTHIS
+#if QT_CONFIG(whatsthis)
     void setTabWhatsThis(int index, const QString &text);
     QString tabWhatsThis(int index) const;
 #endif
@@ -130,8 +139,8 @@ public:
     int currentIndex() const;
     int count() const;
 
-    QSize sizeHint() const Q_DECL_OVERRIDE;
-    QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
     void setDrawBase(bool drawTheBase);
     bool drawBase() const;
@@ -166,6 +175,11 @@ public:
     bool changeCurrentOnDrag() const;
     void setChangeCurrentOnDrag(bool change);
 
+#ifndef QT_NO_ACCESSIBILITY
+    QString accessibleTabName(int index) const;
+    void setAccessibleTabName(int index, const QString &name);
+#endif
+
 public Q_SLOTS:
     void setCurrentIndex(int index);
 
@@ -183,20 +197,20 @@ protected:
     virtual void tabRemoved(int index);
     virtual void tabLayoutChange();
 
-    bool event(QEvent *) Q_DECL_OVERRIDE;
-    void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
-    void showEvent(QShowEvent *) Q_DECL_OVERRIDE;
-    void hideEvent(QHideEvent *) Q_DECL_OVERRIDE;
-    void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
-    void mousePressEvent (QMouseEvent *) Q_DECL_OVERRIDE;
-    void mouseMoveEvent (QMouseEvent *) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent (QMouseEvent *) Q_DECL_OVERRIDE;
-#ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+    bool event(QEvent *) override;
+    void resizeEvent(QResizeEvent *) override;
+    void showEvent(QShowEvent *) override;
+    void hideEvent(QHideEvent *) override;
+    void paintEvent(QPaintEvent *) override;
+    void mousePressEvent (QMouseEvent *) override;
+    void mouseMoveEvent (QMouseEvent *) override;
+    void mouseReleaseEvent (QMouseEvent *) override;
+#if QT_CONFIG(wheelevent)
+    void wheelEvent(QWheelEvent *event) override;
 #endif
-    void keyPressEvent(QKeyEvent *) Q_DECL_OVERRIDE;
-    void changeEvent(QEvent *) Q_DECL_OVERRIDE;
-    void timerEvent(QTimerEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *) override;
+    void changeEvent(QEvent *) override;
+    void timerEvent(QTimerEvent *event) override;
     void initStyleOption(QStyleOptionTab *option, int tabIndex) const;
 
 #ifndef QT_NO_ACCESSIBILITY
@@ -208,8 +222,6 @@ private:
     Q_PRIVATE_SLOT(d_func(), void _q_scrollTabs())
     Q_PRIVATE_SLOT(d_func(), void _q_closeTab())
 };
-
-#endif // QT_NO_TABBAR
 
 QT_END_NAMESPACE
 

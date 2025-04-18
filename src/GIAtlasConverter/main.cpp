@@ -23,6 +23,7 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QFileInfo>
+#include <QScreen>
 #include "LibGens.h"
 #include "FreeImage.h"
 #include "../QDarkPalette.cpp"
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]) {
 	GIWindow w(NULL);
 	w.show();
 	w.setWindowState(Qt::WindowActive);
-	w.setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, w.size(), a.desktop()->availableGeometry()));
+	w.setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, w.size(), QGuiApplication::primaryScreen()->availableGeometry()));
 	w.setWindowIcon(QIcon(":Icon/Icon.ico"));
 	return a.exec();
 }

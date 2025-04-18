@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,12 +40,10 @@
 #ifndef QTCORE_RESULTSTORE_H
 #define QTCORE_RESULTSTORE_H
 
-#include <QtCore/qglobal.h>
-
-#ifndef QT_NO_QFUTURE
-
 #include <QtCore/qmap.h>
 #include <QtCore/qdebug.h>
+
+QT_REQUIRE_CONFIG(future);
 
 QT_BEGIN_NAMESPACE
 
@@ -52,7 +56,6 @@ QT_BEGIN_NAMESPACE
     either individually or in batches.
 */
 
-#ifndef Q_QDOC
 
 namespace QtPrivate {
 
@@ -61,8 +64,8 @@ class ResultItem
 public:
     ResultItem(const void *_result, int _count) : m_count(_count), result(_result) { } // contruct with vector of results
     ResultItem(const void *_result) : m_count(0), result(_result) { } // construct with result
-    ResultItem() : m_count(0), result(0) { }
-    bool isValid() const { return result != 0; }
+    ResultItem() : m_count(0), result(nullptr) { }
+    bool isValid() const { return result != nullptr; }
     bool isVector() const { return m_count != 0; }
     int count() const { return (m_count == 0) ?  1 : m_count; }
     int m_count;          // result is either a pointer to a result or to a vector of results,
@@ -87,20 +90,14 @@ public:
 protected:
     QMap<int, ResultItem>::const_iterator mapIterator;
     int m_vectorIndex;
-};
-
-template <typename T>
-class  ResultIterator : public ResultIteratorBase
-{
 public:
-    ResultIterator(const ResultIteratorBase &base)
-    : ResultIteratorBase(base) { }
-
+    template <typename T>
     const T &value() const
     {
-        return *pointer();
+        return *pointer<T>();
     }
 
+    template <typename T>
     const T *pointer() const
     {
         if (mapIterator.value().isVector())
@@ -124,7 +121,7 @@ public:
     ResultIteratorBase resultAt(int index) const;
     bool contains(int index) const;
     int count() const;
-    virtual ~ResultStoreBase() { }
+    virtual ~ResultStoreBase();
 
 protected:
     int insertResultItem(int index, ResultItem &resultItem);
@@ -141,64 +138,44 @@ protected:
     QMap<int, ResultItem> pendingResults;
     int filteredResults;
 
-};
-
-template <typename T>
-class ResultStore : public ResultStoreBase
-{
 public:
-    ResultStore() { }
-
-    ResultStore(const ResultStoreBase &base)
-    : ResultStoreBase(base) { }
-
-    int addResult(int index, const T  *result)
+    template <typename T>
+    int addResult(int index, const T *result)
     {
-        if (result == 0)
-            return ResultStoreBase::addResult(index, result);
+        if (result == nullptr)
+            return addResult(index, static_cast<void *>(nullptr));
         else
-            return ResultStoreBase::addResult(index, new T(*result));
+            return addResult(index, static_cast<void *>(new T(*result)));
     }
 
+    template <typename T>
     int addResults(int index, const QVector<T> *results)
     {
-        return ResultStoreBase::addResults(index, new QVector<T>(*results), results->count(), results->count());
+        return addResults(index, new QVector<T>(*results), results->count(), results->count());
     }
 
+    template <typename T>
     int addResults(int index, const QVector<T> *results, int totalCount)
     {
         if (m_filterMode == true && results->count() != totalCount && 0 == results->count())
-            return ResultStoreBase::addResults(index, 0, 0, totalCount);
+            return addResults(index, nullptr, 0, totalCount);
         else
-            return ResultStoreBase::addResults(index, new QVector<T>(*results), results->count(), totalCount);
+            return addResults(index, new QVector<T>(*results), results->count(), totalCount);
     }
 
     int addCanceledResult(int index)
     {
-        return addResult(index, 0);
+        return addResult(index, static_cast<void *>(nullptr));
     }
 
+    template <typename T>
     int addCanceledResults(int index, int _count)
     {
         QVector<T> empty;
         return addResults(index, &empty, _count);
     }
 
-    ResultIterator<T> begin() const
-    {
-        return static_cast<ResultIterator<T> >(ResultStoreBase::begin());
-    }
-
-    ResultIterator<T> end() const
-    {
-        return static_cast<ResultIterator<T> >(ResultStoreBase::end());
-    }
-
-    ResultIterator<T> resultAt(int index) const
-    {
-        return static_cast<ResultIterator<T> >(ResultStoreBase::resultAt(index));
-    }
-
+    template <typename T>
     void clear()
     {
         QMap<int, ResultItem>::const_iterator mapIterator = m_results.constBegin();
@@ -212,20 +189,13 @@ public:
         resultCount = 0;
         m_results.clear();
     }
-
-    ~ResultStore()
-    {
-        clear();
-    }
-
 };
 
 } // namespace QtPrivate
 
-#endif //Q_QDOC
+Q_DECLARE_TYPEINFO(QtPrivate::ResultItem, Q_PRIMITIVE_TYPE);
+
 
 QT_END_NAMESPACE
-
-#endif // QT_NO_QFUTURE
 
 #endif

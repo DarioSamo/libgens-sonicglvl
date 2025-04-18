@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -117,7 +123,7 @@ public:
 
     static bool sendEvent(QObject *receiver, QEvent *event);
     static void postEvent(QObject *receiver, QEvent *event, int priority = Qt::NormalEventPriority);
-    static void sendPostedEvents(QObject *receiver = 0, int event_type = 0);
+    static void sendPostedEvents(QObject *receiver = nullptr, int event_type = 0);
     static void removePostedEvents(QObject *receiver, int eventType = 0);
 #if QT_DEPRECATED_SINCE(5, 3)
     QT_DEPRECATED static bool hasPendingEvents();
@@ -133,14 +139,14 @@ public:
 
     static QString applicationDirPath();
     static QString applicationFilePath();
-    static qint64 applicationPid();
+    static qint64 applicationPid() Q_DECL_CONST_FUNCTION;
 
-#ifndef QT_NO_LIBRARY
+#if QT_CONFIG(library)
     static void setLibraryPaths(const QStringList &);
     static QStringList libraryPaths();
     static void addLibraryPath(const QString &);
     static void removeLibraryPath(const QString &);
-#endif // QT_NO_LIBRARY
+#endif // QT_CONFIG(library)
 
 #ifndef QT_NO_TRANSLATION
     static bool installTranslator(QTranslator * messageFile);
@@ -149,7 +155,7 @@ public:
 
     static QString translate(const char * context,
                              const char * key,
-                             const char * disambiguation = 0,
+                             const char * disambiguation = nullptr,
                              int n = -1);
 #if QT_DEPRECATED_SINCE(5, 0)
     enum Encoding { UnicodeUTF8, Latin1, DefaultCodec = UnicodeUTF8, CodecForTr = UnicodeUTF8 };
@@ -159,7 +165,9 @@ public:
 #endif
 
 #ifndef QT_NO_QOBJECT
-    static void flush();
+#  if QT_DEPRECATED_SINCE(5, 9)
+    QT_DEPRECATED static void flush();
+#  endif
 
     void installNativeEventFilter(QAbstractNativeEventFilter *filterObj);
     void removeNativeEventFilter(QAbstractNativeEventFilter *filterObj);
@@ -179,7 +187,7 @@ Q_SIGNALS:
     void applicationVersionChanged();
 
 protected:
-    bool event(QEvent *) Q_DECL_OVERRIDE;
+    bool event(QEvent *) override;
 
     virtual bool compressEvent(QEvent *, QObject *receiver, QPostEventList *);
 #endif // QT_NO_QOBJECT
@@ -194,10 +202,15 @@ protected:
 private:
 #ifndef QT_NO_QOBJECT
     static bool sendSpontaneousEvent(QObject *receiver, QEvent *event);
-    bool notifyInternal(QObject *receiver, QEvent *event);
+#  if QT_DEPRECATED_SINCE(5,6)
+    QT_DEPRECATED bool notifyInternal(QObject *receiver, QEvent *event); // ### Qt6 BIC: remove me
+#  endif
+    static bool notifyInternal2(QObject *receiver, QEvent *);
+    static bool forwardEvent(QObject *receiver, QEvent *event, QEvent *originatingEvent = nullptr);
 #endif
-
-    void init();
+#if QT_CONFIG(library)
+    static QStringList libraryPathsLocked();
+#endif
 
     static QCoreApplication *self;
 
@@ -217,27 +230,20 @@ private:
 #endif
     friend Q_CORE_EXPORT QString qAppName();
     friend class QClassFactory;
+    friend class QCommandLineParserPrivate;
 };
-
-#ifndef QT_NO_QOBJECT
-inline bool QCoreApplication::sendEvent(QObject *receiver, QEvent *event)
-{  if (event) event->spont = false; return self ? self->notifyInternal(receiver, event) : false; }
-
-inline bool QCoreApplication::sendSpontaneousEvent(QObject *receiver, QEvent *event)
-{ if (event) event->spont = true; return self ? self->notifyInternal(receiver, event) : false; }
-#endif
 
 #ifdef QT_NO_DEPRECATED
 #  define QT_DECLARE_DEPRECATED_TR_FUNCTIONS(context)
 #else
 #  define QT_DECLARE_DEPRECATED_TR_FUNCTIONS(context) \
-    QT_DEPRECATED static inline QString trUtf8(const char *sourceText, const char *disambiguation = 0, int n = -1) \
+    QT_DEPRECATED static inline QString trUtf8(const char *sourceText, const char *disambiguation = nullptr, int n = -1) \
         { return QCoreApplication::translate(#context, sourceText, disambiguation, n); }
 #endif
 
 #define Q_DECLARE_TR_FUNCTIONS(context) \
 public: \
-    static inline QString tr(const char *sourceText, const char *disambiguation = 0, int n = -1) \
+    static inline QString tr(const char *sourceText, const char *disambiguation = nullptr, int n = -1) \
         { return QCoreApplication::translate(#context, sourceText, disambiguation, n); } \
     QT_DECLARE_DEPRECATED_TR_FUNCTIONS(context) \
 private:

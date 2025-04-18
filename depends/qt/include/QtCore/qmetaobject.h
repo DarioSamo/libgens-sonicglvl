@@ -1,32 +1,38 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
+** Copyright (C) 2016 The Qt Company Ltd.
 ** Copyright (C) 2014 Olivier Goffart <ogoffart@woboq.com>
-** Contact: http://www.qt.io/licensing/
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -48,7 +54,7 @@ template <typename T> class QList;
 class Q_CORE_EXPORT QMetaMethod
 {
 public:
-    Q_DECL_CONSTEXPR inline QMetaMethod() : mobj(0),handle(0) {}
+    Q_DECL_CONSTEXPR inline QMetaMethod() : mobj(nullptr), handle(0) {}
 
     QByteArray methodSignature() const;
     QByteArray name() const;
@@ -74,7 +80,7 @@ public:
     bool invoke(QObject *object,
                 Qt::ConnectionType connectionType,
                 QGenericReturnArgument returnValue,
-                QGenericArgument val0 = QGenericArgument(0),
+                QGenericArgument val0 = QGenericArgument(nullptr),
                 QGenericArgument val1 = QGenericArgument(),
                 QGenericArgument val2 = QGenericArgument(),
                 QGenericArgument val3 = QGenericArgument(),
@@ -86,7 +92,7 @@ public:
                 QGenericArgument val9 = QGenericArgument()) const;
     inline bool invoke(QObject *object,
                        QGenericReturnArgument returnValue,
-                       QGenericArgument val0 = QGenericArgument(0),
+                       QGenericArgument val0 = QGenericArgument(nullptr),
                        QGenericArgument val1 = QGenericArgument(),
                        QGenericArgument val2 = QGenericArgument(),
                        QGenericArgument val3 = QGenericArgument(),
@@ -102,7 +108,7 @@ public:
     }
     inline bool invoke(QObject *object,
                        Qt::ConnectionType connectionType,
-                       QGenericArgument val0 = QGenericArgument(0),
+                       QGenericArgument val0 = QGenericArgument(nullptr),
                        QGenericArgument val1 = QGenericArgument(),
                        QGenericArgument val2 = QGenericArgument(),
                        QGenericArgument val3 = QGenericArgument(),
@@ -117,7 +123,7 @@ public:
                       val0, val1, val2, val3, val4, val5, val6, val7, val8, val9);
     }
     inline bool invoke(QObject *object,
-                       QGenericArgument val0 = QGenericArgument(0),
+                       QGenericArgument val0 = QGenericArgument(nullptr),
                        QGenericArgument val1 = QGenericArgument(),
                        QGenericArgument val2 = QGenericArgument(),
                        QGenericArgument val3 = QGenericArgument(),
@@ -131,57 +137,52 @@ public:
         return invoke(object, Qt::AutoConnection, QGenericReturnArgument(),
                       val0, val1, val2, val3, val4, val5, val6, val7, val8, val9);
     }
-
     bool invokeOnGadget(void *gadget,
-                QGenericReturnArgument returnValue,
-                QGenericArgument val0 = QGenericArgument(0),
-                QGenericArgument val1 = QGenericArgument(),
-                QGenericArgument val2 = QGenericArgument(),
-                QGenericArgument val3 = QGenericArgument(),
-                QGenericArgument val4 = QGenericArgument(),
-                QGenericArgument val5 = QGenericArgument(),
-                QGenericArgument val6 = QGenericArgument(),
-                QGenericArgument val7 = QGenericArgument(),
-                QGenericArgument val8 = QGenericArgument(),
-                QGenericArgument val9 = QGenericArgument()) const;
+                        QGenericReturnArgument returnValue,
+                        QGenericArgument val0 = QGenericArgument(nullptr),
+                        QGenericArgument val1 = QGenericArgument(),
+                        QGenericArgument val2 = QGenericArgument(),
+                        QGenericArgument val3 = QGenericArgument(),
+                        QGenericArgument val4 = QGenericArgument(),
+                        QGenericArgument val5 = QGenericArgument(),
+                        QGenericArgument val6 = QGenericArgument(),
+                        QGenericArgument val7 = QGenericArgument(),
+                        QGenericArgument val8 = QGenericArgument(),
+                        QGenericArgument val9 = QGenericArgument()) const;
     inline bool invokeOnGadget(void *gadget,
-                       QGenericArgument val0 = QGenericArgument(0),
-                       QGenericArgument val1 = QGenericArgument(),
-                       QGenericArgument val2 = QGenericArgument(),
-                       QGenericArgument val3 = QGenericArgument(),
-                       QGenericArgument val4 = QGenericArgument(),
-                       QGenericArgument val5 = QGenericArgument(),
-                       QGenericArgument val6 = QGenericArgument(),
-                       QGenericArgument val7 = QGenericArgument(),
-                       QGenericArgument val8 = QGenericArgument(),
-                       QGenericArgument val9 = QGenericArgument()) const
+                               QGenericArgument val0 = QGenericArgument(nullptr),
+                               QGenericArgument val1 = QGenericArgument(),
+                               QGenericArgument val2 = QGenericArgument(),
+                               QGenericArgument val3 = QGenericArgument(),
+                               QGenericArgument val4 = QGenericArgument(),
+                               QGenericArgument val5 = QGenericArgument(),
+                               QGenericArgument val6 = QGenericArgument(),
+                               QGenericArgument val7 = QGenericArgument(),
+                               QGenericArgument val8 = QGenericArgument(),
+                               QGenericArgument val9 = QGenericArgument()) const
     {
         return invokeOnGadget(gadget, QGenericReturnArgument(),
-                      val0, val1, val2, val3, val4, val5, val6, val7, val8, val9);
+                              val0, val1, val2, val3, val4, val5, val6, val7, val8, val9);
     }
 
-    inline bool isValid() const { return mobj != 0; }
+    inline bool isValid() const { return mobj != nullptr; }
 
-#ifdef Q_QDOC
-    static QMetaMethod fromSignal(PointerToMemberFunction signal);
-#else
-    template <typename Func>
-    static inline QMetaMethod fromSignal(Func signal)
+    template <typename PointerToMemberFunction>
+    static inline QMetaMethod fromSignal(PointerToMemberFunction signal)
     {
-        typedef QtPrivate::FunctionPointer<Func> SignalType;
+        typedef QtPrivate::FunctionPointer<PointerToMemberFunction> SignalType;
         Q_STATIC_ASSERT_X(QtPrivate::HasQ_OBJECT_Macro<typename SignalType::Object>::Value,
                           "No Q_OBJECT in the class with the signal");
         return fromSignalImpl(&SignalType::Object::staticMetaObject,
                               reinterpret_cast<void **>(&signal));
     }
-#endif
 
 private:
 #if QT_DEPRECATED_SINCE(5,0)
     // signature() has been renamed to methodSignature() in Qt 5.
     // Warning, that function returns a QByteArray; check the life time if
     // you convert to char*.
-    char *signature(struct renamedInQt5_warning_checkTheLifeTime * = 0) Q_DECL_EQ_DELETE;
+    char *signature(struct renamedInQt5_warning_checkTheLifeTime * = nullptr) = delete;
 #endif
     static QMetaMethod fromSignalImpl(const QMetaObject *, void **);
 
@@ -204,10 +205,12 @@ inline bool operator!=(const QMetaMethod &m1, const QMetaMethod &m2)
 class Q_CORE_EXPORT QMetaEnum
 {
 public:
-    Q_DECL_CONSTEXPR inline QMetaEnum() : mobj(0),handle(0) {}
+    Q_DECL_CONSTEXPR inline QMetaEnum() : mobj(nullptr), handle(0) {}
 
     const char *name() const;
+    const char *enumName() const;
     bool isFlag() const;
+    bool isScoped() const;
 
     int keyCount() const;
     const char *key(int index) const;
@@ -215,18 +218,19 @@ public:
 
     const char *scope() const;
 
-    int keyToValue(const char *key, bool *ok = 0) const;
+    int keyToValue(const char *key, bool *ok = nullptr) const;
     const char* valueToKey(int value) const;
-    int keysToValue(const char * keys, bool *ok = 0) const;
+    int keysToValue(const char * keys, bool *ok = nullptr) const;
     QByteArray valueToKeys(int value) const;
 
     inline const QMetaObject *enclosingMetaObject() const { return mobj; }
 
-    inline bool isValid() const { return name() != 0; }
+    inline bool isValid() const { return name() != nullptr; }
 
     template<typename T> static QMetaEnum fromType() {
         Q_STATIC_ASSERT_X(QtPrivate::IsQEnumHelper<T>::Value,
-                          "QMetaEnum::fromType only works with enums declared as Q_ENUM or Q_FLAG");
+                          "QMetaEnum::fromType only works with enums declared as "
+                          "Q_ENUM, Q_ENUM_NS, Q_FLAG or Q_FLAG_NS");
         const QMetaObject *metaObject = qt_getEnumMetaObject(T());
         const char *name = qt_getEnumName(T());
         return metaObject->enumerator(metaObject->indexOfEnumerator(name));
@@ -249,17 +253,21 @@ public:
     QVariant::Type type() const;
     int userType() const;
     int propertyIndex() const;
+    int relativePropertyIndex() const;
 
     bool isReadable() const;
     bool isWritable() const;
     bool isResettable() const;
-    bool isDesignable(const QObject *obj = 0) const;
-    bool isScriptable(const QObject *obj = 0) const;
-    bool isStored(const QObject *obj = 0) const;
-    bool isEditable(const QObject *obj = 0) const;
-    bool isUser(const QObject *obj = 0) const;
+    bool isDesignable(const QObject *obj = nullptr) const;
+    bool isScriptable(const QObject *obj = nullptr) const;
+    bool isStored(const QObject *obj = nullptr) const;
+#if QT_DEPRECATED_SINCE(5, 15)
+    QT_DEPRECATED_VERSION_5_15 bool isEditable(const QObject *obj = nullptr) const;
+#endif
+    bool isUser(const QObject *obj = nullptr) const;
     bool isConstant() const;
     bool isFinal() const;
+    bool isRequired() const;
 
     bool isFlagType() const;
     bool isEnumType() const;
@@ -297,7 +305,7 @@ private:
 class Q_CORE_EXPORT QMetaClassInfo
 {
 public:
-    Q_DECL_CONSTEXPR inline QMetaClassInfo() : mobj(0),handle(0) {}
+    Q_DECL_CONSTEXPR inline QMetaClassInfo() : mobj(nullptr), handle(0) {}
     const char *name() const;
     const char *value() const;
     inline const QMetaObject *enclosingMetaObject() const { return mobj; }

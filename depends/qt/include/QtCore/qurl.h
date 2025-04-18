@@ -1,32 +1,38 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Copyright (C) 2012 Intel Corporation.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2016 Intel Corporation.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -42,11 +48,9 @@
 #include <QtCore/qpair.h>
 #include <QtCore/qglobal.h>
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_DARWIN) || defined(Q_QDOC)
 Q_FORWARD_DECLARE_CF_TYPE(CFURL);
-#  ifdef __OBJC__
 Q_FORWARD_DECLARE_OBJC_CLASS(NSURL);
-#  endif
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -65,8 +69,8 @@ public:
     Q_DECL_CONSTEXPR inline QUrlTwoFlags(E1 f) : i(f) {}
     Q_DECL_CONSTEXPR inline QUrlTwoFlags(E2 f) : i(f) {}
     Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlag f) : i(f) {}
-    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E1> f) : i(f.operator int()) {}
-    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E2> f) : i(f.operator int()) {}
+    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E1> f) : i(f.operator typename QFlags<E1>::Int()) {}
+    Q_DECL_CONSTEXPR inline QUrlTwoFlags(QFlags<E2> f) : i(f.operator typename QFlags<E2>::Int()) {}
     Q_DECL_CONSTEXPR inline QUrlTwoFlags(Zero = 0) : i(0) {}
 
     inline QUrlTwoFlags &operator&=(int mask) { i &= mask; return *this; }
@@ -115,7 +119,7 @@ class QTypeInfo<QUrlTwoFlags<E1, E2> > : public QTypeInfoMerger<QUrlTwoFlags<E1,
 
 class QUrl;
 // qHash is a friend, but we can't use default arguments for friends (§8.3.6.4)
-Q_CORE_EXPORT uint qHash(const QUrl &url, uint seed = 0) Q_DECL_NOTHROW;
+Q_CORE_EXPORT uint qHash(const QUrl &url, uint seed = 0) noexcept;
 
 class Q_CORE_EXPORT QUrl
 {
@@ -158,6 +162,12 @@ public:
     };
     Q_DECLARE_FLAGS(ComponentFormattingOptions, ComponentFormattingOption)
 #ifdef Q_QDOC
+private:
+    // We need to let qdoc think that FormattingOptions is a normal QFlags, but
+    // it needs to be a QUrlTwoFlags for compiling default arguments of somme functions.
+    template<typename T> struct QFlags : QUrlTwoFlags<T, ComponentFormattingOption>
+    { using QUrlTwoFlags<T, ComponentFormattingOption>::QUrlTwoFlags; };
+public:
     Q_DECLARE_FLAGS(FormattingOptions, UrlFormattingOption)
 #else
     typedef QUrlTwoFlags<UrlFormattingOption, ComponentFormattingOption> FormattingOptions;
@@ -172,21 +182,19 @@ public:
     QUrl(const QString &url, ParsingMode mode = TolerantMode);
     QUrl &operator=(const QString &url);
 #endif
-#ifdef Q_COMPILER_RVALUE_REFS
-    QUrl(QUrl &&other) Q_DECL_NOTHROW : d(other.d)
-    { other.d = Q_NULLPTR; }
-    inline QUrl &operator=(QUrl &&other) Q_DECL_NOTHROW
+    QUrl(QUrl &&other) noexcept : d(other.d)
+    { other.d = nullptr; }
+    inline QUrl &operator=(QUrl &&other) noexcept
     { qSwap(d, other.d); return *this; }
-#endif
     ~QUrl();
 
-    inline void swap(QUrl &other) Q_DECL_NOTHROW { qSwap(d, other.d); }
+    inline void swap(QUrl &other) noexcept { qSwap(d, other.d); }
 
     void setUrl(const QString &url, ParsingMode mode = TolerantMode);
     QString url(FormattingOptions options = FormattingOptions(PrettyDecoded)) const;
     QString toString(FormattingOptions options = FormattingOptions(PrettyDecoded)) const;
     QString toDisplayString(FormattingOptions options = FormattingOptions(PrettyDecoded)) const;
-    QUrl adjusted(FormattingOptions options) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QUrl adjusted(FormattingOptions options) const;
 
     QByteArray toEncoded(FormattingOptions options = FullyEncoded) const;
     static QUrl fromEncoded(const QByteArray &url, ParsingMode mode = TolerantMode);
@@ -225,7 +233,11 @@ public:
 
     void setHost(const QString &host, ParsingMode mode = DecodedMode);
     QString host(ComponentFormattingOptions = FullyDecoded) const;
-    QString topLevelDomain(ComponentFormattingOptions options = FullyDecoded) const;
+#if QT_DEPRECATED_SINCE(5, 15)
+#if QT_CONFIG(topleveldomain)
+    QT_DEPRECATED QString topLevelDomain(ComponentFormattingOptions options = FullyDecoded) const;
+#endif
+#endif // QT_DEPRECATED_SINCE(5, 15)
 
     void setPort(int port);
     int port(int defaultPort = -1) const;
@@ -243,7 +255,7 @@ public:
     QString fragment(ComponentFormattingOptions options = PrettyDecoded) const;
     void setFragment(const QString &fragment, ParsingMode mode = TolerantMode);
 
-    QUrl resolved(const QUrl &relative) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QUrl resolved(const QUrl &relative) const;
 
     bool isRelative() const;
     bool isParentOf(const QUrl &url) const;
@@ -265,13 +277,11 @@ public:
     static QByteArray toPercentEncoding(const QString &,
                                         const QByteArray &exclude = QByteArray(),
                                         const QByteArray &include = QByteArray());
-#if defined(Q_OS_MAC) || defined(Q_QDOC)
+#if defined(Q_OS_DARWIN) || defined(Q_QDOC)
     static QUrl fromCFURL(CFURLRef url);
     CFURLRef toCFURL() const Q_DECL_CF_RETURNS_RETAINED;
-#  if defined(__OBJC__) || defined(Q_QDOC)
     static QUrl fromNSURL(const NSURL *url);
     NSURL *toNSURL() const Q_DECL_NS_RETURNS_AUTORELEASED;
-#  endif
 #endif
 
 #if QT_DEPRECATED_SINCE(5,0)
@@ -351,7 +361,7 @@ public:
     static QList<QUrl> fromStringList(const QStringList &uris, ParsingMode mode = TolerantMode);
 
     static void setIdnWhitelist(const QStringList &);
-    friend Q_CORE_EXPORT uint qHash(const QUrl &url, uint seed) Q_DECL_NOTHROW;
+    friend Q_CORE_EXPORT uint qHash(const QUrl &url, uint seed) noexcept;
 
 private:
     QUrlPrivate *d;
@@ -366,6 +376,7 @@ Q_DECLARE_SHARED(QUrl)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QUrl::ComponentFormattingOptions)
 //Q_DECLARE_OPERATORS_FOR_FLAGS(QUrl::FormattingOptions)
 
+#ifndef Q_QDOC
 Q_DECL_CONSTEXPR inline QUrl::FormattingOptions operator|(QUrl::UrlFormattingOption f1, QUrl::UrlFormattingOption f2)
 { return QUrl::FormattingOptions(f1) | f2; }
 Q_DECL_CONSTEXPR inline QUrl::FormattingOptions operator|(QUrl::UrlFormattingOption f1, QUrl::FormattingOptions f2)
@@ -393,6 +404,7 @@ Q_DECL_CONSTEXPR inline QUrl::FormattingOptions operator|(QUrl::ComponentFormatt
 
 //inline QUrl::UrlFormattingOption &operator=(const QUrl::UrlFormattingOption &i, QUrl::ComponentFormattingOptions f)
 //{ i = int(f); f; }
+#endif // Q_QDOC
 
 #ifndef QT_NO_DATASTREAM
 Q_CORE_EXPORT QDataStream &operator<<(QDataStream &, const QUrl &);

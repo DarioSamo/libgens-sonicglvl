@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -39,9 +45,9 @@
 QT_BEGIN_NAMESPACE
 
 
-#ifndef QT_NO_THREAD
+#if QT_CONFIG(thread)
 
-struct QReadWriteLockPrivate;
+class QReadWriteLockPrivate;
 
 class Q_CORE_EXPORT QReadWriteLock
 {
@@ -63,8 +69,10 @@ public:
 
 private:
     Q_DISABLE_COPY(QReadWriteLock)
-    QReadWriteLockPrivate *d;
+    QAtomicPointer<QReadWriteLockPrivate> d_ptr;
 
+    enum StateForWaitCondition { LockedForRead, LockedForWrite, Unlocked, RecursivelyLocked };
+    StateForWaitCondition stateForWaitCondition() const;
     friend class QWaitCondition;
 };
 
@@ -166,24 +174,24 @@ inline QWriteLocker::QWriteLocker(QReadWriteLock *areadWriteLock)
 #pragma warning( pop )
 #endif
 
-#else // QT_NO_THREAD
+#else // QT_CONFIG(thread)
 
 class Q_CORE_EXPORT QReadWriteLock
 {
 public:
     enum RecursionMode { NonRecursive, Recursive };
-    inline explicit QReadWriteLock(RecursionMode = NonRecursive) Q_DECL_NOTHROW { }
+    inline explicit QReadWriteLock(RecursionMode = NonRecursive) noexcept { }
     inline ~QReadWriteLock() { }
 
-    static inline void lockForRead() Q_DECL_NOTHROW { }
-    static inline bool tryLockForRead() Q_DECL_NOTHROW { return true; }
-    static inline bool tryLockForRead(int timeout) Q_DECL_NOTHROW { Q_UNUSED(timeout); return true; }
+    void lockForRead() noexcept { }
+    bool tryLockForRead() noexcept { return true; }
+    bool tryLockForRead(int timeout) noexcept { Q_UNUSED(timeout); return true; }
 
-    static inline void lockForWrite() Q_DECL_NOTHROW { }
-    static inline bool tryLockForWrite() Q_DECL_NOTHROW { return true; }
-    static inline bool tryLockForWrite(int timeout) Q_DECL_NOTHROW { Q_UNUSED(timeout); return true; }
+    void lockForWrite() noexcept { }
+    bool tryLockForWrite() noexcept { return true; }
+    bool tryLockForWrite(int timeout) noexcept { Q_UNUSED(timeout); return true; }
 
-    static inline void unlock() Q_DECL_NOTHROW { }
+    void unlock() noexcept { }
 
 private:
     Q_DISABLE_COPY(QReadWriteLock)
@@ -192,12 +200,12 @@ private:
 class Q_CORE_EXPORT QReadLocker
 {
 public:
-    inline QReadLocker(QReadWriteLock *) Q_DECL_NOTHROW { }
-    inline ~QReadLocker() Q_DECL_NOTHROW { }
+    inline explicit QReadLocker(QReadWriteLock *) noexcept { }
+    inline ~QReadLocker() noexcept { }
 
-    static inline void unlock() Q_DECL_NOTHROW { }
-    static inline void relock() Q_DECL_NOTHROW { }
-    static inline QReadWriteLock *readWriteLock() Q_DECL_NOTHROW { return Q_NULLPTR; }
+    void unlock() noexcept { }
+    void relock() noexcept { }
+    QReadWriteLock *readWriteLock() noexcept { return nullptr; }
 
 private:
     Q_DISABLE_COPY(QReadLocker)
@@ -206,18 +214,18 @@ private:
 class Q_CORE_EXPORT QWriteLocker
 {
 public:
-    inline explicit QWriteLocker(QReadWriteLock *) Q_DECL_NOTHROW { }
-    inline ~QWriteLocker() Q_DECL_NOTHROW { }
+    inline explicit QWriteLocker(QReadWriteLock *) noexcept { }
+    inline ~QWriteLocker() noexcept { }
 
-    static inline void unlock() Q_DECL_NOTHROW { }
-    static inline void relock() Q_DECL_NOTHROW { }
-    static inline QReadWriteLock *readWriteLock() Q_DECL_NOTHROW { return Q_NULLPTR; }
+    void unlock() noexcept { }
+    void relock() noexcept { }
+    QReadWriteLock *readWriteLock() noexcept { return nullptr; }
 
 private:
     Q_DISABLE_COPY(QWriteLocker)
 };
 
-#endif // QT_NO_THREAD
+#endif // QT_CONFIG(thread)
 
 QT_END_NAMESPACE
 

@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtGui module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -34,6 +40,7 @@
 #ifndef QFONTMETRICS_H
 #define QFONTMETRICS_H
 
+#include <QtGui/qtguiglobal.h>
 #include <QtGui/qfont.h>
 #include <QtCore/qsharedpointer.h>
 #ifndef QT_INCLUDE_COMPAT
@@ -52,20 +59,31 @@ class Q_GUI_EXPORT QFontMetrics
 {
 public:
     explicit QFontMetrics(const QFont &);
-    QFontMetrics(const QFont &, QPaintDevice *pd);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QFontMetrics(const QFont &font, QPaintDevice *pd);
+#ifndef Q_QDOC
+    // the template is necessary to make QFontMetrics(font,nullptr) and QFontMetrics(font,NULL)
+    // not ambiguous. Implementation detail that should not be documented.
+    template<char = 0>
+#endif
+    QFontMetrics(const QFont &font, const QPaintDevice *pd)
+        : QFontMetrics(font, const_cast<QPaintDevice*>(pd))
+    {}
+#else
+    QFontMetrics(const QFont &font, const QPaintDevice *pd);
+#endif
     QFontMetrics(const QFontMetrics &);
     ~QFontMetrics();
 
     QFontMetrics &operator=(const QFontMetrics &);
-#ifdef Q_COMPILER_RVALUE_REFS
-    inline QFontMetrics &operator=(QFontMetrics &&other) Q_DECL_NOEXCEPT
+    inline QFontMetrics &operator=(QFontMetrics &&other) noexcept
     { qSwap(d, other.d); return *this; }
-#endif
 
-    void swap(QFontMetrics &other) Q_DECL_NOEXCEPT
+    void swap(QFontMetrics &other) noexcept
     { qSwap(d, other.d); }
 
     int ascent() const;
+    int capHeight() const;
     int descent() const;
     int height() const;
     int leading() const;
@@ -82,20 +100,31 @@ public:
 
     int leftBearing(QChar) const;
     int rightBearing(QChar) const;
-    int width(const QString &, int len = -1) const;
-    int width(const QString &, int len, int flags) const;
 
+#if QT_DEPRECATED_SINCE(5, 11)
+    QT_DEPRECATED_X("Use QFontMetrics::horizontalAdvance")
+    int width(const QString &, int len = -1) const;
+    QT_DEPRECATED_X("Use QFontMetrics::horizontalAdvance")
+    int width(const QString &, int len, int flags) const;
+    QT_DEPRECATED_X("Use QFontMetrics::horizontalAdvance")
     int width(QChar) const;
-    int charWidth(const QString &str, int pos) const;
+#endif
+
+    int horizontalAdvance(const QString &, int len = -1) const;
+    int horizontalAdvance(QChar) const;
+
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QT_DEPRECATED int charWidth(const QString &str, int pos) const;
+#endif
 
     QRect boundingRect(QChar) const;
 
     QRect boundingRect(const QString &text) const;
-    QRect boundingRect(const QRect &r, int flags, const QString &text, int tabstops=0, int *tabarray=0) const;
+    QRect boundingRect(const QRect &r, int flags, const QString &text, int tabstops = 0, int *tabarray = nullptr) const;
     inline QRect boundingRect(int x, int y, int w, int h, int flags, const QString &text,
-                              int tabstops=0, int *tabarray=0) const
+                              int tabstops = 0, int *tabarray = nullptr) const
         { return boundingRect(QRect(x, y, w, h), flags, text, tabstops, tabarray); }
-    QSize size(int flags, const QString& str, int tabstops=0, int *tabarray=0) const;
+    QSize size(int flags, const QString& str, int tabstops = 0, int *tabarray = nullptr) const;
 
     QRect tightBoundingRect(const QString &text) const;
 
@@ -105,6 +134,8 @@ public:
     int overlinePos() const;
     int strikeOutPos() const;
     int lineWidth() const;
+
+    qreal fontDpi() const;
 
     bool operator==(const QFontMetrics &other) const;
     inline bool operator !=(const QFontMetrics &other) const { return !operator==(other); }
@@ -121,22 +152,33 @@ Q_DECLARE_SHARED(QFontMetrics)
 class Q_GUI_EXPORT QFontMetricsF
 {
 public:
-    explicit QFontMetricsF(const QFont &);
-    QFontMetricsF(const QFont &, QPaintDevice *pd);
+    explicit QFontMetricsF(const QFont &font);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QFontMetricsF(const QFont &font, QPaintDevice *pd);
+#ifndef Q_QDOC
+    // the template is necessary to make QFontMetrics(font,nullptr) and QFontMetrics(font,NULL)
+    // not ambiguous. Implementation detail that should not be documented.
+    template<char = 0>
+#endif
+    QFontMetricsF(const QFont &font, const QPaintDevice *pd)
+        : QFontMetricsF(font, const_cast<QPaintDevice*>(pd))
+    {}
+#else
+    QFontMetricsF(const QFont &font, const QPaintDevice *pd);
+#endif
     QFontMetricsF(const QFontMetrics &);
     QFontMetricsF(const QFontMetricsF &);
     ~QFontMetricsF();
 
     QFontMetricsF &operator=(const QFontMetricsF &);
     QFontMetricsF &operator=(const QFontMetrics &);
-#ifdef Q_COMPILER_RVALUE_REFS
-    inline QFontMetricsF &operator=(QFontMetricsF &&other)
+    inline QFontMetricsF &operator=(QFontMetricsF &&other) noexcept
     { qSwap(d, other.d); return *this; }
-#endif
 
-    void swap(QFontMetricsF &other) { qSwap(d, other.d); }
+    void swap(QFontMetricsF &other) noexcept { qSwap(d, other.d); }
 
     qreal ascent() const;
+    qreal capHeight() const;
     qreal descent() const;
     qreal height() const;
     qreal leading() const;
@@ -153,14 +195,19 @@ public:
 
     qreal leftBearing(QChar) const;
     qreal rightBearing(QChar) const;
-    qreal width(const QString &string) const;
 
+#if QT_DEPRECATED_SINCE(5, 11)
+    qreal width(const QString &string) const;
     qreal width(QChar) const;
+#endif
+
+    qreal horizontalAdvance(const QString &string, int length = -1) const;
+    qreal horizontalAdvance(QChar) const;
 
     QRectF boundingRect(const QString &string) const;
     QRectF boundingRect(QChar) const;
-    QRectF boundingRect(const QRectF &r, int flags, const QString& string, int tabstops=0, int *tabarray=0) const;
-    QSizeF size(int flags, const QString& str, int tabstops=0, int *tabarray=0) const;
+    QRectF boundingRect(const QRectF &r, int flags, const QString& string, int tabstops = 0, int *tabarray = nullptr) const;
+    QSizeF size(int flags, const QString& str, int tabstops = 0, int *tabarray = nullptr) const;
 
     QRectF tightBoundingRect(const QString &text) const;
 
@@ -170,6 +217,8 @@ public:
     qreal overlinePos() const;
     qreal strikeOutPos() const;
     qreal lineWidth() const;
+
+    qreal fontDpi() const;
 
     bool operator==(const QFontMetricsF &other) const;
     inline bool operator !=(const QFontMetricsF &other) const { return !operator==(other); }

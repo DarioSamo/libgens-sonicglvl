@@ -1,31 +1,37 @@
 /****************************************************************************
 **
 ** Copyright (C) 2013 John Layt <jlayt@kde.org>
-** Contact: http://www.qt.io/licensing/
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -39,6 +45,13 @@
 #include <QtCore/qlocale.h>
 #include <QtCore/qdatetime.h>
 
+QT_REQUIRE_CONFIG(timezone);
+
+#if (defined(Q_OS_DARWIN) || defined(Q_QDOC)) && !defined(QT_NO_SYSTEMLOCALE)
+Q_FORWARD_DECLARE_CF_TYPE(CFTimeZone);
+Q_FORWARD_DECLARE_OBJC_CLASS(NSTimeZone);
+#endif
+
 QT_BEGIN_NAMESPACE
 
 class QTimeZonePrivate;
@@ -46,6 +59,14 @@ class QTimeZonePrivate;
 class Q_CORE_EXPORT QTimeZone
 {
 public:
+    // Sane UTC offsets range from -14 to +14 hours:
+    enum {
+        // No known zone > 12 hrs West of Greenwich (Baker Island, USA)
+        MinUtcOffsetSecs = -14 * 3600,
+        // No known zone > 14 hrs East of Greenwich (Kiritimati, Christmas Island, Kiribati)
+        MaxUtcOffsetSecs = +14 * 3600
+    };
+
     enum TimeType {
         StandardTime = 0,
         DaylightTime = 1,
@@ -68,7 +89,7 @@ public:
     };
     typedef QVector<OffsetData> OffsetDataList;
 
-    QTimeZone();
+    QTimeZone() noexcept;
     explicit QTimeZone(const QByteArray &ianaId);
     explicit QTimeZone(int offsetSeconds);
     /*implicit*/ QTimeZone(const QByteArray &zoneId, int offsetSeconds, const QString &name,
@@ -78,11 +99,9 @@ public:
     ~QTimeZone();
 
     QTimeZone &operator=(const QTimeZone &other);
- #ifdef Q_COMPILER_RVALUE_REFS
-    QTimeZone &operator=(QTimeZone &&other) Q_DECL_NOTHROW { swap(other); return *this; }
-#endif
+    QTimeZone &operator=(QTimeZone &&other) noexcept { swap(other); return *this; }
 
-    void swap(QTimeZone &other) Q_DECL_NOTHROW
+    void swap(QTimeZone &other) noexcept
     { d.swap(other.d); }
 
     bool operator==(const QTimeZone &other) const;
@@ -133,6 +152,13 @@ public:
     static QList<QByteArray> windowsIdToIanaIds(const QByteArray &windowsId);
     static QList<QByteArray> windowsIdToIanaIds(const QByteArray &windowsId,
                                                  QLocale::Country country);
+
+#if (defined(Q_OS_DARWIN) || defined(Q_QDOC)) && !defined(QT_NO_SYSTEMLOCALE)
+    static QTimeZone fromCFTimeZone(CFTimeZoneRef timeZone);
+    CFTimeZoneRef toCFTimeZone() const Q_DECL_CF_RETURNS_RETAINED;
+    static QTimeZone fromNSTimeZone(const NSTimeZone *timeZone);
+    NSTimeZone *toNSTimeZone() const Q_DECL_NS_RETURNS_AUTORELEASED;
+#endif
 
 private:
     QTimeZone(QTimeZonePrivate &dd);

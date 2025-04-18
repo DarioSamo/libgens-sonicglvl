@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -44,21 +50,19 @@ class Q_CORE_EXPORT QBitArray
 {
     friend Q_CORE_EXPORT QDataStream &operator<<(QDataStream &, const QBitArray &);
     friend Q_CORE_EXPORT QDataStream &operator>>(QDataStream &, QBitArray &);
-    friend Q_CORE_EXPORT uint qHash(const QBitArray &key, uint seed) Q_DECL_NOTHROW;
+    friend Q_CORE_EXPORT uint qHash(const QBitArray &key, uint seed) noexcept;
     QByteArray d;
 
 public:
-    inline QBitArray() {}
+    inline QBitArray() noexcept {}
     explicit QBitArray(int size, bool val = false);
     QBitArray(const QBitArray &other) : d(other.d) {}
     inline QBitArray &operator=(const QBitArray &other) { d = other.d; return *this; }
-#ifdef Q_COMPILER_RVALUE_REFS
-    inline QBitArray(QBitArray &&other) Q_DECL_NOTHROW : d(std::move(other.d)) {}
-    inline QBitArray &operator=(QBitArray &&other) Q_DECL_NOTHROW
+    inline QBitArray(QBitArray &&other) noexcept : d(std::move(other.d)) {}
+    inline QBitArray &operator=(QBitArray &&other) noexcept
     { qSwap(d, other.d); return *this; }
-#endif
 
-    inline void swap(QBitArray &other) Q_DECL_NOTHROW { qSwap(d, other.d); }
+    inline void swap(QBitArray &other) noexcept { qSwap(d, other.d); }
 
     inline int size() const { return (d.size() << 3) - *d.constData(); }
     inline int count() const { return (d.size() << 3) - *d.constData(); }
@@ -97,6 +101,9 @@ public:
     void fill(bool val, int first, int last);
 
     inline void truncate(int pos) { if (pos < size()) resize(pos); }
+
+    const char *bits() const { return isEmpty() ? nullptr : d.constData() + 1; }
+    static QBitArray fromBits(const char *data, qsizetype len);
 
 public:
     typedef QByteArray::DataPtr DataPtr;
@@ -142,6 +149,7 @@ private:
     inline QBitRef(QBitArray& array, int idx) : a(array), i(idx) {}
     friend class QBitArray;
 public:
+    QBitRef(const QBitRef &) = default;
     inline operator bool() const { return a.testBit(i); }
     inline bool operator!() const { return !a.testBit(i); }
     QBitRef& operator=(const QBitRef& val) { a.setBit(i, val); return *this; }

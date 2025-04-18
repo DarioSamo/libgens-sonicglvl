@@ -1,31 +1,38 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2016 Intel Corporation.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -43,16 +50,15 @@
 #include <stdarg.h>
 
 #include <string>
+#include <iterator>
 
 #ifdef truncate
 #error qbytearray.h must be included before any header file that defines truncate
 #endif
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_DARWIN) || defined(Q_QDOC)
 Q_FORWARD_DECLARE_CF_TYPE(CFData);
-#  ifdef __OBJC__
 Q_FORWARD_DECLARE_OBJC_CLASS(NSData);
-#  endif
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -93,14 +99,15 @@ inline int qstrncmp(const char *str1, const char *str2, uint len)
 }
 Q_CORE_EXPORT int qstricmp(const char *, const char *);
 Q_CORE_EXPORT int qstrnicmp(const char *, const char *, uint len);
+Q_CORE_EXPORT int qstrnicmp(const char *, qsizetype, const char *, qsizetype = -1);
 
 // implemented in qvsnprintf.cpp
 Q_CORE_EXPORT int qvsnprintf(char *str, size_t n, const char *fmt, va_list ap);
 Q_CORE_EXPORT int qsnprintf(char *str, size_t n, const char *fmt, ...);
 
 // qChecksum: Internet checksum
-
-Q_CORE_EXPORT quint16 qChecksum(const char *s, uint len);
+Q_CORE_EXPORT quint16 qChecksum(const char *s, uint len);                            // ### Qt 6: Remove
+Q_CORE_EXPORT quint16 qChecksum(const char *s, uint len, Qt::ChecksumType standard); // ### Qt 6: Use Qt::ChecksumType standard = Qt::ChecksumIso3309
 
 class QByteRef;
 class QString;
@@ -134,8 +141,6 @@ struct QByteArrayDataPtr
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(size, sizeof(QByteArrayData)) \
     /**/
 
-#if defined(Q_COMPILER_LAMBDA)
-
 #  define QByteArrayLiteral(str) \
     ([]() -> QByteArray { \
         enum { Size = sizeof(str) - 1 }; \
@@ -143,18 +148,9 @@ struct QByteArrayDataPtr
             Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER(Size), \
             str }; \
         QByteArrayDataPtr holder = { qbytearray_literal.data_ptr() }; \
-        const QByteArray ba(holder); \
-        return ba; \
+        return QByteArray(holder); \
     }()) \
     /**/
-
-#endif
-
-#ifndef QByteArrayLiteral
-// no lambdas, not GCC, just return a temporary QByteArray
-
-# define QByteArrayLiteral(str) QByteArray(str, sizeof(str) - 1)
-#endif
 
 class Q_CORE_EXPORT QByteArray
 {
@@ -162,63 +158,72 @@ private:
     typedef QTypedArrayData<char> Data;
 
 public:
-    // undocumented:
-    static const quint64 MaxSize = (1 << 30) - sizeof(Data);
-
     enum Base64Option {
         Base64Encoding = 0,
         Base64UrlEncoding = 1,
 
         KeepTrailingEquals = 0,
-        OmitTrailingEquals = 2
+        OmitTrailingEquals = 2,
+
+        IgnoreBase64DecodingErrors = 0,
+        AbortOnBase64DecodingErrors = 4,
     };
     Q_DECLARE_FLAGS(Base64Options, Base64Option)
 
-    inline QByteArray() Q_DECL_NOTHROW;
+    enum class Base64DecodingStatus {
+        Ok,
+        IllegalInputLength,
+        IllegalCharacter,
+        IllegalPadding,
+    };
+
+    inline QByteArray() noexcept;
     QByteArray(const char *, int size = -1);
     QByteArray(int size, char c);
     QByteArray(int size, Qt::Initialization);
-    inline QByteArray(const QByteArray &) Q_DECL_NOTHROW;
+    inline QByteArray(const QByteArray &) noexcept;
     inline ~QByteArray();
 
-    QByteArray &operator=(const QByteArray &) Q_DECL_NOTHROW;
+    QByteArray &operator=(const QByteArray &) noexcept;
     QByteArray &operator=(const char *str);
-#ifdef Q_COMPILER_RVALUE_REFS
-    inline QByteArray(QByteArray && other) Q_DECL_NOTHROW : d(other.d) { other.d = Data::sharedNull(); }
-    inline QByteArray &operator=(QByteArray &&other) Q_DECL_NOTHROW
+    inline QByteArray(QByteArray && other) noexcept : d(other.d) { other.d = Data::sharedNull(); }
+    inline QByteArray &operator=(QByteArray &&other) noexcept
     { qSwap(d, other.d); return *this; }
-#endif
 
-    inline void swap(QByteArray &other) Q_DECL_NOTHROW
+    inline void swap(QByteArray &other) noexcept
     { qSwap(d, other.d); }
 
     inline int size() const;
-    bool isEmpty() const;
+    inline bool isEmpty() const;
     void resize(int size);
 
     QByteArray &fill(char c, int size = -1);
 
-    int capacity() const;
-    void reserve(int size);
-    void squeeze();
+    inline int capacity() const;
+    inline void reserve(int size);
+    inline void squeeze();
 
 #ifndef QT_NO_CAST_FROM_BYTEARRAY
-    operator const char *() const;
-    operator const void *() const;
+    inline operator const char *() const;
+    inline operator const void *() const;
 #endif
-    char *data();
-    const char *data() const;
+    inline char *data();
+    inline const char *data() const;
     inline const char *constData() const;
     inline void detach();
-    bool isDetached() const;
+    inline bool isDetached() const;
     inline bool isSharedWith(const QByteArray &other) const { return d == other.d; }
     void clear();
 
-    char at(int i) const;
-    char operator[](int i) const;
-    char operator[](uint i) const;
-    QByteRef operator[](int i);
-    QByteRef operator[](uint i);
+    inline char at(int i) const;
+    inline char operator[](int i) const;
+    inline char operator[](uint i) const;
+    Q_REQUIRED_RESULT inline QByteRef operator[](int i);
+    Q_REQUIRED_RESULT inline QByteRef operator[](uint i);
+    Q_REQUIRED_RESULT char front() const { return at(0); }
+    Q_REQUIRED_RESULT inline QByteRef front();
+    Q_REQUIRED_RESULT char back() const { return at(size() - 1); }
+    Q_REQUIRED_RESULT inline QByteRef back();
 
     int indexOf(char c, int from = 0) const;
     int indexOf(const char *c, int from = 0) const;
@@ -227,16 +232,21 @@ public:
     int lastIndexOf(const char *c, int from = -1) const;
     int lastIndexOf(const QByteArray &a, int from = -1) const;
 
-    bool contains(char c) const;
-    bool contains(const char *a) const;
-    bool contains(const QByteArray &a) const;
+    inline bool contains(char c) const;
+    inline bool contains(const char *a) const;
+    inline bool contains(const QByteArray &a) const;
     int count(char c) const;
     int count(const char *a) const;
     int count(const QByteArray &a) const;
 
-    QByteArray left(int len) const Q_REQUIRED_RESULT;
-    QByteArray right(int len) const Q_REQUIRED_RESULT;
-    QByteArray mid(int index, int len = -1) const Q_REQUIRED_RESULT;
+    inline int compare(const char *c, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept;
+    inline int compare(const QByteArray &a, Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept;
+
+    Q_REQUIRED_RESULT QByteArray left(int len) const;
+    Q_REQUIRED_RESULT QByteArray right(int len) const;
+    Q_REQUIRED_RESULT QByteArray mid(int index, int len = -1) const;
+    Q_REQUIRED_RESULT QByteArray chopped(int len) const
+    { Q_ASSERT(len >= 0); Q_ASSERT(len <= size()); return left(size() - len); }
 
     bool startsWith(const QByteArray &a) const;
     bool startsWith(char c) const;
@@ -246,55 +256,61 @@ public:
     bool endsWith(char c) const;
     bool endsWith(const char *c) const;
 
+    bool isUpper() const;
+    bool isLower() const;
+
     void truncate(int pos);
     void chop(int n);
 
-#if defined(Q_COMPILER_REF_QUALIFIERS) && !defined(QT_COMPILING_QSTRING_COMPAT_CPP)
-#  if defined(Q_CC_GNU)
+#if defined(Q_COMPILER_REF_QUALIFIERS) && !defined(QT_COMPILING_QSTRING_COMPAT_CPP) && !defined(Q_CLANG_QDOC)
+#  if defined(Q_CC_GNU) && !defined(Q_CC_CLANG) && !defined(Q_CC_INTEL) && !__has_cpp_attribute(nodiscard)
     // required due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61941
 #    pragma push_macro("Q_REQUIRED_RESULT")
 #    undef Q_REQUIRED_RESULT
 #    define Q_REQUIRED_RESULT
 #    define Q_REQUIRED_RESULT_pushed
 #  endif
-    QByteArray toLower() const & Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray toLower() const &
     { return toLower_helper(*this); }
-    QByteArray toLower() && Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray toLower() &&
     { return toLower_helper(*this); }
-    QByteArray toUpper() const & Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray toUpper() const &
     { return toUpper_helper(*this); }
-    QByteArray toUpper() && Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray toUpper() &&
     { return toUpper_helper(*this); }
-    QByteArray trimmed() const & Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray trimmed() const &
     { return trimmed_helper(*this); }
-    QByteArray trimmed() && Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray trimmed() &&
     { return trimmed_helper(*this); }
-    QByteArray simplified() const & Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray simplified() const &
     { return simplified_helper(*this); }
-    QByteArray simplified() && Q_REQUIRED_RESULT
+    Q_REQUIRED_RESULT QByteArray simplified() &&
     { return simplified_helper(*this); }
 #  ifdef Q_REQUIRED_RESULT_pushed
 #    pragma pop_macro("Q_REQUIRED_RESULT")
 #  endif
 #else
-    QByteArray toLower() const Q_REQUIRED_RESULT;
-    QByteArray toUpper() const Q_REQUIRED_RESULT;
-    QByteArray trimmed() const Q_REQUIRED_RESULT;
-    QByteArray simplified() const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QByteArray toLower() const;
+    Q_REQUIRED_RESULT QByteArray toUpper() const;
+    Q_REQUIRED_RESULT QByteArray trimmed() const;
+    Q_REQUIRED_RESULT QByteArray simplified() const;
 #endif
 
-    QByteArray leftJustified(int width, char fill = ' ', bool truncate = false) const Q_REQUIRED_RESULT;
-    QByteArray rightJustified(int width, char fill = ' ', bool truncate = false) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QByteArray leftJustified(int width, char fill = ' ', bool truncate = false) const;
+    Q_REQUIRED_RESULT QByteArray rightJustified(int width, char fill = ' ', bool truncate = false) const;
 
     QByteArray &prepend(char c);
+    inline QByteArray &prepend(int count, char c);
     QByteArray &prepend(const char *s);
     QByteArray &prepend(const char *s, int len);
     QByteArray &prepend(const QByteArray &a);
     QByteArray &append(char c);
+    inline QByteArray &append(int count, char c);
     QByteArray &append(const char *s);
     QByteArray &append(const char *s, int len);
     QByteArray &append(const QByteArray &a);
     QByteArray &insert(int i, char c);
+    QByteArray &insert(int i, int count, char c);
     QByteArray &insert(int i, const char *s);
     QByteArray &insert(int i, const char *s, int len);
     QByteArray &insert(int i, const QByteArray &a);
@@ -302,105 +318,124 @@ public:
     QByteArray &replace(int index, int len, const char *s);
     QByteArray &replace(int index, int len, const char *s, int alen);
     QByteArray &replace(int index, int len, const QByteArray &s);
-    QByteArray &replace(char before, const char *after);
+    inline QByteArray &replace(char before, const char *after);
     QByteArray &replace(char before, const QByteArray &after);
-    QByteArray &replace(const char *before, const char *after);
+    inline QByteArray &replace(const char *before, const char *after);
     QByteArray &replace(const char *before, int bsize, const char *after, int asize);
     QByteArray &replace(const QByteArray &before, const QByteArray &after);
-    QByteArray &replace(const QByteArray &before, const char *after);
+    inline QByteArray &replace(const QByteArray &before, const char *after);
     QByteArray &replace(const char *before, const QByteArray &after);
     QByteArray &replace(char before, char after);
-    QByteArray &operator+=(char c);
-    QByteArray &operator+=(const char *s);
-    QByteArray &operator+=(const QByteArray &a);
+    inline QByteArray &operator+=(char c);
+    inline QByteArray &operator+=(const char *s);
+    inline QByteArray &operator+=(const QByteArray &a);
 
     QList<QByteArray> split(char sep) const;
 
-    QByteArray repeated(int times) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QByteArray repeated(int times) const;
 
-#ifndef QT_NO_CAST_TO_ASCII
-    QT_ASCII_CAST_WARN QByteArray &append(const QString &s);
-    QT_ASCII_CAST_WARN QByteArray &insert(int i, const QString &s);
-    QT_ASCII_CAST_WARN QByteArray &replace(const QString &before, const char *after);
-    QT_ASCII_CAST_WARN QByteArray &replace(char c, const QString &after);
-    QT_ASCII_CAST_WARN QByteArray &replace(const QString &before, const QByteArray &after);
+#if !defined(QT_NO_CAST_TO_ASCII) && QT_DEPRECATED_SINCE(5, 15)
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    QByteArray &append(const QString &s);
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    QByteArray &insert(int i, const QString &s);
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    QByteArray &replace(const QString &before, const char *after);
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    QByteArray &replace(char c, const QString &after);
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    QByteArray &replace(const QString &before, const QByteArray &after);
 
-    QT_ASCII_CAST_WARN QByteArray &operator+=(const QString &s);
-    QT_ASCII_CAST_WARN int indexOf(const QString &s, int from = 0) const;
-    QT_ASCII_CAST_WARN int lastIndexOf(const QString &s, int from = -1) const;
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    QByteArray &operator+=(const QString &s);
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    int indexOf(const QString &s, int from = 0) const;
+    QT_DEPRECATED_VERSION_X_5_15("Use QString's toUtf8(), toLatin1() or toLocal8Bit()")
+    int lastIndexOf(const QString &s, int from = -1) const;
 #endif
-#ifndef QT_NO_CAST_FROM_ASCII
-    inline QT_ASCII_CAST_WARN bool operator==(const QString &s2) const;
-    inline QT_ASCII_CAST_WARN bool operator!=(const QString &s2) const;
-    inline QT_ASCII_CAST_WARN bool operator<(const QString &s2) const;
-    inline QT_ASCII_CAST_WARN bool operator>(const QString &s2) const;
-    inline QT_ASCII_CAST_WARN bool operator<=(const QString &s2) const;
-    inline QT_ASCII_CAST_WARN bool operator>=(const QString &s2) const;
+#if !defined(QT_NO_CAST_FROM_ASCII) && !defined(QT_RESTRICTED_CAST_FROM_ASCII)
+    inline bool operator==(const QString &s2) const;
+    inline bool operator!=(const QString &s2) const;
+    inline bool operator<(const QString &s2) const;
+    inline bool operator>(const QString &s2) const;
+    inline bool operator<=(const QString &s2) const;
+    inline bool operator>=(const QString &s2) const;
 #endif
 
-    short toShort(bool *ok = 0, int base = 10) const;
-    ushort toUShort(bool *ok = 0, int base = 10) const;
-    int toInt(bool *ok = 0, int base = 10) const;
-    uint toUInt(bool *ok = 0, int base = 10) const;
-    long toLong(bool *ok = 0, int base = 10) const;
-    ulong toULong(bool *ok = 0, int base = 10) const;
-    qlonglong toLongLong(bool *ok = 0, int base = 10) const;
-    qulonglong toULongLong(bool *ok = 0, int base = 10) const;
-    float toFloat(bool *ok = 0) const;
-    double toDouble(bool *ok = 0) const;
+    short toShort(bool *ok = nullptr, int base = 10) const;
+    ushort toUShort(bool *ok = nullptr, int base = 10) const;
+    int toInt(bool *ok = nullptr, int base = 10) const;
+    uint toUInt(bool *ok = nullptr, int base = 10) const;
+    long toLong(bool *ok = nullptr, int base = 10) const;
+    ulong toULong(bool *ok = nullptr, int base = 10) const;
+    qlonglong toLongLong(bool *ok = nullptr, int base = 10) const;
+    qulonglong toULongLong(bool *ok = nullptr, int base = 10) const;
+    float toFloat(bool *ok = nullptr) const;
+    double toDouble(bool *ok = nullptr) const;
     QByteArray toBase64(Base64Options options) const;
     QByteArray toBase64() const; // ### Qt6 merge with previous
     QByteArray toHex() const;
+    QByteArray toHex(char separator) const; // ### Qt6 merge with previous
     QByteArray toPercentEncoding(const QByteArray &exclude = QByteArray(),
                                  const QByteArray &include = QByteArray(),
                                  char percent = '%') const;
 
-    QByteArray &setNum(short, int base = 10);
-    QByteArray &setNum(ushort, int base = 10);
-    QByteArray &setNum(int, int base = 10);
-    QByteArray &setNum(uint, int base = 10);
+    inline QByteArray &setNum(short, int base = 10);
+    inline QByteArray &setNum(ushort, int base = 10);
+    inline QByteArray &setNum(int, int base = 10);
+    inline QByteArray &setNum(uint, int base = 10);
     QByteArray &setNum(qlonglong, int base = 10);
     QByteArray &setNum(qulonglong, int base = 10);
-    QByteArray &setNum(float, char f = 'g', int prec = 6);
+    inline QByteArray &setNum(float, char f = 'g', int prec = 6);
     QByteArray &setNum(double, char f = 'g', int prec = 6);
     QByteArray &setRawData(const char *a, uint n); // ### Qt 6: use an int
 
-    static QByteArray number(int, int base = 10) Q_REQUIRED_RESULT;
-    static QByteArray number(uint, int base = 10) Q_REQUIRED_RESULT;
-    static QByteArray number(qlonglong, int base = 10) Q_REQUIRED_RESULT;
-    static QByteArray number(qulonglong, int base = 10) Q_REQUIRED_RESULT;
-    static QByteArray number(double, char f = 'g', int prec = 6) Q_REQUIRED_RESULT;
-    static QByteArray fromRawData(const char *, int size) Q_REQUIRED_RESULT;
-    static QByteArray fromBase64(const QByteArray &base64, Base64Options options) Q_REQUIRED_RESULT;
-    static QByteArray fromBase64(const QByteArray &base64) Q_REQUIRED_RESULT; // ### Qt6 merge with previous
-    static QByteArray fromHex(const QByteArray &hexEncoded) Q_REQUIRED_RESULT;
-    static QByteArray fromPercentEncoding(const QByteArray &pctEncoded, char percent = '%') Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT static QByteArray number(int, int base = 10);
+    Q_REQUIRED_RESULT static QByteArray number(uint, int base = 10);
+    Q_REQUIRED_RESULT static QByteArray number(qlonglong, int base = 10);
+    Q_REQUIRED_RESULT static QByteArray number(qulonglong, int base = 10);
+    Q_REQUIRED_RESULT static QByteArray number(double, char f = 'g', int prec = 6);
+    Q_REQUIRED_RESULT static QByteArray fromRawData(const char *, int size);
 
-#if defined(Q_OS_MAC) || defined(Q_QDOC)
+    class FromBase64Result;
+    Q_REQUIRED_RESULT static FromBase64Result fromBase64Encoding(QByteArray &&base64, Base64Options options = Base64Encoding);
+    Q_REQUIRED_RESULT static FromBase64Result fromBase64Encoding(const QByteArray &base64, Base64Options options = Base64Encoding);
+    Q_REQUIRED_RESULT static QByteArray fromBase64(const QByteArray &base64, Base64Options options);
+    Q_REQUIRED_RESULT static QByteArray fromBase64(const QByteArray &base64); // ### Qt6 merge with previous
+    Q_REQUIRED_RESULT static QByteArray fromHex(const QByteArray &hexEncoded);
+    Q_REQUIRED_RESULT static QByteArray fromPercentEncoding(const QByteArray &pctEncoded, char percent = '%');
+
+#if defined(Q_OS_DARWIN) || defined(Q_QDOC)
     static QByteArray fromCFData(CFDataRef data);
     static QByteArray fromRawCFData(CFDataRef data);
     CFDataRef toCFData() const Q_DECL_CF_RETURNS_RETAINED;
     CFDataRef toRawCFData() const Q_DECL_CF_RETURNS_RETAINED;
-#  if defined(__OBJC__) || defined(Q_QDOC)
     static QByteArray fromNSData(const NSData *data);
     static QByteArray fromRawNSData(const NSData *data);
     NSData *toNSData() const Q_DECL_NS_RETURNS_AUTORELEASED;
     NSData *toRawNSData() const Q_DECL_NS_RETURNS_AUTORELEASED;
-#  endif
 #endif
 
     typedef char *iterator;
     typedef const char *const_iterator;
     typedef iterator Iterator;
     typedef const_iterator ConstIterator;
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator cbegin() const;
-    const_iterator constBegin() const;
-    iterator end();
-    const_iterator end() const;
-    const_iterator cend() const;
-    const_iterator constEnd() const;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    inline iterator begin();
+    inline const_iterator begin() const;
+    inline const_iterator cbegin() const;
+    inline const_iterator constBegin() const;
+    inline iterator end();
+    inline const_iterator end() const;
+    inline const_iterator cend() const;
+    inline const_iterator constEnd() const;
+    reverse_iterator rbegin() { return reverse_iterator(end()); }
+    reverse_iterator rend() { return reverse_iterator(begin()); }
+    const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+    const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+    const_reverse_iterator crbegin() const { return const_reverse_iterator(end()); }
+    const_reverse_iterator crend() const { return const_reverse_iterator(begin()); }
 
     // stl compatibility
     typedef int size_type;
@@ -410,12 +445,13 @@ public:
     typedef char *pointer;
     typedef const char *const_pointer;
     typedef char value_type;
-    void push_back(char c);
-    void push_back(const char *c);
-    void push_back(const QByteArray &a);
-    void push_front(char c);
-    void push_front(const char *c);
-    void push_front(const QByteArray &a);
+    inline void push_back(char c);
+    inline void push_back(const char *c);
+    inline void push_back(const QByteArray &a);
+    inline void push_front(char c);
+    inline void push_front(const char *c);
+    inline void push_front(const QByteArray &a);
+    void shrink_to_fit() { squeeze(); }
 
     static inline QByteArray fromStdString(const std::string &s);
     inline std::string toStdString() const;
@@ -455,7 +491,7 @@ public:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QByteArray::Base64Options)
 
-inline QByteArray::QByteArray() Q_DECL_NOTHROW : d(Data::sharedNull()) { }
+inline QByteArray::QByteArray() noexcept : d(Data::sharedNull()) { }
 inline QByteArray::~QByteArray() { if (!d->ref.deref()) Data::deallocate(d); }
 inline int QByteArray::size() const
 { return d->size; }
@@ -485,7 +521,7 @@ inline void QByteArray::detach()
 { if (d->ref.isShared() || (d->offset != sizeof(QByteArrayData))) reallocData(uint(d->size) + 1u, d->detachFlags()); }
 inline bool QByteArray::isDetached() const
 { return !d->ref.isShared(); }
-inline QByteArray::QByteArray(const QByteArray &a) Q_DECL_NOTHROW : d(a.d)
+inline QByteArray::QByteArray(const QByteArray &a) noexcept : d(a.d)
 { d->ref.ref(); }
 
 inline int QByteArray::capacity() const
@@ -513,21 +549,66 @@ inline void QByteArray::squeeze()
     }
 }
 
-class Q_CORE_EXPORT QByteRef {
+namespace QtPrivate {
+namespace DeprecatedRefClassBehavior {
+    enum class EmittingClass {
+        QByteRef,
+        QCharRef,
+    };
+
+    enum class WarningType {
+        OutOfRange,
+        DelayedDetach,
+    };
+
+    Q_CORE_EXPORT Q_DECL_COLD_FUNCTION void warn(WarningType w, EmittingClass c);
+} // namespace DeprecatedAssignmentOperatorBehavior
+} // namespace QtPrivate
+
+class
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+Q_CORE_EXPORT
+#endif
+QByteRef {  // ### Qt 7: remove
     QByteArray &a;
     int i;
     inline QByteRef(QByteArray &array, int idx)
         : a(array),i(idx) {}
     friend class QByteArray;
 public:
+    QByteRef(const QByteRef &) = default;
     inline operator char() const
-        { return i < a.d->size ? a.d->data()[i] : char(0); }
+    {
+        using namespace QtPrivate::DeprecatedRefClassBehavior;
+        if (Q_LIKELY(i < a.d->size))
+            return a.d->data()[i];
+#ifdef QT_DEBUG
+        warn(WarningType::OutOfRange, EmittingClass::QByteRef);
+#endif
+        return char(0);
+    }
     inline QByteRef &operator=(char c)
-        { if (i >= a.d->size) a.expand(i); else a.detach();
-          a.d->data()[i] = c;  return *this; }
+    {
+        using namespace QtPrivate::DeprecatedRefClassBehavior;
+        if (Q_UNLIKELY(i >= a.d->size)) {
+#ifdef QT_DEBUG
+            warn(WarningType::OutOfRange, EmittingClass::QByteRef);
+#endif
+            a.expand(i);
+        } else {
+#ifdef QT_DEBUG
+            if (Q_UNLIKELY(!a.isDetached()))
+                warn(WarningType::DelayedDetach, EmittingClass::QByteRef);
+#endif
+            a.detach();
+        }
+        a.d->data()[i] = c;
+        return *this;
+    }
     inline QByteRef &operator=(const QByteRef &c)
-        { if (i >= a.d->size) a.expand(i); else a.detach();
-          a.d->data()[i] = c.a.d->data()[c.i];  return *this; }
+    {
+        return operator=(char(c));
+    }
     inline bool operator==(char c) const
     { return a.d->data()[i] == c; }
     inline bool operator!=(char c) const
@@ -543,9 +624,11 @@ public:
 };
 
 inline QByteRef QByteArray::operator[](int i)
-{ Q_ASSERT(i >= 0); return QByteRef(*this, i); }
+{ Q_ASSERT(i >= 0); detach(); return QByteRef(*this, i); }
 inline QByteRef QByteArray::operator[](uint i)
-{ return QByteRef(*this, i); }
+{  detach(); return QByteRef(*this, i); }
+inline QByteRef QByteArray::front() { return operator[](0); }
+inline QByteRef QByteArray::back() { return operator[](size() - 1); }
 inline QByteArray::iterator QByteArray::begin()
 { detach(); return d->data(); }
 inline QByteArray::const_iterator QByteArray::begin() const
@@ -562,6 +645,10 @@ inline QByteArray::const_iterator QByteArray::cend() const
 { return d->data() + d->size; }
 inline QByteArray::const_iterator QByteArray::constEnd() const
 { return d->data() + d->size; }
+inline QByteArray &QByteArray::append(int n, char ch)
+{ return insert(d->size, n, ch); }
+inline QByteArray &QByteArray::prepend(int n, char ch)
+{ return insert(0, n, ch); }
 inline QByteArray &QByteArray::operator+=(char c)
 { return append(c); }
 inline QByteArray &QByteArray::operator+=(const char *s)
@@ -584,41 +671,51 @@ inline bool QByteArray::contains(const QByteArray &a) const
 { return indexOf(a) != -1; }
 inline bool QByteArray::contains(char c) const
 { return indexOf(c) != -1; }
-inline bool operator==(const QByteArray &a1, const QByteArray &a2)
+inline int QByteArray::compare(const char *c, Qt::CaseSensitivity cs) const noexcept
+{
+    return cs == Qt::CaseSensitive ? qstrcmp(*this, c) :
+                                     qstrnicmp(data(), size(), c, -1);
+}
+inline int QByteArray::compare(const QByteArray &a, Qt::CaseSensitivity cs) const noexcept
+{
+    return cs == Qt::CaseSensitive ? qstrcmp(*this, a) :
+                                     qstrnicmp(data(), size(), a.data(), a.size());
+}
+inline bool operator==(const QByteArray &a1, const QByteArray &a2) noexcept
 { return (a1.size() == a2.size()) && (memcmp(a1.constData(), a2.constData(), a1.size())==0); }
-inline bool operator==(const QByteArray &a1, const char *a2)
+inline bool operator==(const QByteArray &a1, const char *a2) noexcept
 { return a2 ? qstrcmp(a1,a2) == 0 : a1.isEmpty(); }
-inline bool operator==(const char *a1, const QByteArray &a2)
+inline bool operator==(const char *a1, const QByteArray &a2) noexcept
 { return a1 ? qstrcmp(a1,a2) == 0 : a2.isEmpty(); }
-inline bool operator!=(const QByteArray &a1, const QByteArray &a2)
+inline bool operator!=(const QByteArray &a1, const QByteArray &a2) noexcept
 { return !(a1==a2); }
-inline bool operator!=(const QByteArray &a1, const char *a2)
+inline bool operator!=(const QByteArray &a1, const char *a2) noexcept
 { return a2 ? qstrcmp(a1,a2) != 0 : !a1.isEmpty(); }
-inline bool operator!=(const char *a1, const QByteArray &a2)
+inline bool operator!=(const char *a1, const QByteArray &a2) noexcept
 { return a1 ? qstrcmp(a1,a2) != 0 : !a2.isEmpty(); }
-inline bool operator<(const QByteArray &a1, const QByteArray &a2)
+inline bool operator<(const QByteArray &a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) < 0; }
- inline bool operator<(const QByteArray &a1, const char *a2)
+ inline bool operator<(const QByteArray &a1, const char *a2) noexcept
 { return qstrcmp(a1, a2) < 0; }
-inline bool operator<(const char *a1, const QByteArray &a2)
+inline bool operator<(const char *a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) < 0; }
-inline bool operator<=(const QByteArray &a1, const QByteArray &a2)
+inline bool operator<=(const QByteArray &a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) <= 0; }
-inline bool operator<=(const QByteArray &a1, const char *a2)
+inline bool operator<=(const QByteArray &a1, const char *a2) noexcept
 { return qstrcmp(a1, a2) <= 0; }
-inline bool operator<=(const char *a1, const QByteArray &a2)
+inline bool operator<=(const char *a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) <= 0; }
-inline bool operator>(const QByteArray &a1, const QByteArray &a2)
+inline bool operator>(const QByteArray &a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) > 0; }
-inline bool operator>(const QByteArray &a1, const char *a2)
+inline bool operator>(const QByteArray &a1, const char *a2) noexcept
 { return qstrcmp(a1, a2) > 0; }
-inline bool operator>(const char *a1, const QByteArray &a2)
+inline bool operator>(const char *a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) > 0; }
-inline bool operator>=(const QByteArray &a1, const QByteArray &a2)
+inline bool operator>=(const QByteArray &a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) >= 0; }
-inline bool operator>=(const QByteArray &a1, const char *a2)
+inline bool operator>=(const QByteArray &a1, const char *a2) noexcept
 { return qstrcmp(a1, a2) >= 0; }
-inline bool operator>=(const char *a1, const QByteArray &a2)
+inline bool operator>=(const char *a1, const QByteArray &a2) noexcept
 { return qstrcmp(a1, a2) >= 0; }
 #if !defined(QT_USE_QSTRINGBUILDER)
 inline const QByteArray operator+(const QByteArray &a1, const QByteArray &a2)
@@ -674,10 +771,50 @@ inline QByteArray qUncompress(const QByteArray& data)
 
 Q_DECLARE_SHARED(QByteArray)
 
-QT_END_NAMESPACE
+class QByteArray::FromBase64Result
+{
+public:
+    QByteArray decoded;
+    QByteArray::Base64DecodingStatus decodingStatus;
 
-#ifdef QT_USE_QSTRINGBUILDER
-#include <QtCore/qstring.h>
+    void swap(QByteArray::FromBase64Result &other) noexcept
+    {
+        qSwap(decoded, other.decoded);
+        qSwap(decodingStatus, other.decodingStatus);
+    }
+
+    explicit operator bool() const noexcept { return decodingStatus == QByteArray::Base64DecodingStatus::Ok; }
+
+#if defined(Q_COMPILER_REF_QUALIFIERS) && !defined(Q_QDOC)
+    QByteArray &operator*() & noexcept { return decoded; }
+    const QByteArray &operator*() const & noexcept { return decoded; }
+    QByteArray &&operator*() && noexcept { return std::move(decoded); }
+#else
+    QByteArray &operator*() noexcept { return decoded; }
+    const QByteArray &operator*() const noexcept { return decoded; }
 #endif
+};
+
+Q_DECLARE_SHARED(QByteArray::FromBase64Result)
+
+inline bool operator==(const QByteArray::FromBase64Result &lhs, const QByteArray::FromBase64Result &rhs) noexcept
+{
+    if (lhs.decodingStatus != rhs.decodingStatus)
+        return false;
+
+    if (lhs.decodingStatus == QByteArray::Base64DecodingStatus::Ok && lhs.decoded != rhs.decoded)
+        return false;
+
+    return true;
+}
+
+inline bool operator!=(const QByteArray::FromBase64Result &lhs, const QByteArray::FromBase64Result &rhs) noexcept
+{
+    return !operator==(lhs, rhs);
+}
+
+Q_CORE_EXPORT Q_DECL_PURE_FUNCTION uint qHash(const QByteArray::FromBase64Result &key, uint seed = 0) noexcept;
+
+QT_END_NAMESPACE
 
 #endif // QBYTEARRAY_H

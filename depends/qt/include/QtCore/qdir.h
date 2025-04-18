@@ -1,31 +1,37 @@
 /****************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd.
-** Contact: http://www.qt.io/licensing/
+** Copyright (C) 2016 The Qt Company Ltd.
+** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the QtCore module of the Qt Toolkit.
 **
-** $QT_BEGIN_LICENSE:LGPL21$
+** $QT_BEGIN_LICENSE:LGPL$
 ** Commercial License Usage
 ** Licensees holding valid commercial Qt licenses may use this file in
 ** accordance with the commercial license agreement provided with the
 ** Software or, alternatively, in accordance with the terms contained in
 ** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see http://www.qt.io/terms-conditions. For further
-** information use the contact form at http://www.qt.io/contact-us.
+** and conditions see https://www.qt.io/terms-conditions. For further
+** information use the contact form at https://www.qt.io/contact-us.
 **
 ** GNU Lesser General Public License Usage
 ** Alternatively, this file may be used under the terms of the GNU Lesser
-** General Public License version 2.1 or version 3 as published by the Free
-** Software Foundation and appearing in the file LICENSE.LGPLv21 and
-** LICENSE.LGPLv3 included in the packaging of this file. Please review the
-** following information to ensure the GNU Lesser General Public License
-** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
-** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+** General Public License version 3 as published by the Free Software
+** Foundation and appearing in the file LICENSE.LGPL3 included in the
+** packaging of this file. Please review the following information to
+** ensure the GNU Lesser General Public License version 3 requirements
+** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
 **
-** As a special exception, The Qt Company gives you certain additional
-** rights. These rights are described in The Qt Company LGPL Exception
-** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
+** GNU General Public License Usage
+** Alternatively, this file may be used under the terms of the GNU
+** General Public License version 2.0 or (at your option) the GNU General
+** Public license version 3 or any later version approved by the KDE Free
+** Qt Foundation. The licenses are as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
+** included in the packaging of this file. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-2.0.html and
+** https://www.gnu.org/licenses/gpl-3.0.html.
 **
 ** $QT_END_LICENSE$
 **
@@ -99,13 +105,13 @@ public:
     ~QDir();
 
     QDir &operator=(const QDir &);
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use QDir::setPath() instead")
     QDir &operator=(const QString &path);
-#ifdef Q_COMPILER_RVALUE_REFS
-    inline QDir &operator=(QDir &&other)
-    { qSwap(d_ptr, other.d_ptr); return *this; }
 #endif
+    QDir &operator=(QDir &&other) noexcept { swap(other); return *this; }
 
-    inline void swap(QDir &other)
+    void swap(QDir &other) noexcept
     { qSwap(d_ptr, other.d_ptr); }
 
     void setPath(const QString &path);
@@ -113,7 +119,10 @@ public:
     QString absolutePath() const;
     QString canonicalPath() const;
 
+#if QT_DEPRECATED_SINCE(5, 13)
+    QT_DEPRECATED_X("Use QDir::addSearchPath() instead")
     static void addResourceSearchPath(const QString &path);
+#endif
 
     static void setSearchPaths(const QString &prefix, const QStringList &searchPaths);
     static void addSearchPath(const QString &prefix, const QString &path);
@@ -139,6 +148,8 @@ public:
     void setSorting(SortFlags sort);
 
     uint count() const;
+    bool isEmpty(Filters filters = Filters(AllEntries | NoDotAndDotDot)) const;
+
     QString operator[](int) const;
 
     static QStringList nameFiltersFromString(const QString &nameFilter);
@@ -177,7 +188,16 @@ public:
 
     static QFileInfoList drives();
 
-    static QChar separator();
+    Q_DECL_CONSTEXPR static inline QChar listSeparator() noexcept
+    {
+#if defined(Q_OS_WIN)
+        return QLatin1Char(';');
+#else
+        return QLatin1Char(':');
+#endif
+    }
+
+    static QChar separator(); // ### Qt6: Make it inline
 
     static bool setCurrent(const QString &path);
     static inline QDir current() { return QDir(currentPath()); }
@@ -190,7 +210,7 @@ public:
     static inline QDir temp() { return QDir(tempPath()); }
     static QString tempPath();
 
-#ifndef QT_NO_REGEXP
+#if QT_CONFIG(regularexpression)
     static bool match(const QStringList &filters, const QString &fileName);
     static bool match(const QString &filter, const QString &fileName);
 #endif
