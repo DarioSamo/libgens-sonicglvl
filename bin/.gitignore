@@ -7,4 +7,4 @@ RelWithDebInfo/
 *.log
 
 !nvdxt.exe
-!HavokConverter_LW.ini
+!HavokConverter_LostWorld.ini

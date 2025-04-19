@@ -35,10 +35,14 @@
 #include "assimp/importerdesc.h"
 
 const QString HKWindow::AppName = "Havok Converter";
-#ifdef HAVOKCONVERTER_LOST_WORLD
+#ifdef HAVOKCONVERTER_LOSTWORLD
 const QString HKWindow::WindowTitle = "Havok Converter - Lost World";
-const QString HKWindow::DefaultSettingsPath = "HavokConverter_LW.ini";
+const QString HKWindow::DefaultSettingsPath = "HavokConverter_LostWorld.ini";
 const QString HKWindow::CommunityGuideURL = "https://info.sonicretro.org/SCHG:Sonic_Lost_World";
+#elif defined(HAVOKCONVERTER_UNLEASHED)
+const QString HKWindow::WindowTitle = "Havok Converter - Unleashed";
+const QString HKWindow::DefaultSettingsPath = "HavokConverter_Unleashed.ini";
+const QString HKWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Sonic_Generations";
 #else
 const QString HKWindow::WindowTitle = HKWindow::AppName;
 const QString HKWindow::DefaultSettingsPath = "HavokConverter.ini";
@@ -51,9 +55,8 @@ const QString HKWindow::LogPath = "HavokConverter.log";
 HKWindow::HKWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);
 	cb_mode->addItem("Collision");
-	//cb_mode->addItem("Rigid Bodies"); // TO IMPLEMENT
-	//cb_mode->addItem("Animation"); // TO IMPLEMENT
-	cb_mode->setCurrentIndex(0);
+	cb_mode->addItem("Rigid Bodies");
+	cb_mode->setCurrentIndex(converter_settings.mode % 2);
 	havok_enviroment = NULL;
 
 	connect(action_open_settings, SIGNAL(triggered()), this, SLOT(openSettingsTriggered()));
@@ -235,11 +238,13 @@ void HKWindow::aboutTriggered() {
 	"<p>Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.</p>"
 	"<ul>"
 	"Dependencies used:"
-	"<li><b>LibGens</b>: <a href=\"https://github.com/DarioSamo/libgens-sonicglvl\">Github Repository</a></li>"
-	"<li><b>Qt 5.5.0</b>: <a href=\"http://qt-project.org/\">Homepage</a></li>"
-	"<li><b>Assimp 3.2</b>: <a href=\"http://www.assimp.org/\">Homepage</a></li>"
-#ifdef Release2012
+	"<li><b>LibGens</b>: <a href=\"https://github.com/DarioSamo/libgens-sonicglvl\">GitHub Repository</a></li>"
+	"<li><b>Qt 5.15.2</b>: <a href=\"http://qt-project.org/\">Homepage</a></li>"
+	"<li><b>Assimp 5.4.3</b>: <a href=\"http://www.assimp.org/\">Homepage</a></li>"
+#ifdef HAVOK_2012
 			"<li><b>Havok 2012 2.0 SDK</b></li>"
+#elif defined(HAVOK_5_5_0)
+			"<li><b>Havok 5.5.0 SDK</b></li>"
 #else
 			"<li><b>Havok 2010 2.0 SDK</b></li>"
 #endif
@@ -365,6 +370,17 @@ void HKWindow::convertTriggered() {
 
 	setEnabled(true);
 	beep();
+
+	// Cleanup
+	for (auto vertices : vertices_to_free) {
+		delete[] vertices;
+	}
+	vertices_to_free.clear();
+
+	for (auto indices : indices_to_free) {
+		delete[] indices;
+	}
+	indices_to_free.clear();
 }
 
 

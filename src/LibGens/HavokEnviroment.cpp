@@ -39,11 +39,20 @@ namespace LibGens {
 	}
 
 	HavokEnviroment::HavokEnviroment(int bufferSize) {
+#ifdef HAVOK_5_5_0
+		hkMemoryBlockServer* server = new hkSystemMemoryBlockServer(256 * 1024 * 1024);
+		hkMemory* memoryManager = new hkFreeListMemory(server);
+		hkThreadMemory* threadMemory = new hkThreadMemory(memoryManager, 16);
+		threadMemory->setStackArea(new uint8_t[1024 * 1024], 1024 * 1024);
+
+		hkBaseSystem::init(memoryManager, threadMemory, HavokErrorReport);
+#else
 		hkMemoryRouter * memoryRouter = hkMemoryInitUtil::initDefault( hkMallocAllocator::m_defaultMallocAllocator, hkMemorySystem::FrameInfo(bufferSize));
 		hkBaseSystem::init(memoryRouter, HavokErrorReport);
+#endif
 	}
 
-	
+#ifndef HAVOK_5_5_0
 	HavokPhysicsCache *HavokEnviroment::getPhysics(string physics_name) {
 		for (list<HavokPhysicsCache *>::iterator it=physics_cache.begin(); it!=physics_cache.end(); it++) {
 			if ((*it)->getName() == physics_name) {
@@ -171,4 +180,5 @@ namespace LibGens {
 
 		return false;
 	}
+#endif
 };

@@ -44,7 +44,8 @@ jobs:
 
       - name: Build project
         run: |
-          msbuild /p:Configuration="Release 2012" src\libgens-sonicglvl.sln
+          msbuild /p:Configuration="Release - Havok 2012" src\libgens-sonicglvl.sln
+          msbuild /p:Configuration="Release - Havok 5.5.0" src\libgens-sonicglvl.sln
           msbuild /p:Configuration=Release src\libgens-sonicglvl.sln
 
       - name: Compress artifact
