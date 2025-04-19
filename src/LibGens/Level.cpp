@@ -32,6 +32,7 @@ namespace LibGens {
 		terrain_info_file = "terrain";
 		direct_light_name = "";
 
+		spawn_type        = LIBGENS_LEVEL_XML_SONIC;
 		spawn_yaw         = 0.0f;
 		spawn_dead_height = -3000.0f;
 		spawn_camera_view = LIBGENS_LEVEL_CAMERA_VIEW_FORWARD;
@@ -72,7 +73,7 @@ namespace LibGens {
 		for(pElem; pElem; pElem=pElem->NextSiblingElement()) {
 			string element_name=pElem->ValueStr();
 
-			if (element_name == LIBGENS_LEVEL_XML_SONIC) {
+			if ((element_name == LIBGENS_LEVEL_XML_SONIC) || (element_name == LIBGENS_LEVEL_XML_EVIL)) {
 				loadSpawn(pElem);
 			}
 
@@ -132,6 +133,8 @@ namespace LibGens {
 	}
 
 	void Level::loadSpawn(TiXmlElement *root) {
+		spawn_type = root->ValueStr();
+
 		for (TiXmlElement *pElem=root->FirstChildElement(); pElem; pElem=pElem->NextSiblingElement()) {
 			string element_name=pElem->ValueStr();
 			char *text_ptr=(char *) pElem->GetText();
@@ -176,6 +179,10 @@ namespace LibGens {
 
 			if (element_name == LIBGENS_LEVEL_XML_CAMERA_VIEW) {
 				spawn_camera_view = ToString(text_ptr);
+			}
+
+			if (element_name == LIBGENS_LEVEL_XML_IS_SIDE_VIEW) {
+				spawn_camera_view = (text_ptr != NULL && strcmp(text_ptr, "true") == 0) ? LIBGENS_LEVEL_CAMERA_VIEW_SIDE : LIBGENS_LEVEL_CAMERA_VIEW_FORWARD;
 			}
 		}
 	}
@@ -482,7 +489,7 @@ namespace LibGens {
 		// Search and delete the first appearance of the Sonic Spawn Point Segment
 		pElem_i=pElem->FirstChildElement();
 		for(pElem_i; pElem_i; pElem_i=pElem_i->NextSiblingElement()) {
-			if (pElem_i->ValueStr() == LIBGENS_LEVEL_XML_SONIC) {
+			if (pElem_i->ValueStr() == spawn_type) {
 				pElem->RemoveChild(pElem_i);
 				break;
 			}
@@ -490,7 +497,7 @@ namespace LibGens {
 
 		// Re-create the Sonic Spawn Point Segment and insert it at the start
 
-		TiXmlElement newSpawnNode(LIBGENS_LEVEL_XML_SONIC);
+		TiXmlElement newSpawnNode(spawn_type);
 		pElem_i = pElem->InsertBeforeChild(pElem->FirstChildElement(), newSpawnNode)->ToElement();
 
 		TiXmlElement* positionRoot=new TiXmlElement(LIBGENS_OBJECT_ELEMENT_POSITION);
@@ -502,8 +509,28 @@ namespace LibGens {
 		yawRoot->LinkEndChild(yawValue);
 		pElem_i->LinkEndChild(yawRoot);
 
+		if (spawn_type == LIBGENS_LEVEL_XML_SONIC) {
+			TiXmlElement* deadHeightRoot = new TiXmlElement(LIBGENS_LEVEL_XML_DEAD_HEIGHT);
+			TiXmlText* deadHeightValue = new TiXmlText(ToString(spawn_dead_height));
+			deadHeightRoot->LinkEndChild(deadHeightValue);
+			pElem_i->LinkEndChild(deadHeightRoot);
+
+			if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
+				TiXmlElement* isSideViewRoot = new TiXmlElement(LIBGENS_LEVEL_XML_IS_SIDE_VIEW);
+				TiXmlText* isSideViewValue = new TiXmlText(spawn_camera_view == LIBGENS_LEVEL_CAMERA_VIEW_SIDE ? "true" : "false");
+				isSideViewRoot->LinkEndChild(isSideViewValue);
+				pElem_i->LinkEndChild(isSideViewRoot);
+			}
+			else {
+				TiXmlElement* cameraViewRoot = new TiXmlElement(LIBGENS_LEVEL_XML_CAMERA_VIEW);
+				TiXmlText* cameraViewValue = new TiXmlText(spawn_camera_view);
+				cameraViewRoot->LinkEndChild(cameraViewValue);
+				pElem_i->LinkEndChild(cameraViewRoot);
+			}
+		}
+
 		TiXmlElement* startRoot=new TiXmlElement(LIBGENS_LEVEL_XML_START);
-		{
+		if (spawn_type == LIBGENS_LEVEL_XML_SONIC) {
 			TiXmlElement* modeRoot=new TiXmlElement(LIBGENS_LEVEL_XML_MODE);
 			TiXmlText* modeValue=new TiXmlText(spawn_mode);
 			modeRoot->LinkEndChild(modeValue);
@@ -520,16 +547,6 @@ namespace LibGens {
 			startRoot->LinkEndChild(timeRoot);
 		}
 		pElem_i->LinkEndChild(startRoot);
-
-		TiXmlElement* deadHeightRoot=new TiXmlElement(LIBGENS_LEVEL_XML_DEAD_HEIGHT);
-		TiXmlText* deadHeightValue=new TiXmlText(ToString(spawn_dead_height));
-		deadHeightRoot->LinkEndChild(deadHeightValue);
-		pElem_i->LinkEndChild(deadHeightRoot);
-
-		TiXmlElement* cameraViewRoot=new TiXmlElement(LIBGENS_LEVEL_XML_CAMERA_VIEW);
-		TiXmlText* cameraViewValue=new TiXmlText(spawn_camera_view);
-		cameraViewRoot->LinkEndChild(cameraViewValue);
-		pElem_i->LinkEndChild(cameraViewRoot);
 
 		// Save the changes
 		if (!doc.SaveFile(filename)) {

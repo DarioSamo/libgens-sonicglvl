@@ -63,6 +63,7 @@
 
 
 #define LIBGENS_LEVEL_XML_SONIC                      "Sonic"
+#define LIBGENS_LEVEL_XML_EVIL                       "Evil"
 #define LIBGENS_LEVEL_XML_YAW                        "Yaw"
 #define LIBGENS_LEVEL_XML_START                      "Start"
 #define LIBGENS_LEVEL_XML_MODE                       "Mode"
@@ -70,6 +71,7 @@
 #define LIBGENS_LEVEL_XML_TIME                       "Time"
 #define LIBGENS_LEVEL_XML_DEAD_HEIGHT                "DeadHeight"
 #define LIBGENS_LEVEL_XML_CAMERA_VIEW                "CameraView"
+#define LIBGENS_LEVEL_XML_IS_SIDE_VIEW               "IsSideView"
 
 #define LIBGENS_LEVEL_XML_SET_DATA                   "SetData"
 #define LIBGENS_LEVEL_XML_LAYER                      "Layer"
@@ -143,6 +145,7 @@ namespace LibGens {
 			string direct_light_name;
 			size_t game_mode;
 
+			string spawn_type;
 			float spawn_yaw;
 			float spawn_dead_height;
 			string spawn_camera_view;
