@@ -41,7 +41,7 @@ const QString GIWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Son
 GIWindow::GIWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);
 	cb_game_engine->addItem("Generations");
-	//cb_game_engine->addItem("Unleashed"); // TO VERIFY
+	cb_game_engine->addItem("Unleashed");
 	//cb_game_engine->addItem("Lost World"); // TO IMPLEMENT
 	cb_game_engine->setCurrentIndex(0);
 

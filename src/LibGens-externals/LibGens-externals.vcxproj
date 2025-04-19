@@ -103,7 +103,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="half\half.cpp" />
     <ClCompile Include="sha1\sha1.cpp" />
     <ClCompile Include="tinyxml\tinystr.cpp" />
     <ClCompile Include="tinyxml\tinyxml.cpp" />
@@ -114,7 +113,6 @@
     <ClCompile Include="tristripper\tri_stripper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="half\half.h" />
     <ClInclude Include="sha1\sha1.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />

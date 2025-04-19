@@ -43,8 +43,7 @@ bool GIWindow::convert() {
 		logProgress(ProgressNormal, "Starting conversion for Generations engine...");
 	}
 	else if (converter_settings.game_engine == Unleashed) {
-		logProgress(ProgressFatal, "No conversion algorithm implemented for Unleashed yet!");
-		return false;
+		logProgress(ProgressNormal, "Starting conversion for Unleashed engine...");
 	}
 	else if (converter_settings.game_engine == LostWorld) {
 		logProgress(ProgressFatal, "No conversion algorithm implemented for Lost World yet!");
@@ -85,7 +84,16 @@ bool GIWindow::convert() {
 	QString temp_path = temp_dir.path();
 	logProgress(ProgressNormal, "Storing temporary terrain files in " + temp_path + ".");
 
-	QString terrain_resources_filename = converter_settings.terrain_directory + "/" + slot_name + ".ar.00";
+	QString terrain_resources_filename = converter_settings.terrain_directory;
+	if (converter_settings.game_engine == Unleashed) {
+		terrain_resources_filename += "/../../#";
+	}
+	else {
+		terrain_resources_filename += "/";
+	}
+	terrain_resources_filename += slot_name;
+	terrain_resources_filename += ".ar.00";
+
 	if (QFileInfo(terrain_resources_filename).exists()) {
 		LibGens::ArPack terrain_ar(terrain_resources_filename.toStdString());
 		terrain_ar.extract(temp_path.toStdString() + "/");
@@ -108,11 +116,12 @@ bool GIWindow::convert() {
 		return false;
 	}
 
-	QString stage_add_pfd_filename = converter_settings.terrain_directory + "/Stage-Add.pfd";
-	if (!QFileInfo(stage_add_pfd_filename).exists()) {
-		logProgress(ProgressFatal, "Couldn't find " + stage_add_pfd_filename + " for existing terrain GI. Cannot create GI for an empty stage.");
-		return false;
+	QString stage_add_pfd_filename = converter_settings.terrain_directory;
+	if (converter_settings.game_engine == Unleashed) {
+		stage_add_pfd_filename += "/../../Additional/";
+		stage_add_pfd_filename += slot_name;
 	}
+	stage_add_pfd_filename += "/Stage-Add.pfd";
 
 	// Extract existing Stage.pfd into a temporary directory and remove all the gia- files if on Pre-Render mode.
 	{
@@ -833,8 +842,9 @@ bool GIWindow::convert() {
 		return pack_result;
 	}
 	else if (converter_settings.game_engine == Unleashed) {
-		logProgress(ProgressFatal, "Packing for Unleashed game engine not implemented yet!");
-		return false;
+		logProgress(ProgressNormal, "Packing for Unleashed engine...");
+		bool pack_result = packUnleashed(converter_settings.terrain_directory, slot_name, temp_path, stage_temp_path, stage_add_temp_path);
+		return pack_result;
 	}
 	else if (converter_settings.game_engine == LostWorld) {
 		logProgress(ProgressFatal, "Packing for Lost World game engine not implemented yet!");
@@ -1126,6 +1136,60 @@ bool GIWindow::packGenerations(QString output_path, QString output_name, QString
 	return true;
 }
 
+bool GIWindow::packUnleashed(QString output_path, QString output_name, QString path, QString stage_path, QString stage_add_path) {
+	// Pack Stage.pfd
+	{
+		logProgress(ProgressNormal, "Saving Stage.pfd from " + stage_path + "...");
+		LibGens::ArPack stage_ar_pack;
+		QStringList entry_list = QDir(stage_path).entryList(QStringList() << "*.ar");
+		foreach(QString entry, entry_list) {
+			QString entry_filename = (stage_path + "/" + entry);
+			stage_ar_pack.addFile(entry_filename.toStdString());
+			logProgress(ProgressNormal, "Added " + entry + " to Stage.pfd.");
+		}
+
+		QString stage_ar_pack_filename = output_path + "/Stage.pfd";
+		stage_ar_pack.save(stage_ar_pack_filename.toStdString());
+		stage_ar_pack.savePFI(path.toStdString() + "/Stage.pfi");
+		logProgress(ProgressNormal, "Saved " + stage_ar_pack_filename + ".");
+	}
+
+	// Pack Stage-Add.pfd
+	{
+		logProgress(ProgressNormal, "Saving Stage-Add.pfd from " + stage_add_path + "...");
+		LibGens::ArPack stage_add_ar_pack;
+		QStringList entry_list = QDir(stage_add_path).entryList(QStringList() << "*.ar");
+		foreach(QString entry, entry_list) {
+			QString entry_filename = (stage_add_path + "/" + entry);
+			stage_add_ar_pack.addFile(entry_filename.toStdString());
+			logProgress(ProgressNormal, "Added " + entry + " to Stage-Add.pfd.");
+		}
+
+		QString stage_add_ar_pack_filename = output_path;
+		stage_add_ar_pack_filename += "/../../Additional/";
+		stage_add_ar_pack_filename += output_name;
+		QDir().mkpath(stage_add_ar_pack_filename);
+
+		stage_add_ar_pack_filename += "/Stage-Add.pfd";
+		stage_add_ar_pack.save(stage_add_ar_pack_filename.toStdString());
+		stage_add_ar_pack.savePFI(path.toStdString() + "/Stage-Add.pfi");
+		logProgress(ProgressNormal, "Saved " + stage_add_ar_pack_filename + ".");
+	}
+
+	QDir temp_dir(path);
+
+	// Finally, pack the resources directory
+	LibGens::ArPack resources_pack;
+	QStringList entry_list = temp_dir.entryList(QStringList() << "*");
+	foreach(QString entry, entry_list) {
+		resources_pack.addFile((path + "/" + entry).toStdString());
+	}
+
+	QString resources_pack_filename = QString("%1/../../#%2.ar.00").arg(output_path).arg(output_name);
+	resources_pack.save(resources_pack_filename.toStdString());
+	logProgress(ProgressNormal, "Saved " + resources_pack_filename + ".");
+	return true;
+}
 
 QColor GIWindow::debugColor(int quality_level, int size) {
 	QColor start, end;

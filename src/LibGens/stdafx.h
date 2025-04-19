@@ -32,7 +32,6 @@ using namespace std;
 #include <ctype.h>
 
 // Common Headers only should be pre-compiled
-#include "half/half.h"
 #include "sha1/sha1.h"
 #include "tinyxml/tinyxml.h"
 #include "MathGens.h"

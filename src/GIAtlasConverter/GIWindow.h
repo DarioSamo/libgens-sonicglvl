@@ -104,8 +104,8 @@ private:
 
 	QList<GIWindow::GIGroup> createGroups(LibGens::AABB current_aabb, QList<string> instances, LibGens::GITextureGroupInfo *gi_group_info, LibGens::PathNodeList &reference_nodes, QList<RenderItem> &render_items, const QMap<string, LibGens::AABB> &instance_aabbs);
 	bool packGenerations(QString output_path, QString output_name, QString path, QString stage_path, QString stage_add_path);
+	bool packUnleashed(QString output_path, QString output_name, QString path, QString stage_path, QString stage_add_path);
 	void compressFileCAB(QString filename);
-	void expandFileCAB(QString filename, QString new_filename);
 	unsigned int nextPowerOfTwo(unsigned int v);
 	QColor debugColor(int quality_level, int size);
 	QString temporaryDirTemplate();
