@@ -217,8 +217,6 @@ namespace LibGens {
 		// Unleashed uses the set files that were loaded from Stage.stg.xml
 		else if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
 			for (list<LevelSetEntry *>::iterator it=set_entries.begin(); it!=set_entries.end(); it++) {
-				if (!(*it)->active) continue;
-
 				string new_filename=folder+(*it)->filename;
 
 				ObjectSet *object_set=new LibGens::ObjectSet(new_filename);
