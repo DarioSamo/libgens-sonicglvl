@@ -91,11 +91,11 @@ namespace LibGens {
 		delete library;
 	}
 
-	void MaterialLibrary::save(string folder_target) {
+	void MaterialLibrary::save(string folder_target, int root_type) {
 		folder = folder_target;
 
 		for (list<Material *>::iterator it=materials.begin(); it!=materials.end(); it++) {
-			(*it)->save(folder + (*it)->getName() + LIBGENS_MATERIAL_EXTENSION);
+			(*it)->save(folder + (*it)->getName() + LIBGENS_MATERIAL_EXTENSION, root_type);
 		}
 	}
 }

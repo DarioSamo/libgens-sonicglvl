@@ -74,8 +74,8 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_SAVE_LEVEL_DATA :
 					editor_application->saveLevelDataGUI();
 					break;
-				case IMD_SAVE_LEVEL_TERRAIN :
-					editor_application->saveLevelTerrainGUI();
+				case IMD_SAVE_LEVEL_RESOURCES :
+					editor_application->saveLevelResourcesGUI();
 					break;
 				case IMD_EXPORT_SCENE_FBX :
 					editor_application->exportSceneFBXGUI();

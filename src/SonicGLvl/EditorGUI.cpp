@@ -210,6 +210,10 @@ void EditorApplication::saveLevelDataGUI() {
 	if (current_level) saveLevelData(current_level_filename);
 }
 
+void EditorApplication::saveLevelResourcesGUI() {
+	if (current_level) saveLevelResources();
+}
+
 void EditorApplication::saveLevelTerrainGUI() {
 	if (terrain_streamer) {
 		if (CONFIRM_MSG("To do any terrain operations you have to wait for the terrain streamer to finish first. Do you want load all the terrain?") == IDYES) {

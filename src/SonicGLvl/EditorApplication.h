@@ -402,6 +402,7 @@ class EditorApplication : public BaseApplication {
 		void openLostWorldLevelGUI();
 
 		void saveLevelDataGUI();
+		void saveLevelResourcesGUI();
 		void saveLevelTerrainGUI();
 		void importLevelTerrainFBXGUI();
 		void exportSceneFBXGUI();
@@ -548,6 +549,7 @@ class EditorApplication : public BaseApplication {
 		void createSkybox(string skybox_name);
 
 		void saveLevelData(string filename);
+		void saveLevelResources();
 		void saveLevelTerrain();
 		void cleanLevelTerrain();
 		void importLevelTerrainFBX(string filename);

@@ -375,6 +375,13 @@ void EditorApplication::saveLevelData(string filename) {
 	SHOW_MSG("Data saved!");
 }
 
+void EditorApplication::saveLevelResources() {
+	if (!current_level) return;
+	current_level->saveResources();
+	current_level->saveHashes();
+	SHOW_MSG("Resources saved!");
+}
+
 void EditorApplication::saveLevelTerrain() {
 	if (!current_level) return;
 

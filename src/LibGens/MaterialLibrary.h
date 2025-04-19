@@ -35,6 +35,6 @@ namespace LibGens {
 			list<Material*> getMaterials();
 			bool checkMaterial(string id);
 			void merge(MaterialLibrary *library, bool overwrite=false);
-			void save(string folder_target);
+			void save(string folder_target, int root_type);
 	};
 };

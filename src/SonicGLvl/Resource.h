@@ -56,7 +56,7 @@
 #define IDL_PROPERTIES_LIST                     40002
 #define IDR_MATERIAL_TERRAIN_MODE               40002
 #define IDS_EDIT_VECTOR_LIST_Z                  40002
-#define IMD_SAVE_LEVEL_TERRAIN                  40002
+#define IMD_SAVE_LEVEL_RESOURCES                40002
 #define IDB_EDIT_ID_GO_TO_TARGET                40003
 #define IDB_EDIT_ID_LIST_DELETE                 40003
 #define IDC_EDIT_BOOL_VALUE                     40003

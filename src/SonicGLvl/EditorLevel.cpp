@@ -618,6 +618,27 @@ void EditorLevel::saveTerrain() {
 	if (!level) return;
 	if (!terrain) return;
 
+	if (terrain) {
+		string filename = resources_cache_folder + "/" + level->getTerrainInfo() + LIBGENS_TERRAIN_EXTENSION;
+		terrain->save(filename);
+
+		vector<LibGens::TerrainGroup*> terrain_groups = terrain->getGroups();
+		for (vector<LibGens::TerrainGroup*>::iterator it = terrain_groups.begin(); it != terrain_groups.end(); it++) {
+			string filename = resources_cache_folder + "/" + (*it)->getName() + LIBGENS_TERRAIN_GROUP_EXTENSION;
+			(*it)->save(filename);
+		}
+	}
+
+	if (terrain_block) {
+		string filename = resources_cache_folder + "/" + LIBGENS_TERRAIN_BLOCK_FILENAME;
+		terrain_block->save(filename);
+	}
+
+	if (terrain_gi_info) {
+		string filename = resources_cache_folder + "/" + LIBGENS_GI_TEXTURE_GROUP_INFO_FILE;
+		terrain_gi_info->save(filename);
+	}
+
 	// Pack Stage.pfd and Stage-Add.pfd
 	string main_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE;
 	string main_add_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE_ADD;
@@ -674,33 +695,20 @@ void EditorLevel::saveResources() {
 	if (!level) return;
 
 	if (terrain) {
-		string filename=resources_cache_folder + "/" + level->getTerrainInfo() + LIBGENS_TERRAIN_EXTENSION;
-		terrain->save(filename);
-
-		vector<LibGens::TerrainGroup *> terrain_groups = terrain->getGroups();
-		for (vector<LibGens::TerrainGroup *>::iterator it=terrain_groups.begin(); it!=terrain_groups.end(); it++) {
-			string filename=resources_cache_folder + "/" + (*it)->getName() + LIBGENS_TERRAIN_GROUP_EXTENSION;
-			(*it)->save(filename);
-		}
-
 		LibGens::MaterialLibrary *terrain_material_library = terrain->getMaterialLibrary();
 		if (terrain_material_library) {
-			terrain_material_library->save(resources_cache_folder + "/");
+			int root_type = LIBGENS_MATERIAL_ROOT_GENERATIONS;
+			if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+				root_type = LIBGENS_MATERIAL_ROOT_UNLEASHED;
+			}
+			terrain_material_library->save(resources_cache_folder + "/", root_type);
 		}
 	}
 
-	if (terrain_block) {
-		string filename=resources_cache_folder + "/" + LIBGENS_TERRAIN_BLOCK_FILENAME;
-		terrain_block->save(filename);
-	}
-
-	if (terrain_gi_info) {
-		string filename=resources_cache_folder + "/" + LIBGENS_GI_TEXTURE_GROUP_INFO_FILE;
-		terrain_gi_info->save(filename);
-	}
-
-
 	string main_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + geometry_name + LIBGENS_AR_MULTIPLE_START;
+	if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+		main_filename = folder + geometry_name + LIBGENS_AR_MULTIPLE_START;
+	}
 
 	LibGens::ArPack *data_ar_pack=new LibGens::ArPack(resources_cache_folder + "/");
 	data_ar_pack->save(main_filename);

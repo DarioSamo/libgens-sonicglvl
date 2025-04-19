@@ -362,10 +362,16 @@ void EditorApplication::materialEditorTerrainMode() {
 
 	material_editor_material_library = current_level->getTerrain()->getMaterialLibrary();
 	material_editor_library_folder = current_level->getTerrain()->getResourcesFolder();
-	for each (LibGens::Material* mat in material_editor_material_library->getMaterials())
-	{
+
+	for (LibGens::Material* mat : material_editor_material_library->getMaterials()) {
 		material_editor_materials.push_back(mat);
 	}
+
+	std::sort(material_editor_materials.begin(), material_editor_materials.end(),
+		[](LibGens::Material* lhs, LibGens::Material* rhs) {
+			return lhs->getName().compare(rhs->getName()) < 0;
+		});
+
 	rebuildListMaterialEditorGUI();
 
 	EnableWindow(GetDlgItem(hMaterialEditorDlg, IDB_MATERIAL_LOAD_MODEL), false);
@@ -659,6 +665,11 @@ void EditorApplication::loadMaterialEditorModelGUI() {
 				material_editor_materials.push_back(mat);
 			}
 		}
+
+		std::sort(material_editor_materials.begin(), material_editor_materials.end(),
+			[](LibGens::Material* lhs, LibGens::Material* rhs) {
+				return lhs->getName().compare(rhs->getName()) < 0; 
+			});
 
 		rebuildListMaterialEditorGUI();
 		createPreviewMaterialEditorGUI();
