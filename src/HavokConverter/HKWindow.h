@@ -27,6 +27,8 @@
 #include <unordered_set>
 
 class hkpShape;
+class hkpConvexShape;
+class hkpConvexVerticesShape;
 class hkpRigidBody;
 class hkpWorld;
 class hkpStaticCompoundShape;
@@ -35,6 +37,7 @@ class hkpBvCompressedMeshShape;
 class hkVector4;
 
 namespace LibGens {
+	class Tags;
 	class HavokEnviroment;
 };
 
@@ -64,10 +67,11 @@ private:
 	enum Mode {
 		Collision,
 		RigidBodies,
-		Animation
 	};
 
 	LibGens::HavokEnviroment *havok_enviroment;
+	vector<float*> vertices_to_free;
+	vector<int*> indices_to_free;
 
 	struct {
 		Mode mode;
@@ -88,10 +92,9 @@ private:
 	void logProgress(ProgressType progress_type, QString message);
 	void logNodeTree(aiNode *node, QString prefix);
 	void beep();
-	hkpShape *convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale);
-	QList<hkpRigidBody *> convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::unordered_set<std::string>& names);
-	void convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::unordered_set<std::string>& names);
-#ifdef HAVOKCONVERTER_LOST_WORLD
+	hkpRigidBody* convertNodeToRigidBody(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::set<std::string>& names);
+	void convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::set<std::string>& names);
+#ifdef HAVOKCONVERTER_LOSTWORLD
 	hkpShape* convertMeshToCompressedShape(aiMesh* mesh, int userdata);
 	hkQsTransform createHKTransform(LibGens::Matrix4 transform);
 	hkpStaticCompoundShape* convertNodeTreeCompoundShape(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform);

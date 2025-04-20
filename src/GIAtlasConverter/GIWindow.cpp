@@ -246,9 +246,9 @@ void GIWindow::aboutTriggered() {
 	"<p>Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.</p>"
 	"<ul>"
 	"Dependencies used:"
-	"<li><b>LibGens</b>: <a href=\"https://github.com/DarioSamo/libgens-sonicglvl\">Github Repository</a></li>"
+	"<li><b>LibGens</b>: <a href=\"https://github.com/DarioSamo/libgens-sonicglvl\">GitHub Repository</a></li>"
 	"<li><b>FreeImage</b>: <a href=\"http://freeimage.sourceforge.net/\">Homepage</a></li>"
-	"<li><b>Qt 5.5.0</b>: <a href=\"http://qt-project.org/\">Homepage</a></li>"
+	"<li><b>Qt 5.15.2</b>: <a href=\"http://qt-project.org/\">Homepage</a></li>"
 	"</ul>");
 }
 

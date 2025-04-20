@@ -24,4 +24,13 @@
 #include "HavokEnviroment.h"
 #include "HavokPropertyDatabase.h"
 #include <Common/Base/keycode.cxx>
-#include <Common/Base/Config/hkProductFeatures.cxx>
+
+#ifdef HAVOK_5_5_0
+    #define HK_CLASSES_FILE <Common/Serialize/Classlist/hkCompleteClasses.h>
+    #include <Common/Serialize/Util/hkBuiltinTypeRegistry.cxx>
+
+    #define HK_COMPAT_FILE <Common/Compat/hkCompatVersions.h>
+    #include <Common/Compat/hkCompat_All.cxx>
+#else
+    #include <Common/Base/Config/hkProductFeatures.cxx>
+#endif

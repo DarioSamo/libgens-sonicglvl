@@ -82,21 +82,23 @@ bool HKWindow::convert() {
 	if (!havok_enviroment)
 		havok_enviroment = new LibGens::HavokEnviroment(HavokBufferSizeMB * 1024 * 1024);
 
-#ifdef HAVOKCONVERTER_LOST_WORLD
+#ifdef HAVOKCONVERTER_LOSTWORLD
 	hkArray<hkRootLevelContainer::NamedVariant> shapes;
 #else
 	hkpWorldCinfo info;
 	info.m_convexListFilter = HK_NULL;
 	info.m_minDesiredIslandSize = 64;
-#ifndef Release2012
+#ifndef HAVOK_5_5_0
+#ifndef HAVOK_2012
 	info.m_autoUpdateKdTree = false;
 #endif
 	info.m_maxConstraintViolation = FLT_MAX;
+#endif
 	hkpWorld* world = new hkpWorld(info);
 	world->lock();
-#endif // HAVOKCONVERTER_LOST_WORLD
+#endif // HAVOKCONVERTER_LOSTWORLD
 
-	std::unordered_set<std::string> rigid_body_names;
+	std::set<std::string> rigid_body_names;
 
 	//*************************
 	//  Load Assimp Scene
@@ -111,7 +113,7 @@ bool HKWindow::convert() {
 															aiComponent_TEXCOORDS | aiComponent_BONEWEIGHTS | aiComponent_TEXTURES | aiComponent_MATERIALS);
 
 		const aiScene *scene = importer.ReadFile(model_source_path.toStdString(), aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices | 
-																				  aiProcess_FindInstances | aiProcess_SplitLargeMeshes | aiProcess_RemoveComponent);
+																				  aiProcess_SplitLargeMeshes | aiProcess_RemoveComponent);
 		if (!scene) {
 			logProgress(ProgressFatal, QString("Assimp failed to open %1: %2").arg(model_source_path).arg(importer.GetErrorString()));
 			return false;
@@ -124,7 +126,7 @@ bool HKWindow::convert() {
 		logProgress(ProgressNormal, QString("* Node Tree:"));
 		logNodeTree(scene->mRootNode, "**");
 		
-#ifdef HAVOKCONVERTER_LOST_WORLD
+#ifdef HAVOKCONVERTER_LOSTWORLD
 		hkpStaticCompoundShape* shape = convertNodeTreeCompoundShape(scene, scene->mRootNode, global_transform);
 		shapes.pushBack(hkRootLevelContainer::NamedVariant("shape",shape, &hkcdStaticTreeDefaultTreeStorage6Class));
 #else
@@ -132,16 +134,16 @@ bool HKWindow::convert() {
 #endif
 	}
 	
-#ifndef HAVOKCONVERTER_LOST_WORLD
+#ifndef HAVOKCONVERTER_LOSTWORLD
 	world->unlock();
-#endif // !HAVOKCONVERTER_LOST_WORLD
+#endif // !HAVOKCONVERTER_LOSTWORLD
 
 	hkOstream outfile(output_file.toStdString().c_str());
 	if (outfile.isOk()) {
 		// Create root level container and push the physics data on to it.
 		hkRootLevelContainer *root_level_container = new hkRootLevelContainer();
 
-#ifdef HAVOKCONVERTER_LOST_WORLD
+#ifdef HAVOKCONVERTER_LOSTWORLD
 		root_level_container->m_namedVariants.append(shapes);
 		logProgress(ProgressNormal, QString("Conversion finished with %1 compressed shapes.").arg(shapes.getSize()));
 #else
@@ -156,32 +158,50 @@ bool HKWindow::convert() {
 
 		logProgress(ProgressNormal, QString("Physics system with %1 rigid bodies.").arg(system->getRigidBodies().getSize()));
 
-		root_level_container->m_namedVariants.pushBack(hkRootLevelContainer::NamedVariant("Physics Data", physics_data, &hkpPhysicsDataClass));
+		hkRootLevelContainer::NamedVariant namedVariant("Physics Data", physics_data, &hkpPhysicsDataClass);
+
+#ifdef HAVOK_5_5_0
+		root_level_container->m_namedVariants = &namedVariant;
+		root_level_container->m_numNamedVariants = 1;
+#else
+		root_level_container->m_namedVariants.pushBack(namedVariant);
 		physics_data->removeReference();
 #endif
 
+#endif
+
 		// Serialize root level container to a binary packfile.
-		hkPackfileWriter::Options pack_options;
-		hkSerializeUtil::SaveOptions options; 
-		pack_options.m_writeMetaInfo = false;
-		options.useBinary(true);
-		hkResult result = hkSerializeUtil::savePackfile(root_level_container, hkRootLevelContainerClass, outfile.getStreamWriter(), pack_options, HK_NULL, options);
-		if (result == HK_SUCCESS)  {
+		hkBinaryPackfileWriter writer;
+		writer.setContents(root_level_container, hkRootLevelContainerClass);
+
+		hkBinaryPackfileWriter::Options options = {};
+#ifdef HAVOKCONVERTER_UNLEASHED
+		options.m_layout = hkStructureLayout::Xbox360LayoutRules;
+#else
+		options.m_layout = hkStructureLayout::MsvcWin32LayoutRules;
+#endif
+		hkResult result = writer.save(outfile.getStreamWriter(), options);
+		bool success = (result == HK_SUCCESS);
+		if (success)  {
 			logProgress(ProgressSuccess, "Serializer success! Saved file to " + output_file);
-			return true;
 		}
 		else {
 			logProgress(ProgressFatal, "Serializer output error. File could not be saved properly.");
-			return false;
 		}
 
-#ifndef HAVOKCONVERTER_LOST_WORLD
+#ifdef HAVOK_5_5_0
+		physics_data->removeReference();
+#endif
+
+#ifndef HAVOKCONVERTER_LOSTWORLD
 		system->removeReference();
 		world->unlock();
 		delete world;
-#endif // !HAVOKCONVERTER_LOST_WORLD
+#endif // !HAVOKCONVERTER_LOSTWORLD
 
 		delete root_level_container;
+
+		return success;
 	}
 	else {
 		logProgress(ProgressFatal, "Could not open output file for writing!");
@@ -199,155 +219,387 @@ void HKWindow::logNodeTree(aiNode *node, QString prefix) {
 	}
 }
 
+hkpRigidBody* HKWindow::convertNodeToRigidBody(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::set<std::string>& names) {
+	LibGens::Tags tags(node->mName.C_Str());
 
-hkpShape *HKWindow::convertMeshToShape(aiMesh *mesh, LibGens::Vector3 scale) {
-	// Get triangle count.
-	int triangles = 0;
-	for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
-		if (mesh->mFaces[f].mNumIndices == 3) {
-			triangles++;
-		}
-	}
-
-	// Fill index buffer.
-	size_t index_count = 0;
-	int *index_buffer = new int[triangles * 3];
-	for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
-		if (mesh->mFaces[f].mNumIndices == 3) {
-			index_buffer[index_count++] = mesh->mFaces[f].mIndices[0];
-			index_buffer[index_count++] = mesh->mFaces[f].mIndices[1];
-			index_buffer[index_count++] = mesh->mFaces[f].mIndices[2];
-		}
-	}
-
-	// Fill vertex buffer.
-	float *vertex_buffer = new float[mesh->mNumVertices * 4];
-	size_t vertex_count = 0;
-	LibGens::AABB aabb;
-	aabb.reset();
-
-	for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
-		LibGens::Vector3 vertex(mesh->mVertices[v].x * scale.x, mesh->mVertices[v].y * scale.y, mesh->mVertices[v].z * scale.z);
-		aabb.addPoint(vertex);
-
-		vertex_buffer[vertex_count++] = vertex.x;
-		vertex_buffer[vertex_count++] = vertex.y;
-		vertex_buffer[vertex_count++] = vertex.z;
-		vertex_buffer[vertex_count++] = 0.0f;
-	}
-
-	// Create extended mesh shape.
-	hkpStorageExtendedMeshShape *extended_shape = new hkpStorageExtendedMeshShape();
-	hkpExtendedMeshShape::TrianglesSubpart part;
-	part.m_numTriangleShapes = triangles;
-	part.m_numVertices = mesh->mNumVertices;
-	part.m_vertexBase = vertex_buffer;
-	part.m_stridingType = hkpExtendedMeshShape::INDICES_INT32;
-	part.m_vertexStriding = sizeof(float) * 4;
-	part.m_indexBase = index_buffer;
-	part.m_indexStriding = sizeof(int) * 3;
-	extended_shape->addTrianglesSubpart(part);
-
-	// Compile mopp and return it as the shape.
-	hkpMoppCompilerInput mopp_input;
-	mopp_input.m_enableChunkSubdivision = true;
-	mopp_input.setAbsoluteFitToleranceOfTriangles(TriangleAbsoluteTolerance);
-	mopp_input.setAbsoluteFitToleranceOfAxisAlignedTriangles(hkVector4(TriangleAbsoluteTolerance, TriangleAbsoluteTolerance, TriangleAbsoluteTolerance));
-	hkpMoppCode *code = hkpMoppUtility::buildCode(extended_shape, mopp_input);
-	hkpMoppBvTreeShape *mopp_shape = new hkpMoppBvTreeShape(extended_shape, code);
-	hkpMeshWeldingUtility::computeWeldingInfo(extended_shape, mopp_shape, hkpWeldingUtility::WELDING_TYPE_ANTICLOCKWISE, false);
-	logProgress(ProgressNormal, QString("Created shape with %1 vertices, %2 faces and a MOPP code of size %3.").arg(mesh->mNumVertices).arg(mesh->mNumFaces).arg(code->getCodeSize()));
-	code->removeReference();
-	extended_shape->removeReference();
-
-	return mopp_shape;
-}
-
-QList<hkpRigidBody *> HKWindow::convertNodeToRigidBodies(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::unordered_set<std::string>& names) {
-	QList<hkpRigidBody *> rigid_bodies;
 	LibGens::Vector3 pos, sca;
 	LibGens::Quaternion ori;
 	transform.decomposition(pos, sca, ori);
 
-	size_t index = 0;
+	LibGens::AABB aabb;
+	aabb.reset();
 
-	for (unsigned int m = 0; m < node->mNumMeshes; m++) {
-		// Rigid body information.
-		hkpRigidBodyCinfo rigid_body_info;
-		rigid_body_info.m_position.set(pos.x, pos.y, pos.z);
-		rigid_body_info.m_rotation.set(ori.x, ori.y, ori.z, ori.w);
-		rigid_body_info.m_angularDamping = 0.049805f;
-		rigid_body_info.m_linearDamping = 0.0f;
-		hkpShape *shape = convertMeshToShape(scene->mMeshes[node->mMeshes[m]], sca);
-		rigid_body_info.m_shape = shape;
-		rigid_body_info.m_mass = 0.0f;
-		rigid_body_info.m_motionType = hkpMotion::MOTION_FIXED;
-		hkpRigidBody* rigid_body = new hkpRigidBody(rigid_body_info);
+	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-		std::string rigid_body_name = node->mName.C_Str();
+		for (unsigned int j = 0; j < mesh->mNumVertices; j++) {
+			LibGens::Vector3 vertex(mesh->mVertices[j].x * sca.x, mesh->mVertices[j].y * sca.y, mesh->mVertices[j].z * sca.z);
+			aabb.addPoint(vertex);
+		}
+	}
 
-		while (names.find(rigid_body_name) != names.end()) {
-			rigid_body_name = ToString(node->mName.C_Str()) + "_" + ToString(index++);
+	hkpShape* shape = NULL;
+
+	for (int i = 0; i < tags.getTagCount(); i++) {
+		auto tag = tags.getTag(i);
+
+		if (tag.getKey() == "BOX") {
+			const hkVector4 half_extents(aabb.sizeX() * 0.5f, aabb.sizeY() * 0.5f, aabb.sizeZ() * 0.5f, 1.0f);
+			shape = new hkpBoxShape(half_extents);
+			pos = (pos + ori * aabb.center());
+			logProgress(ProgressNormal, QString("Created box shape with half extents [%1, %2, %3].").arg(half_extents(0)).arg(half_extents(1)).arg(half_extents(2)));
+			break;
 		}
 
-		// The name is going to be kept alive by the unordered set.
-		rigid_body->setName(names.insert(rigid_body_name).first->c_str());
+		else if (tag.getKey() == "SPHERE") {
+			shape = new hkpSphereShape(aabb.radius());
+			pos = (pos + ori * aabb.center());
+			logProgress(ProgressNormal, QString("Created sphere shape with radius %1.").arg(aabb.radius()));
+			break;
+		}
 
-		// Prepare properties.
-		QMap<hkUint32, int> properties;
-		LibGens::Tags tags(node->mName.C_Str());
-		for (int i = 0; i < tags.getTagCount(); i++) {
-			QString tag_match = tags.getTag(i).getKey().c_str();
+		else if (tag.getKey() == "CYLINDER" || tag.getKey() == "CYL" || tag.getKey() == "CAPSULE") {
+			// Get the longest extent to define the axis of the cylinder, then second longest to get the radius.
 
-			// Search for tag in existing properties. We only use it if it matches the bitwise operation.
-			for (int bitwise = 0; bitwise < 2; bitwise++) {
-				foreach(const HKPropertyTag &tag, converter_settings.property_tags) {
-					if (tag.tag == tag_match) {
-						foreach(const HKPropertyValue &value, tag.values) {
-							if (value.bitwise == bitwise) {
-								if (value.bitwise == HKBitwise_SET)
-									properties[value.key] = value.value;
-								else if (value.bitwise == HKBitwise_OR)
-									properties[value.key] |= value.value;
-							}
+			auto mid_element = [](float a, float b, float c, float min, float max) -> float {
+				if (a > min && a < max)
+					return a;
+				if (b > min && b < max)
+					return b;
+				if (c > min && c < max)
+					return c;
+
+				return min;
+			};
+
+			enum LongAxis {
+				NONE,
+				AXIS_X,
+				AXIS_Y,
+				AXIS_Z
+			};
+
+			LongAxis axis = NONE;
+			string axis_value = tag.getValue(0, "");
+
+			if (axis_value == "X" || axis_value == "x")
+				axis = AXIS_X;
+			if (axis_value == "Y" || axis_value == "y")
+				axis = AXIS_Y;
+			if (axis_value == "Z" || axis_value == "z")
+				axis = AXIS_Z;
+
+			const float size_x = aabb.sizeX() * 0.5f;
+			const float size_y = aabb.sizeY() * 0.5f;
+			const float size_z = aabb.sizeZ() * 0.5f;
+
+			hkVector4 start;
+			hkVector4 end;
+			float radius;
+
+			switch (axis) {
+			case AXIS_X: {
+				start = hkVector4(size_x, 0, 0);
+				end = hkVector4(-size_x, 0, 0);
+				radius = max(size_y, size_z);
+				break;
+			}
+			case AXIS_Y: {
+				start = hkVector4(0, size_y, 0);
+				end = hkVector4(0, -size_y, 0);
+				radius = max(size_x, size_z);
+				break;
+			}
+			case AXIS_Z: {
+				start = hkVector4(0, 0, size_z);
+				end = hkVector4(0, 0, -size_z);
+				radius = max(size_x, size_y);
+				break;
+			}
+
+			// Determine automatically by getting the longest or shortest axis & assuming that's the polar axis.
+			// If longest axis is the polar axis, get the SECOND longest axis as the radius. Else, just get the longest axis.
+			// It's a hack method for sure, but better than nothing.
+			case NONE: {
+				start = hkVector4(size_x, 0, 0);
+				end = hkVector4(-size_x, 0, 0);
+				float min_size, max_size;
+				const bool is_long = tag.getValueInt(0, 1) > 0; // if @CYL(0) then use short axis, else use long. Default is long.
+
+				if (is_long) {
+					max_size = size_x;
+					if (size_y > max_size) {
+						max_size = size_y;
+						start = hkVector4(0, size_y, 0);
+						end = hkVector4(0, -size_y, 0);
+					}
+
+					if (size_z > max_size) {
+						max_size = size_z;
+						start = hkVector4(0, 0, size_z);
+						end = hkVector4(0, 0, -size_z);
+					}
+					min_size = min(size_x, min(size_y, size_z));
+					radius = mid_element(size_x, size_y, size_z, min_size, max_size);
+				}
+				else {
+					min_size = size_x;
+					if (size_y < min_size) {
+						min_size = size_y;
+						start = hkVector4(0, size_y, 0);
+						end = hkVector4(0, -size_y, 0);
+					}
+
+					if (size_z < min_size) {
+						// No need to assign min, as that value is not used.
+						start = hkVector4(0, 0, size_z);
+						end = hkVector4(0, 0, -size_z);
+					}
+					radius = max(size_x, max(size_y, size_z));
+				}
+				break;
+			}
+			}
+
+			if (tag.getKey() == "CAPSULE") {
+				shape = new hkpCapsuleShape(start, end, radius);
+				logProgress(ProgressNormal, QString("Created capsule shape with start [%1, %2, %3], end [%4, %5, %6] and radius %7.").arg(start(0)).arg(start(1)).arg(start(2)).arg(end(0)).arg(end(1)).arg(end(2)).arg(radius));
+			}
+			else {
+				shape = new hkpCylinderShape(start, end, radius);
+				logProgress(ProgressNormal, QString("Created cylinder shape with start [%1, %2, %3], end [%4, %5, %6] and radius %7.").arg(start(0)).arg(start(1)).arg(start(2)).arg(end(0)).arg(end(1)).arg(end(2)).arg(radius));
+			}
+
+			pos = (pos + ori * aabb.center());
+			break;
+		}
+	}
+
+	if (shape == NULL) {
+		bool is_convex = tags.getTagValueBool("CONVEX", 0, converter_settings.mode == RigidBodies);
+
+		if (is_convex) {
+			int num_vertices = 0;
+
+			for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+				num_vertices += mesh->mNumVertices;
+			}
+			
+			float* vertex_buffer = new float[num_vertices * 4];
+			int vertex_index = 0;
+
+			for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+				for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
+					LibGens::Vector3 vertex(mesh->mVertices[v].x * sca.x, mesh->mVertices[v].y * sca.y, mesh->mVertices[v].z * sca.z);
+
+					vertex_buffer[vertex_index++] = vertex.x;
+					vertex_buffer[vertex_index++] = vertex.y;
+					vertex_buffer[vertex_index++] = vertex.z;
+					vertex_buffer[vertex_index++] = 0.0f;
+				}
+			}
+
+			vertices_to_free.push_back(vertex_buffer);
+
+#ifdef HAVOK_5_5_0
+			hkStridedVertices verts;
+			verts.m_vertices = vertex_buffer;
+			verts.m_numVertices = num_vertices;
+			verts.m_striding = sizeof(hkVector4);
+
+			hkGeometry geometry;
+			hkInplaceArrayAligned16<hkVector4, 32> transformedPlanes;
+
+			hkpGeometryUtility::createConvexGeometry(verts, geometry, transformedPlanes);
+
+			verts.m_numVertices = geometry.m_vertices.getSize();
+			verts.m_vertices = &(geometry.m_vertices[0](0));
+
+			shape = new hkpConvexVerticesShape(verts, transformedPlanes);
+#else
+			hkStridedVertices verts((hkVector4*)vertex_buffer, num_vertices);
+			shape = new hkpConvexVerticesShape(verts);
+#endif
+			logProgress(ProgressNormal, QString("Created convex shape with %1 vertices.").arg(num_vertices));
+		}
+		else {
+			// Create extended mesh shape.
+			hkpStorageExtendedMeshShape* extended_shape = new hkpStorageExtendedMeshShape();
+			int num_vertices = 0;
+			int num_faces = 0;
+
+			for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+				// Get triangle count.
+				int triangles = 0;
+				for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
+					if (mesh->mFaces[f].mNumIndices == 3) {
+						triangles++;
+					}
+				}
+
+				// Fill index buffer.
+				size_t index_count = 0;
+				int* index_buffer = new int[triangles * 3];
+				for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
+					if (mesh->mFaces[f].mNumIndices == 3) {
+						index_buffer[index_count++] = mesh->mFaces[f].mIndices[0];
+						index_buffer[index_count++] = mesh->mFaces[f].mIndices[1];
+						index_buffer[index_count++] = mesh->mFaces[f].mIndices[2];
+						num_faces += 3;
+					}
+				}
+
+				indices_to_free.push_back(index_buffer);
+
+				// Fill vertex buffer.
+				float* vertex_buffer = new float[mesh->mNumVertices * 4];
+				size_t vertex_count = 0;
+
+				for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
+					LibGens::Vector3 vertex(mesh->mVertices[v].x * sca.x, mesh->mVertices[v].y * sca.y, mesh->mVertices[v].z * sca.z);
+
+					vertex_buffer[vertex_count++] = vertex.x;
+					vertex_buffer[vertex_count++] = vertex.y;
+					vertex_buffer[vertex_count++] = vertex.z;
+					vertex_buffer[vertex_count++] = 0.0f;
+
+					++num_vertices;
+				}
+
+				vertices_to_free.push_back(vertex_buffer);
+
+				hkpExtendedMeshShape::TrianglesSubpart part;
+				part.m_numTriangleShapes = triangles;
+				part.m_numVertices = mesh->mNumVertices;
+				part.m_vertexBase = vertex_buffer;
+				part.m_stridingType = hkpExtendedMeshShape::INDICES_INT32;
+				part.m_vertexStriding = sizeof(float) * 4;
+				part.m_indexBase = index_buffer;
+				part.m_indexStriding = sizeof(int) * 3;
+				extended_shape->addTrianglesSubpart(part);
+			}
+
+			// Compile mopp and return it as the shape.
+			hkpMoppCompilerInput mopp_input;
+			mopp_input.setAbsoluteFitToleranceOfTriangles(TriangleAbsoluteTolerance);
+			mopp_input.setAbsoluteFitToleranceOfAxisAlignedTriangles(hkVector4(TriangleAbsoluteTolerance, TriangleAbsoluteTolerance, TriangleAbsoluteTolerance));
+			hkpMoppCode* code = hkpMoppUtility::buildCode(extended_shape, mopp_input);
+			hkpMoppBvTreeShape* mopp_shape = new hkpMoppBvTreeShape(extended_shape, code);
+#ifdef HAVOK_5_5_0
+			extended_shape->computeWeldingInfo(mopp_shape, hkpWeldingUtility::WELDING_TYPE_ANTICLOCKWISE);
+#else
+			hkpMeshWeldingUtility::computeWeldingInfo(extended_shape, mopp_shape, hkpWeldingUtility::WELDING_TYPE_ANTICLOCKWISE, false);
+#endif
+			logProgress(ProgressNormal, QString("Created shape with %1 vertices, %2 faces and a MOPP code of size %3.").arg(num_vertices).arg(num_faces).arg(code->getCodeSize()));
+			code->removeReference();
+			extended_shape->removeReference();
+
+			shape = mopp_shape;
+		}
+	}
+
+	// Rigid body information.
+	hkpRigidBodyCinfo rigid_body_info;
+	rigid_body_info.m_position.set(pos.x, pos.y, pos.z);
+	rigid_body_info.m_rotation.set(ori.x, ori.y, ori.z, ori.w);
+	rigid_body_info.m_angularDamping = 0.049805f;
+	rigid_body_info.m_linearDamping = 0.0f;
+
+	switch (converter_settings.mode) {
+	default:
+	case Collision: {
+		rigid_body_info.m_mass = 0.0f;
+		rigid_body_info.m_motionType = hkpMotion::MOTION_FIXED;
+		break;
+	}
+	case RigidBodies: {
+		rigid_body_info.m_mass = tags.getTagValueFloat("MASS", 0, 5.0f);
+		rigid_body_info.m_motionType = (tags.getTagValueInt("MOTION", 0, 1) == 0) ? hkpMotion::MOTION_FIXED : hkpMotion::MOTION_BOX_INERTIA;
+		break;
+	}
+	}
+	rigid_body_info.m_shape = shape;
+
+	hkpRigidBody* rigid_body = new hkpRigidBody(rigid_body_info);
+
+	std::string node_name;
+	if (converter_settings.mode == RigidBodies) {
+		node_name = tags.getName();
+	}
+	else {
+		node_name = node->mName.C_Str();
+	}
+
+	std::string rigid_body_name = node_name;
+	size_t rigid_body_name_index = 0;
+	while (names.find(rigid_body_name) != names.end()) {
+		rigid_body_name = node_name;
+		rigid_body_name += "_";
+		rigid_body_name += ToString(rigid_body_name_index);
+		++rigid_body_name_index;
+	}
+
+	rigid_body->setName(names.insert(rigid_body_name).first->c_str());
+
+	// Prepare properties.
+	QMap<hkUint32, int> properties;
+	for (int i = 0; i < tags.getTagCount(); i++) {
+		QString tag_match = tags.getTag(i).getKey().c_str();
+
+		// Search for tag in existing properties. We only use it if it matches the bitwise operation.
+		for (int bitwise = 0; bitwise < 2; bitwise++) {
+			foreach(const HKPropertyTag & tag, converter_settings.property_tags) {
+				if (tag.tag == tag_match) {
+					foreach(const HKPropertyValue & value, tag.values) {
+						if (value.bitwise == bitwise) {
+							if (value.bitwise == HKBitwise_SET)
+								properties[value.key] = value.value;
+							else if (value.bitwise == HKBitwise_OR)
+								properties[value.key] |= value.value;
 						}
 					}
 				}
 			}
 		}
-		
-		// Set properties.
-		if (!properties.isEmpty())
-			logProgress(ProgressNormal, QString("Applying %1 properties to %2").arg(properties.size()).arg(rigid_body->getName()));
-
-		foreach(hkUint32 key, properties.keys()) {
-			rigid_body->setProperty(key, properties[key]);
-		}
-
-		shape->removeReference();
-		rigid_bodies.append(rigid_body);
 	}
 
-	return rigid_bodies;
+	// Set properties.
+	if (!properties.isEmpty()) {
+		logProgress(ProgressNormal, QString("Applying %1 properties to %2").arg(properties.size()).arg(rigid_body->getName()));
+	}
+
+	foreach(hkUint32 key, properties.keys()) {
+		if (rigid_body->hasProperty(key)) {
+			rigid_body->editProperty(key, properties[key]);
+		}
+		else {
+			rigid_body->addProperty(key, properties[key]);
+		}
+	}
+	
+	shape->removeReference();
+
+	return rigid_body;
 }
 
-void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::unordered_set<std::string>& names) {
+void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matrix4 parent_transform, hkpWorld *world, std::set<std::string>& names) {
 	// Convert meshes to rigid bodies.
 	LibGens::Matrix4 local_transform;
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
 			local_transform[i][j] = node->mTransformation[i][j];
 
-	if (node->mNumMeshes)
-		logProgress(ProgressNormal, QString("Converting %1 to rigid bodies.").arg(node->mName.C_Str()));
-
 	LibGens::Matrix4 transform = parent_transform * local_transform;
-	QList<hkpRigidBody *> rigid_bodies = convertNodeToRigidBodies(scene, node, transform, names);
-	
-	if (!rigid_bodies.isEmpty())
-		logProgress(ProgressNormal, QString("Adding %1 rigid bodies to World.").arg(rigid_bodies.size()));
 
-	foreach(hkpRigidBody *rigid_body, rigid_bodies) {
+	if (node->mNumMeshes) {
+		logProgress(ProgressNormal, QString("Converting %1 to rigid body.").arg(node->mName.C_Str()));
+
+		hkpRigidBody* rigid_body = convertNodeToRigidBody(scene, node, transform, names);
 		world->addEntity(rigid_body);
 		rigid_body->removeReference();
 	}
@@ -358,7 +610,7 @@ void HKWindow::convertNodeTree(const aiScene *scene, aiNode *node, LibGens::Matr
 	}
 }
 
-#ifdef HAVOKCONVERTER_LOST_WORLD
+#ifdef HAVOKCONVERTER_LOSTWORLD
 
 hkpShape* HKWindow::convertMeshToCompressedShape(aiMesh* mesh, int userdata = 0)
 {

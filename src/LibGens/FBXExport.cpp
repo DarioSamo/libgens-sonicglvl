@@ -17,6 +17,8 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
+#ifndef HAVOK_5_5_0
+
 #include "Havok.h"
 #include "FBX.h"
 #include "FBXManager.h"
@@ -681,3 +683,5 @@ namespace LibGens {
 		}
 	}
 };
+
+#endif

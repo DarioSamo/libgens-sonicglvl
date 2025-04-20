@@ -19,6 +19,10 @@
 
 #pragma once
 
+class hkResource;
+class hkaAnimation;
+class hkaAnimationBinding;
+
 namespace LibGens {
 	class HavokAnimationCache {
 		protected:
