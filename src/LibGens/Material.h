@@ -52,9 +52,10 @@ namespace LibGens {
 			string extra;
 			string gi_extra;
 			string layer;
-			unsigned char material_flag;
+			unsigned char alpha_threshold;
 			bool no_culling;
 			bool color_blend;
+			int root_node_type;
 		public:
 			static const string LayerOpaq;
 			static const string LayerTrans;
@@ -100,11 +101,13 @@ namespace LibGens {
 			void setExtraGI(string v);
 			string getExtraGI();
 			bool hasExtraGI();
+			unsigned char getAlphaThreshold();
 			void setNoCulling(bool v);
 			bool hasNoCulling();
 			void setColorBlend(bool v);
 			bool hasColorBlend();
 			void setPropertyValue(string name, unsigned int value);
+			int getRootNodeType();
 	};
 };
 

@@ -38,6 +38,7 @@ EditorApplication::EditorApplication(void)
 	game_client->AddMessageProcessor(Game_ProcessMessage);
 	ghost_data = nullptr;
 	isGhostRecording = false;
+	checked_shader_library = false;
 }
 
 EditorApplication::~EditorApplication(void) {
@@ -535,17 +536,36 @@ void EditorApplication::createScene(void) {
 	fbx_manager      = new LibGens::FBXManager();
 
 	// Initialize Editor Managers
-	havok_property_database = new LibGens::HavokPropertyDatabase(SONICGLVL_HAVOK_PROPERTY_DATABASE_PATH);
-	history                 = new History();
-	property_vector_history = new History();
-	look_at_vector_history  = new History();
-	level_database          = new EditorLevelDatabase(SONICGLVL_LEVEL_DATABASE_PATH);
-	material_library        = new LibGens::MaterialLibrary(SONICGLVL_RESOURCES_PATH);
-	model_library           = new LibGens::ModelLibrary(SONICGLVL_RESOURCES_PATH);
-	shader_library          = new LibGens::ShaderLibrary(SONICGLVL_SHADERS_PATH);
-	uv_animation_library    = new LibGens::UVAnimationLibrary(SONICGLVL_RESOURCES_PATH);
-	library                 = new LibGens::ObjectLibrary(SONICGLVL_LIBRARY_PATH);
-	animations_list         = new EditorAnimationsList();
+	havok_property_database    = new LibGens::HavokPropertyDatabase(SONICGLVL_HAVOK_PROPERTY_DATABASE_PATH);
+	history                    = new History();
+	property_vector_history    = new History();
+	look_at_vector_history     = new History();
+	level_database             = new EditorLevelDatabase(SONICGLVL_LEVEL_DATABASE_PATH);
+	material_library           = new LibGens::MaterialLibrary(SONICGLVL_RESOURCES_PATH);
+	model_library              = new LibGens::ModelLibrary(SONICGLVL_RESOURCES_PATH);
+	generations_shader_library = new LibGens::ShaderLibrary(SONICGLVL_SHADERS_PATH);
+	unleashed_shader_library   = new LibGens::ShaderLibrary(SONICGLVL_SHADERS_PATH);
+	uv_animation_library       = new LibGens::UVAnimationLibrary(SONICGLVL_RESOURCES_PATH);
+	library                    = new LibGens::ObjectLibrary(SONICGLVL_LIBRARY_PATH);
+	animations_list            = new EditorAnimationsList();
+
+	bool loaded_generations_shader_library = 
+		generations_shader_library->loadShaderArchive("shader_r.ar.00") &&
+		generations_shader_library->loadShaderArchive("shader_r_add.ar.00");
+
+	if (!loaded_generations_shader_library) {
+		delete generations_shader_library;
+		generations_shader_library = NULL;
+	}
+
+	bool loaded_unleashed_shader_library = 
+		unleashed_shader_library->loadShaderArchive("shader.ar") &&
+		unleashed_shader_library->loadShaderArchive("shader_d3d9.ar");
+
+	if (!loaded_unleashed_shader_library) {
+		delete unleashed_shader_library;
+		unleashed_shader_library = NULL;
+	}
 
 	library->loadDatabase(SONICGLVL_OBJECTS_DATABASE_PATH);
 
@@ -917,21 +937,6 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 	// Global Mode Shortcuts
 	if (keyboard->isModifierDown(OIS::Keyboard::Ctrl)) {
-		if(arg.key == OIS::KC_F1) {
-			if (global_directional_light) {
-				global_directional_light->setDirection(global_directional_light->getDirection() * -1);
-			}
-
-			viewport->setTechnique(SONICGLVL_LOW_END_TECHNIQUE);
-		}
-		if(arg.key == OIS::KC_F2) {
-			if (global_directional_light) {
-				global_directional_light->setDirection(global_directional_light->getDirection() * -1);
-			}
-
-			viewport->setTechnique("Default");
-		}
-
 		if(arg.key == OIS::KC_1) {
 			editor_application->toggleNodeVisibility(EDITOR_NODE_OBJECT);
 			editor_application->toggleNodeVisibility(EDITOR_NODE_OBJECT_MSP);

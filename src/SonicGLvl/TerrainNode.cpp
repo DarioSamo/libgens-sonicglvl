@@ -33,7 +33,7 @@ TerrainNode::TerrainNode(LibGens::TerrainInstance *terrain_instance_p, Ogre::Sce
 		quality_level = 3;
 
 		scene_node = scene_manager->getRootSceneNode()->createChildSceneNode();
-		buildModel(scene_node, model, model->getName(), "", scene_manager, material_library, EDITOR_NODE_QUERY_TERRAIN, GENERAL_MESH_GROUP, true);
+		buildModel(scene_node, model, model->getName(), "", scene_manager, material_library, EDITOR_NODE_QUERY_TERRAIN, GENERAL_MESH_GROUP, true, SONICGLVL_SHADER_LIBRARY);
 		
 		LibGens::Matrix4 instance_matrix=terrain_instance->getMatrix();
 

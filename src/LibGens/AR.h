@@ -56,8 +56,6 @@ namespace LibGens {
 			vector<ArFile *> files;
 			vector<unsigned int> split_sizes;
 			unsigned int padding;
-			unsigned int sha1_hash[5];
-			SHA1Context sha1_context;
 		public:
 			ArPack(unsigned int padding_p=0x40);
 			ArPack(string filename, bool data=true);
@@ -73,7 +71,7 @@ namespace LibGens {
 			void merge(ArPack *pack);
 			void addFile(string filename, string override_name="");
 			unsigned int getFileCount();
-			unsigned int *getHash();
+			XXH128_hash_t computeHash();
 			~ArPack();
 	};
 };

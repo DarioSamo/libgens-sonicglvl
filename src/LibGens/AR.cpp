@@ -139,8 +139,6 @@ namespace LibGens {
 
 		
 		
-		SHA1Reset(&sha1_context);
-		
 		File file(filename, LIBGENS_FILE_READ_BINARY);
 		if (file.valid()) {
 			read(&file);
@@ -168,18 +166,11 @@ namespace LibGens {
 				}
 			}
 		}
-
-		SHA1Result(&sha1_context);
-		for (size_t i=0; i<5; i++) {
-			sha1_hash[i] = sha1_context.Message_Digest[i];
-		}
 	}
 
 	void ArPack::merge(ArPack *pack) {
 		size_t file_count=pack->files.size();
 		for (size_t i=0; i<file_count; i++) {
-			SHA1Input(&sha1_context, pack->files[i]->getData(), pack->files[i]->getSize());
-
 			files.push_back(pack->files[i]);
 		}
 		pack->files.clear();
@@ -213,10 +204,6 @@ namespace LibGens {
 		while (!file->endOfFile()) {
 			ArFile* ar_file = new ArFile();
 			ar_file->read(file, data);
-
-			if (ar_file->getData()) {
-				SHA1Input(&sha1_context, ar_file->getData(), ar_file->getSize());
-			}
 
 			files.push_back(ar_file);
 
@@ -255,8 +242,6 @@ namespace LibGens {
 			}
 		}
 
-		SHA1Reset(&sha1_context);
-
 		File *current_file=new LibGens::File(filename, LIBGENS_FILE_WRITE_BINARY);
 		if (current_file->valid()) {
 			unsigned int ar_header_0=0;
@@ -272,10 +257,6 @@ namespace LibGens {
 
 			for (size_t i=0; i<files.size(); i++) {
 				files[i]->write(current_file, padding);
-
-				if (files[i]->getData()) {
-					SHA1Input(&sha1_context, files[i]->getData(), files[i]->getSize());
-				}
 
 				if (split_file_mode && (current_file->getCurrentAddress() > LIBGENS_AR_MAX_SPLIT_FILE_BYTES) && (i<files.size()-1)) {
 					split_sizes.push_back(current_file->getFileSize());
@@ -309,11 +290,6 @@ namespace LibGens {
 			string arl_filename=pack_name;
 			arl_filename[arl_filename.size()-1]='l';
 			saveARL(arl_filename);
-		}
-
-		SHA1Result(&sha1_context);
-		for (size_t i=0; i<5; i++) {
-			sha1_hash[i] = sha1_context.Message_Digest[i];
 		}
 	}
 
@@ -443,8 +419,17 @@ namespace LibGens {
 		return files.size();
 	}
 
-	unsigned int *ArPack::getHash() {
-		return sha1_hash;
+	XXH128_hash_t ArPack::computeHash() {
+		XXH3_state_t state;
+		XXH3_128bits_reset(&state);
+
+		for (auto& file : files) {
+			if (file->getData() != NULL) {
+				XXH3_128bits_update(&state, file->getData(), file->getSize());
+			}
+		}
+
+		return XXH3_128bits_digest(&state);
 	}
 
 	ArPack::~ArPack() {

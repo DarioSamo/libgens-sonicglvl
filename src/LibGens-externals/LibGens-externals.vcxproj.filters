@@ -4,9 +4,6 @@
     <Filter Include="Externals">
       <UniqueIdentifier>{9713a720-75e4-4057-af98-af21c57bb260}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Externals\sha1">
-      <UniqueIdentifier>{06f55bc1-9d1f-41f4-b1a3-5cf226eea8fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Externals\tinyxml">
       <UniqueIdentifier>{b25006fd-9bcd-44db-802c-3bf6acfc6b54}</UniqueIdentifier>
     </Filter>
@@ -16,11 +13,14 @@
     <Filter Include="Externals\tristripper\detail">
       <UniqueIdentifier>{e55ac474-994d-487f-8926-b1f1f86a07cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Externals\libmspack">
+      <UniqueIdentifier>{91bc0309-f0ae-4134-acc2-2a6405f6558a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Externals\xxhash">
+      <UniqueIdentifier>{53b3bc62-63e0-4b7f-8ae3-8443304a2fd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="sha1\sha1.cpp">
-      <Filter>Externals\sha1</Filter>
-    </ClCompile>
     <ClCompile Include="tinyxml\tinystr.cpp">
       <Filter>Externals\tinyxml</Filter>
     </ClCompile>
@@ -42,11 +42,14 @@
     <ClCompile Include="tristripper\tri_stripper.cpp">
       <Filter>Externals\tristripper</Filter>
     </ClCompile>
+    <ClCompile Include="libmspack\lzxd.c">
+      <Filter>Externals\libmspack</Filter>
+    </ClCompile>
+    <ClCompile Include="xxhash\xxhash.c">
+      <Filter>Externals\xxhash</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sha1\sha1.h">
-      <Filter>Externals\sha1</Filter>
-    </ClInclude>
     <ClInclude Include="tinyxml\tinystr.h">
       <Filter>Externals\tinyxml</Filter>
     </ClInclude>
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="tristripper\detail\types.h">
       <Filter>Externals\tristripper\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="xxhash\xxhash.h">
+      <Filter>Externals\xxhash</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

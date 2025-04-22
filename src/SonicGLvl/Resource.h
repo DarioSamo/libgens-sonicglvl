@@ -135,17 +135,15 @@
 #define IDR_MULTISETPARAM_MSP                   40011
 #define IDS_BOTTOM_SELECTION_ROT_Z              40011
 #define IDS_LOOK_AT_Z                           40011
-#define IMD_CLEAN_TERRAIN                       40011
+#define IMD_LOAD_ALL_TERRAIN                    40011
 #define IDB_EDIT_VECTOR_LIST_MOVE_DOWN          40012
 #define IDB_LOOK_AT_FOCUS                       40012
 #define IDC_BOTTOM_CURRENT_OBJECT_SET           40012
 #define IDC_MATERIAL_BACKFACE_CULLING           40012
 #define IDR_MULTISETPARAM_MSP_ADD               40012
-#define IMD_IMPORT_TERRAIN_FBX                  40012
 #define IDB_BOTTOM_GHOST_FORWARD                40013
 #define IDB_MULTISETPARAM_CLEAR                 40013
 #define IDC_MATERIAL_ADDITIVE                   40013
-#define IMD_GENERATE_TERRAIN_GROUPS             40013
 #define IDB_BOTTOM_GHOST_PLAY                   40014
 #define IDC_MATERIAL_UNKNOWN_FLAG               40014
 #define IDC_MULTISETPARAM_SNAP_PATH_CENTERS     40014
@@ -184,7 +182,6 @@
 #define IDE_MATERIAL_PARAMETER_2_N              40028
 #define IMD_OPEN_MATERIAL_EDITOR                40028
 #define IDE_MATERIAL_PARAMETER_3_N              40029
-#define IMD_OPEN_PHYSICS_EDITOR                 40029
 #define IDE_MATERIAL_PARAMETER_4_N              40030
 #define IMD_LOCAL_ROTATION                      40030
 #define IDE_MATERIAL_PARAMETER_5_N              40031

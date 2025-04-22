@@ -62,6 +62,10 @@ namespace LibGens {
 				return name;
 			}
 
+			void setName(string v) {
+				name = v;
+			}
+
 			vector<ShaderParam *> getParameterList(size_t index) {
 				vector<ShaderParam *> empty;
 				empty.clear();
@@ -94,6 +98,10 @@ namespace LibGens {
 				return shader_parameter_filenames;
 			}
 
+			void setName(string v) {
+				name = v;
+			}
+
 			void setExtra(string v) {
 				extra=v;
 			}
@@ -123,6 +131,8 @@ namespace LibGens {
 			string getVertexShaderName() {
 				return vertex_shader_name;
 			}
+
+			bool check(bool const_tex_coord);
 	};
 
 	class ShaderSet {
@@ -145,6 +155,8 @@ namespace LibGens {
 			}
 
 			string getVertexShaderName(string rendering_mode="");
+
+			bool check(bool const_tex_coord, bool no_gi, bool no_light);
 	};
 
 	class ShaderList {
@@ -161,7 +173,14 @@ namespace LibGens {
 			string getName() {
 				return name;
 			}
+
+			void setName(string v) {
+				name = v;
+			}
 	};
+
+	class ArPack;
+	class ArFile;
 
 	class ShaderLibrary {
 		protected:
@@ -174,38 +193,20 @@ namespace LibGens {
 			list<ShaderParams *> pixel_shader_params;
 
 			string folder;
-
-			Vector3 global_light_direction;
-			Vector3 global_light_color;
+			ArPack* ar_pack;
 		public:
-			ShaderLibrary(string folder_p) {
-				folder = folder_p;
+			ShaderLibrary(string folder_p);
 
-				global_light_direction = Vector3(1, -1, 1);
-				global_light_color = Vector3(1, 1, 1);
-			}
+			bool loadShaderArchive(const string& filename);
 
+			ArFile* getFile(string filename);
+			ArFile* getFileByIndex(size_t index);
+			size_t getFileCount();
 			ShaderList *getShaderList(string id);
 			Shader *getVertexShader(string id);
 			Shader *getPixelShader(string id);
 			ShaderParams *getVertexShaderParams(string id);
 			ShaderParams *getPixelShaderParams(string id);
-
-			void setGlobalLightDirection(Vector3 v) {
-				global_light_direction = v;
-			}
-
-			void setGlobalLightColor(Vector3 v) {
-				global_light_color = v;
-			}
-
-			Vector3 getGlobalLightDirection() {
-				return global_light_direction;
-			}
-
-			Vector3 getGlobalLightColor() {
-				return global_light_color;
-			}
 
 			bool getMaterialShaders(string shader_list_name, Shader *&vertex_shader, Shader *&pixel_shader, bool no_light=true, bool no_gi=true, bool const_tex_coord=true);
 

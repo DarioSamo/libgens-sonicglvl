@@ -33,15 +33,9 @@ void GlobalIlluminationListener::notifyRenderSingleObject(Ogre::Renderable *rend
 
 			if (edit_pass) {
 				if (edit_pass->hasVertexProgram()) {
-					Ogre::GpuProgramParametersSharedPtr vp_parameters = edit_pass->getVertexProgramParameters();
-					if (!vp_parameters.isNull()) {
-						vp_parameters->setConstant(186, Ogre::Vector4(parameter->gi_texture->getWidth(), parameter->gi_texture->getHeight(), parameter->gi_texture->getX(), parameter->gi_texture->getY()));
-					}
-					
 					Ogre::TextureUnitState *state=edit_pass->getTextureUnitState(10);
 					state->setTexture(parameter->texture_ptr);
 					Ogre::Root::getSingleton().getRenderSystem()->_setTextureUnitSettings(10, *state);
-					Ogre::Root::getSingleton().getRenderSystem()->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM, vp_parameters, Ogre::GPV_ALL);
 				}
 			}
 		}
@@ -61,4 +55,5 @@ GlobalIlluminationParameter::GlobalIlluminationParameter(LibGens::GISubtexture *
 
 void GlobalIlluminationAssignVisitor::visit(Ogre::Renderable *rend, Ogre::ushort lodIndex, bool isDebug, Ogre::Any *pAny) {
 	rend->getUserObjectBindings().setUserAny(Ogre::Any(parameter));
+	rend->setCustomParameter(0, Ogre::Vector4(parameter->gi_texture->getWidth(), parameter->gi_texture->getHeight(), parameter->gi_texture->getX(), parameter->gi_texture->getY()));
 }

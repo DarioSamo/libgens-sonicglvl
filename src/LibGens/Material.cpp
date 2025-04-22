@@ -35,7 +35,7 @@ namespace LibGens {
 		color_blend = false;
 		extra="";
 		gi_extra="";
-		material_flag = 0x80;
+		alpha_threshold = 0x80;
 		layer = LayerOpaq;
 	}
 
@@ -61,7 +61,8 @@ namespace LibGens {
 		gi_extra="";
 		no_culling = false;
 		color_blend = false;
-		material_flag = 0x80;
+		alpha_threshold = 0x80;
+		root_node_type = LIBGENS_MATERIAL_ROOT_GENERATIONS;
 
 		if (file.valid()) {
 			file.readHeader();
@@ -102,7 +103,9 @@ namespace LibGens {
 			return;
 		}
 
-		switch (file->getRootNodeType()) {
+		root_node_type = file->getRootNodeType();
+
+		switch (root_node_type) {
 			case LIBGENS_MATERIAL_ROOT_GENERATIONS:
 				readRootNodeGenerations(file);
 				break;
@@ -138,7 +141,7 @@ namespace LibGens {
 		file->readInt32BEA(&texture_address);
 
 		file->goToAddress(header_address + 16);
-		file->readUChar((unsigned char *)&material_flag);
+		file->readUChar((unsigned char *)&alpha_threshold);
 		file->readUChar((unsigned char *)&no_culling);
 		file->readUChar((unsigned char *)&color_blend);
 
@@ -211,7 +214,7 @@ namespace LibGens {
 		file->readInt32BEA(&texset_name_address);
 
 		file->goToAddress(header_address + 16);
-		file->readUChar((unsigned char *)&material_flag);
+		file->readUChar((unsigned char *)&alpha_threshold);
 		file->readUChar((unsigned char *)&no_culling);
 		file->readUChar((unsigned char *)&color_blend);
 
@@ -333,7 +336,7 @@ namespace LibGens {
 
 		file->writeNull(16);
 
-		file->writeUChar(&material_flag);
+		file->writeUChar(&alpha_threshold);
 		file->writeUChar((unsigned char *)&no_culling);
 		file->writeUChar((unsigned char *)&color_blend);
 		file->writeNull(1);
@@ -430,7 +433,7 @@ namespace LibGens {
 
 		file->writeNull(16);
 
-		file->writeUChar(&material_flag);
+		file->writeUChar(&alpha_threshold);
 		file->writeUChar((unsigned char *)&no_culling);
 		file->writeUChar((unsigned char *)&color_blend);
 		file->writeNull(1);
@@ -706,6 +709,14 @@ namespace LibGens {
 		}
 
 		properties.push_back(new SampleChunkProperty(name, value));
+	}
+
+	int Material::getRootNodeType() {
+		return root_node_type;
+	}
+
+	unsigned char Material::getAlphaThreshold() {
+		return alpha_threshold;
 	}
 
 	void Material::setNoCulling(bool v) {

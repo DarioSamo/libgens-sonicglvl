@@ -68,6 +68,16 @@ class EditorViewport {
 			zooming_multiplier = v;
 		}
 
+		void setNearClipDistance(float v) {
+			camera->setNearClipDistance(v);
+			camera_overlay->setNearClipDistance(v);
+		}
+
+		void setFarClipDistance(float v) {
+			camera->setFarClipDistance(v);
+			camera_overlay->setFarClipDistance(v);
+		}
+
 		void resize(float left=0.0f, float top=0.0f, float width=1.0f, float height=1.0f);
 
 		void getEntityInformation(Ogre::Entity *entity, size_t &vertex_count, Ogre::Vector3* &vertices, size_t &index_count, unsigned long* &indices, 

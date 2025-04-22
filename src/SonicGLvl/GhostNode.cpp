@@ -29,10 +29,10 @@ GhostNode::GhostNode(LibGens::Ghost *ghost_p, Ogre::SceneManager *scene_manager,
 	LibGens::Model *model=model_library->getModel("chr_Sonic_HD");
 
 	if (model) {
-		buildModel(scene_node, model, model->getName(), "chr_Sonic_HD", scene_manager, material_library, EDITOR_NODE_QUERY_GHOST, GENERAL_MESH_GROUP, false);
+		buildModel(scene_node, model, model->getName(), "chr_Sonic_HD", scene_manager, material_library, EDITOR_NODE_QUERY_GHOST, GENERAL_MESH_GROUP, false, SONICGLVL_SHADER_LIBRARY);
 	}
 	else {
-		SHOW_MSG("No model named chr_Sonic_HD was found for creating the ghost!");
+		ERROR_MSG("No model named chr_Sonic_HD was found for creating the ghost!");
 	}
 
 	/*

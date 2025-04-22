@@ -69,7 +69,7 @@ namespace LibGens {
 		}
 	};
 
-	struct ReadOnlyMemoryFile : public FileImpl {
+	class ReadOnlyMemoryFile : public FileImpl {
 	public:
 		const void* data;
 		size_t data_size;
@@ -149,7 +149,62 @@ namespace LibGens {
 		}
 	};
 
-	struct MemoryFile : public FileImpl {
+	class ReadOnlyMemoryMappedFile : public ReadOnlyMemoryFile {
+	private:
+		HANDLE file_handle;
+		HANDLE mapping_handle;
+
+	public:
+		ReadOnlyMemoryMappedFile(const char* filename)
+			: ReadOnlyMemoryFile(nullptr, 0), file_handle(INVALID_HANDLE_VALUE), mapping_handle(NULL) {
+
+			file_handle = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (file_handle == INVALID_HANDLE_VALUE) {
+				return;
+			}
+
+			LARGE_INTEGER fileSize;
+			if (!GetFileSizeEx(file_handle, &fileSize)) {
+				CloseHandle(file_handle);
+				file_handle = INVALID_HANDLE_VALUE;
+				return;
+			}
+
+			mapping_handle = CreateFileMappingA(file_handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
+			if (!mapping_handle) {
+				CloseHandle(file_handle);
+				file_handle = INVALID_HANDLE_VALUE;
+				return;
+			}
+
+			void* mapped_data = MapViewOfFile(mapping_handle, FILE_MAP_READ, 0, 0, 0);
+			if (!mapped_data) {
+				CloseHandle(file_handle);
+				CloseHandle(mapping_handle);
+				file_handle = INVALID_HANDLE_VALUE;
+				mapping_handle = {};
+				return;
+			}
+
+			data = mapped_data;
+			data_size = static_cast<size_t>(fileSize.QuadPart);
+			data_offset = 0;
+		}
+
+		void close() override {
+			if (data) {
+				UnmapViewOfFile(data);
+			}
+			if (mapping_handle) {
+				CloseHandle(mapping_handle);
+			}
+			if (file_handle != INVALID_HANDLE_VALUE) {
+				CloseHandle(file_handle);
+			}
+		}
+	};
+
+	class MemoryFile : public FileImpl {
 	public:
 		vector<unsigned char> data;
 		size_t data_offset;
@@ -245,13 +300,26 @@ namespace LibGens {
 	File::File(string filename, string mode) {
 		init();
 
-		FILE* file=fopen(filename.c_str(), mode.c_str());
-		if (!file) {
-			Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
-			return;
+		if (mode == "rb") {
+			ReadOnlyMemoryMappedFile *memory_mapped_file = new ReadOnlyMemoryMappedFile(filename.c_str());
+			if (!memory_mapped_file->data) {
+				Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
+				delete memory_mapped_file;
+				return;
+			}
+
+			file_impl = memory_mapped_file;
+		}
+		else {
+			FILE* file = fopen(filename.c_str(), mode.c_str());
+			if (!file) {
+				Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
+				return;
+			}
+
+			file_impl = new DiskFile(file);
 		}
 
-		file_impl = new DiskFile(file);
 		path = filename;
 	}
 

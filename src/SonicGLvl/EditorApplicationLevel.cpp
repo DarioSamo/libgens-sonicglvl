@@ -54,12 +54,13 @@ EditorLevelDatabase::EditorLevelDatabase(string filename) {
 		pElem->QueryValueAttribute(SONICGLVL_DATABASE_SLOT_ATTRIBUTE, &slot_name);
 		pElem->QueryValueAttribute(SONICGLVL_DATABASE_GAME_ATTRIBUTE, &game_name);
 
-		if (!game_name.size()) {
-			game_name = LIBGENS_LEVEL_GAME_STRING_GENERATIONS;
+		size_t game_mode = LIBGENS_LEVEL_GAME_GENERATIONS;
+		if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+			game_mode = LIBGENS_LEVEL_GAME_UNLEASHED;
 		}
 
 		if ((entry_name==SONICGLVL_DATABASE_ENTRY) && level_name.size() && geometry_name.size()) {
-			EditorLevelEntry *entry=new EditorLevelEntry(level_name, geometry_name, layout_merge_name, slot_name, game_name);
+			EditorLevelEntry *entry=new EditorLevelEntry(level_name, geometry_name, layout_merge_name, slot_name, game_mode);
 			entries.push_back(entry);
 		}
 	}
@@ -94,11 +95,11 @@ string EditorLevelDatabase::getSlot(string name) {
 	return "";
 }
 
-string EditorLevelDatabase::getGame(string name) {
+size_t EditorLevelDatabase::getGame(string name) {
 	for (size_t i=0; i<entries.size(); i++) {
 		if (entries[i]->name == name) return entries[i]->game;
 	}
-	return LIBGENS_LEVEL_GAME_STRING_GENERATIONS;
+	return LIBGENS_LEVEL_GAME_GENERATIONS;
 }
 
 
@@ -110,7 +111,7 @@ void EditorApplication::openLostWorldLevel(string filename) {
 
 	CreateDirectory((SONICGLVL_CACHE_PATH + slot_name).c_str(), NULL);
 
-	EditorLevel *lost_world_level = new EditorLevel(folder, slot_name, slot_name, "", LIBGENS_LEVEL_GAME_STRING_LOST_WORLD);
+	EditorLevel *lost_world_level = new EditorLevel(folder, slot_name, slot_name, "", LIBGENS_LEVEL_GAME_LOST_WORLD);
 	current_level = lost_world_level;
 
 	lost_world_level->unpackResources();
@@ -139,9 +140,26 @@ void EditorApplication::openLostWorldLevel(string filename) {
 	terrain_streamer = NULL;
 }
 
+void EditorApplication::checkShaderLibrary(size_t game_mode) {
+	if (!checked_shader_library) {
+		if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
+			if (!unleashed_shader_library) {
+				ERROR_MSG("Unable to locate Sonic Unleashed shader archives. Please copy the \"shader.ar\" file from the Xbox 360 version of the game to the \"database\\shaders\" folder.");
+			}
+		}
+		else {
+			if (!generations_shader_library) {
+				ERROR_MSG("Unable to locate Sonic Generations shader archives. Please copy the following files from the 2011 Steam version of the game (located in \"bb3.cpk\") to the \"database\\shaders\" folder:\n\nshader_r.ar.00\nshader_r_add.ar.00\nshader_r_add.ar.01\nshader_r_add.ar.02");
+			}
+		}
+
+		checked_shader_library = true;
+	}
+}
+
 void EditorApplication::openLevel(string filename) {
 	if (!level_database) {
-		SHOW_MSG("You can't open any levels without a level database!");
+		ERROR_MSG("You can't open any levels without a level database!");
 		return;
 	}
 
@@ -161,24 +179,25 @@ void EditorApplication::openLevel(string filename) {
 
 	string data_name=slot_name;
 	string geometry_name=level_database->getGeometryPath(slot_name);
-	string merge_name=level_database->getMergePath(slot_name);
 	string slot_id_name=level_database->getSlot(slot_name);
-	string game_name=level_database->getGame(slot_name);
+	size_t game_mode=level_database->getGame(slot_name);
 
 	if (!geometry_name.size()) geometry_name = slot_name;
 
 	if (!level_database->exists(slot_name)) {
-		SHOW_MSG("This level name doesn't exist in the current database. The slot name will be used for finding the geometry.");
+		INFO_MSG("This level name doesn't exist in the current database. The slot name will be used for finding the geometry.");
 	}
+
+	checkShaderLibrary(game_mode);
 
 	CreateDirectory((SONICGLVL_CACHE_PATH + slot_name).c_str(), NULL);
 	CreateDirectory((SONICGLVL_CACHE_PATH + geometry_name).c_str(), NULL);
-	if (merge_name.size()) CreateDirectory((SONICGLVL_CACHE_PATH + merge_name).c_str(), NULL);
+	if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED && !slot_id_name.empty()) CreateDirectory((SONICGLVL_CACHE_PATH + slot_id_name).c_str(), NULL);
 
 
 	current_level_filename=filename;
 
-	current_level = new EditorLevel(folder, slot_name, geometry_name, merge_name, game_name);
+	current_level = new EditorLevel(folder, slot_name, geometry_name, slot_id_name, game_mode);
 	current_level->unpackData();
 	printf("Unpacked data...\n");
 	current_level->unpackResources();
@@ -202,7 +221,7 @@ void EditorApplication::openLevel(string filename) {
 		camera_manager->setLevel(current_level->getLevel());
 	}
 	
-	if (game_name == LIBGENS_LEVEL_GAME_STRING_GENERATIONS) {
+	if (game_mode == LIBGENS_LEVEL_GAME_GENERATIONS) {
 		current_level->loadCollision(havok_enviroment, scene_manager, havok_nodes_list);
 	}
 
@@ -323,14 +342,18 @@ void EditorApplication::createDirectionalLight(LibGens::Light *direct_light) {
 	LibGens::Vector3 light_direction=direct_light->getPosition();
 	LibGens::Vector3 light_color=direct_light->getColor();
 
-	SONICGLVL_SHADER_LIBRARY->setGlobalLightDirection(light_direction);
-	SONICGLVL_SHADER_LIBRARY->setGlobalLightColor(light_color);
-
 	global_directional_light = scene_manager->createLight(direct_light->getName());
 	global_directional_light->setSpecularColour(Ogre::ColourValue::White);
 	global_directional_light->setDiffuseColour(Ogre::ColourValue(light_color.x, light_color.y, light_color.z));
 	global_directional_light->setType(Ogre::Light::LT_DIRECTIONAL);
-	global_directional_light->setDirection(Ogre::Vector3(-light_direction.x, -light_direction.y, -light_direction.z));
+
+	// Ogre expects light direction to be inverted as opposed to the game shaders.
+	if (SONICGLVL_SHADER_LIBRARY) {
+		global_directional_light->setDirection(Ogre::Vector3(-light_direction.x, -light_direction.y, -light_direction.z));
+	}
+	else {
+		global_directional_light->setDirection(Ogre::Vector3(light_direction.x, light_direction.y, light_direction.z));
+	}
 
 	Ogre::Light *light = axis_scene_manager->createLight(direct_light->getName()+"_viewport");
 	light->setSpecularColour(Ogre::ColourValue::White);
@@ -341,10 +364,14 @@ void EditorApplication::createDirectionalLight(LibGens::Light *direct_light) {
 
 
 void EditorApplication::createSkybox(string skybox_name) {
+	if (!SONICGLVL_SHADER_LIBRARY) {
+		return;
+	}
+
 	LibGens::Model *skybox_model=current_level->getModelLibrary()->getModel(skybox_name);
 	if (skybox_model) {
 		Ogre::SceneNode *scene_node = scene_manager->getRootSceneNode()->createChildSceneNode();
-		buildModel(scene_node, skybox_model, skybox_model->getName(), "", scene_manager, current_level->getMaterialLibrary(), 0, GENERAL_MESH_GROUP, false);
+		buildModel(scene_node, skybox_model, skybox_model->getName(), "", scene_manager, current_level->getMaterialLibrary(), 0, GENERAL_MESH_GROUP, false, SONICGLVL_SHADER_LIBRARY);
 
 
 		unsigned short attached_objects=scene_node->numAttachedObjects();
@@ -372,14 +399,14 @@ void EditorApplication::saveLevelData(string filename) {
 	if (!current_level) return;
 	current_level->saveData(filename);
 	current_level->saveHashes();
-	SHOW_MSG("Data saved!");
+	INFO_MSG("Data saved!");
 }
 
 void EditorApplication::saveLevelResources() {
 	if (!current_level) return;
 	current_level->saveResources();
 	current_level->saveHashes();
-	SHOW_MSG("Resources saved!");
+	INFO_MSG("Resources saved!");
 }
 
 void EditorApplication::saveLevelTerrain() {
@@ -388,13 +415,13 @@ void EditorApplication::saveLevelTerrain() {
 	current_level->saveTerrain();
 	current_level->saveResources();
 	current_level->saveHashes();
-	SHOW_MSG("Terrain saved!");
+	INFO_MSG("Terrain saved!");
 }
 
 
 void EditorApplication::cleanLevelTerrain() {
 	if (!current_level) {
-		SHOW_MSG("There's no level currently loaded.");
+		INFO_MSG("There's no level currently loaded.");
 		return;
 	}
 
@@ -418,7 +445,7 @@ void EditorApplication::cleanLevelTerrain() {
 	Ogre::ResourceGroupManager::getSingleton().unloadUnreferencedResourcesInGroup(GENERAL_MESH_GROUP, false);
 	Ogre::MeshManager::getSingleton().unloadUnreferencedResources(false);
 
-	SHOW_MSG("Terrain cleaned!");
+	INFO_MSG("Terrain cleaned!");
 }
 
 

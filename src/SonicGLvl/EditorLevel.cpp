@@ -23,12 +23,12 @@
 #include "ObjectLibrary.h"
 #include "ObjectSet.h"
 
-EditorLevel::EditorLevel(string folder_p, string slot_name_p, string geometry_name_p, string merge_name_p, string game_name_p) {
+EditorLevel::EditorLevel(string folder_p, string slot_name_p, string geometry_name_p, string slot_id_name_p, size_t game_mode_p) {
 	folder = folder_p;
 	slot_name = slot_name_p;
 	geometry_name = geometry_name_p;
-	merge_name = merge_name_p;
-	game_name = game_name_p;
+	slot_id_name = slot_id_name_p;
+	game_mode = game_mode_p;
 
 	level=NULL;
 	terrain=NULL;
@@ -36,11 +36,12 @@ EditorLevel::EditorLevel(string folder_p, string slot_name_p, string geometry_na
 	direct_light = NULL;
 	terrain_autodraw=NULL;
 
-	cache_folder            = SONICGLVL_CACHE_PATH + slot_name + "/";
-	data_cache_folder       = SONICGLVL_CACHE_PATH + slot_name + "/" + SONICGLVL_CACHE_DATA_PATH;
-	gi_cache_folder         = SONICGLVL_CACHE_PATH + slot_name + "/" + SONICGLVL_CACHE_GI_TEMP_PATH;
-	terrain_cache_folder    = SONICGLVL_CACHE_PATH + geometry_name + "/" + SONICGLVL_CACHE_TERRAIN_PATH;
-	resources_cache_folder  = SONICGLVL_CACHE_PATH + geometry_name + "/" + SONICGLVL_CACHE_RESOURCES_PATH;
+	cache_folder				   = SONICGLVL_CACHE_PATH + slot_name + "/";
+	data_cache_folder			   = SONICGLVL_CACHE_PATH + slot_name + "/" + SONICGLVL_CACHE_DATA_PATH;
+	gi_cache_folder				   = SONICGLVL_CACHE_PATH + slot_name + "/" + SONICGLVL_CACHE_GI_TEMP_PATH;
+	terrain_cache_folder		   = SONICGLVL_CACHE_PATH + geometry_name + "/" + SONICGLVL_CACHE_TERRAIN_PATH;
+	resources_cache_folder		   = SONICGLVL_CACHE_PATH + geometry_name + "/" + SONICGLVL_CACHE_RESOURCES_PATH;
+	slot_resources_cache_folder	   = SONICGLVL_CACHE_PATH + slot_id_name + "/" + SONICGLVL_CACHE_SLOT_RESOURCES_PATH;
 
 	model_library    = new LibGens::ModelLibrary(resources_cache_folder + "/");
 	material_library = NULL;
@@ -50,11 +51,9 @@ EditorLevel::EditorLevel(string folder_p, string slot_name_p, string geometry_na
 
 
 void EditorLevel::loadHashes() {
-	for (size_t i=0; i<5; i++) {
-		data_hash[i] = 0;
-		terrain_hash[i] = 0;
-		resources_hash[i] = 0;
-	}
+	data_hash = {};
+	terrain_hash = {};
+	resources_hash = {};
 
 	TiXmlDocument doc(cache_folder + SONICGLVL_LEVEL_HASH_FILENAME);
 	if (!doc.LoadFile()) {
@@ -77,12 +76,12 @@ void EditorLevel::loadHashes() {
 		entry_name = pElem->ValueStr();
 
 		int *hash_pointer = NULL;
-		if (entry_name==SONICGLVL_LEVEL_HASH_DATA)      hash_pointer = (int *) data_hash;
-		if (entry_name==SONICGLVL_LEVEL_HASH_TERRAIN)   hash_pointer = (int *) terrain_hash;
-		if (entry_name==SONICGLVL_LEVEL_HASH_RESOURCES) hash_pointer = (int *) resources_hash;
+		if (entry_name==SONICGLVL_LEVEL_HASH_DATA)      hash_pointer = (int *) &data_hash;
+		if (entry_name==SONICGLVL_LEVEL_HASH_TERRAIN)   hash_pointer = (int *) &terrain_hash;
+		if (entry_name==SONICGLVL_LEVEL_HASH_RESOURCES) hash_pointer = (int *) &resources_hash;
 
 		if (hash_pointer) {
-			for (size_t i=0; i<5; i++) {
+			for (size_t i=0; i<4; i++) {
 				pElem->QueryIntAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), &hash_pointer[i]);
 			}
 		}
@@ -98,20 +97,20 @@ void EditorLevel::saveHashes() {
 	TiXmlElement *hashRoot = new TiXmlElement(SONICGLVL_LEVEL_HASH_ROOT);
 
 	TiXmlElement *dataRoot = new TiXmlElement(SONICGLVL_LEVEL_HASH_DATA);
-	for (size_t i=0; i<5; i++) {
-		dataRoot->SetAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), data_hash[i]);
+	for (size_t i=0; i<4; i++) {
+		dataRoot->SetAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), ((int*)&data_hash)[i]);
 	}
 	hashRoot->LinkEndChild(dataRoot);
 
 	TiXmlElement *terrainRoot = new TiXmlElement(SONICGLVL_LEVEL_HASH_TERRAIN);
-	for (size_t i=0; i<5; i++) {
-		terrainRoot->SetAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), terrain_hash[i]);
+	for (size_t i=0; i<4; i++) {
+		terrainRoot->SetAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), ((int*)&terrain_hash)[i]);
 	}
 	hashRoot->LinkEndChild(terrainRoot);
 
 	TiXmlElement *resourcesRoot = new TiXmlElement(SONICGLVL_LEVEL_HASH_RESOURCES);
-	for (size_t i=0; i<5; i++) {
-		resourcesRoot->SetAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), resources_hash[i]);
+	for (size_t i=0; i<4; i++) {
+		resourcesRoot->SetAttribute(SONICGLVL_LEVEL_HASH_VALUE_ATTRIBUTE + ToString(i), ((int*)&resources_hash)[i]);
 	}
 	hashRoot->LinkEndChild(resourcesRoot);
 
@@ -142,22 +141,14 @@ void EditorLevel::unpackData() {
 	string main_filename=folder + "#" + slot_name + ".ar.00";
 
 	LibGens::ArPack *level_data_ar_pack=new LibGens::ArPack(main_filename);
-	bool unpack=false;
-	for (size_t i=0; i<5; i++) {
-		if (level_data_ar_pack->getHash()[i] != data_hash[i]) {
-			unpack = true;
-			break;
-		}
-	}
+	XXH128_hash_t hash = level_data_ar_pack->computeHash();
+	bool unpack=!XXH128_isEqual(hash, data_hash);
 
 	if (unpack) {
 		cleanData();
 		CreateDirectory(data_cache_folder.c_str(), NULL);
 		level_data_ar_pack->extract(data_cache_folder+"/");
-
-		for (size_t i=0; i<5; i++) {
-			data_hash[i] = level_data_ar_pack->getHash()[i];
-		}
+		data_hash = hash;
 	}
 	delete level_data_ar_pack;
 }
@@ -248,21 +239,20 @@ void EditorLevel::cleanTerrainResources() {
 void EditorLevel::unpackTerrain() {
 	string main_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE;
 	string main_add_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE_ADD;
+	if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
+		main_add_filename = folder + SONICGLVL_LEVEL_ADDITIONAL_FOLDER + "/" + geometry_name + "/" + SONICGLVL_LEVEL_PACKED_STAGE_ADD;
+	}
 
 	LibGens::ArPack *stage_data_ar_pack=new LibGens::ArPack(main_filename);
 	printf("Opened %s\n", main_filename.c_str());
 	LibGens::ArPack *stage_add_data_ar_pack=new LibGens::ArPack(main_add_filename);
+	has_additional_gi = stage_add_data_ar_pack->getFileCount() != 0;
 	printf("Opened %s\n", main_add_filename.c_str());
 	stage_data_ar_pack->merge(stage_add_data_ar_pack);
 	printf("Merged AR Packs\n");
 
-	bool unpack=false;
-	for (size_t i=0; i<5; i++) {
-		if (stage_data_ar_pack->getHash()[i] != terrain_hash[i]) {
-			unpack = true;
-			break;
-		}
-	}
+	XXH128_hash_t hash = stage_data_ar_pack->computeHash();
+	bool unpack=!XXH128_isEqual(hash, terrain_hash);
 
 	if (unpack) {
 		if (MessageBox(NULL, "Do you want to unpack the terrain?", "SonicGLvl", MB_YESNO) != IDYES) unpack=false;
@@ -289,9 +279,7 @@ void EditorLevel::unpackTerrain() {
 			}
 		}
 
-		for (size_t i=0; i<5; i++) {
-			terrain_hash[i] = stage_data_ar_pack->getHash()[i];
-		}
+		terrain_hash = hash;
 	}
 	delete stage_data_ar_pack;
 }
@@ -315,7 +303,7 @@ void EditorLevel::cleanResources() {
 }
 
 void EditorLevel::unpackResources() {
-	if (game_name == LIBGENS_LEVEL_GAME_STRING_LOST_WORLD) {
+	if (game_mode == LIBGENS_LEVEL_GAME_LOST_WORLD) {
 		string main_filename=folder + slot_name;
 		string trr_cmn_filename = main_filename + "_trr_cmn.pac";
 		string sky_cmn_filename = main_filename + "_sky.pac";
@@ -336,29 +324,47 @@ void EditorLevel::unpackResources() {
 	}
 	else {
 		string main_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + geometry_name + LIBGENS_AR_MULTIPLE_START;
-		if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+		if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
 			main_filename = folder + geometry_name + LIBGENS_AR_MULTIPLE_START;
 		}
 
 		LibGens::ArPack *resources_data_ar_pack=new LibGens::ArPack(main_filename);
-		bool unpack=false;
-		for (size_t i=0; i<5; i++) {
-			if (resources_data_ar_pack->getHash()[i] != resources_hash[i]) {
-				unpack = true;
-				break;
-			}
-		}
+		XXH128_hash_t hash = resources_data_ar_pack->computeHash();
+		bool unpack=!XXH128_isEqual(hash, resources_hash);
+		bool unpack_slot_resources = (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED && !slot_id_name.empty());
 
 		if (unpack) {
 			cleanResources();
 			CreateDirectory(resources_cache_folder.c_str(), NULL);
 			resources_data_ar_pack->extract(resources_cache_folder + "/");
 
-			for (size_t i=0; i<5; i++) {
-				resources_hash[i] = resources_data_ar_pack->getHash()[i];
+			if (unpack_slot_resources) {
+				CreateDirectory(slot_resources_cache_folder.c_str(), NULL);
+
+				WIN32_FIND_DATA FindFileData;
+				HANDLE hFind;
+				hFind = FindFirstFile((folder + "Cmn*" + slot_id_name + "*.ar.00").c_str(), &FindFileData);
+				if (hFind == INVALID_HANDLE_VALUE) {}
+				else {
+					do {
+						const char* name = FindFileData.cFileName;
+						if (name[0] == '.') continue;
+
+						LibGens::ArPack slot_resources_data_ar_pack(folder + name);
+						slot_resources_data_ar_pack.extract(slot_resources_cache_folder + "/");
+
+					} while (FindNextFile(hFind, &FindFileData) != 0);
+					FindClose(hFind);
+				}
 			}
+
+			resources_hash = hash;
 		}
 		delete resources_data_ar_pack;
+
+		if (unpack_slot_resources) {
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(slot_resources_cache_folder, "FileSystem");
+		}
 	}
 }
 
@@ -366,7 +372,7 @@ void EditorLevel::unpackResources() {
 
 
 void EditorLevel::loadData(LibGens::ObjectLibrary *library, ObjectNodeManager *object_node_manager) {
-	level = new LibGens::Level(data_cache_folder + "/", game_name);
+	level = new LibGens::Level(data_cache_folder + "/", game_mode);
 
 	// Fix anything inside the level to fit with the library
 	level->learnFromLibrary(library);
@@ -451,7 +457,7 @@ void EditorLevel::createHavokNodes(LibGens::HavokPhysicsCache *physics_cache, Og
 
 
 void EditorLevel::loadTerrain(Ogre::SceneManager *scene_manager, list<TerrainNode *> *terrain_nodes_list) {
-	if (game_name == LIBGENS_LEVEL_GAME_STRING_LOST_WORLD) {
+	if (game_mode == LIBGENS_LEVEL_GAME_LOST_WORLD) {
 		string terrain_data_folder = resources_cache_folder;
 
 		terrain          = new LibGens::Terrain();
@@ -545,7 +551,7 @@ void EditorLevel::loadTerrain(Ogre::SceneManager *scene_manager, list<TerrainNod
 		string terrain_data_folder = resources_cache_folder;
 
 		// Terrain-related data files are stored in the data folder on Unleashed
-		if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+		if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
 			terrain_data_folder = data_cache_folder;
 		}
 
@@ -607,9 +613,7 @@ void EditorLevel::saveData(string filename) {
 
 	LibGens::ArPack *data_ar_pack=new LibGens::ArPack(data_cache_folder + "/");
 	data_ar_pack->save(filename);
-	for (size_t i=0; i<5; i++) {
-		data_hash[i] = data_ar_pack->getHash()[i];
-	}
+	data_hash = data_ar_pack->computeHash();
 	delete data_ar_pack;
 }
 
@@ -672,9 +676,7 @@ void EditorLevel::saveTerrain() {
 	}
 	stage_ar_pack->save(main_filename, 0x800);
 	stage_ar_pack->savePFI(resources_cache_folder + "/" + "Stage.pfi");
-	for (size_t i=0; i<5; i++) {
-		terrain_hash[i] = stage_ar_pack->getHash()[i];
-	}
+	terrain_hash = stage_ar_pack->computeHash();
 	delete stage_ar_pack;
 
 
@@ -698,7 +700,7 @@ void EditorLevel::saveResources() {
 		LibGens::MaterialLibrary *terrain_material_library = terrain->getMaterialLibrary();
 		if (terrain_material_library) {
 			int root_type = LIBGENS_MATERIAL_ROOT_GENERATIONS;
-			if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+			if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
 				root_type = LIBGENS_MATERIAL_ROOT_UNLEASHED;
 			}
 			terrain_material_library->save(resources_cache_folder + "/", root_type);
@@ -706,16 +708,14 @@ void EditorLevel::saveResources() {
 	}
 
 	string main_filename=folder + SONICGLVL_LEVEL_PACKED_FOLDER + "/" + geometry_name + "/" + geometry_name + LIBGENS_AR_MULTIPLE_START;
-	if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
+	if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
 		main_filename = folder + geometry_name + LIBGENS_AR_MULTIPLE_START;
 	}
 
 	LibGens::ArPack *data_ar_pack=new LibGens::ArPack(resources_cache_folder + "/");
 	data_ar_pack->save(main_filename);
 
-	for (size_t i=0; i<5; i++) {
-		resources_hash[i] = data_ar_pack->getHash()[i];
-	}
+	resources_hash = data_ar_pack->computeHash();
 
 	delete data_ar_pack;
 }

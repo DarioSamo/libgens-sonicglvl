@@ -18,6 +18,7 @@
 //=========================================================================
 
 #include "EditorApplication.h"
+#include "AR.h"
 #include "Texture.h"
 #include "Parameter.h"
 #include "Material.h"
@@ -56,18 +57,6 @@ void EditorApplication::openMaterialEditorGUI() {
 
 		// Disable non-functional modes for now
 		EnableWindow(GetDlgItem(hMaterialEditorDlg, IDR_MATERIAL_MATERIAL_MODE), false);
-
-		// Populate the shader list
-		WIN32_FIND_DATA FindFileData;
-		HANDLE hFind;
-		hFind = FindFirstFile((string(SONICGLVL_SHADERS_PATH) + "*.shader-list").c_str(), &FindFileData);
-		if (hFind != INVALID_HANDLE_VALUE) {
-			do {
-				SendMessage(GetDlgItem(hMaterialEditorDlg, IDC_MATERIAL_SHADER)
-					, CB_ADDSTRING, NULL, (LPARAM)LibGens::File::nameFromFilenameNoExtension(string(FindFileData.cFileName)).c_str());
-			} while (FindNextFile(hFind, &FindFileData) != 0);
-		}
-		FindClose(hFind);
 	}
 
 	SetFocus(hMaterialEditorDlg);
@@ -288,40 +277,43 @@ void EditorApplication::updateMaterialEditorInfo() {
 
 	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_RESETCONTENT, NULL, NULL);
 
-	string shader_name = mat->getShader();
-	LibGens::Shader* vertex_shader = NULL;
-	LibGens::Shader* pixel_shader = NULL;
-	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !mat->hasExtraGI(), false);
+	if (material_editor_shader_library) {
+		string shader_name = mat->getShader();
+		LibGens::Shader* vertex_shader = NULL;
+		LibGens::Shader* pixel_shader = NULL;
+		material_editor_shader_library->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !mat->hasExtraGI(), false);
 
-	if (pixel_shader) {
-		vector<string> names = pixel_shader->getShaderParameterFilenames();
-		for (size_t i = 0; i < names.size(); i++) {
-			LibGens::ShaderParams* params = SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(names[i]);
-			if (params->getName() == "global")
-				continue;
-			vector<LibGens::ShaderParam*> paramList = params->getParameterList(3);
-			for (size_t i2 = 0; i2 < paramList.size(); i2++) {
-				SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_ADDSTRING, NULL, (LPARAM)paramList[i2]->getName().c_str());
+		if (pixel_shader) {
+			vector<string> names = pixel_shader->getShaderParameterFilenames();
+			for (size_t i = 0; i < names.size(); i++) {
+				LibGens::ShaderParams* params = material_editor_shader_library->getPixelShaderParams(names[i]);
+				if (params->getName() == "global")
+					continue;
+				vector<LibGens::ShaderParam*> paramList = params->getParameterList(3);
+				for (size_t i2 = 0; i2 < paramList.size(); i2++) {
+					SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_TEXTURE_UNIT_SLOT, CB_ADDSTRING, NULL, (LPARAM)paramList[i2]->getName().c_str());
+				}
 			}
 		}
 	}
 }
 
 void EditorApplication::loadMaterialDefaultParams() {
-	if (!material_editor_material)
+	if (!material_editor_material || !material_editor_shader_library) {
 		return;
+	}
 
 	LibGens::Material* material = material_editor_material;
 	material->removeAllParameters();
 	string shader_name = material->getShader();
 	LibGens::Shader* vertex_shader = NULL;
 	LibGens::Shader* pixel_shader = NULL;
-	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !material->hasExtraGI(), false);
+	material_editor_shader_library->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, !material->hasExtraGI(), false);
 
 	if (pixel_shader) {
 		vector<string> names = pixel_shader->getShaderParameterFilenames();
 		for (size_t i = 0; i < names.size(); i++) {
-			LibGens::ShaderParams* params = SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(names[i]);
+			LibGens::ShaderParams* params = material_editor_shader_library->getPixelShaderParams(names[i]);
 			vector<LibGens::ShaderParam*> paramList = params->getParameterList(0);
 			for (size_t i2 = 0; i2 < paramList.size(); i2++) {
 				if (paramList[i2]->getName().rfind("g_", 0) == -1 && paramList[i2]->getName().rfind("mrg", 0) == -1)
@@ -345,7 +337,7 @@ void EditorApplication::removeMaterialEditorTexture() {
 	Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL, material_editor_shader_library);
 	}
 }
 
@@ -455,6 +447,8 @@ void EditorApplication::createPreviewMaterialEditorGUI() {
 		material_editor_viewport = new EditorViewport(material_editor_preview_scene_manager, bogus_manager, material_editor_preview_window, SONICGLVL_CAMERA_PREVIEW_NAME);
 		material_editor_viewport->setPanningMultiplier(0.005);
 		material_editor_viewport->setZoomingMultiplier(0.04);
+		material_editor_viewport->setNearClipDistance(0.001f);
+		material_editor_viewport->setFarClipDistance(100.0f);
 
 		// Create Listener for Window
 		material_editor_preview_listener = new MaterialEditorPreviewListener();
@@ -531,7 +525,16 @@ void EditorApplication::rebuildMaterialPreviewNodes() {
 		prepareSkeletonAndAnimation(material_editor_skeleton_name, material_editor_animation_name);
 	}
 
-	buildModel(material_editor_scene_node, material_editor_model, material_editor_model->getName(), material_editor_skeleton_name, material_editor_preview_scene_manager, material_editor_material_library, 0, PREVIEW_MESH_GROUP, false);
+	LibGens::ShaderLibrary* shader_library = NULL;
+
+	if (material_editor_unleashed) {
+		shader_library = unleashed_shader_library;
+	}
+	else {
+		shader_library = generations_shader_library;
+	}
+
+	buildModel(material_editor_scene_node, material_editor_model, material_editor_model->getName(), material_editor_skeleton_name, material_editor_preview_scene_manager, material_editor_material_library, 0, PREVIEW_MESH_GROUP, false, shader_library);
 
 
 	material_editor_animation_state = NULL;
@@ -577,6 +580,39 @@ void EditorApplication::rebuildListMaterialEditorGUI() {
 		Item.iItem = ListView_GetItemCount(hMaterialList); 
 		ListView_InsertItem(hMaterialList, &Item);
 	}
+
+	// Populate the shader list
+	bool shader_library_unleashed = false;
+
+	if (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN && current_level != NULL) {
+		shader_library_unleashed = (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED);
+	}
+	else {
+		shader_library_unleashed = material_editor_unleashed;
+	}
+
+	checkShaderLibrary(shader_library_unleashed ? LIBGENS_LEVEL_GAME_UNLEASHED : LIBGENS_LEVEL_GAME_GENERATIONS);
+
+	material_editor_shader_library = NULL;
+
+	if (shader_library_unleashed) {
+		material_editor_shader_library = unleashed_shader_library;
+	}
+	else {
+		material_editor_shader_library = generations_shader_library;
+	}
+
+	SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_SHADER, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
+
+	if (material_editor_shader_library) {
+		for (size_t i = 0; i < material_editor_shader_library->getFileCount(); i++) {
+			LibGens::ArFile* ar_file = material_editor_shader_library->getFileByIndex(i);
+
+			if (ar_file->getName().find(".shader-list") != string::npos) {
+				SendDlgItemMessage(hMaterialEditorDlg, IDC_MATERIAL_SHADER, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)LibGens::File::nameFromFilenameNoExtension(ar_file->getName()).c_str());
+			}
+		}
+	}
 }
 
 
@@ -587,8 +623,8 @@ void EditorApplication::saveMaterialEditorModelGUI(){
 	OPENFILENAME    ofn;
 	memset(&ofn, 0, sizeof(ofn));
 	ofn.lStructSize		= sizeof(ofn);
-	ofn.lpstrFilter		= "Model File(.model)\0*.model";
-	ofn.nFilterIndex	= 1;
+	ofn.lpstrFilter		= "Generations Model File(.model)\0*.model\0Unleashed Model File(.model)\0*.model\0";
+	ofn.nFilterIndex	= material_editor_unleashed ? 2 : 1;
 	ofn.lpstrFile		= filename;
 	ofn.nMaxFile		= 1024;
 	ofn.lpstrTitle		= "Choose where you would like save the model";
@@ -597,14 +633,12 @@ void EditorApplication::saveMaterialEditorModelGUI(){
 						  OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT |
 						  OFN_ENABLESIZING;
 
-	if (GetSaveFileName(&ofn))
-	{
+	if (GetSaveFileName(&ofn)) {
 		string folder = LibGens::File::folderFromFilename(ofn.lpstrFile);
 		material_editor_model->save(ToString(ofn.lpstrFile));
 
-		for each (LibGens::Material* mat in material_editor_materials)
-		{
-			mat->save(folder + "\\" + mat->getName() + ".material");
+		for (LibGens::Material* mat : material_editor_materials) {
+			mat->save(folder + "\\" + mat->getName() + ".material", ofn.nFilterIndex == 2 ? LIBGENS_MATERIAL_ROOT_UNLEASHED : LIBGENS_MATERIAL_ROOT_GENERATIONS);
 		}
 	}
 
@@ -658,10 +692,14 @@ void EditorApplication::loadMaterialEditorModelGUI() {
 		// Clear Material List and insert the ones from the model
 		clearSelectionMaterialEditorGUI();
 		material_editor_materials.clear();
+		material_editor_unleashed = true;
 		for (list<string>::iterator it=material_names.begin(); it!=material_names.end(); it++) {
 			LibGens::Material *mat = material_editor_material_library->getMaterial(*it);
 
 			if (mat) {
+				if (mat->getRootNodeType() != LIBGENS_MATERIAL_ROOT_UNLEASHED) {
+					material_editor_unleashed = false;
+				}
 				material_editor_materials.push_back(mat);
 			}
 		}
@@ -770,7 +808,7 @@ void EditorApplication::addMaterialEditorTextureGUI() {
 		Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 		if (ogre_material) {
-			updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+			updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL, material_editor_shader_library);
 		}
 
 		updateMaterialEditorTextureList();
@@ -895,7 +933,7 @@ void EditorApplication::updateEditParameterMaterialEditor(size_t i, LibGens::Col
 	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL, material_editor_shader_library);
 	}
 }
 
@@ -907,7 +945,7 @@ void EditorApplication::updateEditShaderMaterialEditor(string shader_name) {
 	Ogre::Material *ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL, material_editor_shader_library);
 	}
 }
 
@@ -919,7 +957,7 @@ void EditorApplication::updateEditTextureMaterialEditor(string texture_name, boo
 	Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL, material_editor_shader_library);
 	}
 
 	if (update_ui) {
@@ -940,7 +978,7 @@ void EditorApplication::updateEditTextureUnitMaterialEditor(string unit_name) {
 	Ogre::Material* ogre_material = Ogre::MaterialManager::getSingleton().getByName(material_editor_material->getExtra(), material_editor_mesh_group).getPointer();
 
 	if (ogre_material) {
-		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL);
+		updateMaterialShaderParameters(ogre_material, material_editor_material, !material_editor_material->hasExtraGI(), NULL, material_editor_shader_library);
 	}
 }
 

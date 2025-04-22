@@ -83,7 +83,11 @@ bool TerrainStreamer::updateScene() {
 		list<LibGens::TerrainInstance *> instances=terrain_group->getInstances();
 		for (list<LibGens::TerrainInstance *>::iterator it=instances.begin(); it!=instances.end(); it++) {
 			TerrainNode *terrain_node=new TerrainNode(*it, scene_manager, terrain_material_library);
-			terrain_node->setGIQualityLevel(gi_group_info, 0);
+			unsigned int gi_quality_level = 2;
+			if (editor_application->getCurrentLevel() != NULL && editor_application->getCurrentLevel()->hasAdditionalGI()) {
+				gi_quality_level = 0;
+			}
+			terrain_node->setGIQualityLevel(gi_group_info, gi_quality_level);
 			if (terrain_nodes_list) terrain_nodes_list->push_back(terrain_node);
 		}
 	}
@@ -133,7 +137,7 @@ void EditorApplication::checkTerrainStreamer() {
 		if (terrain_streamer->isFinished()) {
 			delete terrain_streamer;
 			terrain_streamer=NULL;
-			SHOW_MSG("Finished loading all terrain!");
+			INFO_MSG("Finished loading all terrain!");
 		}
 	}
 }

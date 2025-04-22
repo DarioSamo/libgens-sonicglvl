@@ -60,6 +60,7 @@
 #define SONICGLVL_CACHE_GI_TEMP_PATH           "gi_temp"
 #define SONICGLVL_CACHE_TERRAIN_PATH           "terrain"
 #define SONICGLVL_CACHE_RESOURCES_PATH         "resources"
+#define SONICGLVL_CACHE_SLOT_RESOURCES_PATH    "slot_resources"
 #define SONICGLVL_LOW_END_TECHNIQUE            "LowEnd"
 #define SONICGLVL_LEVEL_DATABASE_PATH          "../database/LevelDatabase.xml"
 #define SONICGLVL_GHOST_DATABASE_PATH          "../database/GhostDatabase.xml"
@@ -193,7 +194,11 @@ class EditorApplication : public BaseApplication {
 
 		// Material
 		LibGens::MaterialLibrary *material_library;
-		LibGens::ShaderLibrary *shader_library;
+
+		LibGens::ShaderLibrary *generations_shader_library;
+		LibGens::ShaderLibrary *unleashed_shader_library;
+		bool checked_shader_library;
+
 		EditorAnimationsList *animations_list;
 		LibGens::UVAnimationLibrary *uv_animation_library;
 
@@ -295,6 +300,9 @@ class EditorApplication : public BaseApplication {
 
 		MaterialEditorPreviewListener *material_editor_preview_listener;
 		EditorViewport *material_editor_viewport;
+
+		LibGens::ShaderLibrary* material_editor_shader_library;
+		bool material_editor_unleashed;
 
 		// Object Movement
 		float placement_grid_snap;
@@ -405,6 +413,7 @@ class EditorApplication : public BaseApplication {
 		void saveLevelResourcesGUI();
 		void saveLevelTerrainGUI();
 		void importLevelTerrainFBXGUI();
+		void loadAllTerrain();
 		void exportSceneFBXGUI();
 		void exportSceneFBX(string filename);
 
@@ -541,6 +550,8 @@ class EditorApplication : public BaseApplication {
 		bool isPalettePreviewActive();
 		bool isRegularMode();
 
+		void checkShaderLibrary(size_t game_mode);
+
 		// LibGens Methods
 		void openLevel(string filename);
 		void openLostWorldLevel(string filename);
@@ -621,7 +632,12 @@ class EditorApplication : public BaseApplication {
 		}
 
 		LibGens::ShaderLibrary *getShaderLibrary() {
-			return shader_library;
+			if (current_level != NULL && current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
+				return unleashed_shader_library;
+			}
+			else {
+				return generations_shader_library;
+			}
 		}
 
 		LibGens::UVAnimationLibrary *getUVAnimationLibrary() {

@@ -38,6 +38,7 @@
 #define SONICGLVL_DATABASE_GAME_ATTRIBUTE      "game"
 
 #define SONICGLVL_LEVEL_PACKED_FOLDER          "Packed"
+#define SONICGLVL_LEVEL_ADDITIONAL_FOLDER      "Additional"
 #define SONICGLVL_LEVEL_PACKED_STAGE           "Stage.pfd"
 #define SONICGLVL_LEVEL_PACKED_STAGE_ADD       "Stage-Add.pfd"
 #define SONICGLVL_LEVEL_PACKED_COMPRESSED      ".cab"
@@ -62,9 +63,9 @@ class EditorLevelEntry {
 		string layout_merge;
 		string geometry;
 		string slot;
-		string game;
+		size_t game;
 	public:
-		EditorLevelEntry(string name_p, string geometry_p, string layout_merge_p, string slot_p, string game_p) {
+		EditorLevelEntry(string name_p, string geometry_p, string layout_merge_p, string slot_p, size_t game_p) {
 			name = name_p;
 			geometry = geometry_p;
 			layout_merge = layout_merge_p;
@@ -83,7 +84,7 @@ class EditorLevelDatabase {
 		string getGeometryPath(string name);
 		string getMergePath(string name);
 		string getSlot(string name);
-		string getGame(string name);
+		size_t getGame(string name);
 };
 
 class EditorLevel {
@@ -102,20 +103,23 @@ class EditorLevel {
 		string folder;
 		string slot_name; 
 		string geometry_name;
-		string merge_name;
-		string game_name;
+		string slot_id_name;
+		size_t game_mode;
 
 		string cache_folder;
 		string data_cache_folder;
 		string gi_cache_folder;
 		string terrain_cache_folder;
 		string resources_cache_folder;
+		string slot_resources_cache_folder;
 
-		unsigned int data_hash[5];
-		unsigned int terrain_hash[5];
-		unsigned int resources_hash[5];
+		bool has_additional_gi;
+
+		XXH128_hash_t data_hash;
+		XXH128_hash_t terrain_hash;
+		XXH128_hash_t resources_hash;
 	public:
-		EditorLevel(string folder_p, string slot_name_p, string geometry_name_p, string merge_name_p, string game_name_p);
+		EditorLevel(string folder_p, string slot_name_p, string geometry_name_p, string merge_name_p, size_t game_mode_p);
 
 		void cleanData();
 		void unpackData();
@@ -132,12 +136,20 @@ class EditorLevel {
 		void loadHashes();
 		void saveHashes();
 
+		size_t getGameMode() {
+			return game_mode;
+		}
+
 		string getDataCacheFolder() {
 			return data_cache_folder;
 		}
 
 		string getResourcesFolder() {
 			return resources_cache_folder;
+		}
+
+		bool hasAdditionalGI() {
+			return has_additional_gi;
 		}
 
 		void loadData(LibGens::ObjectLibrary *library, ObjectNodeManager *object_node_manager);

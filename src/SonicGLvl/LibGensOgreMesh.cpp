@@ -17,6 +17,7 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
+#include "AR.h"
 #include "Common.h"
 #include "EditorApplication.h"
 #include "HavokSkeletonCache.h"
@@ -29,8 +30,6 @@
 #include "Vertex.h"
 #include "Bone.h"
 #include "DefaultShaderParameters.h"
-
-DefaultShaderParameters default_shader_parameters("../database/DefaultShaderParameterDatabase.xml");
 
 void buildBones(hkaSkeleton *havok_skeleton, Ogre::Skeleton *ogre_skeleton, Ogre::Bone *parent_bone, unsigned int parent_index) {
 	for (int b=0; b<havok_skeleton->m_bones.getSize(); b++) {
@@ -182,7 +181,7 @@ void prepareSkeletonAndAnimation(string skeleton_id, string animation_id, string
 	}
 }
 
-void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr program_params, LibGens::Material *material, LibGens::ShaderParams *shader_params, LibGens::UVAnimation *uv_animation) {
+void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr program_params, LibGens::Material *material, LibGens::ShaderParams *shader_params, LibGens::UVAnimation *uv_animation, LibGens::ArFile* shader_code) {
 	EditorLevel *current_editor_level = editor_application->getCurrentLevel();
 	LibGens::Level *current_level = NULL;
 
@@ -199,207 +198,203 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 		for (size_t param=0; param<shader_param_list.size(); param++) {
 			LibGens::ShaderParam *shader_parameter = shader_param_list[param];
 
+			string shader_parameter_name = shader_parameter->getName();
 			unsigned char index = shader_parameter->getIndex();
 			unsigned char size = shader_parameter->getSize();
 
 			if (slot == 0) {
-				LibGens::Parameter *material_parameter = material->getParameterByName(shader_parameter->getName());
+				LibGens::Parameter *material_parameter = material->getParameterByName(shader_parameter_name);
 
 				if (material_parameter) {
 					LibGens::Color color = material_parameter->getColor();
 					
-					if (shader_parameter->getName() == "diffuse")  color.a = 1.0;
-					if (shader_parameter->getName() == "specular") color.a = 1.0;
-					if (shader_parameter->getName() == "ambient")  color.a = 1.0;
+					if (shader_parameter_name == "diffuse")  color.a = 1.0;
+					if (shader_parameter_name == "specular") color.a = 1.0;
+					if (shader_parameter_name == "ambient")  color.a = 1.0;
 
 					program_params->setConstant((size_t)index, Ogre::Vector4(color.r, color.g, color.b, color.a));
 					continue;
 				}
 
-				bool found_in_list = false;
-				string shader_parameter_name = shader_parameter->getName();
+				const char* haystack_begin = reinterpret_cast<const char*>(shader_code->getData());
+				const char* haystack_end = haystack_begin + shader_code->getSize();
 
-				for (list<DefaultShaderParameter *>::iterator it = default_shader_parameters.parameters.begin(); it != default_shader_parameters.parameters.end(); it++) {
-					if ((*it)->name == shader_parameter_name) {
-						program_params->setConstant((size_t)index, Ogre::Vector4((*it)->r, (*it)->g, (*it)->b, (*it)->a));
-						found_in_list = true;
-						break;
-					}
-				}
+				const char* needle_begin = shader_parameter_name.data();
+				const char* needle_end = needle_begin + shader_parameter_name.size();
 
-				if (found_in_list) {
+				if (search(haystack_begin, haystack_end, needle_begin, needle_end) == haystack_end) {
 					continue;
 				}
-				
-				if (shader_parameter->getName() == "g_MtxProjection") {
+
+				if (shader_parameter_name == "g_MtxProjection") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_PROJECTION_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxInvProjection") {
+				else if (shader_parameter_name == "g_MtxInvProjection") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_INVERSE_PROJECTION_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxView") {
+				else if (shader_parameter_name == "g_MtxView") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_VIEW_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxInvView") {
+				else if (shader_parameter_name == "g_MtxInvView") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxWorld") {
+				else if (shader_parameter_name == "g_MtxWorld") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_WORLD_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxWorldIT") {
+				else if (shader_parameter_name == "g_MtxWorldIT") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_INVERSE_TRANSPOSE_WORLD_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxPrevView") {
+				else if (shader_parameter_name == "g_MtxPrevView") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_VIEW_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxPrevWorld") {
+				else if (shader_parameter_name == "g_MtxPrevWorld") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_WORLD_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxLightViewProjection") {
+				else if (shader_parameter_name == "g_MtxLightViewProjection") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxVerticalLightViewProjection") {
+				else if (shader_parameter_name == "g_MtxVerticalLightViewProjection") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX);
 				}
-				else if (shader_parameter->getName() == "g_MtxBillboardY") {
+				else if (shader_parameter_name == "g_MtxBillboardY") {
 					// Incomplete
 				}
-				else if (shader_parameter->getName() == "g_MtxPalette") {
+				else if (shader_parameter_name == "g_MtxPalette") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4);
 				}
-				else if (shader_parameter->getName() == "g_MtxPrevPalette") {
+				else if (shader_parameter_name == "g_MtxPrevPalette") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4);
 				}
-				else if (shader_parameter->getName() == "g_EyePosition") {
+				else if (shader_parameter_name == "g_EyePosition") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_CAMERA_POSITION);
 				}
-				else if (shader_parameter->getName() == "g_EyeDirection") {
+				else if (shader_parameter_name == "g_EyeDirection") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_VIEW_DIRECTION);
 				}
-				else if (shader_parameter->getName() == "g_ViewportSize") {
+				else if (shader_parameter_name == "g_ViewportSize") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_VIEWPORT_SIZE);
 				}
-				else if (shader_parameter->getName() == "g_CameraNearFarAspect") {
+				else if (shader_parameter_name == "g_CameraNearFarAspect") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgAmbientColor") {
+				else if (shader_parameter_name == "mrgAmbientColor") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgGroundColor") {
+				else if (shader_parameter_name == "mrgGroundColor") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgSkyColor") {
+				else if (shader_parameter_name == "mrgSkyColor") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgPowerGlossLevel") {
+				else if (shader_parameter_name == "mrgPowerGlossLevel") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgEmissionPower") {
+				else if (shader_parameter_name == "mrgEmissionPower") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgGlobalLight_Direction") {
+				else if (shader_parameter_name == "mrgGlobalLight_Direction") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 0);
 				}
-				else if (shader_parameter->getName() == "mrgGlobalLight_Direction_View") {
+				else if (shader_parameter_name == "mrgGlobalLight_Direction_View") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION_VIEW_SPACE, 0);
 				}
-				else if (shader_parameter->getName() == "mrgGlobalLight_Diffuse") {
+				else if (shader_parameter_name == "mrgGlobalLight_Diffuse") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 0);
 				}
-				else if (shader_parameter->getName() == "mrgGlobalLight_Specular") {
+				else if (shader_parameter_name == "mrgGlobalLight_Specular") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_SPECULAR_COLOUR, 0);
 				}
-				else if (shader_parameter->getName() == "mrgLocallightIndexArray") {
+				else if (shader_parameter_name == "mrgLocallightIndexArray") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight0_Position") {
+				else if (shader_parameter_name == "mrgLocalLight0_Position") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 1);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight0_Color") {
+				else if (shader_parameter_name == "mrgLocalLight0_Color") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 1);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight0_Range") {
+				else if (shader_parameter_name == "mrgLocalLight0_Range") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 1);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight0_Attribute") {
+				else if (shader_parameter_name == "mrgLocalLight0_Attribute") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 1);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight1_Position") {
+				else if (shader_parameter_name == "mrgLocalLight1_Position") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 2);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight1_Color") {
+				else if (shader_parameter_name == "mrgLocalLight1_Color") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 2);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight1_Range") {
+				else if (shader_parameter_name == "mrgLocalLight1_Range") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 2);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight1_Attribute") {
+				else if (shader_parameter_name == "mrgLocalLight1_Attribute") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 2);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight2_Position") {
+				else if (shader_parameter_name == "mrgLocalLight2_Position") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 3);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight2_Color") {
+				else if (shader_parameter_name == "mrgLocalLight2_Color") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 3);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight2_Range") {
+				else if (shader_parameter_name == "mrgLocalLight2_Range") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 3);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight2_Attribute") {
+				else if (shader_parameter_name == "mrgLocalLight2_Attribute") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 3);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight3_Position") {
+				else if (shader_parameter_name == "mrgLocalLight3_Position") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 4);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight3_Color") {
+				else if (shader_parameter_name == "mrgLocalLight3_Color") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 4);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight3_Range") {
+				else if (shader_parameter_name == "mrgLocalLight3_Range") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 4);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight3_Attribute") {
+				else if (shader_parameter_name == "mrgLocalLight3_Attribute") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 4);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight4_Position") {
+				else if (shader_parameter_name == "mrgLocalLight4_Position") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 5);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight4_Color") {
+				else if (shader_parameter_name == "mrgLocalLight4_Color") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_DIFFUSE_COLOUR, 5);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight4_Range") {
+				else if (shader_parameter_name == "mrgLocalLight4_Range") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 5);
 				}
-				else if (shader_parameter->getName() == "mrgLocalLight4_Attribute") {
+				else if (shader_parameter_name == "mrgLocalLight4_Attribute") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_ATTENUATION, 5);
 				}
-				else if (shader_parameter->getName() == "mrgEyeLight_Diffuse") {
+				else if (shader_parameter_name == "mrgEyeLight_Diffuse") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 1));
 				}
-				else if (shader_parameter->getName() == "mrgEyeLight_Specular") {
+				else if (shader_parameter_name == "mrgEyeLight_Specular") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0.1, 0.1, 0.1, 1));
 				}
-				else if (shader_parameter->getName() == "mrgEyeLight_Range") {
+				else if (shader_parameter_name == "mrgEyeLight_Range") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 0, 40));
 				}
-				else if (shader_parameter->getName() == "mrgEyeLight_Attribute") {
+				else if (shader_parameter_name == "mrgEyeLight_Attribute") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 2));
 				}
-				else if (shader_parameter->getName() == "mrgLuminanceRange") {
+				else if (shader_parameter_name == "mrgLuminanceRange") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgInShadowScale") {
+				else if (shader_parameter_name == "mrgInShadowScale") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ShadowMapParams") {
+				else if (shader_parameter_name == "g_ShadowMapParams") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgVsmEpsilon") {
+				else if (shader_parameter_name == "mrgVsmEpsilon") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgColourCompressFactor") {
+				else if (shader_parameter_name == "mrgColourCompressFactor") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_BackGroundScale") {
+				else if (shader_parameter_name == "g_BackGroundScale") {
 					float background_scale = 1.0f;
 					if (current_level) {
 						background_scale=current_level->getSceneEffect().sky_intensity_scale;
@@ -407,83 +402,88 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 
 					program_params->setConstant((size_t)index, Ogre::Vector4(background_scale));
 				}
-				else if (shader_parameter->getName() == "g_GIModeParam") {
+				else if (shader_parameter_name == "g_GIModeParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_OffsetParam") {
+				else if (shader_parameter_name == "g_OffsetParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_WaterParam") {
+				else if (shader_parameter_name == "g_WaterParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_IceParam") {
+				else if (shader_parameter_name == "g_IceParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_GI0Scale") {
+				else if (shader_parameter_name == "g_GI0Scale") {
+					if (editor_application->getCurrentLevel() != NULL && editor_application->getCurrentLevel()->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
+						program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 0));
+					}
+					else {
+						program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
+					}
+				}
+				else if (shader_parameter_name == "g_GI1Scale") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
 				}
-				else if (shader_parameter->getName() == "g_GI1Scale") {
-					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
-				}
-				else if (shader_parameter->getName() == "g_MotionBlur_AlphaRef_VelocityLimit_VelocityCutoff_BlurMagnitude") {
+				else if (shader_parameter_name == "g_MotionBlur_AlphaRef_VelocityLimit_VelocityCutoff_BlurMagnitude") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgDebugDistortionParam") {
+				else if (shader_parameter_name == "mrgDebugDistortionParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgEdgeEmissionParam") {
+				else if (shader_parameter_name == "mrgEdgeEmissionParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_DebugValue") {
+				else if (shader_parameter_name == "g_DebugValue") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgGIAtlasParam") {
-					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 0, 0));
+				else if (shader_parameter_name == "mrgGIAtlasParam") {
+					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_CUSTOM);
 				}
-				else if (shader_parameter->getName() == "mrgTexcoordIndex") {
+				else if (shader_parameter_name == "mrgTexcoordIndex") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgTexcoordOffset") {
+				else if (shader_parameter_name == "mrgTexcoordOffset") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 
 					if (uv_animation) {
 						editor_application->getAnimationsList()->addTexcoordAnimation(uv_animation, program_params, (size_t)index);
 					}
 				}
-				else if (shader_parameter->getName() == "mrgFresnelParam") {
+				else if (shader_parameter_name == "mrgFresnelParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgMorphWeight") {
+				else if (shader_parameter_name == "mrgMorphWeight") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "mrgZOffsetRate") {
+				else if (shader_parameter_name == "mrgZOffsetRate") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_IndexCount") {
+				else if (shader_parameter_name == "g_IndexCount") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_TransColorMask") {
+				else if (shader_parameter_name == "g_TransColorMask") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ChaosWaveParamEx") {
+				else if (shader_parameter_name == "g_ChaosWaveParamEx") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ChaosWaveParamY") {
+				else if (shader_parameter_name == "g_ChaosWaveParamY") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ChaosWaveParamXZ") {
+				else if (shader_parameter_name == "g_ChaosWaveParamXZ") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ChaosWaveParamXY") {
+				else if (shader_parameter_name == "g_ChaosWaveParamXY") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ChaosWaveParamZX") {
+				else if (shader_parameter_name == "g_ChaosWaveParamZX") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_IgnoreLightParam") {
+				else if (shader_parameter_name == "g_IgnoreLightParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_LightScattering_Ray_Mie_Ray2_Mie2") {
+				else if (shader_parameter_name == "g_LightScattering_Ray_Mie_Ray2_Mie2") {
 					LibGens::Color lsrm(0.291f,0.96f, 0.017543f, 0.075757f);
 					if (current_level) {
 						LibGens::SceneEffect& scene_effect = current_level->getSceneEffect();
@@ -499,7 +499,7 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 					// 0.291, 0.96, 0.017543, 0.075757
 					// 0.1, 0.01, 0.005952, 0.0007974481
 				}
-				else if (shader_parameter->getName() == "g_LightScattering_ConstG_FogDensity") {
+				else if (shader_parameter_name == "g_LightScattering_ConstG_FogDensity") {
 					LibGens::Color lsgf(0.0f, 0.0f, 0.0f, 0.0f);
 					if (current_level) {
 						LibGens::SceneEffect& scene_effect = current_level->getSceneEffect();
@@ -510,65 +510,71 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 					}
 					program_params->setConstant((size_t)index, Ogre::Vector4(lsgf.r, lsgf.g, lsgf.b, lsgf.a));
 				}
-				else if (shader_parameter->getName() == "g_LightScatteringFarNearScale") {
-					LibGens::Color lsfn(0.0003125f,380.0f,1.2f,114.0f);
+				else if (shader_parameter_name == "g_LightScatteringFarNearScale") {
+					LibGens::Color lsfn(3200.0f,380.0f,1.2f,114.0f);
 					if (current_level) {
 						LibGens::SceneEffect& scene_effect = current_level->getSceneEffect();
 
-						lsfn.r = 1.0f / (scene_effect.light_scattering_z_far - scene_effect.light_scattering_z_near);
+						lsfn.r = scene_effect.light_scattering_z_far;
 						lsfn.g = scene_effect.light_scattering_z_near;
 						lsfn.b = scene_effect.light_scattering_depth_scale;
 						lsfn.a = scene_effect.light_scattering_in_scattering_scale;
 					}
+					
+					if (editor_application->getCurrentLevel() != NULL && editor_application->getCurrentLevel()->getGameMode() != LIBGENS_LEVEL_GAME_UNLEASHED) {
+						lsfn.r = 1.0f / (lsfn.r - lsfn.g);
+					}
 
 					program_params->setConstant((size_t)index, Ogre::Vector4(lsfn.r, lsfn.g, lsfn.b, lsfn.a));
 				}
-				else if (shader_parameter->getName() == "g_LightScatteringColor") {
+				else if (shader_parameter_name == "g_LightScatteringColor") {
 					LibGens::Color lsc(0.11,0.35,0.760001,1);
 					if (current_level) {
 						lsc=current_level->getSceneEffect().light_scattering_color;
 					}
 					program_params->setConstant((size_t)index, Ogre::Vector4(lsc.r, lsc.g, lsc.b, 1));
 				}
-				else if (shader_parameter->getName() == "g_LightScatteringMode") {
+				else if (shader_parameter_name == "g_LightScatteringMode") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(4, 1, 1, 1));
 				}
-				else if (shader_parameter->getName() == "g_VerticalLightDirection") {
+				else if (shader_parameter_name == "g_VerticalLightDirection") {
 					program_params->setAutoConstant((size_t)index, Ogre::GpuProgramParameters::ACT_LIGHT_POSITION, 0);
 				}
-				else if (shader_parameter->getName() == "g_aLightField") {
+				else if (shader_parameter_name == "g_aLightField") {
 					float lightfield_cube[24];
 					for (size_t i=0; i<24; i++) {
-						lightfield_cube[i] = 0.9;
+						lightfield_cube[i] = 0.5f;
 					}
+					lightfield_cube[3] = 1.0f;
+
 					program_params->setConstant((size_t)index, lightfield_cube, 6);
 				}
-				else if (shader_parameter->getName() == "g_TimeParam") {
+				else if (shader_parameter_name == "g_TimeParam") {
 					//program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 					program_params->setAutoConstantReal((size_t)index, Ogre::GpuProgramParameters::ACT_TIME, 1.0f);
 				}
-				else if (shader_parameter->getName() == "diffuse") {
+				else if (shader_parameter_name == "diffuse") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
 				}
-				else if (shader_parameter->getName() == "ambient") {
+				else if (shader_parameter_name == "ambient") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
 				}
-				else if (shader_parameter->getName() == "specular") {
+				else if (shader_parameter_name == "specular") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
 				}
-				else if (shader_parameter->getName() == "emissive") {
+				else if (shader_parameter_name == "emissive") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "opacity_reflection_refraction_spectype") {
+				else if (shader_parameter_name == "opacity_reflection_refraction_spectype") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 0, 1, 3));
 				}
-				else if (shader_parameter->getName() == "power_gloss_level") {
+				else if (shader_parameter_name == "power_gloss_level") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(50, 0.3, 0.19, 0));
 				}
-				else if (shader_parameter->getName() == "g_SonicSkinFalloffParam") {
+				else if (shader_parameter_name == "g_SonicSkinFalloffParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0.15, 2, 3, 0));
 				}
-				else if (shader_parameter->getName() == "g_SkyParam") {
+				else if (shader_parameter_name == "g_SkyParam") {
 					float sky_follow_y_ratio = 1.0f;
 					if (current_level) {
 						sky_follow_y_ratio=current_level->getSceneEffect().sky_follow_up_ratio_y;
@@ -576,48 +582,52 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, sky_follow_y_ratio, 1, 1));
 				}
-				else if (shader_parameter->getName() == "g_ViewZAlphaFade") {
+				else if (shader_parameter_name == "g_ViewZAlphaFade") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
-				else if (shader_parameter->getName() == "g_ForceAlphaColor") {
+				else if (shader_parameter_name == "g_ForceAlphaColor") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
 				}
-				else if (shader_parameter->getName() == "g_ChrPlayableMenuParam") {
+				else if (shader_parameter_name == "g_ChrPlayableMenuParam") {
 					program_params->setConstant((size_t)index, Ogre::Vector4(1, 1, 1, 1));
+				}	
+				else if (shader_parameter_name == "mrgPlayableParam") {
+					program_params->setConstant((size_t)index, Ogre::Vector4(-1, 1, 1, 1));
 				}
 				else {
-					SHOW_MSG(("Unhandled constant/variable float4 " + shader_parameter->getName() + " with index " + ToString((int)index) + " on the Shader " + ToString(material->getShader()) + ". Handle it!").c_str());
+					printf(("Unhandled constant/variable float4 " + shader_parameter_name + " with index " + ToString((int)index) + " on the Shader " + ToString(material->getShader()) + ". Handle it!\n").c_str());
+					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
 			}
 			else if (slot == 2) {
-				if (shader_parameter->getName() == "mrgHasBone") {
+				if (shader_parameter_name == "mrgHasBone") {
 					// Unhandled, how do I set a bool
 				}
-				else if (shader_parameter->getName() == "g_IsShadowMapEnable") {
+				else if (shader_parameter_name == "g_IsShadowMapEnable") {
 					// Unhandled, how do I set a bool
 				}
-				else if (shader_parameter->getName() == "g_IsLightScatteringEnable") {
+				else if (shader_parameter_name == "g_IsLightScatteringEnable") {
 					// Unhandled, how do I set a bool
 				}
-				else if (shader_parameter->getName() == "mrgIsEnableHemisphere") {
+				else if (shader_parameter_name == "mrgIsEnableHemisphere") {
 					// Unhandled, how do I set a bool
 				}
-				else if (shader_parameter->getName() == "g_IsAlphaDepthBlur") {
+				else if (shader_parameter_name == "g_IsAlphaDepthBlur") {
 					// Unhandled, how do I set a bool
 				}
-				else if (shader_parameter->getName() == "g_IsGIEnabled") {
+				else if (shader_parameter_name == "g_IsGIEnabled") {
 					// Unhandled, how do I set a bool
 				}
-				else if (shader_parameter->getName() == "g_IsSoftParticle") {
+				else if (shader_parameter_name == "g_IsSoftParticle") {
 					// Unhandled, how do I set a bool
 				}
 				else {
-					SHOW_MSG(("Unhandled constant/variable bool " + shader_parameter->getName() + " with index " + ToString((int)index) + " on the Shader " + ToString(material->getShader()) + ". Handle it!").c_str());
+					ERROR_MSG(("Unhandled constant/variable bool " + shader_parameter_name + " with index " + ToString((int)index) + " on the Shader " + ToString(material->getShader()) + ". Handle it!").c_str());
 				}
 			}
 			else if (slot == 3) {
-				if ((size_t)index > 15) index = ((size_t) (index) / 17);
-				string texture_unit = shader_parameter->getName();
+				index &= 0xF;
+				string texture_unit = shader_parameter_name;
 
 				size_t texture_unit_used_count=0;
 				for (size_t i=0; i<texture_units_used.size(); i++) {
@@ -630,60 +640,61 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 				pass->getTextureUnitState((size_t)index)->setTextureName("");
 				LibGens::Texture *material_texture = material->getTextureByUnit(texture_unit, texture_unit_used_count);
 				if (material_texture) {
+					pass->getTextureUnitState((size_t)index)->setTextureFiltering(Ogre::TextureFilterOptions::TFO_TRILINEAR);
 					pass->getTextureUnitState((size_t)index)->setTextureName(material_texture->getName()+LIBGENS_TEXTURE_FILE_EXTENSION);
 					texture_units_used.push_back(texture_unit);
 					continue;
 				}
 
 
-				if (shader_parameter->getName() == "TerrainDiffusemapMask") {
+				if (shader_parameter_name == "TerrainDiffusemapMask") {
 				}
-				else if (shader_parameter->getName() == "GI") {
+				else if (shader_parameter_name == "GI") {
 					pass->getTextureUnitState((size_t)index)->setTextureName("white.dds");
 				}
-				else if (shader_parameter->getName() == "Framebuffer") {
+				else if (shader_parameter_name == "Framebuffer") {
 					//pass->getTextureUnitState((size_t)index)->setTextureName("ColorTex");
 				}
-				else if (shader_parameter->getName() == "Depth") {
+				else if (shader_parameter_name == "Depth") {
 					//pass->getTextureUnitState((size_t)index)->setTextureName("DepthTex");
 					pass->getTextureUnitState((size_t)index)->setTextureName("white.dds");
 				}
-				else if (shader_parameter->getName() == "ShadowMap") {
+				else if (shader_parameter_name == "ShadowMap") {
 					pass->getTextureUnitState((size_t)index)->setTextureName("white.dds");
 				}
-				else if (shader_parameter->getName() == "VerticalShadowMap") {
+				else if (shader_parameter_name == "VerticalShadowMap") {
 					pass->getTextureUnitState((size_t)index)->setTextureName("white.dds");
 				}
-				else if (shader_parameter->getName() == "ShadowMapJitter") {
+				else if (shader_parameter_name == "ShadowMapJitter") {
 				}
-				else if (shader_parameter->getName() == "ReflectionMap") {
+				else if (shader_parameter_name == "ReflectionMap") {
 				}
-				else if (shader_parameter->getName() == "ReflectionMap2") {
+				else if (shader_parameter_name == "ReflectionMap2") {
 				}
-				else if (shader_parameter->getName() == "INDEXEDLIGHTMAP") {
+				else if (shader_parameter_name == "INDEXEDLIGHTMAP") {
 				}
-				else if (shader_parameter->getName() == "PamNpcEye") {
+				else if (shader_parameter_name == "PamNpcEye") {
 				}
-				else if (shader_parameter->getName() == "diffuse") {
+				else if (shader_parameter_name == "diffuse") {
 				}
-				else if (shader_parameter->getName() == "specular") {
+				else if (shader_parameter_name == "specular") {
 				}
-				else if (shader_parameter->getName() == "reflection") {
+				else if (shader_parameter_name == "reflection") {
 				}
-				else if (shader_parameter->getName() == "normal") {
+				else if (shader_parameter_name == "normal") {
 				}
-				else if (shader_parameter->getName() == "displacement") {
+				else if (shader_parameter_name == "displacement") {
 				}
-				else if (shader_parameter->getName() == "gloss") {
+				else if (shader_parameter_name == "gloss") {
 				}
-				else if (shader_parameter->getName() == "opacity") {
+				else if (shader_parameter_name == "opacity") {
 				}
 				else {
-					SHOW_MSG(("Unhandled constant/variable sampler " + shader_parameter->getName() + " with index " + ToString((int)index) + " on the Shader " + ToString(material->getShader()) + ". Handle it!").c_str());
+					ERROR_MSG(("Unhandled constant/variable sampler " + shader_parameter_name + " with index " + ToString((int)index) + " on the Shader " + ToString(material->getShader()) + ". Handle it!").c_str());
 				}
 			}
 			else {
-				SHOW_MSG(("Unhandled slot " + ToString(slot) + ". Handle it!").c_str());
+				ERROR_MSG(("Unhandled slot " + ToString(slot) + ". Handle it!").c_str());
 			}
 		}
 	}
@@ -697,12 +708,11 @@ void fixPass(Ogre::Pass *pass, LibGens::Material *material, size_t mesh_slot) {
 
 	if (mesh_slot == LIBGENS_MODEL_SUBMESH_SLOT_WATER) {
 		pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-		//pass->setDepthWriteEnabled(false);
+		pass->setDepthWriteEnabled(true);
 	}
 
 	if (mesh_slot == LIBGENS_MODEL_SUBMESH_SLOT_BOOLEAN) {
-		pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-		pass->setAlphaRejectSettings(Ogre::CMPF_GREATER_EQUAL, (unsigned char)192);
+		pass->setAlphaRejectSettings(Ogre::CMPF_GREATER_EQUAL, material->getAlphaThreshold());
 	}
 
 	if (material->hasColorBlend()) {
@@ -713,24 +723,42 @@ void fixPass(Ogre::Pass *pass, LibGens::Material *material, size_t mesh_slot) {
 	if (material->hasNoCulling()) pass->setCullingMode(Ogre::CULL_NONE);
 }
 
-void updateMaterialShaderParameters(Ogre::Material *ogre_material, LibGens::Material *material, bool no_gi, LibGens::UVAnimation *uv_animation) {
+namespace Ogre {
+	class D3D9GpuProgram {
+	public:
+		void setExternalMicrocode(const void* pMicrocode, size_t size);
+	};
+}
+
+void updateMaterialShaderParameters(Ogre::Material *ogre_material, LibGens::Material *material, bool no_gi, LibGens::UVAnimation *uv_animation, LibGens::ShaderLibrary *shader_library) {
 	Ogre::Pass *pass=ogre_material->getTechnique(0)->getPass(0);
 	if (!pass) return;
+
+	if (!shader_library) {
+		LibGens::Texture* texture = material->getTextureByIndex(0);
+		if (texture) {
+			pass->getTextureUnitState(0)->setTextureName(texture->getName() + LIBGENS_TEXTURE_FILE_EXTENSION);
+		}
+		return;
+	}
 
 	// Search for shaders based on the material's shader
 	string shader_name = material->getShader();
 	LibGens::Shader *vertex_shader=NULL;
 	LibGens::Shader *pixel_shader=NULL;
-	SONICGLVL_SHADER_LIBRARY->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, no_gi, /*(uv_animation ? false : true)*/ false);
+	shader_library->getMaterialShaders(shader_name, vertex_shader, pixel_shader, false, no_gi, /*(uv_animation ? false : true)*/ false);
 
 	if (vertex_shader && pixel_shader) {
 		// Vertex Shader
 		string vertex_shader_name = vertex_shader->getShaderFilename();
+		string vertex_shader_key = ToString((size_t)shader_library) + "_vertex_" + vertex_shader_name;
+		LibGens::ArFile* vertex_shader_code_file = shader_library->getFile(vertex_shader_name + ".wvu");
 		if (!vertex_shader->hasExtra()) {
-			Ogre::GpuProgramPtr vertex = Ogre::GpuProgramManager::getSingletonPtr()->createProgram(vertex_shader_name, GENERAL_MESH_GROUP, vertex_shader_name+".wvu.asm", Ogre::GPT_VERTEX_PROGRAM, "vs_3_0");
-			vertex_shader->setExtra(vertex_shader_name);
+			Ogre::ResourcePtr vertex = Ogre::GpuProgramManager::getSingletonPtr()->createProgramFromString(vertex_shader_key, GENERAL_MESH_GROUP, "", Ogre::GPT_VERTEX_PROGRAM, "vs_3_0");
+			((Ogre::D3D9GpuProgram*)(vertex.get()))->setExternalMicrocode(vertex_shader_code_file->getData(), vertex_shader_code_file->getSize());
+			vertex_shader->setExtra(vertex_shader_key);
 		}
-		pass->setVertexProgram(vertex_shader_name);
+		pass->setVertexProgram(vertex_shader_key);
 
 		
 		if (pass->hasVertexProgram()) {
@@ -740,21 +768,24 @@ void updateMaterialShaderParameters(Ogre::Material *ogre_material, LibGens::Mate
 			vp_parameters->setTransposeMatrices(true);
 
 			for (size_t i=0; i<shader_parameter_filenames.size(); i++) {
-				LibGens::ShaderParams *shader_params=SONICGLVL_SHADER_LIBRARY->getVertexShaderParams(shader_parameter_filenames[i]);
+				LibGens::ShaderParams *shader_params=shader_library->getVertexShaderParams(shader_parameter_filenames[i]);
 
 				if (shader_params) {
-					setShaderParameters(pass, vp_parameters, material, shader_params, uv_animation);
+					setShaderParameters(pass, vp_parameters, material, shader_params, uv_animation, vertex_shader_code_file);
 				}
 			}
 		}
 
 		// Pixel Shader
 		string pixel_shader_name = pixel_shader->getShaderFilename();
+		string pixel_shader_key = ToString((size_t)shader_library) + "_pixel_" + pixel_shader_name;
+		LibGens::ArFile* pixel_shader_code_file = shader_library->getFile(pixel_shader_name + ".wpu");
 		if (!pixel_shader->hasExtra()) {
-			Ogre::GpuProgramPtr shader = Ogre::GpuProgramManager::getSingletonPtr()->createProgram(pixel_shader_name, GENERAL_MESH_GROUP, pixel_shader_name+".wpu.asm", Ogre::GPT_FRAGMENT_PROGRAM, "ps_3_0");
-			pixel_shader->setExtra(pixel_shader_name);
+			Ogre::ResourcePtr shader = Ogre::GpuProgramManager::getSingletonPtr()->createProgramFromString(pixel_shader_key, GENERAL_MESH_GROUP, "", Ogre::GPT_FRAGMENT_PROGRAM, "ps_3_0");
+			((Ogre::D3D9GpuProgram*)(shader.get()))->setExternalMicrocode(pixel_shader_code_file->getData(), pixel_shader_code_file->getSize());
+			pixel_shader->setExtra(pixel_shader_key);
 		}
-		pass->setFragmentProgram(pixel_shader_name);
+		pass->setFragmentProgram(pixel_shader_key);
 
 		if (pass->hasFragmentProgram()) {
 			Ogre::GpuProgramParametersSharedPtr fp_parameters = pass->getFragmentProgramParameters();
@@ -763,10 +794,10 @@ void updateMaterialShaderParameters(Ogre::Material *ogre_material, LibGens::Mate
 			fp_parameters->setTransposeMatrices(true);
 
 			for (size_t i=0; i<shader_parameter_filenames.size(); i++) {
-				LibGens::ShaderParams *shader_params=SONICGLVL_SHADER_LIBRARY->getPixelShaderParams(shader_parameter_filenames[i]);
+				LibGens::ShaderParams *shader_params=shader_library->getPixelShaderParams(shader_parameter_filenames[i]);
 
 				if (shader_params) {
-					setShaderParameters(pass, fp_parameters, material, shader_params, uv_animation);
+					setShaderParameters(pass, fp_parameters, material, shader_params, uv_animation, pixel_shader_code_file);
 				}
 			}
 		}
@@ -778,7 +809,7 @@ void updateMaterialShaderParameters(Ogre::Material *ogre_material, LibGens::Mate
 }
 
 
-void buildMaterial(LibGens::Material *material, string material_name, string resource_group, size_t mesh_slot, bool no_gi) {
+void buildMaterial(LibGens::Material *material, string material_name, string resource_group, size_t mesh_slot, bool no_gi, LibGens::ShaderLibrary *shader_library) {
 	material->setExtra(material_name);
 	LibGens::Texture *texture=material->getTextureByUnit(LIBGENS_MATERIAL_TEXTURE_UNIT_DIFFUSE);
 
@@ -793,7 +824,7 @@ void buildMaterial(LibGens::Material *material, string material_name, string res
 
 	// Force it to use 16 total texture units and full ambient lighting
 	for (size_t i=0; i<16; i++) {
-		Ogre::TextureUnitState *texture_unit_state=pass->createTextureUnitState("black.dds");
+		Ogre::TextureUnitState *texture_unit_state=pass->createTextureUnitState(shader_library == NULL ? "white.dds" : "black.dds");
 	}
 	pass->setAmbient(1.0, 1.0, 1.0);
 
@@ -804,23 +835,11 @@ void buildMaterial(LibGens::Material *material, string material_name, string res
 	}
 
 	// Search for shaders based on the material's shader
-	updateMaterialShaderParameters(compilematerial, material, no_gi, uv_animation);
-
-	// Create low-end technique
-	Ogre::Technique *low_end_technique=compilematerial->createTechnique();
-	low_end_technique->setSchemeName(SONICGLVL_LOW_END_TECHNIQUE);
-	pass=low_end_technique->createPass();
-
-	fixPass(pass, material, mesh_slot);
-
-	if (texture) {
-		Ogre::TextureUnitState *state=pass->createTextureUnitState(texture->getName()+LIBGENS_TEXTURE_FILE_EXTENSION);
-		state->setTextureAddressingMode(Ogre::TextureUnitState::TAM_WRAP);
-	}
+	updateMaterialShaderParameters(compilematerial, material, no_gi, uv_animation, shader_library);
 }
 
 
-void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneManager *scene_manager, LibGens::MaterialLibrary *material_library, string root_name, Ogre::uint32 query_flags, string resource_group, bool global_illumination, string skeleton_name, Ogre::Entity *&shared_entity, vector<LibGens::Bone *> model_bones) {
+void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneManager *scene_manager, LibGens::MaterialLibrary *material_library, string root_name, Ogre::uint32 query_flags, string resource_group, bool global_illumination, string skeleton_name, Ogre::Entity *&shared_entity, vector<LibGens::Bone *> model_bones, LibGens::ShaderLibrary *shader_library) {
 	vector<LibGens::Submesh *> *submeshes=mesh->getSubmeshSlots();
 	unsigned int i=0;
 	bool create_resource = true;
@@ -958,13 +977,13 @@ void buildMesh(Ogre::SceneNode *scene_node, LibGens::Mesh *mesh, Ogre::SceneMana
 						mat_name += "_GI";
 
 						if (!mat->hasExtraGI()) {
-							buildMaterial(mat, mat_name, resource_group, mesh_slot, false);
+							buildMaterial(mat, mat_name, resource_group, mesh_slot, false, shader_library);
 							mat->setExtraGI(mat_name);
 						}
 					}
 					else {
 						if (!mat->hasExtra()) {
-							buildMaterial(mat, mat_name, resource_group, mesh_slot, true);
+							buildMaterial(mat, mat_name, resource_group, mesh_slot, true, shader_library);
 							mat->setExtra(mat_name);
 						}
 					}
@@ -1098,7 +1117,7 @@ void cleanModelResource(LibGens::Model *model, string resource_group) {
 }
 
 
-void buildModel(Ogre::SceneNode *scene_node, LibGens::Model *model, string model_name, string skeleton_name, Ogre::SceneManager *scene_manager, LibGens::MaterialLibrary *material_library, Ogre::uint32 query_flags, string resource_group, bool global_illumination) {
+void buildModel(Ogre::SceneNode *scene_node, LibGens::Model *model, string model_name, string skeleton_name, Ogre::SceneManager *scene_manager, LibGens::MaterialLibrary *material_library, Ogre::uint32 query_flags, string resource_group, bool global_illumination, LibGens::ShaderLibrary *shader_library) {
 	if (!model) return;
 	if (!scene_manager) return;
 	if (!material_library) return;
@@ -1107,7 +1126,7 @@ void buildModel(Ogre::SceneNode *scene_node, LibGens::Model *model, string model
 	vector<LibGens::Mesh *> meshes=model->getMeshes();
 	unsigned int i=0;
 	for (vector<LibGens::Mesh *>::iterator it=meshes.begin(); it!=meshes.end(); it++) {
-		buildMesh(scene_node, (*it), scene_manager, material_library, model_name + "_" + ToString(i), query_flags, resource_group, global_illumination, skeleton_name, shared_entity, model->getBones());
+		buildMesh(scene_node, (*it), scene_manager, material_library, model_name + "_" + ToString(i), query_flags, resource_group, global_illumination, skeleton_name, shared_entity, model->getBones(), shader_library);
 		i++;
 	}
 }

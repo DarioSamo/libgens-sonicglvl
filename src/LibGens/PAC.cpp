@@ -809,9 +809,9 @@ namespace LibGens {
 		}
 	}
 
-	void PacFile::hashInput(SHA1Context &sha1_context) {
+	void PacFile::hashInput(XXH3_state_t& hash_state) {
 		if (data) {
-			SHA1Input(&sha1_context, data, data_size);
+			XXH3_128bits_update(&hash_state, data, data_size);
 		}
 	}
 
@@ -896,9 +896,9 @@ namespace LibGens {
 		}
 	}
 
-	void PacExtension::hashInput(SHA1Context &sha1_context) {
+	void PacExtension::hashInput(XXH3_state_t&hash_state) {
 		for (size_t i=0; i<files.size(); i++) {
-			files[i]->hashInput(sha1_context);
+			files[i]->hashInput(hash_state);
 		}
 	}
 
@@ -1090,9 +1090,9 @@ namespace LibGens {
 		return internal_size;
 	}
 
-	void PacPack::hashInput(SHA1Context &sha1_context) {
+	void PacPack::hashInput(XXH3_state_t& hash_state) {
 		for (size_t i=0; i<extensions.size(); i++) {
-			extensions[i]->hashInput(sha1_context);
+			extensions[i]->hashInput(hash_state);
 		}
 	}
 
@@ -1108,9 +1108,6 @@ namespace LibGens {
 
 	PacSet::PacSet() {
 		name = folder = "";
-		for (int i=0; i<5; i++) {
-			sha1_hash[i] = 0;
-		}
 	}
 
 	PacSet::~PacSet() {
@@ -1138,21 +1135,6 @@ namespace LibGens {
 				}
 			}
 		}
-
-		// Generate SHA1 Hash
-		SHA1Reset(&sha1_context);
-		for (size_t i=0; i < packs.size(); i++) {
-			packs[i]->hashInput(sha1_context);
-		}
-		SHA1Result(&sha1_context);
-
-		for (int i=0; i<5; i++) {
-			sha1_hash[i] = sha1_context.Message_Digest[i];
-		}
-	}
-
-	int PacSet::getSHA1Hash(int i) {
-		return sha1_hash[i];
 	}
 
 	void PacSet::openDependFile(PacFile *file) {
@@ -1317,5 +1299,14 @@ namespace LibGens {
 		}
 
 		return list<string>();
+	}
+
+	XXH128_hash_t PacSet::computeHash() {
+		XXH3_state_t state;
+		XXH3_128bits_reset(&state);
+		for (size_t i = 0; i < packs.size(); i++) {
+			packs[i]->hashInput(state);
+		}
+		return XXH3_128bits_digest(&state);
 	}
 };
