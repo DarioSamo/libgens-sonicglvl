@@ -191,7 +191,6 @@ FakesAssemblies/
 
 # Intellisense database
 .vs/
-database
 
 # JetBrains IDE files
 .idea
