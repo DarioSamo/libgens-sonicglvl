@@ -56,6 +56,7 @@
 #define LIBGENS_LEVEL_XML_COLOR_Z                    "ms_Color.z"
 #define LIBGENS_LEVEL_XML_RAY_MIE_RAY2_MIE2_X    	 "ms_Ray_Mie_Ray2_Mie2.x"
 #define LIBGENS_LEVEL_XML_RAY_MIE_RAY2_MIE2_Y    	 "ms_Ray_Mie_Ray2_Mie2.y"
+#define LIBGENS_LEVEL_XML_G    						 "ms_G"
 #define LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_X       	 "ms_FarNearScale.x"
 #define LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_Y       	 "ms_FarNearScale.y"
 #define LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_Z       	 "ms_FarNearScale.z"
@@ -121,12 +122,30 @@ namespace LibGens {
 
 	class SceneEffect {
 		public:
-			Color light_scattering_ray_mie_ray2_mie2;
-			Color light_scattering_far_near_scale;
 			Color light_scattering_color;
+			float light_scattering_depth_scale;
+			float light_scattering_in_scattering_scale;
+			float light_scattering_rayleigh;
+			float light_scattering_mie;
+			float light_scattering_g;
+			float light_scattering_z_near;
+			float light_scattering_z_far;
 
 			float sky_follow_up_ratio_y;
 			float sky_intensity_scale;
+
+			SceneEffect() {
+				light_scattering_color = Color(0.1f, 0.21f, 0.3f);
+				light_scattering_depth_scale = 9.1f;
+				light_scattering_in_scattering_scale = 50.0f;
+				light_scattering_rayleigh = 0.1f;
+				light_scattering_mie = 0.01f;
+				light_scattering_g = 0.7f;
+				light_scattering_z_near = 60.0f;
+				light_scattering_z_far = 700.0f;
+				sky_follow_up_ratio_y = 1.0f;
+				sky_intensity_scale = 1.0f;
+			}
 	};
 
 	class Object;

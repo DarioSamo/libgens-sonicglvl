@@ -484,26 +484,44 @@ void setShaderParameters(Ogre::Pass *pass, Ogre::GpuProgramParametersSharedPtr p
 					program_params->setConstant((size_t)index, Ogre::Vector4(0, 0, 0, 0));
 				}
 				else if (shader_parameter->getName() == "g_LightScattering_Ray_Mie_Ray2_Mie2") {
-					LibGens::Color lsrm(0.291,0.96,1,1);
+					LibGens::Color lsrm(0.291f,0.96f, 0.017543f, 0.075757f);
 					if (current_level) {
-						lsrm=current_level->getSceneEffect().light_scattering_ray_mie_ray2_mie2;
+						LibGens::SceneEffect& scene_effect = current_level->getSceneEffect();
+
+						lsrm.r = scene_effect.light_scattering_rayleigh;
+						lsrm.g = scene_effect.light_scattering_mie;
+						lsrm.b = scene_effect.light_scattering_rayleigh * 3.0f / (LIBGENS_MATH_PI * 16.0f);
+						lsrm.a = scene_effect.light_scattering_mie / (LIBGENS_MATH_PI * 4.0f);
 					}
 
-					program_params->setConstant((size_t)index, Ogre::Vector4(lsrm.r, lsrm.g, lsrm.r / 16.587812802827, lsrm.g / 12.672096307931));
+					program_params->setConstant((size_t)index, Ogre::Vector4(lsrm.r, lsrm.g, lsrm.b, lsrm.a));
 
 					// 0.291, 0.96, 0.017543, 0.075757
 					// 0.1, 0.01, 0.005952, 0.0007974481
 				}
 				else if (shader_parameter->getName() == "g_LightScattering_ConstG_FogDensity") {
-					program_params->setConstant((size_t)index, Ogre::Vector4(0.0, 0.0, 0.0, 0.0));
+					LibGens::Color lsgf(0.0f, 0.0f, 0.0f, 0.0f);
+					if (current_level) {
+						LibGens::SceneEffect& scene_effect = current_level->getSceneEffect();
+
+						lsgf.r = (1.0f - scene_effect.light_scattering_g) * (1.0f - scene_effect.light_scattering_g);
+						lsgf.g = scene_effect.light_scattering_g * scene_effect.light_scattering_g + 1.0f;
+						lsgf.b = scene_effect.light_scattering_g * -2.0f;
+					}
+					program_params->setConstant((size_t)index, Ogre::Vector4(lsgf.r, lsgf.g, lsgf.b, lsgf.a));
 				}
 				else if (shader_parameter->getName() == "g_LightScatteringFarNearScale") {
-					LibGens::Color lsfn(3200,380,1.2,114);
+					LibGens::Color lsfn(0.0003125f,380.0f,1.2f,114.0f);
 					if (current_level) {
-						lsfn=current_level->getSceneEffect().light_scattering_far_near_scale;
+						LibGens::SceneEffect& scene_effect = current_level->getSceneEffect();
+
+						lsfn.r = 1.0f / (scene_effect.light_scattering_z_far - scene_effect.light_scattering_z_near);
+						lsfn.g = scene_effect.light_scattering_z_near;
+						lsfn.b = scene_effect.light_scattering_depth_scale;
+						lsfn.a = scene_effect.light_scattering_in_scattering_scale;
 					}
 
-					program_params->setConstant((size_t)index, Ogre::Vector4(1.0/lsfn.r, lsfn.g, lsfn.b, lsfn.a));
+					program_params->setConstant((size_t)index, Ogre::Vector4(lsfn.r, lsfn.g, lsfn.b, lsfn.a));
 				}
 				else if (shader_parameter->getName() == "g_LightScatteringColor") {
 					LibGens::Color lsc(0.11,0.35,0.760001,1);

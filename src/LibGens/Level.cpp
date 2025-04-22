@@ -283,28 +283,32 @@ namespace LibGens {
 											FromString<float>(scene_effect.light_scattering_color.b, value_text, std::dec);
 										}
 
-										if (pElem_l->ValueStr()==LIBGENS_LEVEL_XML_RAY_MIE_RAY2_MIE2_X) {
-											FromString<float>(scene_effect.light_scattering_ray_mie_ray2_mie2.r, value_text, std::dec);
-										}
-
-										if (pElem_l->ValueStr()==LIBGENS_LEVEL_XML_RAY_MIE_RAY2_MIE2_Y) {
-											FromString<float>(scene_effect.light_scattering_ray_mie_ray2_mie2.g, value_text, std::dec);
-										}
-
-										if (pElem_l->ValueStr()==LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_X) {
-											FromString<float>(scene_effect.light_scattering_far_near_scale.r, value_text, std::dec);
-										}
-
-										if (pElem_l->ValueStr()==LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_Y) {
-											FromString<float>(scene_effect.light_scattering_far_near_scale.g, value_text, std::dec);
-										}
-
 										if (pElem_l->ValueStr()==LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_Z) {
-											FromString<float>(scene_effect.light_scattering_far_near_scale.b, value_text, std::dec);
+											FromString<float>(scene_effect.light_scattering_depth_scale, value_text, std::dec);
 										}
 
-										if (pElem_l->ValueStr()==LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_W) {
-											FromString<float>(scene_effect.light_scattering_far_near_scale.a, value_text, std::dec);
+										if (pElem_l->ValueStr() == LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_W) {
+											FromString<float>(scene_effect.light_scattering_in_scattering_scale, value_text, std::dec);
+										}
+
+										if (pElem_l->ValueStr() == LIBGENS_LEVEL_XML_RAY_MIE_RAY2_MIE2_X) {
+											FromString<float>(scene_effect.light_scattering_rayleigh, value_text, std::dec);
+										}
+
+										if (pElem_l->ValueStr() == LIBGENS_LEVEL_XML_RAY_MIE_RAY2_MIE2_Y) {
+											FromString<float>(scene_effect.light_scattering_mie, value_text, std::dec);
+										}
+
+										if (pElem_l->ValueStr() == LIBGENS_LEVEL_XML_G) {
+											FromString<float>(scene_effect.light_scattering_g, value_text, std::dec);
+										}
+
+										if (pElem_l->ValueStr() == LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_Y) {
+											FromString<float>(scene_effect.light_scattering_z_near, value_text, std::dec);
+										}
+
+										if (pElem_l->ValueStr() == LIBGENS_LEVEL_XML_FAR_NEAR_SCALE_X) {
+											FromString<float>(scene_effect.light_scattering_z_far, value_text, std::dec);
 										}
 									}
 								}
