@@ -86,6 +86,7 @@
 
 #define LIBGENS_LEVEL_GAME_GENERATIONS               0
 #define LIBGENS_LEVEL_GAME_UNLEASHED                 1
+#define LIBGENS_LEVEL_GAME_LOST_WORLD                2
 
 #define LIBGENS_LEVEL_GAME_STRING_GENERATIONS        "Generations"
 #define LIBGENS_LEVEL_GAME_STRING_UNLEASHED          "Unleashed"
@@ -182,11 +183,10 @@ namespace LibGens {
 			list<LevelSetEntry *> set_entries;
 		public:
 			Level();
-			Level(string folder_p, string game_name=LIBGENS_LEVEL_GAME_STRING_GENERATIONS);
+			Level(string folder_p, size_t game_mode_p=LIBGENS_LEVEL_GAME_GENERATIONS);
 			void setName(string nm);
 			size_t getGameMode();
 			void setGameMode(size_t v);
-			void setGameMode(string v);
 			string getName();
 			string getTerrainInfo();
 			string getDirectLight();

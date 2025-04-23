@@ -139,7 +139,7 @@ namespace LibGens {
 			void writeFixed(File *file);
 			vector<string> getPacDependNames();
 			unsigned int getDataSize();
-			void hashInput(SHA1Context &sha1_context);
+			void hashInput(XXH3_state_t &hash_state);
 	};
 
 	class PacExtension {
@@ -165,7 +165,7 @@ namespace LibGens {
 			void deleteFiles();
 			bool isEmpty();
 			bool isSpecialExtension();
-			void hashInput(SHA1Context &sha1_context);
+			void hashInput(XXH3_state_t& hash_state);
 			list<string> getFileList();
 	};
 
@@ -212,7 +212,7 @@ namespace LibGens {
 			string getName();
 			size_t getInternalSize();
 			list<string> getFileList();
-			void hashInput(SHA1Context &sha1_context);
+			void hashInput(XXH3_state_t& hash_state);
 	};
 
 	class PacSet {
@@ -220,8 +220,6 @@ namespace LibGens {
 			vector<PacPack *> packs;
 			string name;
 			string folder;
-			unsigned int sha1_hash[5];
-			SHA1Context sha1_context;
 		public:
 			PacSet();
 			PacSet(string filename);
@@ -232,6 +230,6 @@ namespace LibGens {
 			void openDependFile(PacFile *file);
 			void extract(string target_folder, bool convert_textures=false, void (*callback)(string)=NULL);
 			list<string> getFileList();
-			int getSHA1Hash(int i);
+			XXH128_hash_t computeHash();
 	};
 };

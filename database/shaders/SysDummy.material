@@ -1,6 +1,6 @@
 vertex_program SysDummyVS asm
 {
-	source SysDefault.wvu.asm
+	source SysDummyVS.txt
 	syntax vs_3_0
 	
 	default_params
@@ -14,7 +14,7 @@ vertex_program SysDummyVS asm
 
 fragment_program SysDummyPS asm
 {
-	source SysError_NoLight_NoGI_ConstTexCoord.wpu.asm
+	source SysDummyPS.txt
 	syntax ps_3_0
 	
 	default_params

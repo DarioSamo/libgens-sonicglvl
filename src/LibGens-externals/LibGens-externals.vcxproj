@@ -86,6 +86,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DisableSpecificWarnings>4018;4146;4244;4267;4305</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)libmspack;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -98,6 +99,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4018;4146;4244;4267;4305</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)libmspack;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -112,6 +114,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4018;4146;4244;4267;4305</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)libmspack;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -126,6 +129,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <DisableSpecificWarnings>4018;4146;4244;4267;4305</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)libmspack;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,7 +138,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="sha1\sha1.cpp" />
+    <ClCompile Include="libmspack\lzxd.c" />
     <ClCompile Include="tinyxml\tinystr.cpp" />
     <ClCompile Include="tinyxml\tinyxml.cpp" />
     <ClCompile Include="tinyxml\tinyxmlerror.cpp" />
@@ -142,9 +146,9 @@
     <ClCompile Include="tristripper\connectivity_graph.cpp" />
     <ClCompile Include="tristripper\policy.cpp" />
     <ClCompile Include="tristripper\tri_stripper.cpp" />
+    <ClCompile Include="xxhash\xxhash.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="sha1\sha1.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />
     <ClInclude Include="tristripper\detail\cache_simulator.h" />
@@ -155,6 +159,7 @@
     <ClInclude Include="tristripper\detail\types.h" />
     <ClInclude Include="tristripper\public_types.h" />
     <ClInclude Include="tristripper\tri_stripper.h" />
+    <ClInclude Include="xxhash\xxhash.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

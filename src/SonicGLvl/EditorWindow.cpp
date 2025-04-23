@@ -68,17 +68,14 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_OPEN_LEVEL :
 					editor_application->openLevelGUI();
 					break;
-				//case IMD_OPEN_LOST_WORLD_LEVEL :
-					//editor_application->openLostWorldLevelGUI();
-					//break;
 				case IMD_SAVE_LEVEL_DATA :
 					editor_application->saveLevelDataGUI();
 					break;
 				case IMD_SAVE_LEVEL_RESOURCES :
 					editor_application->saveLevelResourcesGUI();
 					break;
-				case IMD_EXPORT_SCENE_FBX :
-					editor_application->exportSceneFBXGUI();
+				case IMD_CLOSE:
+					SendMessage(editor_application->getHwnd(), WM_CLOSE, 0, 0);
 					break;
 
 				// Edit
@@ -123,27 +120,18 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					editor_application->openLookAtPointGUI();
 					break;
 
-				// Physics
-				case IMD_OPEN_PHYSICS_EDITOR :
-					editor_application->openPhysicsEditorGUI();
-					break;
-
 				// Materials
 				case IMD_OPEN_MATERIAL_EDITOR :
 					editor_application->openMaterialEditorGUI();
 					break;
 
 				// Terrain
-				case IMD_CLEAN_TERRAIN :
-					editor_application->cleanLevelTerrain();
+				case IMD_LOAD_ALL_TERRAIN:
+					editor_application->loadAllTerrain();
 					break;
-				case IMD_IMPORT_TERRAIN_FBX :
-					editor_application->importLevelTerrainFBXGUI();
+				case IMD_EXPORT_SCENE_FBX:
+					editor_application->exportSceneFBXGUI();
 					break;
-				case IMD_GENERATE_TERRAIN_GROUPS :
-					editor_application->generateTerrainGroups();
-					break;
-				
 
 				// Objects
 				case IMD_RELOAD_TEMPLATES_DATABASE :

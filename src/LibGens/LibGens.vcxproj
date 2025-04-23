@@ -83,7 +83,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../LibGens-externals;../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk2010_2_0_r1/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../LibGens-externals;../LibGens-externals/libmspack;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -100,7 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../LibGens-externals;../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk2010_2_0_r1/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../LibGens-externals;../LibGens-externals/libmspack;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -121,7 +121,7 @@
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../LibGens-externals;../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk550/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../LibGens-externals;../LibGens-externals/libmspack;../../depends/fbxsdk/include;../../depends/hk550/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;HAVOK_5_5_0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>
@@ -143,7 +143,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../LibGens-externals;../../depends/fbxsdk/include;../../depends/libmspack;../../depends/hk2012_2_0_r1/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../LibGens-externals;../LibGens-externals/libmspack;../../depends/fbxsdk/include;../../depends/hk2012_2_0_r1/Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PreprocessorDefinitions>LIBGENS_DLL_EXPORT;_CRT_SECURE_NO_WARNINGS;HAVOK_2012;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>stdafx.h</ForcedIncludeFiles>

@@ -1,0 +1,10 @@
+Copy shader archive files here.
+
+Files to copy from Sonic Generations (located in bb3.cpk):
+    shader_r.ar.00
+    shader_r_add.ar.00
+    shader_r_add.ar.01
+    shader_r_add.ar.02
+
+Files to copy from Sonic Unleashed:
+    shader.ar

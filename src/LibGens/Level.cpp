@@ -27,7 +27,7 @@ namespace LibGens {
 	Level::Level() {
 	}
 
-	Level::Level(string folder_p, string game_name) {
+	Level::Level(string folder_p, size_t game_mode_p) {
 		folder = folder_p;
 		terrain_info_file = "terrain";
 		direct_light_name = "";
@@ -41,11 +41,7 @@ namespace LibGens {
 		spawn_speed       = 0.0f;
 		spawn_time        = 0.0f;
 
-		game_mode = LIBGENS_LEVEL_GAME_GENERATIONS;
-
-		if (game_name == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
-			game_mode = LIBGENS_LEVEL_GAME_UNLEASHED;
-		}
+		game_mode = game_mode_p;
 
 		loadStage();
 		loadSceneEffect();
@@ -631,13 +627,6 @@ namespace LibGens {
 
 	void Level::setGameMode(size_t v) {
 		game_mode = v;
-	}
-
-	void Level::setGameMode(string v) {
-		game_mode = LIBGENS_LEVEL_GAME_GENERATIONS;
-		if (v == LIBGENS_LEVEL_GAME_STRING_UNLEASHED) {
-			game_mode = LIBGENS_LEVEL_GAME_UNLEASHED;
-		}
 	}
 
 	string Level::getName() {

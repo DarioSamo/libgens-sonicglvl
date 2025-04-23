@@ -206,6 +206,12 @@ void EditorApplication::importLevelTerrainFBXGUI() {
     free(filename);
 }
 
+void EditorApplication::loadAllTerrain() {
+	if (terrain_streamer) {
+		terrain_streamer->forceLoad();
+	}
+}
+
 void EditorApplication::saveLevelDataGUI() {
 	if (current_level) saveLevelData(current_level_filename);
 }

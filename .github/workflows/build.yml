@@ -54,6 +54,7 @@ jobs:
           Remove-Item -Recurse -Force -Include *.pdb -Path bin
           Remove-Item -Path cache\.gitignore
           Remove-Item -Path database\CONTRIBUTING.txt
+          Remove-Item -Path database\shaders\.gitignore
           Compress-Archive -Path bin, cache, database -DestinationPath libgens-sonicglvl.zip
         shell: pwsh
 

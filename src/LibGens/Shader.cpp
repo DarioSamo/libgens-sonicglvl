@@ -18,6 +18,7 @@
 //=========================================================================
 
 #include "Shader.h"
+#include "AR.h"
 
 namespace LibGens {
 	ShaderParam::ShaderParam() {
@@ -166,6 +167,12 @@ namespace LibGens {
 		printf("  Vertex Shader Set %s (Mode: %s, Flag: %d)\n", vertex_shader_name.c_str(), rendering_mode.c_str(), shader_flag);
 	}
 
+	bool VertexShaderSet::check(bool const_tex_coord) {
+		unsigned int flags = 0;
+		if (const_tex_coord) flags |= 0x1;
+		return (shader_flag & (1 << flags)) != 0;
+	}
+
 
 	ShaderSet::ShaderSet() {
 	}
@@ -216,6 +223,14 @@ namespace LibGens {
 		}
 
 		return "";
+	}
+
+	bool ShaderSet::check(bool const_tex_coord, bool no_gi, bool no_light) {
+		unsigned int flags = 0;
+		if (const_tex_coord) flags |= 0x1;
+		if (no_gi) flags |= 0x2;
+		if (no_light) flags |= 0x4;
+		return (shader_flag & (1 << flags)) != 0;
 	}
 
 
@@ -281,6 +296,30 @@ namespace LibGens {
 	}
 
 
+	ShaderLibrary::ShaderLibrary(string folder_p) {
+		folder = folder_p;
+		ar_pack = new ArPack();
+	}
+
+	bool ShaderLibrary::loadShaderArchive(const string& filename) {
+		ArPack* shader_ar_pack = new ArPack(folder + filename);
+		bool success = shader_ar_pack->getFileCount() != 0;
+		ar_pack->merge(shader_ar_pack);
+		return success;
+	}
+
+	ArFile* ShaderLibrary::getFile(string filename) {
+		return ar_pack->getFile(filename);
+	}
+
+	ArFile* ShaderLibrary::getFileByIndex(size_t index) {
+		return ar_pack->getFileByIndex(index);
+	}
+
+	size_t ShaderLibrary::getFileCount() {
+		return ar_pack->getFileCount();
+	}
+
 	ShaderList *ShaderLibrary::getShaderList(string id) {
 		for (list<ShaderList *>::iterator it=shader_lists.begin(); it!=shader_lists.end(); it++) {
 			if ((*it)->getName() == id) {
@@ -288,9 +327,17 @@ namespace LibGens {
 			}
 		}
 		
-		string new_filename = folder + id + LIBGENS_SHADER_LIST_EXTENSION;
-		if (File::check(new_filename)) {
-			ShaderList *shader_list=new ShaderList(new_filename);
+		string new_filename = id + LIBGENS_SHADER_LIST_EXTENSION;
+		ArFile* ar_data_file = ar_pack->getFile(new_filename);
+		if (ar_data_file != NULL) {
+			File file(ar_data_file->getData(), ar_data_file->getSize());
+
+			ShaderList *shader_list=new ShaderList();
+			shader_list->setName(id);
+
+			file.readHeader();
+			shader_list->read(&file);
+
 			shader_lists.push_back(shader_list);
 			return shader_list;
 		}
@@ -303,8 +350,16 @@ namespace LibGens {
 				return *it;
 			}
 		}
-		
-		Shader *vertex_shader=new Shader(folder + id + LIBGENS_VERTEX_SHADER_EXTENSION);
+
+		ArFile* ar_data_file = ar_pack->getFile(id + LIBGENS_VERTEX_SHADER_EXTENSION);
+		File file(ar_data_file->getData(), ar_data_file->getSize());
+
+		Shader *vertex_shader=new Shader();
+		vertex_shader->setName(id);
+
+		file.readHeader();
+		vertex_shader->read(&file);
+
 		vertex_shaders.push_back(vertex_shader);
 		return vertex_shader;
 	}
@@ -315,8 +370,16 @@ namespace LibGens {
 				return *it;
 			}
 		}
+
+		ArFile* ar_data_file = ar_pack->getFile(id + LIBGENS_PIXEL_SHADER_EXTENSION);
+		File file(ar_data_file->getData(), ar_data_file->getSize());
 		
-		Shader *pixel_shader=new Shader(folder + id + LIBGENS_PIXEL_SHADER_EXTENSION);
+		Shader *pixel_shader=new Shader();
+		pixel_shader->setName(id);
+
+		file.readHeader();
+		pixel_shader->read(&file);
+
 		pixel_shaders.push_back(pixel_shader);
 		return pixel_shader;
 	}
@@ -327,8 +390,16 @@ namespace LibGens {
 				return *it;
 			}
 		}
+
+		ArFile* ar_data_file = ar_pack->getFile(id + LIBGENS_VERTEX_SHADER_PARAMS_EXTENSION);
+		File file(ar_data_file->getData(), ar_data_file->getSize());
 		
-		ShaderParams *vertex_shader_param=new ShaderParams(folder + id + LIBGENS_VERTEX_SHADER_PARAMS_EXTENSION);
+		ShaderParams *vertex_shader_param=new ShaderParams(id);
+		vertex_shader_param->setName(id);
+
+		file.readHeader();
+		vertex_shader_param->read(&file);
+
 		vertex_shader_params.push_back(vertex_shader_param);
 		return vertex_shader_param;
 	}
@@ -339,8 +410,16 @@ namespace LibGens {
 				return *it;
 			}
 		}
+
+		ArFile* ar_data_file = ar_pack->getFile(id + LIBGENS_PIXEL_SHADER_PARAMS_EXTENSION);
+		File file(ar_data_file->getData(), ar_data_file->getSize());
 		
-		ShaderParams *pixel_shader_param=new ShaderParams(folder + id + LIBGENS_PIXEL_SHADER_PARAMS_EXTENSION);
+		ShaderParams *pixel_shader_param=new ShaderParams();
+		pixel_shader_param->setName(id);
+
+		file.readHeader();
+		pixel_shader_param->read(&file);
+
 		pixel_shader_params.push_back(pixel_shader_param);
 		return pixel_shader_param;
 	}
@@ -353,6 +432,17 @@ namespace LibGens {
 			if (shader_set) {
 				// Pixel Shader
 				string pixel_shader_name=shader_set->getPixelShaderName();
+
+				if (!shader_set->check(const_tex_coord, no_gi, no_light)) {
+					const_tex_coord = false;
+				}
+				if (!shader_set->check(const_tex_coord, no_gi, no_light)) {
+					no_light = false;
+				}
+				if (!shader_set->check(const_tex_coord, no_gi, no_light)) {
+					no_gi = false;
+				}
+
 				if (no_light) pixel_shader_name += "_NoLight";
 				if (no_gi) pixel_shader_name += "_NoGI";
 				if (const_tex_coord) pixel_shader_name += "_ConstTexCoord";

@@ -240,7 +240,7 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 
 					if (model) {
 						prepareSkeletonAndAnimation(skeleton_id, animation_id);
-						buildModel(target_node, model, model->getName(), skeleton_id, scene_manager, material_library, EDITOR_NODE_QUERY_OBJECT, GENERAL_MESH_GROUP, false);
+						buildModel(target_node, model, model->getName(), skeleton_id, scene_manager, material_library, EDITOR_NODE_QUERY_OBJECT, GENERAL_MESH_GROUP, false, SONICGLVL_SHADER_LIBRARY);
 						createAnimationState(animation_id);
 						found_model = true;
 					}
@@ -287,7 +287,7 @@ void ObjectNode::createEntities(Ogre::SceneNode *target_node, Ogre::SceneManager
 
 		if (model) {
 			prepareSkeletonAndAnimation(skeleton_id, animation_id);
-			buildModel(target_node, model, model->getName(), skeleton_id, scene_manager, material_library, EDITOR_NODE_QUERY_OBJECT, GENERAL_MESH_GROUP, false);
+			buildModel(target_node, model, model->getName(), skeleton_id, scene_manager, material_library, EDITOR_NODE_QUERY_OBJECT, GENERAL_MESH_GROUP, false, SONICGLVL_SHADER_LIBRARY);
 		}
 		else {
 			Ogre::Entity *entity = scene_manager->createEntity(OBJECT_NODE_UNKNOWN_MESH);
