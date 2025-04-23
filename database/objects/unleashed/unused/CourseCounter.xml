@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="24" description="" />
+  <Collision_Width type="float" default="21" description="" />
+  <Extra type="description" name="Updates the lap number the player is on for the unused laps mission type." />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+</Template>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRange type="float" default="180" description="" />
+  <DownSpeed0 type="float" default="10" description="" />
+  <DownSpeed1 type="float" default="12" description="" />
+  <DownSpeed2 type="float" default="9" description="" />
+  <DownSpeed3 type="float" default="13" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  
+  <Extra type="model" name="csc_obj_breakroadA.model" />
+</Template>

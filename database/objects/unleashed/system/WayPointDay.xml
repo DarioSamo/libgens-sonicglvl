@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <EventID type="integer" default="0" description="" />
+  <EventTime type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ID type="integer" default="2" description="" />
+  <NextID type="integer" default="3" description="" />
+  <WayPointType type="integer" default="0" description="" />
+</Template>

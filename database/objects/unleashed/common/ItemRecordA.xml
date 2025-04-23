@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MediaIndex type="float" default="60" description="" />
+  <Extra type="model" name="item_obj_soc_recordA_000.model" />
+</Template>

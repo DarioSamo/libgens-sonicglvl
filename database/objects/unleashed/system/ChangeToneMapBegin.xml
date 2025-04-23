@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="37" description="" />
+  <Collision_Width type="float" default="33" description="" />
+  <EaseTime type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ID type="integer" default="0" description="" />
+  <ToneMapMiddleGray type="float" default="0.350002" description="" />
+  <ToneMapSimpleScale type="float" default="1" description="" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Width" />
+  <Extra type="description" name="An object that modifies the Middle_Gray and Scale values of the stage's SceneEffect.prm.xml file." />
+</Template>

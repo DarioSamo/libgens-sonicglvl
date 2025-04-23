@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <Friction type="float" default="0.1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Kasoku type="float" default="0.3" description="" />
+</Template>

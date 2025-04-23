@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttackInterval type="float" default="2" description="" />
+  <AttackTime type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <MoveTypeSideView type="bool" default="false" description="" />
+  <OnlyPlayerAttack type="bool" default="false" description="" />
+  <PlayAppearEffect type="bool" default="false" description="" />
+  <StartTime type="float" default="2" description="" />
+  <StartWayPointID type="id" description="Connect to a WayPointDay object" />
+  <Type type="integer" default="0" description="" />
+  
+  <Extra type="model" name="em_eday_bals_hi.model" />
+</Template>

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<Template>
+  <AirChaser_01 type="integer" default="0" description="" />
+  <AirChaser_02 type="integer" default="0" description="" />
+  <AirChaser_03 type="integer" default="0" description="" />
+  <AppearOffset type="float" default="5" description="" />
+  <AppearVelocityL type="float" default="8" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <HeightFromPath type="float" default="2" description="" />
+  <IsEndAnnihilation type="bool" default="true" description="" />
+  <IsUseCameraAppear type="bool" default="true" description="" />
+  <IsUseCameraChaser type="bool" default="true" description="" />
+  <LaserChargeTime type="float" default="0.1" description="" />
+  <MaxVelocity type="float" default="40" description="" />
+  <MinVelocity type="float" default="30" description="" />
+  <NumEnemy type="integer" default="1" description="" />
+  <SnapOnPath type="bool" default="false" description="" />
+  <WavingVelocity type="float" default="180" description="" />
+  <Extra type="model" name="em_eday_chse_hi.model" />
+</Template>

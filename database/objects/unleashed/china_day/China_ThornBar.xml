@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Offset type="float" default="0" description="How far away from the origin the bar should appear" />
+  <Phase type="float" default="0" description="" />
+  <Speed type="float" default="-7.4" description="How fast the bar should rotate" />
+  
+  <Extra type="model" name="chn_obj_ms_thornclub.model" />
+  
+  <Extra type="description" name="" />
+</Template>

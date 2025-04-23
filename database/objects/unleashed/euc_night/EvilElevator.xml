@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <EventDown_1F type="integer" default="0" description="" />
+  <EventUp_2F type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Start2F type="bool" default="true" description="" />
+  <TargetListDown_1F type="id_list" description="" />
+  <TargetListUp_2F type="id_list" description="" />
+  <TimerDown_1F type="float" default="0" description="" />
+  <TimerUp_2F type="float" default="0" description="" />
+  <Extra type="model" name="evil_euc_obj_ma_elevatorA.model" />
+</Template>

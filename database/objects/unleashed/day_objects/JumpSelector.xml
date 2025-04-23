@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<Template>
+  <DownShotForce type="float" default="10" description="Speed granted when launching with the B button" />
+  <DownShotOutOfControl type="float" default="0.3" description="Time taken before restoring control to the player after launching with the B button" />
+  <FrontJumpForce type="float" default="25" description="Speed granted when launching with the X button" />
+  <FrontJumpOutOfControl type="float" default="0.3" description="Time taken before restoring control to the player after launching with the X button" />
+  <GroundOffset type="float" default="0" description="" />
+  <InputTime type="float" default="1" description="How long the player has to input a direction" />
+  <IsDownShot type="bool" default="false" description="Plays the success sfx/animation when launching with B" />
+  <IsPathChange type="bool" default="false" description="Automatically places the player on a new spline if they're launched to one" />
+  <IsQuestion type="bool" default="false" description="Displays a question mark as the success button" />
+  <SuccessButton type="float" default="2" description="The button displayed on the jump selector:
+  0: A   1: B   2: X" />
+  <UpJumpForce type="float" default="21" description="Speed granted when launching with the A button" />
+  <UpJumpOutOfControl type="float" default="0" description="Time taken before restoring control to the player after launching with the A button" />
+  <UpJumpPitch type="float" default="0" description="Angle of the launch on the Y axis after launching with the A button" />
+  
+  <Extra type="model" name="cmn_obj_km_AjpselectorGrM_000.model" />
+  <Extra type="description" name="An object which launches the player in one of three directions, depending on the button pressed." />
+</Template>

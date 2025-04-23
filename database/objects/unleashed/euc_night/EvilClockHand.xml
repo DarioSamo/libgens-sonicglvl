@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <DialDirection type="float" default="0" description="" />
+  <DialId type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

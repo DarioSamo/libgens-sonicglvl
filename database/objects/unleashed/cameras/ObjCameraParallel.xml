@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<Template>
+  <Distance type="float" default="12" description="Distance from the player." />
+  <Ease_Time_Enter type="float" default="0" description="Time taken to swap to this camera." />
+  <Ease_Time_Leave type="float" default="0" description="Time taken to swap out of this camera." />
+  <Fovy type="float" default="45" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsCollision type="bool" default="false" description="" />
+  <IsControllable type="bool" default="false" description="" />
+  <OffsetPitch type="float" default="0" description="" />
+  <OffsetYaw type="float" default="0" description="" />
+  <Pitch type="float" default="22" description="Angle of the camera on the Y axis." />
+  <Range type="float" default="100000" description="Area in which the camera exists." />
+  <Target type="id" description="" />
+  <TargetOffset_Front type="float" default="0.5" description="" />
+  <TargetOffset_Right type="float" default="0" description="" />
+  <TargetOffset_Up type="float" default="0" description="" />
+  <TargetPositionFix type="vector" description="" />
+  <Target_Type type="float" default="0" description="" />
+  <Yaw type="float" default="-25" description="" />
+  <ZRot type="float" default="0" description="" />
+  
+  <Extra type="model" name="Camera.mesh" />
+  <Extra type="description" name="A camera which stays a set distance from Sonic and points towards a fixed direction." />
+</Template>

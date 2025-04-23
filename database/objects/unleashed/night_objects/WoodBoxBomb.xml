@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsRestore type="bool" default="false" description="" />
+  <ModelIndex type="integer" default="1" description="" />
+  <TimeLimit type="float" default="0" description="" />
+</Template>

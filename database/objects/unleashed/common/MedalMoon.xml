@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Index type="float" default="0" description="" />
+  
+  <Extra type="model" name="cmn_boj_km_medalMoon_000.model" />
+</Template>

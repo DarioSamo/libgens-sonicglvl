@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Height type="float" default="5" description="The height at which the Checkpoint can be triggered" />
+  <Width type="float" default="1.4" description="The width of the Checkpoint" />
+  <StageType type="float" default="0" description="" />
+  
+  <Extra type="preview_box_y" name="Height" />
+  <Extra type="model" name="cmn_obj_km_pointmarker_L_M_000.model" />
+</Template>

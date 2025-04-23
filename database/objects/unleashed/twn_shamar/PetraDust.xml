@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Template>
+  <ClearTime type="float" default="0.5" description="" />
+  <ColliRangeBoxScale.x type="float" default="100" description="" />
+  <ColliRangeBoxScale.y type="float" default="100" description="" />
+  <ColliRangeBoxScale.z type="float" default="100" description="" />
+  <ColliRangeSphereRadius type="float" default="100" description="" />
+  <Density type="float" default="50" description="" />
+  <DensityTime type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsDebugDraw type="bool" default="false" description="" />
+  <IsUseBoxRange type="bool" default="true" description="" />
+  <LeaveTimeMax type="float" default="0.5" description="" />
+  <MoveDir.x type="float" default="0" description="" />
+  <MoveDir.y type="float" default="0" description="" />
+  <MoveDir.z type="float" default="1" description="" />
+  <MoveSpeedMax type="float" default="1.7" description="" />
+  <MoveSpeedMin type="float" default="1.5" description="" />
+  <OffsetYMax type="float" default="0.5" description="" />
+  <OffsetYMin type="float" default="-0.5" description="" />
+  <RangeBoxScale.x type="float" default="100" description="" />
+  <RangeBoxScale.y type="float" default="100" description="" />
+  <RangeBoxScale.z type="float" default="100" description="" />
+  <RangeSphereRadius type="float" default="100" description="" />
+  <ScaleMax type="float" default="4" description="" />
+  <ScaleMin type="float" default="2" description="" />
+  <Extra type="preview_box_x" name="ColliRangeBoxScale.x" />
+  <Extra type="preview_box_y" name="ColliRangeBoxScale.y" />
+  <Extra type="preview_box_z" name="ColliRangeBoxScale.z" />
+</Template>

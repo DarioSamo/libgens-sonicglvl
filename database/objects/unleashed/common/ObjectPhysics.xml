@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRange type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsDynamic type="bool" default="false" description="" />
+  <IsReset type="bool" default="false" description="" />
+  <Type type="string" default="IronBox2" description="" />
+  <ItemNum type="float" default="0" description="" />
+  <ItemType type="float" default="0" description="" />
+</Template>

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <GroupMove type="vector" description="" />
+  <TargetList type="id_list" description="" />
+  
+  <Extra type="model" name="Grouper.model" />
+</Template>

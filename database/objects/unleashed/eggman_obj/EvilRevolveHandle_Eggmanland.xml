@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsPause type="bool" default="false" description="" />
+  <OffTime type="float" default="3" description="" />
+  <OnTime type="float" default="5" description="" />
+  <Phase type="float" default="0" description="" />
+</Template>

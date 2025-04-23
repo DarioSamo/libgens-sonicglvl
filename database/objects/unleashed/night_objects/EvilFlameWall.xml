@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Height type="float" default="3" description="" />
+  <Intencity type="float" default="1000" description="" />
+  <IntencityEvil type="float" default="300" description="" />
+  <Num type="float" default="1" description="" />
+  <ShockTimeEvil type="float" default="2" description="" />
+  <Space type="float" default="1" description="" />
+</Template>

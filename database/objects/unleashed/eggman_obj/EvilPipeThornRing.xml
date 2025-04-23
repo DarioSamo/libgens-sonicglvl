@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="0" description="" />
+  <Cycle type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <StopTime type="float" default="0" description="" />
+</Template>

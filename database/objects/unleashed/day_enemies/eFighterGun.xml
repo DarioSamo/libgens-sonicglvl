@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttackInterval type="float" default="0.25" description="" />
+  <AttackTime type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsUseFootIK type="bool" default="true" description="" />
+  <MoveTypeSideView type="bool" default="false" description="" />
+  <OnlyPlayerAttack type="bool" default="true" description="" />
+  <PlayAppearEffect type="bool" default="false" description="" />
+  <RadiusActive type="float" default="20" description="" />
+  <RadiusAttack type="float" default="60" description="" />
+  <ShotType type="integer" default="0" description="" />
+  <StartWayPointID type="id" description="Connect to a WayPointDay object" />
+  <Type type="integer" default="0" description="" />
+  <UseChibi type="bool" default="false" description="" />
+  <Extra type="model" name="em_eday_ef2g_hi.model" />
+</Template>

@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <ColorScale_A type="float" default="1" description="" />
+  <ColorScale_B type="float" default="1" description="" />
+  <ColorScale_G type="float" default="1" description="" />
+  <ColorScale_R type="float" default="1" description="" />
+  <EditColorFlag type="bool" default="false" description="" />
+  <EffectType type="string" default="eu_stg_fountain_water" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Loop type="bool" default="true" description="" />
+  <ScaleX type="float" default="1" description="" />
+  <ScaleY type="float" default="1" description="" />
+  <ScaleZ type="float" default="1" description="" />
+  <SphereRadius type="float" default="25" description="" />
+  <UserRange type="float" default="0" description="" />
+  <VolumeScale type="float" default="2" description="" />
+</Template>

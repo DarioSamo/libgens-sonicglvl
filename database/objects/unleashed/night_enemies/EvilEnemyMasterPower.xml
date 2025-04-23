@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstState type="integer" default="0" description="" />
+  <PatrolType type="integer" default="0" description="" />
+  <Personality type="integer" default="0" description="" />
+  <StartWayPointID type="integer" default="0" description="" />
+  <TargetList type="id_list" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Extra type="model" name="em_dark_mstp_hi.model" />
+</Template>

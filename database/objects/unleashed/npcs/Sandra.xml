@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <PositionID type="string" default="StandNormal" description="" />
+  <Extra type="description" name="Sandra" />
+</Template>

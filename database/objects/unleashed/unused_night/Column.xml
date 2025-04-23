@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Layer type="float" default="0" description="" />
+  <Length type="float" default="4" description="" />
+</Template>

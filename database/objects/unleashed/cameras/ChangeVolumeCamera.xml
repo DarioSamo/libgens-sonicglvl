@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="110" description="" />
+  <Collision_Length type="float" default="54" description="" />
+  <Collision_Width type="float" default="50" description="" />
+  <DefaultStatus type="integer" default="0" description="" />
+  <Ease_Time_Enter type="float" default="0.5" description="Time taken to swap to this camera." />
+  <Ease_Time_Leave type="float" default="1" description="Time taken to swap out of this camera." />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="true" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsEnableCollision type="bool" default="false" description="" />
+  <LineType type="integer" default="0" description="" />
+  <Priority type="integer" default="0" description="" />
+  <Range type="float" default="100" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <Target type="id" description="SetObjectID of the camera to activate." />
+  <PositionList type="vector_list" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
+  <Extra type="description" name="A volume which changes the current camera while in the collision." />
+</Template>

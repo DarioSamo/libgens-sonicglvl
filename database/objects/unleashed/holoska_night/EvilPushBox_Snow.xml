@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <Bar1_Enable type="bool" default="true" description="" />
+  <Bar2_Enable type="bool" default="false" description="" />
+  <Bar3_Enable type="bool" default="false" description="" />
+  <Bar4_Enable type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Weight type="float" default="0.4" description="" />
+</Template>

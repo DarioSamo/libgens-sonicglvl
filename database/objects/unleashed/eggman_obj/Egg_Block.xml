@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <AppearTime type="float" default="0.5" description="" />
+  <DisappearTime type="float" default="2" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsMessageON type="bool" default="true" description="" />
+  <IsPush type="bool" default="true" description="" />
+  <Length type="float" default="6.5" description="" />
+  <OffTime type="float" default="1.5" description="" />
+  <OnTime type="float" default="1.5" description="" />
+  <Phase type="float" default="0" description="" />
+  <Type type="float" default="0" description="" />
+</Template>

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MotionSpeed type="float" default="1" description="How fast the head should open" />
+  
+  <Extra type="model" name="chn_obj_yy_dragonhead.model" />
+  
+  <Extra type="description" name="" />
+</Template>

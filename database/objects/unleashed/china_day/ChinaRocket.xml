@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <Acc type="float" default="80" description="" />
+  <BreakTime type="float" default="2.5" description="" />
+  <FirstSpeed type="float" default="50" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <JumpTime type="float" default="0.8" description="" />
+  <MaxSpeed type="float" default="130" description="" />
+  <OutOfControl type="float" default="1.5" description="" />
+  <Pitch type="float" default="0" description="" />
+  <Yaw type="float" default="0" description="" />
+  
+  <Extra type="model" name="chn_obj_ms_firework_000.model" />
+  
+  <Extra type="description" name="" />
+</Template>

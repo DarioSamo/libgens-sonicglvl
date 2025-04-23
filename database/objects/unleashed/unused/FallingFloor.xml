@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <FallTime type="float" default="1" description="" />
+  <Gravity type="float" default="0.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsIce type="bool" default="false" description="" />
+  <IsMessageON type="bool" default="false" description="" />
+  <ResetTime type="float" default="5" description="" />
+  <ScaleX type="float" default="5" description="" />
+  <ScaleY type="float" default="5" description="" />
+  <ScaleZ type="float" default="5" description="" />
+  <Extra type="description" name="A debug floor that falls after a set amount of time" />
+</Template>

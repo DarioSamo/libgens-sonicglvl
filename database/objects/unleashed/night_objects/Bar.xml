@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="0" description="" />
+  <Cycle type="float" default="0" description="" />
+  <Direction type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Length type="float" default="2" description="" />
+  <MoveType type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <StopTime type="float" default="0" description="" />
+  <Layer type="float" default="0" description="" />
+</Template>

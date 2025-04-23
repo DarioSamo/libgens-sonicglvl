@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Length type="float" default="200" description="" />
+  <MaterialIndex type="float" default="0" description="" />
+  <PatternIndex type="float" default="1" description="" />
+  <RingInterval type="float" default="1.5" description="" />
+  <Speed type="float" default="38" description="" />
+  <TimeInterval type="float" default="0.5" description="" />
+  <Width type="float" default="18" description="" />
+  
+    <Extra type="preview_box_x" name="Width" />
+  <Extra type="preview_box_z" name="Length" />
+</Template>

@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRange type="float" default="0" description="" />
+  <Amplitude type="float" default="10.1" description="" />
+  <AppearStopTime type="float" default="0.5" description="" />
+  <AppearTime type="float" default="0.5" description="" />
+  <Cycle type="float" default="0.1" description="" />
+  <DisappearStopTime type="float" default="0.5" description="" />
+  <DisappearTime type="float" default="1" description="" />
+  <Gravity type="float" default="45" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsDamage type="bool" default="true" description="" />
+  <IsEffect type="bool" default="false" description="" />
+  <IsMessageON type="bool" default="false" description="" />
+  <IsReverse type="bool" default="false" description="" />
+  <IsWallJump type="bool" default="false" description="" />
+  <Length type="float" default="5" description="" />
+  <MoveType type="float" default="2" description="" />
+  <OnFloorTime type="float" default="3" description="" />
+  <OnShakeTime type="float" default="0" description="" />
+  <PathReverseTime type="float" default="2" description="" />
+  <PathSpeed type="float" default="1" description="" />
+  <Phase type="float" default="0" description="" />
+  <PressDirection type="float" default="0" description="" />
+  <ResetTime type="float" default="5" description="" />
+  
+  <Extra type="model" name="sea_obj_ky_movefloorB_000.model" />
+</Template>

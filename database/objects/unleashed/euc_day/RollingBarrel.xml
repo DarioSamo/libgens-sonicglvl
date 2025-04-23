@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <BarrelDamageID type="id" description="The BarrelDamageCollision which will destroy the object" />
+  <FirstVelocity type="float" default="20" description="Initial speed of the barrel" />
+  <GenerationTime type="float" default="1.5" description="Time taken before spawning a barrel" />
+  <GroundOffset type="float" default="0" description="" />
+  <MaxVelocity type="float" default="35" description="Maximum speed of the barrel" />
+  <RandomRange type="float" default="5" description="" />
+  <ThornRatio type="float" default="0.5" description="How often a spiked barrel should spawn" />
+  <Width type="float" default="2.7" description="" />
+  
+  <Extra type="model" name="euc_obj_barrel.model" />
+</Template>

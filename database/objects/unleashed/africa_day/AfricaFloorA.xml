@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRange type="float" default="0" description="" />
+  <Amplitude type="float" default="1" description="How far the platform moves" />
+  <AppearStopTime type="float" default="0.5" description="" />
+  <AppearTime type="float" default="0.5" description="" />
+  <Cycle type="float" default="1" description="Movement speed of the platform" />
+  <DisappearStopTime type="float" default="0.5" description="" />
+  <DisappearTime type="float" default="1" description="" />
+  <Gravity type="float" default="45" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsDamage type="bool" default="true" description="" />
+  <IsEffect type="bool" default="false" description="" />
+  <IsMessageON type="bool" default="false" description="" />
+  <IsReverse type="bool" default="false" description="" />
+  <IsWallJump type="bool" default="false" description="" />
+  <Length type="float" default="5" description="" />
+  <MoveType type="float" default="0" description="0: Stationary
+  1: Move up and down
+  2: Move left and right
+  3: Shake then fall once the player touches it" />
+  <OnFloorTime type="float" default="3" description="How long before the platform starts shaking after the player lands." />
+  <OnShakeTime type="float" default="0" description="How long the platform should shake before falling." />
+  <PathReverseTime type="float" default="2" description="" />
+  <PathSpeed type="float" default="1" description="" />
+  <Phase type="float" default="0" description="" />
+  <PressDirection type="float" default="0" description="" />
+  <ResetTime type="float" default="5" description="How long before the platform should respawn after falling." />
+  
+  <Extra type="model" name="afr_ter_st_bridge_3x3.model" />
+  <Extra type="description" name="A 3x3 platform with the Mazuri theme." />
+</Template>

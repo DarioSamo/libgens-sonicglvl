@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <BaseVolume type="float" default="1" description="" />
+  <CueName type="string" default="cmn_ambience_01" description="" />
+  <FileName type="string" default="se_ambience_common" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IntervalTime type="float" default="5" description="" />
+  <IsRegularly type="bool" default="false" description="" />
+  
+  <Extra type="model" name="sound.mesh" />
+</Template>

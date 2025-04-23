@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Template>
+  <BottomStopTime type="float" default="0.3" description="" />
+  <DownTime type="float" default="0.2" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsMessageOn type="bool" default="false" description="" />
+  <IsMoveable type="bool" default="false" description="" />
+  <Phase type="float" default="0" description="" />
+  <TopStoptime type="float" default="1.7" description="" />
+  <UpDownWidth type="float" default="2" description="" />
+  <UpTime type="float" default="1" description="" />
+  <Layer type="float" default="2" description="" />
+  <IsTopThorn type="bool" default="true" description="" />
+</Template>

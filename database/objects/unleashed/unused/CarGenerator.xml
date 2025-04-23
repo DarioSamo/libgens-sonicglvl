@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <ScheduleXMLFileIndex type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <CarSpeed type="float" default="40" description="" />
+  <PathReverse type="bool" default="false" description="" />
+  
+  <Extra type="description" name="An unused object which spawns cars." />
+</Template>

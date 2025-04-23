@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstState type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

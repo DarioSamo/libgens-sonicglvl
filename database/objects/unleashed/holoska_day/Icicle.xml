@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstVelocity type="float" default="15" description="" />
+  <Gravity type="float" default="35.1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsWaterEffect type="bool" default="false" description="" />
+  <Timer type="float" default="0.5" description="" />
+</Template>

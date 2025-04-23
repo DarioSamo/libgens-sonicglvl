@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttackInterval type="float" default="4" description="" />
+  <AttackTime type="float" default="3" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Intencity type="float" default="1000" description="" />
+  <IntencityEvil type="float" default="10" description="" />
+  <Length type="float" default="2" description="" />
+  <ShockTimeEvil type="float" default="10" description="" />
+  <StartTime type="float" default="2" description="" />
+  <Type type="integer" default="1" description="" />
+</Template>

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <CenterType type="float" default="0" description="" />
+  <FanNum type="float" default="4" description="" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

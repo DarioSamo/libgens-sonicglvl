@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MoveLength type="float" default="3" description="" />
+  <MoveType type="float" default="0" description="" />
+  <Num type="float" default="5" description="" />
+  <Phase type="float" default="0" description="" />
+  <Speed type="float" default="1" description="" />
+  
+  <Extra type="model" name="sea_obj_kt3_thornpillar.model" />
+</Template>

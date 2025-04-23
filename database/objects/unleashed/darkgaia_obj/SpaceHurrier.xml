@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <Camera type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <m_BoostSpeed type="float" default="56" description="" />
+  <m_DebugCylinderHeight type="float" default="500" description="" />
+  <m_IsFirstHurrier type="bool" default="false" description="" />
+  <m_NormalSpeed type="float" default="28" description="" />
+  <m_Range type="float" default="50" description="" />
+</Template>

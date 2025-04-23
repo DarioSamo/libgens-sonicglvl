@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <Ease_Time_Enter type="float" default="0" description="Time taken to swap to this camera." />
+  <Ease_Time_Leave type="float" default="0" description="Time taken to swap out of this camera." />
+  <Fovy type="float" default="30.0002" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCastShadow type="bool" default="false" description="" />
+  <IsCollision type="bool" default="false" description="" />
+  <IsControllable type="bool" default="true" description="" />
+  <Range type="float" default="100000" description="Area in which the camera exists." />
+  <TargetPosition type="vector" description="Coordinates for the camera to lock on to." />
+  <ZRot type="float" default="0" description="" />
+  
+  <Extra type="model" name="Camera.mesh" />
+  <Extra type="description" name="A camera centered at the object's location which faces towards coordinates." />
+</Template>

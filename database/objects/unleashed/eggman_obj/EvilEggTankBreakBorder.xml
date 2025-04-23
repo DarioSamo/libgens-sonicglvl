@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <FallTime type="float" default="8" description="" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

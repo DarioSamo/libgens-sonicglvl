@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttackInterval type="float" default="2" description="" />
+  <AttackTime type="float" default="5" description="" />
+  <FirstSpeed type="float" default="10" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsUseFootIK type="bool" default="true" description="" />
+  <MoveTypeSideView type="bool" default="false" description="" />
+  <OnlyPlayerAttack type="bool" default="false" description="" />
+  <PlayAppearEffect type="bool" default="false" description="" />
+  <RadiusActive type="float" default="50" description="" />
+  <RadiusAttack type="float" default="4.5" description="" />
+  <ShieldType type="integer" default="0" description="0 - Normal, 1 - Spring, 2 - Electric" />
+  <StartTime type="float" default="2" description="" />
+  <StartWayPointID type="id" description="Connect to a WayPointDay object" />
+  <Type type="integer" default="1" description="" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" />
+</Template>

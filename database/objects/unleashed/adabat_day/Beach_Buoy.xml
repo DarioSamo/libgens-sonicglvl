@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <OutControl type="float" default="0.5" description="" />
+  <Extra type="model" name="ssh_obj_buoy.model" />
+</Template>

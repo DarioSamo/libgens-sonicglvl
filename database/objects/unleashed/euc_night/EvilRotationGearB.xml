@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <RotationDirection type="float" default="0" description="" />
+  <RotationPhase type="float" default="0" description="" />
+  <RotationSpeed type="float" default="0.4" description="" />
+</Template>

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <ImpulseVelocity type="float" default="18" description="Speed at which the player is launched when the reel reaches its peak." />
+  <IsWaitUp type="bool" default="false" description="
+  True: Waits until an event activates it, causing it to lower.
+  False: Lowered by default, allowing Sonic to use it." />
+  <Length type="float" default="8" description="Length of the wire." />
+  <OutOfControl type="float" default="0" description="Time taken before restoring control to the player after the reel reaches its peak." />
+  <UpSpeedMax type="float" default="50" description="Speed at which the handle rises." />
+  
+  <Extra type="description" name="A handle on a wire which moves Sonic upwards when grabbed." />
+  <Extra type="model" name="cmn_obj_upreel_stand_HD.model" />
+  <Extra type="offset_rotation_y" name="180" />
+</Template>

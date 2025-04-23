@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <Event0 type="float" default="1" description="The event to fire" />
+  <GroundOffset type="float" default="0" description="" />
+  <TargetList0 type="id_list" description="The objects to target with the event" />
+  <Timer0 type="float" default="0" description="Delay before firing the event" />
+  
+  <Extra type="description" name="A switch which triggers an event after being stomped thrice." />
+</Template>

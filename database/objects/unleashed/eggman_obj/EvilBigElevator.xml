@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <EnemyMaxCount type="float" default="4" description="" />
+  <FirstState type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <HangerNum type="float" default="2" description="" />
+  <Personality type="float" default="8" description="" />
+</Template>

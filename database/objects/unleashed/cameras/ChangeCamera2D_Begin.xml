@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<Template>
+  <BaseSpacePathPosition type="float" default="166.925" description="" />
+  <Collision_Height type="float" default="10" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <Distance type="float" default="20" description="" />
+  <Ease_Time type="float" default="0.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ID type="float" default="1" description="" />
+  <IsBaseSpacePlayer type="bool" default="true" description="" />
+  <IsCameraView type="bool" default="true" description="" />
+  <IsPositionBasePlayer type="bool" default="true" description="" />
+  <Rotation_Y type="float" default="0" description="" />
+  <Rotation_Z type="float" default="-0.1314" description="" />
+  <Target_Front_Offset_Bias type="float" default="1.8" description="" />
+  <Target_Front_Offset_Max type="float" default="4" description="" />
+  <Target_Front_Offset_Speed_Scale type="float" default="0.1" description="" />
+  <Target_Up_Offset type="float" default="2" description="" />
+  
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="model" name="Camera.mesh" />
+</Template>

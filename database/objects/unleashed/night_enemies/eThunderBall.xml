@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttackInterval type="float" default="5" description="" />
+  <AttackTime type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <MoveType type="integer" default="0" description="" />
+  <StartTime type="float" default="10" description="" />
+  
+  <Extra type="model" name="em_eday_bals_hi.model" />
+</Template>

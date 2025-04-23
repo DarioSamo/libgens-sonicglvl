@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <Distance type="float" default="200" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Time type="float" default="0.5" description="" />
+</Template>

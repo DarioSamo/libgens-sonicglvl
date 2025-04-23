@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <Aggression type="float" default="0" description="" />
+  <FirstState type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

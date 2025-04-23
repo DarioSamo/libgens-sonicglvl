@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="24" description="" />
+  <Collision_Width type="float" default="27" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <TargetFail type="id" description="" />
+  <TargetSuccess type="id" description="" />
+  <m_DebugCylinderHeight type="float" default="40" description="" />
+  <m_Range type="float" default="13.9" description="" />
+    <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+</Template>

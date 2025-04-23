@@ -546,7 +546,9 @@ void EditorApplication::createScene(void) {
 	generations_shader_library = new LibGens::ShaderLibrary(SONICGLVL_SHADERS_PATH);
 	unleashed_shader_library   = new LibGens::ShaderLibrary(SONICGLVL_SHADERS_PATH);
 	uv_animation_library       = new LibGens::UVAnimationLibrary(SONICGLVL_RESOURCES_PATH);
-	library                    = new LibGens::ObjectLibrary(SONICGLVL_LIBRARY_PATH);
+	generations_library        = new LibGens::ObjectLibrary(SONICGLVL_LIBRARY_PATH);
+	unleashed_library          = new LibGens::ObjectLibrary(SONICGLVL_LIBRARY_PATH);
+	library                    = generations_library;
 	animations_list            = new EditorAnimationsList();
 
 	bool loaded_generations_shader_library = 
@@ -567,7 +569,8 @@ void EditorApplication::createScene(void) {
 		unleashed_shader_library = NULL;
 	}
 
-	library->loadDatabase(SONICGLVL_OBJECTS_DATABASE_PATH);
+	generations_library->loadDatabase(SONICGLVL_GENERATIONS_OBJECTS_DATABASE_PATH);
+	unleashed_library->loadDatabase(SONICGLVL_UNLEASHED_OBJECTS_DATABASE_PATH);
 
 	configuration    = new EditorConfiguration();
 	configuration->load(SONICGLVL_CONFIGURATION_FILE);

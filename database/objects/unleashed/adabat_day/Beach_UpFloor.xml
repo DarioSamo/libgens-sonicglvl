@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRange type="float" default="300" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <StopTime type="float" default="1" description="" />
+  <UpSpeed type="float" default="7" description="" />
+  
+  <Extra type="model" name="sea_obj_kt3_upfloor_000.model" />
+</Template>

@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <EventOFF type="integer" default="0" description="The event to fire when deactivated:
+  0:No event   1:Open   2:Close  3:Kill  4:Generate  5:Get_off   6:On   7:Off  8:Attack  9:Attack_Ready  10:Can't_Attack" />
+  <EventON type="integer" default="6" description="The event to fire when activated. Events continued: 
+  11:Return   12:Destroy  13:Start_Moving   14:Reset  15:Rise  16:Descent  17:Start   18:Invert  19:Clear
+  " />
+  <GroundOffset type="float" default="0" description="" />
+  <OffTimer type="float" default="5" description="" />
+  <TargetListOFF type="id_list" description="" />
+  <TargetListON type="id_list" description="" />
+  <TimerOFF type="float" default="0" description="" />
+  <TimerON type="float" default="0" description="" />
+  <Type type="integer" default="0" description="Behavior for the switch:
+ 0 - Remain on    1- Remain on while weighed down   2 - Turn off after time expires" />
+ 
+ <Extra type="description" name="A small switch which activates an event once pressed." />
+</Template>

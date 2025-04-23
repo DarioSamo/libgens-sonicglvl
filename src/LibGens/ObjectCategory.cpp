@@ -50,6 +50,8 @@ namespace LibGens {
 	}
 
 	void ObjectCategory::saveXMLTemplates(string folder) {
+		CreateDirectory(folder.c_str(), nullptr);
+
 		for (vector<Object *>::iterator it=templates.begin(); it!=templates.end(); it++) {
 			string filename=folder + (*it)->getName() + LIBGENS_OBJECT_TEMPLATE_EXTENSION;
 			(*it)->saveXMLTemplate(filename);

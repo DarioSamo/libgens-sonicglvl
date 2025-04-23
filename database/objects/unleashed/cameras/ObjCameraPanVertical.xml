@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<Template>
+  <CameraPositionMode type="float" default="1" description="" />
+  <Distance type="float" default="12" description="Distance from the player." />
+  <Ease_Time_Enter type="float" default="0" description="Time taken to swap to this camera." />
+  <Ease_Time_Leave type="float" default="0" description="Time taken to swap to this camera." />
+  <FaceType type="float" default="0" description="" />
+  <Fovy type="float" default="45" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCollision type="bool" default="false" description="" />
+  <IsControllable type="bool" default="false" description="" />
+  <OffsetPitch type="float" default="0" description="" />
+  <OffsetYaw type="float" default="0" description="" />
+  <Pitch type="float" default="0" description="Angle of the camera on the Y axis." />
+  <Radius type="float" default="1" description="" />
+  <Target type="id" description="" />
+  <TargetOffset_Front type="float" default="0" description="" />
+  <TargetOffset_Right type="float" default="0" description="" />
+  <TargetOffset_Up type="float" default="0" description="" />
+  <Target_Type type="float" default="0" description="" />
+  <ZRot type="float" default="0" description="" />
+  
+  <Extra type="model" name="Camera.mesh" />
+  <Extra type="description" name="A camera which tracks Sonic from the object's location and aligns vertically with Sonic." />
+</Template>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="18" description="" />
+  <Collision_Width type="float" default="23" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ParameterType type="float" default="1" description="" />
+  <m_Scale type="float" default="0" description="" />
+  <m_Value type="float" default="100" description="" />
+    <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+</Template>

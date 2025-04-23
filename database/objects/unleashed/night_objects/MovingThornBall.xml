@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <Direction type="float" default="0" description="" />
+  <Distance type="float" default="3" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Time type="float" default="3.5" description="" />
+  <Layer type="float" default="0" description="" />
+</Template>

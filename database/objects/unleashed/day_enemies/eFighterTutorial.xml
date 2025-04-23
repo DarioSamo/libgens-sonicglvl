@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsUseFootIK type="bool" default="true" description="" />
+  <MoveTypeSideView type="bool" default="false" description="" />
+  <OnlyPlayerAttack type="bool" default="false" description="" />
+  <PlayAppearEffect type="bool" default="false" description="" />
+  <RadiusActive type="float" default="70" description="" />
+  <RadiusAttack type="float" default="4.5" description="" />
+  <StartWayPointID type="id" description="Connect to a WayPointDay object" />
+  <Type type="integer" default="5" description="" />
+  <Extra type="model" name="em_eday_ef2t_hi.model" />
+</Template>

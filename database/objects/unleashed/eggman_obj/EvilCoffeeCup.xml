@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <PathSearch type="bool" default="true" description="" />
+  <PathVel type="float" default="3" description="" />
+  <WaitTime type="float" default="5" description="" />
+</Template>

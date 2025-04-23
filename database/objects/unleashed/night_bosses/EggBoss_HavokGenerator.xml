@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <AngularVelocity type="float" default="3" description="" />
+  <DebrisVelocity type="float" default="34" description="" />
+  <FirstVelocity type="float" default="26" description="" />
+  <GenerateTime type="float" default="3.7" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <KillTime type="float" default="10" description="" />
+  <evil_egbboss_obj_hh_crane_S type="bool" default="true" description="" />
+  <evil_egbboss_obj_hh_floatfloorB_S type="bool" default="true" description="" />
+  <evil_egbboss_obj_hh_rockA_S type="bool" default="false" description="" />
+  <evil_egbboss_obj_hh_rockB_S type="bool" default="false" description="" />
+  <evil_egbboss_obj_hh_rockC_S type="bool" default="false" description="" />
+  <evil_egbboss_obj_hh_rockD_S type="bool" default="false" description="" />
+  <evil_egbboss_obj_hh_rockE_S type="bool" default="false" description="" />
+</Template>

@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Template>
+  <RangeIn type="float" default="1000" description="Distance from object before it spawns" />
+  <RangeOut type="float" default="1200" description="Distance from object before it despawns" />
+  <Parent type="target" description="" />
+  <Unknown1 type="uint16" default="0" description="" />
+  <Unknown2 type="uint32" default="0" description="" />
+  <Unknown3 type="float" default="0" description="" />
+  <Collision_Height type="float" default="145" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+</Template>

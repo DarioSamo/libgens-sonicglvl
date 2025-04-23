@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="1" description="" />
+  <Cycle type="float" default="1" description="" />
+  <DialDirection type="float" default="0" description="" />
+  <DialId type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAdvance type="float" default="0" description="" />
+  <IsUseMessage type="bool" default="false" description="" />
+  <Length type="float" default="9" description="" />
+  <MoveDirection type="float" default="0" description="" />
+  <MoveType type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Rotation90Snap type="bool" default="true" description="" />
+  <RotationPhase type="float" default="0" description="" />
+  <RotationSpeed type="float" default="0" description="" />
+  <SpeedOnPath type="float" default="1" description="" />
+  <StopTime type="float" default="0" description="" />
+  <YRotation type="float" default="0" description="" />
+</Template>

@@ -192,8 +192,17 @@ void EditorApplication::openLevel(string filename) {
 
 	CreateDirectory((SONICGLVL_CACHE_PATH + slot_name).c_str(), NULL);
 	CreateDirectory((SONICGLVL_CACHE_PATH + geometry_name).c_str(), NULL);
-	if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED && !slot_id_name.empty()) CreateDirectory((SONICGLVL_CACHE_PATH + slot_id_name).c_str(), NULL);
+	if (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED) {
+		if (!slot_id_name.empty()) {
+			CreateDirectory((SONICGLVL_CACHE_PATH + slot_id_name).c_str(), NULL);
+		}
+		library = unleashed_library;
+	}
+	else {
+		library = generations_library;
+	}
 
+	updateObjectCategoriesGUI();
 
 	current_level_filename=filename;
 
@@ -488,5 +497,5 @@ void EditorApplication::reloadTemplatesDatabase() {
 void EditorApplication::saveTemplatesDatabase() {
 	if (!library) return;
 
-	library->saveDatabase(SONICGLVL_OBJECTS_DATABASE_PATH);
+	library->saveDatabase(library == unleashed_library ? SONICGLVL_UNLEASHED_OBJECTS_DATABASE_PATH : SONICGLVL_GENERATIONS_OBJECTS_DATABASE_PATH);
 }

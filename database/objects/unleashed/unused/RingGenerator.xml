@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <Count type="integer" default="6" description="Number of rings to spawn" />
+  <Interval type="float" default="1.5" description="Space between each ring" />
+  
+  <Extra type="description" name="An object which spawns rings in a straight line." />
+</Template>

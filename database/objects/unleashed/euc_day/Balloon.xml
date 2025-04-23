@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <BalloonColor type="integer" default="1" description="Color of the balloon.
+  1: Blue   2: Green   3: Red   4: Yellow" />
+  <GroundOffset type="float" default="0" description="" />
+  <ReviveTime type="float" default="3" description="Time taken before respawning." />
+  <SpeedMax type="float" default="25" description="Maximum speed of the launch" />
+  <SpeedMin type="float" default="25" description="Minimum speed of the launch" />
+  <UpSpeed type="float" default="10" description="How high the player should be launched" />
+  
+  <Extra type="model" name="cmn_obj_km_balloonblueM_000.model" condition="BalloonColor == 1"/>
+  <Extra type="model" name="cmn_obj_km_balloonredM_000.model" condition="BalloonColor == 3"/>
+  <Extra type="model" name="cmn_obj_km_balloonyellowM_000.model" condition="BalloonColor == 4"/>
+  <Extra type="model" name="cmn_obj_km_balloongreenM_000.model" condition="BalloonColor == 2"/>
+  <Extra type="description" name="A small, colorful balloon that launches Sonic into the air upon contact." />
+</Template>

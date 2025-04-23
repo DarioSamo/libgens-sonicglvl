@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <BallNum type="float" default="5" description="" />
+  <Cycle type="float" default="0.2" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Radius type="float" default="3" description="" />
+  <Layer type="float" default="0" description="" />
+</Template>

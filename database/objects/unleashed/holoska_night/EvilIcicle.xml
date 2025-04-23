@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <BreakTime type="float" default="3" description="" />
+  <BreakTime1 type="float" default="-5" description="" />
+  <BreakTime2 type="float" default="-6.2" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Rotation90Snap type="bool" default="false" description="" />
+</Template>

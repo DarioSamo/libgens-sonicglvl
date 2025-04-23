@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsLoop type="bool" default="false" description="" />
+  <IsMessageON type="bool" default="true" description="" />
+  <IsReverse type="bool" default="false" description="" />
+  <IsRotation type="bool" default="true" description="" />
+  <Length type="float" default="18" description="" />
+  <MoveType type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Speed type="float" default="8" description="" />
+</Template>

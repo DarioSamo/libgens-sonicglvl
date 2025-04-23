@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <IsBigChaserMode type="bool" default="false" description="Determines if the bomb is used in a Big Chaser segment, allowing for the notification to appear." />
+  <GroundOffset type="float" default="0" description="" />
+  <ThresholdStumble type="float" default="30" description="" />
+  
+  <Extra type="model" name="sea_obj_km_bomb_000.model" />
+</Template>

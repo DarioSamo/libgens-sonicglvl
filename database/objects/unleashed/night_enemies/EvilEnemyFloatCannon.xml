@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsRevival type="bool" default="false" description="" />
+</Template>

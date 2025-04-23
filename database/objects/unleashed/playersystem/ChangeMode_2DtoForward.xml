@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="35" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <Range type="float" default="100" description="" />
+  <TargetDirection type="vector" description="Coordinates to face toward when entering the volume?" />
+  <Template type="float" default="3" description="A debug shortcut used to quickly set CurveCorrectionForce and PathCorrectionForce:
+  0: Wall-running
+  1: Custom
+  2: Normal
+  3: Dash Mode" />
+  <m_CurveCorrectionForce type="float" default="1" description="" />
+  <m_DashPathSideMoveRate type="float" default="0.6" description="How aggressively the camera corrects." />
+  <m_IsChangeCamera type="bool" default="true" description="Does the camera change?" />
+  <m_IsEnableFromBack type="bool" default="true" description="" />
+  <m_IsEnableFromFront type="bool" default="true" description="" />
+  <m_IsLimitEdge type="bool" default="false" description="Prevents the player from running past the end of the path." />
+  <m_IsReverseCameraEnable type="bool" default="false" description="Change the camera when entering from opposite side?" />
+  <m_PathCorrectionForce type="float" default="1" description="How aggressively the player should be moved on to the path." />
+  
+  <Extra type="model" name="DebugArrow.model" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" /> 
+</Template>

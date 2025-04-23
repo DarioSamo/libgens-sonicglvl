@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="1.7" description="" />
+  <Collision_Length type="float" default="4.5" description="" />
+  <Collision_Width type="float" default="3" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <LaunchVelocity type="float" default="13" description="Speed after stumbling." />
+  <NoControlTime type="float" default="0.45" description="Duration of the stumble." />
+  <Range type="float" default="100" description="Controls how far away from the player the object can be before loading" />
+  <Shape_Type type="float" default="0" description="" />
+  
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
+  <Extra type="description" name="A volume which trips the player." />
+</Template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddUserRange type="float" default="0" description="" />
+  <EndPosition type="float" default="3" description="How close to the end of the spline the pulley should be before forcing the player off. The larger the number, the earlier the drop." />
+  <GroundOffset type="float" default="0" description="" />
+  <IsJumpCancel type="bool" default="true" description="When true, allows the player to jump off the pulley." />
+  <IsNoBug type="bool" default="false" description="" />
+  <PathID type="float" default="1" description="ID of the guide path to follow." />
+  <StartPosition type="float" default="0" description="Adjusts how far along the spline the pulley spawns." />
+  
+  <Extra type="description" name="A handle which carries Sonic along a guide spline." />
+  <Extra type="model" name="cmn_obj_pulley_HD.model" />
+</Template>

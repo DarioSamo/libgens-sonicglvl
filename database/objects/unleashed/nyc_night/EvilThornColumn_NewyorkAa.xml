@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="1" description="" />
+  <Cycle type="float" default="1" description="" />
+  <DialDirection type="float" default="0" description="" />
+  <DialId type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAdvance type="float" default="0" description="" />
+  <IsGearColumn type="bool" default="true" description="" />
+  <IsUseMessage type="bool" default="false" description="" />
+  <Length type="float" default="5" description="" />
+  <MoveDirection type="float" default="0" description="" />
+  <MoveType type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Rotation90Snap type="bool" default="false" description="" />
+  <RotationPhase type="float" default="0" description="" />
+  <RotationSpeed type="float" default="0" description="" />
+  <SpeedOnPath type="float" default="1" description="" />
+  <StopTime type="float" default="0" description="" />
+  <ThornAmplitude type="float" default="2.8" description="" />
+  <ThornBaseOffset type="float" default="2.08" description="" />
+  <ThornCycle type="float" default="8" description="" />
+  <ThornModelType type="float" default="0" description="" />
+  <ThornMoveType type="float" default="2" description="" />
+  <ThornNumBtm type="float" default="0" description="" />
+  <ThornNumTop type="float" default="0" description="" />
+  <ThornPhase type="float" default="0" description="" />
+  <ThornSpace type="float" default="3" description="" />
+  <ThornStopTime type="float" default="2" description="" />
+  <YRotation type="float" default="0" description="" />
+</Template>

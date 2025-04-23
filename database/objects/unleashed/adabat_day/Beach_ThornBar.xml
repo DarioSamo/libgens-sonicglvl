@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <Speed type="float" default="1" description="" />
+  
+  <Extra type="model" name="sea_obj_kt3_thornball_000.model" />
+</Template>

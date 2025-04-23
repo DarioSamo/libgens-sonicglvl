@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstHurrier type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <LastHurrier type="id" description="" />
+  <Robo_Start_Degree type="float" default="-112.5" description="" />
+</Template>

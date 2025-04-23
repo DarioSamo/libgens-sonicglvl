@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <DownAcc type="float" default="10" description="" />
+  <DownSpeed type="float" default="0.25" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ShakeTime type="float" default="0.7" description="" />
+</Template>

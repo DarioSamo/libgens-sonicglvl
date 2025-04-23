@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="2" description="" />
+  <Collision_Width type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ImpulseSpeedOnBoost type="float" default="50" description="Speed of the launch when boosting." />
+  <ImpulseSpeedOnNormal type="float" default="50" description="Regular speed of the launch." />
+  <IsStartVelocityConstant type="bool" default="true" description="" />
+  <OutOfControl type="float" default="0.49" description="Time before returning control to the player." />
+  <Pitch type="string" default="5" description="Angle the player will be launched on the Y axis" />
+  <SpeedMin type="float" default="20" description="Minimum speed to trigger the object." />
+  <TerrainIgnoreTime type="float" default="0.25" description="" />
+  <m_IsGroundOnly type="bool" default="false" description="" />
+  
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="model" name="DebugArrow.model" />
+  <Extra type="description" name="A volume which launches the player based on their speed." />
+</Template>

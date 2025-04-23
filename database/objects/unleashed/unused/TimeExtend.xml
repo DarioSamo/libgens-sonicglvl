@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <ExtendTime type="float" default="10" description="" />
+  <Extra type="description" name="Does nothing." />
+</Template>

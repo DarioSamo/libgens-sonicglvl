@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <ChaoType type="integer" default="0" description="" />
+  <IsFlying type="bool" default="true" description="" />
+  <Extra type="model" name="cmn_obj_ym_chaoA_000.model" />
+</Template>

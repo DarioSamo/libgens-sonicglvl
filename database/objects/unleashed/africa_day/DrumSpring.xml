@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<Template>
+  <DebugShotTimeLength type="float" default="2" description="A debug visualization tool." />
+  <FirstSpeed type="float" default="30" description="Initial speed of the launch." />
+  <GroundOffset type="float" default="0" description="" />
+  <HasBase type="bool" default="false" description="Toggles whether the spring has an extra model at the base." />
+  <IsChangeCameraWhenPathChange type="bool" default="true" description="" />
+  <IsPathChange type="bool" default="false" description="" />
+  <IsStartVelocityConstant type="bool" default="true" description="" />
+  <IsWallWalk type="bool" default="false" description="Causes the player to wall-run if the spring launches to a wall." />
+  <IsYawUpdate type="bool" default="false" description="" />
+  <KeepVelocityDistance type="float" default="5" description="Distance before restoring gravity to Sonic. If set too high, gravity will be disabled until hitting another spring or object." />
+  <OutOfControl type="float" default="0.4" description="Time taken before restoring control to the player." />
+  <m_IsConstantFrame type="bool" default="false" description="" />
+  <m_IsConstantPosition type="bool" default="true" description="" />
+  <m_IsMonkeyHunting type="bool" default="false" description="If true, automatically steers Sonic towards the MonkeyTarget." />
+  <m_IsMonkeyHuntingLowAngle type="bool" default="true" description="" />
+  <m_IsStopBoost type="bool" default="false" description="" />
+  <m_IsTo3D type="bool" default="false" description="Changes the perspective to 3D when interacting with the object." />
+  <m_MonkeyTarget type="vector" description="Location to launch Sonic when IsMonkeyHunting is enabled." />
+  
+  <Extra type="model" name="afr_obj_me_drumspring.model" />  
+  <Extra type="description" name="A spring with a Mazuri theme." />
+</Template>

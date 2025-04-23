@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <BgmVolume type="float" default="0.3" description="" />
+  <Collision_Height type="float" default="4" description="" />
+  <Collision_Length type="float" default="7" description="" />
+  <Collision_Width type="float" default="20" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <EnterChangeTime type="float" default="0.4" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <LeaveChangeTime type="float" default="3.1" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  <Extra type="preview_box_x" name="Collision_Length" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Width" />
+</Template>

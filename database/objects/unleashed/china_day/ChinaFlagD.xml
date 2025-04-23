@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsReverse type="bool" default="false" description="" />
+  <Extra type="model" name="chn_obj_yr_flaglong_yellow.model" />
+</Template>

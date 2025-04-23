@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <NoBreak type="bool" default="false" description="" />
+  <Extra type="model" name="evil_nyc_obj_dml_ironbridgejoint.model" />
+</Template>

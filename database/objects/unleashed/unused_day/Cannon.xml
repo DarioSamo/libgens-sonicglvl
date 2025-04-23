@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <ShotAngle type="float" default="20.4" description="Pitch of the barrel" />
+  <GroundOffset type="float" default="0" description="" />
+  <SetRotation type="float" default="20.4" description="Yaw of the barrel" />
+  <IsControllableShotAngle type="bool" default="false" description="Allows the player to manually rotate the cannon." />
+  <FirstSpeed type="float" default="80.4" description="Initial speed of the launch" />
+  <OutOfControl type="float" default="1" description="Time taken before restoring control to the player." />
+  <KeepVelocityDistance type="float" default="5" description="Distance before restoring gravity to Sonic. If set too high, gravity will be disabled until hitting another spring or object" />
+  <IsPathChange type="bool" default="false" description="" />
+  <IsWallWalk type="bool" default="false" description="Enables wall running if the player launches into a wall" />
+  
+  <Extra type="description" name="An unfinished object which launches the player after pressing A. The object is functional, and the parameters work correctly, but Sonic doesn't enter the cannon properly." />
+  <Extra type="model" name="Cannon.model" />
+</Template>

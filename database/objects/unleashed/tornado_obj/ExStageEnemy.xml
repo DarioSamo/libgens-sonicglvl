@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddShotNum type="float" default="0" description="" />
+  <AppearWaitTime type="float" default="0" description="" />
+  <ButtonType type="float" default="4" description="" />
+  <ChildNum type="float" default="0" description="" />
+  <EnemyType type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <GroupQteNum type="float" default="1" description="" />
+  <LeaveType type="float" default="10" description="" />
+  <PathType type="float" default="0" description="" />
+  <ShotTiming type="float" default="0" description="" />
+</Template>

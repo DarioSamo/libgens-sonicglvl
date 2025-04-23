@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsFront type="bool" default="true" description="" />
+  <IsStartVelocityConstant type="bool" default="true" description="Sets the player to this speed, regardless of how fast they entered it" />
+  <OutOfControl type="float" default="2.5" description="Time taken before restoring control to the player" />
+  <Speed type="float" default="60" description="Speed granted to the player upon interacting with the object" />
+  
+  <Extra type="offset_rotation_y" name="-90" />
+  <Extra type="model" name="cmn_obj_grindbooster_HD.model" />
+  <Extra type="description" name="Gotta go fast: Rail Edition." />
+</Template>

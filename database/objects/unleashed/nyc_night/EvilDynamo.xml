@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MaxHp type="float" default="3" description="" />
+  <TargetList type="id_list" description="" />
+  <Extra type="model" name="nyc_obj_km_dynamo_000.model" />
+</Template>

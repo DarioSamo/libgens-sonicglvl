@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Length type="float" default="3.6" description="" />
+  <ModelOffsetY type="float" default="6" description="" />
+  <ModelOffsetZ type="float" default="6" description="" />
+  <OffsetTime type="float" default="0" description="" />
+  <RotateAngleWidth type="float" default="90" description="" />
+  <Speed type="float" default="15" description="" />
+  <Layer type="float" default="0" description="" />
+</Template>

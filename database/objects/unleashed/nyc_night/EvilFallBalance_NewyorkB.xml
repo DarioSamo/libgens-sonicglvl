@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <FallTime type="float" default="3.3" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Extra type="model" name="evil_nyc_obj_dml_ironbridgeB.model" />
+</Template>

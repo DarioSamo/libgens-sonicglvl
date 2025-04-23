@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <Bar1_Enable type="bool" default="false" description="" />
+  <Bar2_Enable type="bool" default="false" description="" />
+  <Bar3_Enable type="bool" default="false" description="" />
+  <Bar4_Enable type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Height type="float" default="2" description="" />
+  <Weight type="float" default="1" description="" />
+  <Layer type="float" default="0" description="" />
+  <Radius type="float" default="2.1" description="" />
+</Template>

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsPause type="bool" default="true" description="" />
+  <OffTime type="float" default="0" description="" />
+  <OnTime type="float" default="6" description="" />
+  <Phase type="float" default="0" description="" />
+  <Extra type="model" name="evl_nyc_obj_shockironbridgeA.model" />
+</Template>

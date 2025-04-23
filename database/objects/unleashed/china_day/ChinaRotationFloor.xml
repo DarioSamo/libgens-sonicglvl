@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<Template>
+  <FloorType type="integer" default="0" description="Amount of floor:
+  0 - full   1 - 3/4   2 - 1/2   3 - 1/4" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsFusa type="bool" default="true" description="Adds a decoration on the outside of the wheel" />
+  <IsWall type="bool" default="true" description="Surrounds the wheel with a cylinder" />
+  <Phase type="integer" default="0" description="" />
+  <PoleType type="integer" default="0" description="Which structure should appear in the middle of the wheel
+  0 - slight raise   1 - pillar   2 - cage   3 - cage with extra circle below   4 - flat" />
+  <Speed type="float" default="0" description="How fast the wheel should rotate" />
+  <UserRange type="float" default="0" description="" />
+  
+  <Extra type="model" name="chn_obj_in_workstand01_000.model" condition_1="FloorType == 0" condition_2="IsFusa == true"/>
+  <Extra type="model" name="chn_obj_in_workstand02_000.model" condition_1="FloorType == 0" condition_2="IsFusa == false"/>  
+  <Extra type="model" name="chn_obj_in_standthreequarter01_000.model" condition_1="FloorType == 1" condition_2="IsFusa == true"/>
+  <Extra type="model" name="chn_obj_in_standthreequarter02_000.model" condition_1="FloorType == 1" condition_2="IsFusa == false"/> 
+  <Extra type="model" name="chn_obj_in_standhalf01_000.model" condition_1="FloorType == 2" condition_2="IsFusa == true"/>
+  <Extra type="model" name="chn_obj_in_standhalf02_000.model" condition_1="FloorType == 2" condition_2="IsFusa == false"/> 
+  <Extra type="model" name="chn_obj_in_standonequarter01_000.model" condition_1="FloorType == 3" condition_2="IsFusa == true"/>
+  <Extra type="model" name="chn_obj_in_standonequarter02_000.model" condition_1="FloorType == 3" condition_2="IsFusa == false"/>
+  
+  <Extra type="description" name="A spinning, circular floor." />
+</Template>

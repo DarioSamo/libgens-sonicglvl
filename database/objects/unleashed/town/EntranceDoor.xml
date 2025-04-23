@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <AreaType type="integer" default="3" description="" />
+  <DoorType type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <KeyType type="integer" default="0" description="" />
+  <NeedMedalNum type="integer" default="1" description="" />
+  <StageType type="string" default="day1" description="" />
+  <Extra type="description" name="Stage gate" />
+</Template>

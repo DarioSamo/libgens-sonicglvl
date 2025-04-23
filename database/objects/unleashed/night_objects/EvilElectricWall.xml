@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsUseMessage type="bool" default="false" description="" />
+  <OffTime type="float" default="0" description="" />
+  <OnTime type="float" default="3" description="" />
+  <WallLength type="float" default="6" description="" />
+</Template>

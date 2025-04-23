@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Layer type="float" default="0" description="" />
+  <Path0_Length type="float" default="0" description="" />
+  <Path0_Offset type="float" default="0" description="" />
+  <Path1_Length type="float" default="0" description="" />
+  <Path1_Offset type="float" default="0" description="" />
+  <Path2_Length type="float" default="0" description="" />
+  <Path2_Offset type="float" default="0" description="" />
+  <Path3_Length type="float" default="0" description="" />
+  <Path3_Offset type="float" default="0" description="" />
+  <ScaleX type="float" default="2" description="" />
+  <ScaleY type="float" default="6" description="" />
+  <ScaleZ type="float" default="1" description="" />
+</Template>

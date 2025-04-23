@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <ShotVelFail type="float" default="15" description="" />
+  <ShotVelSuccess type="float" default="22" description="" />
+  
+  <Extra type="model" name="afr_obj_yy_pole01_000.model" />
+  <Extra type="description" name="A thin pole for Sonic to swing on." />
+</Template>

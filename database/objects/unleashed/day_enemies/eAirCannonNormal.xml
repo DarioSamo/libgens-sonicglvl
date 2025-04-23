@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<Template>
+  <Interval type="float" default="1" description="" /> 
+  <MoveType type="integer" default="0" description="" /> 
+  <NumBullet type="integer" default="10" description="" /> 
+  <NumShotOneTime type="integer" default="1" description="" /> 
+  <OnlyPlayerAttack type="bool" default="true" description="" />
+  <PlayAppearEffect type="bool" default="true" description="" />
+  <RadiusAction type="float" default="30" description="" /> 
+  <RadiusSearch type="float" default="30" description="" /> 
+  <ShotType type="integer" default="2" description="" /> 
+  <Type type="integer" default="0" description="" /> 
+  <ViewAngleTate type="float" default="30" description="" /> 
+  <ViewAngleYoko type="float" default="30" description="" /> 
+  <GroundOffset type="float" default="0" description="" /> 
+  <IsCastShadow type="bool" default="true" description="" /> 
+  
+  <Extra type="model" name="enm_aerocannon_HD.model" />
+</Template>

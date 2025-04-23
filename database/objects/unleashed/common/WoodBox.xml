@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <Direction type="float" default="0" description="" />
+  <Distance type="float" default="1000" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Time type="float" default="0.25" description="" />
+  <Extra type="model" name="cmn_obj_ms_woodboxM_000.model" />
+</Template>

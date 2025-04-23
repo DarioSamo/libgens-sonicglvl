@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Template>
+  <BlendBase type="float" default="0" description="" />
+  <BlendSpeed type="float" default="3.5" description="" />
+  <BlendType type="float" default="0" description="" />
+  <CameraList type="id_list" description="" />
+  <Ease_Time_Enter type="float" default="0" description="Time taken to swap to this camera." />
+  <Ease_Time_Leave type="float" default="0" description="Time taken to swap out of this camera." />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCollision type="bool" default="true" description="" />
+  <Target type="id" description="" />
+  <TargetOffset_Front type="float" default="-3" description="" />
+  <TargetOffset_Right type="float" default="0" description="" />
+  <TargetOffset_Up type="float" default="0" description="" />
+  <Target_Type type="float" default="0" description="" />
+  <TargetPositionFix type="vector" description="" />
+  
+  <Extra type="model" name="Camera.mesh" />
+  <Extra type="description" name="A camera used to blend between two cameras." />
+</Template>

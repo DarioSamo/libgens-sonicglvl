@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="0" description="" />
+  <Cycle type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsUseMessage type="bool" default="false" description="" />
+  <Length type="float" default="7" description="" />
+  <MoveDirection type="float" default="0" description="" />
+  <OffTime type="float" default="0" description="" />
+  <OnTime type="float" default="3" description="" />
+  <Phase type="float" default="0" description="" />
+  <RotationPhase type="float" default="0" description="" />
+  <RotationSpeed type="float" default="0" description="" />
+</Template>

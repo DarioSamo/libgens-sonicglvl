@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <Event0 type="float" default="1" description="" />
-  <GroundOffset type="float" default="0" description="" />
-  <TargetList0 type="id" description="" />
-  <Timer0 type="float" default="0" description="" />
-</Template>

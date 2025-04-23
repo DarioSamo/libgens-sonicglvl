@@ -765,46 +765,7 @@ namespace LibGens {
 
 		TiXmlElement *root=new TiXmlElement(LIBGENS_OBJECT_TEMPLATE_ROOT);
 		
-		ObjectElementFloat RangeIn;
-		RangeIn.setName("RangeIn");
-		RangeIn.setDescription("Distance from object before it spawns");
-		RangeIn.value = 1000;
-		RangeIn.writeXMLTemplate(root);
-		
-		ObjectElementFloat RangeOut;
-		RangeOut.setName("RangeOut");
-		RangeOut.setDescription("Distance from object before it despawns");
-		RangeOut.value = 1200;
-		RangeOut.writeXMLTemplate(root);
-		
-		ObjectElementTarget Parent;
-		Parent.setName("Parent");
-		Parent.value = 0;
-		Parent.writeXMLTemplate(root);
-		
-		ObjectElementUint16 Unknown1;
-		Unknown1.setName("Unknown1");
-		Unknown1.value = 0;
-		Unknown1.writeXMLTemplate(root);
-		
-		ObjectElementUint32 Unknown2;
-		Unknown2.setName("Unknown2");
-		Unknown2.value = 0;
-		Unknown2.writeXMLTemplate(root);
-		
-		ObjectElementFloat Unknown3;
-		Unknown3.setName("Unknown3");
-		Unknown3.value = 0;
-		Unknown3.writeXMLTemplate(root);
-		
 		for (list<ObjectElement *>::iterator it=elements.begin(); it!=elements.end(); it++) {
-			if ((*it)->getName() == "RangeIn") continue;
-			if ((*it)->getName() == "RangeOut") continue;
-			if ((*it)->getName() == "Parent") continue;
-			if ((*it)->getName() == "Unknown1") continue;
-			if ((*it)->getName() == "Unknown2") continue;
-			if ((*it)->getName() == "Unknown3") continue;
-			if ((*it)->getName() == "Unknown4") continue;
 			(*it)->writeXMLTemplate(root);
 		}
 

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <Acceleration type="float" default="80" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <MaxSpeed type="float" default="120" description="" />
+  <MinSpeed type="float" default="60" description="" />
+</Template>

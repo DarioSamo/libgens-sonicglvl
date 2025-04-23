@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<Template>
+  <EnableEffect type ="bool" default="true" description="Determines if the enemy spawns with particle and sound effects." />
+  <EnemyType type="integer" default="29" description="0: Nightmare, 1: Deep Nightmare, 2: Green Reckless, 3: Purple Spooky, 4: Red Spooky, 5: Green Killer Bee, 6: Red Killer Bee, 7: Gun Egg Fighter, 8: Sword Egg Fighter, 9: Shield Egg Fighter, 10: Shield and Sword Egg Fighter, 11: Electric Shield and Sword Egg Fighter12: Electric Shield Egg Fighter (only punches), 13: Electric Shield Egg Fighter (jabs with shield), 14: Chibi Fighter, 15: Power Master, 16: Cure Master, 17: Fright Master, 18: Fire Master, 19: Lightning Master, 20: Flower, 21: Float, 22: Shooting Float, 23: Thunder Float, 24: Flame Element, 25: Ice Element, 26: Wind Element, 27: Thunder Ball, 28: Red Reckless, 29: Standard Egg Fighter, 30: Gun Egg Fighter (doesn't shoot)" />
+  <FirstState type="integer" default="0" description="" />
+  <GenerateMaxCount type="integer" default="1" description="The amount of times the enemy is spawned." />
+  <GenerateSeparateTime type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Personality type="integer" default="0" description="" />
+  <Extra type="model" name="em_dark_nmar_hi.model" condition="EnemyType == 0" />
+  <Extra type="model" name="em_dark_nmag_hi.model" condition="EnemyType == 1" />
+  <Extra type="model" name="em_dark_recl_hi.model" condition="EnemyType == 2" />
+  <Extra type="model" name="em_dark_spky_hi.model" condition="EnemyType == 3" />
+  <Extra type="model" name="em_dark_spkr_hi.model" condition="EnemyType == 4" />
+  <Extra type="model" name="em_dark_kbee_hi.model" condition="EnemyType == 5" />
+  <Extra type="model" name="em_dark_kbeg_hi.model" condition="EnemyType == 6" />
+  <Extra type="model" name="em_eday_ef2g_hi.model" condition="EnemyType == 7" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 8" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 9" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 10" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 11" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 12" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 13" />
+  <Extra type="model" name="em_eday_chbi_hi.model" condition="EnemyType == 14" />
+  <Extra type="model" name="em_dark_mstp_hi.model" condition="EnemyType == 15" />
+  <Extra type="model" name="em_dark_mstc_hi.model" condition="EnemyType == 16" />
+  <Extra type="model" name="em_dark_msts_hi.model" condition="EnemyType == 17" />
+  <Extra type="model" name="em_dark_mstf_hi.model" condition="EnemyType == 18" />
+  <Extra type="model" name="em_dark_mstl_hi.model" condition="EnemyType == 19" />
+  <Extra type="model" name="em_dark_evfn_hi.model" condition="EnemyType == 20" />
+  <Extra type="model" name="em_dark_dflt_hi.model" condition="EnemyType == 21" />
+  <Extra type="model" name="em_dark_dfcn_hi.model" condition="EnemyType == 22" />
+  <Extra type="model" name="em_dark_dfth_hi.model" condition="EnemyType == 23" />
+  <Extra type="model" name="em_eday_gflm_hi.model" condition="EnemyType == 24" />
+  <Extra type="model" name="em_eday_gblz_hi.model" condition="EnemyType == 25" />
+  <Extra type="model" name="em_eday_gtyp_hi.model" condition="EnemyType == 26" />
+  <Extra type="model" name="em_eday_bals_hi.model" condition="EnemyType == 27" />
+  <Extra type="model" name="em_dark_recr_hi.model" condition="EnemyType == 28" />
+  <Extra type="model" name="em_eday_ef2n_hi.model" condition="EnemyType == 29" />
+  <Extra type="model" name="em_eday_ef2g_hi.model" condition="EnemyType == 30" />
+</Template>

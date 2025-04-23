@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <Eventright_off type="float" default="0" description="" />
+  <Eventright_on type="float" default="1" description="" />
+  <Friction type="float" default="0.1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsDefaultOn type="bool" default="false" description="" />
+  <IsReturn type="bool" default="false" description="" />
+  <Kasoku type="float" default="0.3" description="" />
+  <ReturnTime type="float" default="5" description="" />
+  <TargetListright_off type="id_list" description="" />
+  <TargetListright_on type="id_list" description="" />
+  <Timerright_off type="float" default="0" description="" />
+  <Timerright_on type="float" default="0" description="" />
+</Template>

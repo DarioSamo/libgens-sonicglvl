@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="13" description="" />
+  <Collision_Length type="float" default="13" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <DefaultStatus type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Shape_Type type="float" default="0" description="" />
+  
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
+</Template>

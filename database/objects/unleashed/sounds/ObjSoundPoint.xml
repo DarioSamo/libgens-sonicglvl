@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <BaseVolume type="float" default="1" description="" />
+  <CueName type="string" default="002_ambsn_snw_waveamb" description="" />
+  <FileName type="string" default="se_ambience_snw_sonic" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <InsideRadius type="float" default="41" description="" />
+  <IntervalTime type="float" default="5" description="" />
+  <IsRegularly type="bool" default="false" description="" />
+  <Radius type="float" default="84" description="" />
+  <Extra type="preview_box_x" name="Radius" />
+  <Extra type="preview_box_y" name="Radius" />
+  <Extra type="preview_box_z" name="Radius" />
+  <Extra type="model" name="sound.mesh" />
+</Template>

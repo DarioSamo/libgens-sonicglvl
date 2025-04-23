@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Personality type="integer" default="1" description="" />
+  
+  <Extra type="model" name="em_dark_recb_hi.model" />
+</Template>

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <RebornTime type="float" default="10" description="" />
+  <RockSize type="float" default="0" description="" />
+  <Scale type="float" default="3.5" description="" />
+  <TentacleNum type="float" default="7" description="" />
+  <Type type="float" default="1" description="" />
+</Template>

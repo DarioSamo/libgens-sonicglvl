@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <Cycle type="float" default="0.7" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsReverse type="bool" default="false" description="" />
+  <Num type="float" default="5" description="" />
+  <Phase type="float" default="0" description="" />
+  <Radius type="float" default="6.5" description="" />
+</Template>

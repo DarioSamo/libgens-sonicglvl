@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <Extra type="description" name="The hour glass used to change the time in Eggmanland" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<LevelDatabase>
+  <Entry name="SonicGLvl Helpers" folder="helpers" />
+  <Entry name="Common Objects" folder="unleashed/common" />
+  <Entry name="Town/ETF Objects" folder="unleashed/town" />
+  <Entry name="Cameras" folder="unleashed/cameras" />
+  <Entry name="System Objects" folder="unleashed/system" />
+  <Entry name="Player System Objects" folder="unleashed/playersystem" />
+  <Entry name="Navigation Hints" folder="unleashed/navi" />
+  <Entry name="Mission Objects" folder="unleashed/mission" />
+  <Entry name="Sound" folder="unleashed/sounds" />
+  <Entry name="Day Objects" folder="unleashed/day_objects" />
+  <Entry name="Day Enemies" folder="unleashed/day_enemies" />
+  <Entry name="Day Bosses" folder="unleashed/day_bosses" />
+  <Entry name="Night Objects" folder="unleashed/night_objects" />
+  <Entry name="Night Enemies" folder="unleashed/night_enemies" />
+  <Entry name="Night Bosses" folder="unleashed/night_bosses" />
+  <Entry name="Apotos Day Objects" folder="unleashed/mykonos_day" />
+  <Entry name="Apotos Night Objects" folder="unleashed/mykonos_night" />
+  <Entry name="Mazuri Day Objects" folder="unleashed/africa_day" />
+  <Entry name="Mazuri Night Objects" folder="unleashed/africa_night" />
+  <Entry name="Mazuri Town Objects" folder="unleashed/twn_africa" />
+  <Entry name="Spagonia Day Objects" folder="unleashed/euc_day" />
+  <Entry name="Spagonia Night Objects" folder="unleashed/euc_night" />
+  <Entry name="Spagonia Town Objects" folder="unleashed/twn_euc" />
+  <Entry name="Chun Nan Day Objects" folder="unleashed/china_day" />
+  <Entry name="Chun Nan Night Objects" folder="unleashed/china_night" />
+  <Entry name="Chun Nan Town Objects" folder="unleashed/twn_china" />
+  <Entry name="Holoska Day Objects" folder="unleashed/holoska_day" />
+  <Entry name="Holoska Night Objects" folder="unleashed/holoska_night" />
+  <Entry name="Shamar Day Objects" folder="unleashed/shamar_day" />
+  <Entry name="Shamar Night Objects" folder="unleashed/shamar_night" />
+  <Entry name="Shamar Town Objects" folder="unleashed/twn_shamar" />
+  <Entry name="Empire City Day Objects" folder="unleashed/nyc_day" />
+  <Entry name="Empire City Night Objects" folder="unleashed/nyc_night" />
+  <Entry name="Empire City Town Objects" folder="unleashed/twn_nyc" />
+  <Entry name="Adabat Day Objects" folder="unleashed/adabat_day" />
+  <Entry name="Adabat Night Objects" folder="unleashed/adabat_night" />
+  <Entry name="Adabat Town Objects" folder="unleashed/twn_adabat" />
+  <Entry name="Eggmanland Objects" folder="unleashed/eggman_obj" />
+  <Entry name="NPCs" folder="unleashed/npc" />
+  <Entry name="Lab Objects" folder="unleashed/twn_lab" />
+  <Entry name="Dark Gaia Objects" folder="unleashed/darkgaia_obj" />
+  <Entry name="Tornado Defence Objects" folder="unleashed/tornado_obj" />
+  <Entry name="Common Unused" folder="unleashed/unused" />
+  <Entry name="Day Unused" folder="unleashed/unused_day" />
+  <Entry name="Night Unused" folder="unleashed/unused_night" />
+  <Entry name="Unassigned" folder="unleashed/unassigned" />
+</LevelDatabase>

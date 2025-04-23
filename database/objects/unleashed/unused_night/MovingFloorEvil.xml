@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="2" description="" />
+  <Cycle type="float" default="2" description="" />
+  <Direction type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Layer type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  <RotationAngle type="float" default="0" description="" />
+  <RotationPhase type="float" default="0" description="" />
+  <ScaleX type="float" default="5" description="" />
+  <ScaleY type="float" default="8.7" description="" />
+  <ScaleZ type="float" default="5" description="" />
+  <StopTime type="float" default="0" description="" />
+  <Extra type="description" name="A debug floor that moves - Werehog Edition" />
+</Template>

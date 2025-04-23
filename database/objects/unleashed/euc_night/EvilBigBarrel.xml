@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MaxSpeed type="float" default="15" description="" />
+  <StopTime type="float" default="6" description="" />
+</Template>

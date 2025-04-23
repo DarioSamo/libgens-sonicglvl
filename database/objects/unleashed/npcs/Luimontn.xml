@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <PositionID type="string" default="Mission" description="" />
+  <Extra type="description" name="Louie Montaine" />
+</Template>

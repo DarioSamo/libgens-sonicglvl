@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddMaxVelocity type="float" default="0" description="Additional height granted when bouncing near the end of the pole" />
+  <AddMinVelocity type="float" default="0" description="Additional height granted when bouncing near the base of the pole" />
+  <GroundOffset type="float" default="0" description="" />
+  
+  <Extra type="model" name="cmn_obj_springpole_HD.model" />
+  <Extra type="description" name="A thin pole which launches the player into the air." />
+</Template>

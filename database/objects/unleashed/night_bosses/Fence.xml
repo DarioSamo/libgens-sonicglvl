@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <DownWaitTime type="float" default="1.2" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <UpWaitTime type="float" default="1.6" description="" />
+</Template>

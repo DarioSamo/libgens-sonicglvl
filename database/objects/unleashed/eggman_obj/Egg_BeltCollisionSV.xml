@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<Template>
+  <EnableReverse type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsRightDirection type="bool" default="false" description="" />
+  <LeftTime type="float" default="5" description="" />
+  <Length type="float" default="20" description="" />
+  <MaterialIndex type="float" default="1" description="" />
+  <RightTime type="float" default="0" description="" />
+  <Speed type="float" default="10" description="" />
+  <Width type="float" default="6" description="" />
+    <Extra type="preview_box_x" name="Width" />
+  <Extra type="preview_box_z" name="Length" />
+</Template>

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRangeDistance type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsDefaultHide type="bool" default="false" description="" />
+  <IsLast type="bool" default="false" description="" />
+  <Type type="integer" default="0" description="" />
+  <Extra type="model" name="evil_egbboss_obj_hh_ironfloor_35m.model" condition="Type == 0"/>
+  <Extra type="model" name="evil_egbboss_obj_hh_rockfloor_25mA.model" condition="Type == 1"/>
+  <Extra type="model" name="evil_egbboss_obj_hh_rockfloor_20m.model" condition="Type == 2"/>
+</Template>

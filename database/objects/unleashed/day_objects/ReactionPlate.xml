@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsChangeCameraWhenPathChange type="bool" default="true" description="Resets the camera upon changing paths." />
+  <IsPathChange type="bool" default="false" description="" />
+  <MainAcceptingTime type="float" default="1.1" description="" />
+  <PreAcceptingTime type="float" default="0.5" description="" />
+  <Target type="id" description="ID of the reaction plate to send the player towards upon winning the QTE." />
+  <Type type="integer" default="0" description="Prompt displayed by the plate.
+  0: Blue spring
+  1: B   2: A   3: X   4: Y   5: End Point   6: Question Mark (Random)" />
+  <m_Difficulty type="integer" default="1" description="" />
+  <m_FailOutOfControlTime type="float" default="3" description="Time taken before restoring control to the player after failing the prompt." />
+  <m_JumpMaxVelocity type="float" default="0" description="" />
+  <m_JumpMinVelocity type="float" default="0" description="" />
+  <m_Score type="float" default="1000" description="" />
+  
+  <Extra type="model" name="cmn_obj_kt3_springblueM_000.model" condition="Type=0"/>
+  <Extra type="model" name="cmn_obj_km_AreactionpanelM_000.model" condition="Type=1"/>
+  <Extra type="description" name="A spring/panel which launches the player to another reaction plate, provided they win the Quick Time Event." />
+</Template>

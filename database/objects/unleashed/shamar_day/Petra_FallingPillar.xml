@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <AddRange type="float" default="200" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Speed type="float" default="1.65" description="" />
+</Template>

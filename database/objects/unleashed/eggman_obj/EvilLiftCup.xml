@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="1" description="" />
+  <Cycle type="float" default="1" description="" />
+  <DialDirection type="float" default="0" description="" />
+  <DialId type="id" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsAdvance type="float" default="1" description="" />
+  <IsUseMessage type="bool" default="true" description="" />
+  <MoveDirection type="float" default="0" description="" />
+  <MoveType type="float" default="8" description="" />
+  <Phase type="float" default="0" description="" />
+  <SpeedOnPath type="float" default="3" description="" />
+  <StopTime type="float" default="0" description="" />
+</Template>

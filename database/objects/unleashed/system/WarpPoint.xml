@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Extra type="description" name="An object that teleports the player when triggered by an event. It is also used in earlier builds of the game to teleport to via the debug menu." />
+</Template>

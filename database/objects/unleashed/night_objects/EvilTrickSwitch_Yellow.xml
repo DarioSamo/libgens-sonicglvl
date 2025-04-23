@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <EventOFF type="integer" default="2" description="" />
+  <EventON type="integer" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <TargetListOFF type="id_list" description="" />
+  <TargetListON type="id_list" description="" />
+  <TimerOFF type="float" default="0" description="" />
+  <TimerON type="float" default="0" description="" />
+</Template>

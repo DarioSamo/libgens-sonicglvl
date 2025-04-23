@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<Template>
-  <ForSideView type="bool" default="true" description="" />
-  <GroundOffset type="float" default="0" description="" />
-  <OnlyPlayerAttack type="bool" default="false" description="" />
-  <PlayAppearEffect type="bool" default="false" description="" />
-  <Type type="float" default="0" description="" />
-</Template>

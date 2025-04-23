@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstState type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <OffTime type="float" default="1" description="" />
+  <OnTime type="float" default="2" description="" />
+  <Phase type="float" default="0" description="" />
+  <Type type="integer" default="1" description="" />
+</Template>

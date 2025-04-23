@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <AppearType type="float" default="1" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <HeadUpAfterSonicJump type="float" default="2" description="" />
+  <IsEnterFromTail type="bool" default="false" description="" />
+  <JumpKeepVelocity type="float" default="1" description="" />
+  <JumpOutOfControl type="float" default="1" description="" />
+  <JumpPitch type="float" default="0" description="" />
+  <JumpSpeed type="float" default="100" description="" />
+  <JumpYaw type="float" default="0" description="" />
+  <LeapDelay type="float" default="0.25" description="" />
+  <LeapHeight type="float" default="130" description="" />
+  <LeapSpeed type="float" default="80" description="" />
+  <SwimUpDistance type="float" default="50" description="" />
+  <ScaleType type="float" default="1" description="" />
+</Template>

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<Template>
+  <Ease_Time_Enter type="float" default="0" description="" />
+  <Ease_Time_Leave type="float" default="0" description="" />
+  <EyePathType type="float" default="1" description="" />
+  <EyeSpeed type="float" default="4" description="" />
+  <Fovy type="float" default="45" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCollision type="bool" default="true" description="" />
+  <IsControllable type="bool" default="false" description="" />
+  <OffsetOnEyePath type="float" default="3.1" description="" />
+  <PanAndTangentBlend type="float" default="0.3" description="" />
+  <PathID type="float" default="0" description="" />
+  <Target type="id" description="" />
+  <TargetOffset_Front type="float" default="0" description="" />
+  <TargetOffset_Right type="float" default="0" description="" />
+  <TargetOffset_Up type="float" default="-0.5" description="" />
+  <Target_Type type="float" default="0" description="" />
+  <ZRot type="float" default="0" description="" />
+  <TargetPositionFix type="vector" description="" />
+</Template>

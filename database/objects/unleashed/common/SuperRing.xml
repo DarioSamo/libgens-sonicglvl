@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  
+  <Extra type="model" name="cmn_obj_superring_HD.model" />
+  <Extra type="offset_rotation_y_speed" name="120" />
+  <Extra type="description" name="10 rings for the price of one." />
+</Template>

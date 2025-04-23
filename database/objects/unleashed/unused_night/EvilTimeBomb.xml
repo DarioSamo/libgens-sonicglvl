@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <IsRestore type="bool" default="true" description="If the bomb will respawn after detonation" />
+  <TimeLimit type="float" default="5" description="Time until the bomb detonates" />
+  <Extra type="description" name="An unused bomb the Werehog can pick up which detonates after a set amount of time" />
+</Template>

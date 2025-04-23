@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <ActivateCategory type="float" default="1" description="" />
+  <ActivateIndex type="float" default="2" description="" />
+  <DeactivateCategory type="float" default="0" description="" />
+  <DeactivateIndex type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ONLayerIndex type="string" default="Chao" description="" />
+  <OffLayerIndex type="string" default="Base" description="" />
+  <UseON type="bool" default="false" description="" />
+  <UseOff type="bool" default="false" description="" />
+</Template>

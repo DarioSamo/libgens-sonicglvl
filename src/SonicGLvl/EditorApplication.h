@@ -53,22 +53,23 @@
 #ifndef EDITOR_APPLICATION_H_INCLUDED
 #define EDITOR_APPLICATION_H_INCLUDED
 
-#define SONICGLVL_CAMERA_NAME                  "EditorCamera"
-#define SONICGLVL_CAMERA_PREVIEW_NAME          "PreviewCamera"
-#define SONICGLVL_CACHE_PATH                   "../cache/"
-#define SONICGLVL_CACHE_DATA_PATH              "data"
-#define SONICGLVL_CACHE_GI_TEMP_PATH           "gi_temp"
-#define SONICGLVL_CACHE_TERRAIN_PATH           "terrain"
-#define SONICGLVL_CACHE_RESOURCES_PATH         "resources"
-#define SONICGLVL_CACHE_SLOT_RESOURCES_PATH    "slot_resources"
-#define SONICGLVL_LOW_END_TECHNIQUE            "LowEnd"
-#define SONICGLVL_LEVEL_DATABASE_PATH          "../database/LevelDatabase.xml"
-#define SONICGLVL_GHOST_DATABASE_PATH          "../database/GhostDatabase.xml"
-#define SONICGLVL_OBJECTS_DATABASE_PATH        "../database/ObjectsDatabase.xml"
-#define SONICGLVL_HAVOK_PROPERTY_DATABASE_PATH "../database/HavokPropertyDatabase.xml"
-#define SONICGLVL_LIBRARY_PATH                 "../database/objects/"
-#define SONICGLVL_RESOURCES_PATH               "../database/resources/"
-#define SONICGLVL_SHADERS_PATH                 "../database/shaders/"
+#define SONICGLVL_CAMERA_NAME                       "EditorCamera"
+#define SONICGLVL_CAMERA_PREVIEW_NAME               "PreviewCamera"
+#define SONICGLVL_CACHE_PATH                        "../cache/"
+#define SONICGLVL_CACHE_DATA_PATH                   "data"
+#define SONICGLVL_CACHE_GI_TEMP_PATH                "gi_temp"
+#define SONICGLVL_CACHE_TERRAIN_PATH                "terrain"
+#define SONICGLVL_CACHE_RESOURCES_PATH              "resources"
+#define SONICGLVL_CACHE_SLOT_RESOURCES_PATH         "slot_resources"
+#define SONICGLVL_LOW_END_TECHNIQUE                 "LowEnd"
+#define SONICGLVL_LEVEL_DATABASE_PATH               "../database/LevelDatabase.xml"
+#define SONICGLVL_GHOST_DATABASE_PATH               "../database/GhostDatabase.xml"
+#define SONICGLVL_GENERATIONS_OBJECTS_DATABASE_PATH "../database/GenerationsObjectsDatabase.xml"
+#define SONICGLVL_UNLEASHED_OBJECTS_DATABASE_PATH   "../database/UnleashedObjectsDatabase.xml"
+#define SONICGLVL_HAVOK_PROPERTY_DATABASE_PATH      "../database/HavokPropertyDatabase.xml"
+#define SONICGLVL_LIBRARY_PATH                      "../database/objects/"
+#define SONICGLVL_RESOURCES_PATH                    "../database/resources/"
+#define SONICGLVL_SHADERS_PATH                      "../database/shaders/"
 
 #define SONICGLVL_FBX_SCENE_NAME               "FBXTerrainImport"
 #define SONICGLVL_UNASSIGNED_OBJECT_CATEGORY   "Unassigned"
@@ -212,6 +213,8 @@ class EditorApplication : public BaseApplication {
 
 		// Object
 		ObjectNodeManager *object_node_manager;
+		LibGens::ObjectLibrary *generations_library;
+		LibGens::ObjectLibrary *unleashed_library;
 		LibGens::ObjectLibrary *library;
 		LibGens::ObjectProduction *object_production;
 

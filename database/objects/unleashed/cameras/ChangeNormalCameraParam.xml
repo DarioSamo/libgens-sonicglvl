@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="6" description="" />
+  <Collision_Length type="float" default="7" description="" />
+  <Collision_Width type="float" default="6" description="" />
+  <DefaultStatus type="integer" default="0" description="" />
+  <EaseTime type="float" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <Shape_Type type="integer" default="0" description="" />
+  <m_Param.Distance type="float" default="5" description="" />
+  <m_Param.Fovy type="float" default="45" description="" />
+  <m_Param.TargetPitch type="float" default="0" description="" />
+  <m_Param.TargetYaw type="float" default="0" description="" />
+  <m_Param.VerticalOffset type="float" default="2.7" description="" />
+    <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
+  <Extra type="model" name="Camera.mesh" />
+</Template>

@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <Distance type="float" default="400" description="" />
+  <Direction type="integer" default="0" description="" />
+  <Time type="float" default="0" description="" />
+  <Phase type="integer" default="0" description="" />
+</Template>

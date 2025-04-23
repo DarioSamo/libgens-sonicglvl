@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <AngleType type="float" default="0" description="Angle at which the player will launch." />
+  <GroundOffset type="float" default="0" description="" />
+  <ImpulseSpeedOnBoost type="float" default="50" description="Launch speed when boosting." />
+  <ImpulseSpeedOnNormal type="float" default="35" description="Launch speed when running." />
+  <OutOfControl type="float" default="1.5" description="Time taken before restoring control to the player." />
+  <SizeType type="float" default="0" description="Size of the board.
+  0: Small
+  1: Big" />
+  
+  <Extra type="description" name="A ramp which launches the player depending on whether they're boosting or running." />
+  <Extra type="model" name="cmn_obj_jumppanel15S_HD.model" condition="SizeType == 0" />
+  <Extra type="model" name="cmn_obj_jumppanel30S_HD.model" condition="SizeType == 1" />
+</Template>

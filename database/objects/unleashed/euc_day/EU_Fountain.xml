@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <OutOfControl type="float" default="0.7" description="Time taken before restoring control to the player." />
+  <ShotVelocity type="vector" description="" />
+  <Velocity type="float" default="35" description="" />
+  
+  <Extra type="model" name="euc_obj_hh_fountain_000.model" />
+</Template>

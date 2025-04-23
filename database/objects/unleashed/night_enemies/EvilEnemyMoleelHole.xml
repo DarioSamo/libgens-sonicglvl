@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsHomeHole type="bool" default="true" description="" />
+  <MoleelCount type="float" default="1" description="" />
+  <Personality type="float" default="2" description="" />
+  <TargetList type="id_list" description="" />
+</Template>

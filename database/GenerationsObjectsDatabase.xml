@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<LevelDatabase>
+  <Entry name="SonicGLvl Helpers" folder="helpers" />
+  <Entry name="Common (Mobility Gimmicks)" folder="generations/common_movement" />
+  <Entry name="Common (Damage Gimmicks)" folder="generations/common_hazard" />
+  <Entry name="Common (Items/Goals)" folder="generations/common_item" />
+  <Entry name="Cameras" folder="generations/cameras" />
+  <Entry name="System Objects" folder="generations/system" />
+  <Entry name="Player System Objects" folder="generations/playersystem" />
+  <Entry name="Enemies" folder="generations/enemies" />
+  <Entry name="Sounds" folder="generations/sounds" />
+  <Entry name="Platforms" folder="generations/platforms" />
+  <Entry name="Breakables" folder="generations/breakables" />
+  <Entry name="Playable Menu" folder="generations/pam" />
+  <Entry name="Green Hill Zone" folder="generations/ghz" />
+  <Entry name="Chemical Plant Zone" folder="generations/cpz" />
+  <Entry name="Sky Sanctuary Zone" folder="generations/ssz" />
+  <Entry name="Speed Highway" folder="generations/sph" />
+  <Entry name="City Escape" folder="generations/cte" />
+  <Entry name="Seaside Hill" folder="generations/ssh" />
+  <Entry name="Crisis City" folder="generations/csc" />
+  <Entry name="Rooftop Run" folder="generations/euc" />
+  <Entry name="Planet Wisp" folder="generations/pla" />
+  <Entry name="Pinball (Casino Night DLC)" folder="generations/cnz" />
+  <Entry name="Metal Sonic" folder="generations/bms" />
+  <Entry name="Shadow" folder="generations/bsd" />
+  <Entry name="Silver" folder="generations/bsl" />
+  <Entry name="Death Egg Robot" folder="generations/bde" />
+  <Entry name="Perfect Chaos" folder="generations/bpc" />
+  <Entry name="Egg Dragoon" folder="generations/bne" />
+  <Entry name="Time Eater" folder="generations/blb" />
+  <Entry name="Mission Objects" folder="generations/mission" />
+  <Entry name="Navigation Hints" folder="generations/navi" />
+  <Entry name="Sonic Unleashed (Generations Compatible)" folder="generations/unleashed_compatible" />
+  <Entry name="Unused (Listed in ObjectDefine)" folder="generations/unused" />
+  <Entry name="Unassigned" folder="generations/unassigned" />
+</LevelDatabase>

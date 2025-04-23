@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstSpeed type="float" default="35" description="Initial speed of the launch." />
+  <GroundOffset type="float" default="0" description="" />
+  <KeepVelocityDistance type="float" default="5" description="Distance before gravity takes effect. If set too high, gravity will remain inactive until Sonic hits another object." />
+  <OutOfControl type="float" default="1.5" description="Time taken before restoring control to the player." />
+  
+  <Extra type="description" name="Sonic and the amazing technicolor dash ring." />
+  <Extra type="model" name="cmn_obj_rainbowring_HD.model" />
+</Template>

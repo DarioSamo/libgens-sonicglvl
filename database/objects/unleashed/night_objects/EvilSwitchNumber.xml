@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <EventON type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ModelType type="integer" default="0" description="" />
+  <OffTimer type="float" default="5" description="" />
+  <Target type="id" description="" />
+  <TargetListON type="id_list" description="" />
+  <TimerON type="float" default="0" description="" />
+  <Type type="integer" default="0" description="" />
+</Template>

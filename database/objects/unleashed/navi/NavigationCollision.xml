@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Template>
+  <CancelAngle type="float" default="90" description="" />
+  <CollisionType type="integer" default="1" description="" />
+  <Collision_Height type="float" default="21" description="" />
+  <Collision_Length type="float" default="28" description="" />
+  <Collision_Width type="float" default="10" description="" />
+  <DefaultStatus type="integer" default="0" description="" />
+  <DirectionType type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <InputAngle type="float" default="70" description="" />
+  <NavigationType type="integer" default="1" description="" />
+  <OffSpeed type="float" default="5" description="" />
+  <OnSpeed type="float" default="10" description="" />
+  <OutputTime type="float" default="3" description="" />
+  <QSType type="integer" default="0" description="" />
+  <SlidingPosition type="vector" description="" />
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
+</Template>

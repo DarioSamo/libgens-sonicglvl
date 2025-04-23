@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MaxHp type="float" default="3" description="" />
+  <Extra type="model" name="nyc_obj_soc_containerA_000.model" />
+</Template>

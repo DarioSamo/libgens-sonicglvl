@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Interval type="float" default="0.5" description="" />
+  <LifeTime type="float" default="30" description="" />
+  <NumBullet type="integer" default="10" description="" />
+  <NumShotOneTime type="integer" default="1" description="" />
+  <OnlyPlayerAttack type="bool" default="true" description="" />
+  <PlayAppearEffect type="bool" default="true" description="" />
+  <RadiusAction type="float" default="30" description="" />
+  <RadiusSearch type="float" default="50" description="" />
+  <ShotType type="integer" default="1" description="" />
+  <Type type="integer" default="1" description="" />
+  <ViewAngleTate type="float" default="30" description="" />
+  <ViewAngleYoko type="float" default="30" description="" />
+  <Extra type="model" name="em_eday_cang_hi.model" />
+</Template>

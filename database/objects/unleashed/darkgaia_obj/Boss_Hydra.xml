@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <ActiveRange type="float" default="100" description="" />
+  <CollisionRange type="float" default="100" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <LifeTime type="float" default="10.7999" description="" />
+  <SizeType type="integer" default="1" description="" />
+  <Speed type="float" default="30" description="" />
+  <TaregetType type="integer" default="0" description="" />
+  <TargetPos-Sync type="float" default="0" description="" />
+  <TargetPosition-X type="float" default="0" description="" />
+  <TargetPosition-Y type="float" default="0" description="" />
+  <TargetPosition-Z type="float" default="0" description="" />
+  <Extra type="model" name="fnl_obj_km_tentacleB_000.model" />
+</Template>

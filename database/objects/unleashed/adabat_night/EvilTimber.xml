@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <MaxHp type="integer" default="1" description="" />
+  <Extra type="description" name="A palmtree that can be knocked over and balanced on" />
+  <Extra type="model" name="evl_obj_ky_steppalm_000.model" />
+</Template>

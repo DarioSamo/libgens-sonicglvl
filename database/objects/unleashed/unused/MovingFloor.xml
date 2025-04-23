@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="3" description="" />
+  <Cycle type="float" default="0.25" description="" />
+  <Direction type="float" default="1" description="" />
+  <EnableMoving type="bool" default="true" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsIce type="bool" default="false" description="" />
+  <IsMessageON type="bool" default="false" description="" />
+  <Phase type="float" default="0" description="" />
+  <ScaleX type="float" default="10" description="" />
+  <ScaleY type="float" default="2" description="" />
+  <ScaleZ type="float" default="2" description="" />
+  <Layer type="float" default="2" description="" />
+  <Extra type="description" name="A debug floor that moves" />
+</Template>

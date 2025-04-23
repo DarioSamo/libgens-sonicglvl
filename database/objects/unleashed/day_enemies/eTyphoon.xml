@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <AttackInterval type="float" default="2" description="" />
+  <AttackTime type="float" default="5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <MoveType type="integer" default="0" description="" />
+  <OnlyPlayerAttack type="bool" default="false" description="" />
+  <PlayAppearEffect type="bool" default="false" description="" />
+  <StartTime type="float" default="2" description="" />
+  <Extra type="model" name="em_eday_gtyp_hi.model" />
+</Template>

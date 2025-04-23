@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<Template>
+  <Amplitude type="float" default="0.15" description="" />
+  <Cycle type="float" default="0.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Phase type="float" default="0" description="" />
+  
+  <Extra type="model" name="cmn_obj_km_guillotine_000.model" />
+</Template>

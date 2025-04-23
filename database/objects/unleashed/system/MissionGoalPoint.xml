@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Extra type="description" name="Defines the result position of the player in boss and mission stages, where there is no GoalRing present." />
+</Template>

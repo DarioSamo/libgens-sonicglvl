@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstOutOfControl type="float" default="1.5" description="" />
+  <FirstPitch type="float" default="50.0999" description="How high the player should travel upon touching the panel." />
+  <FirstSpeed type="float" default="60.0997" description="How fast the player should travel upon touching the panel." />
+  <GroundOffset type="float" default="0" description="" />
+  <IsSideView type="bool" default="false" description="Size of the panel:
+  True = small
+  False = large" />
+  <SecondOutOfControl type="float" default="1" description="" />
+  <SecondPitch type="float" default="52.0999" description="Launch angle on the Y axis upon winning the Quick Time Event." />
+  <SecondSpeed type="float" default="55.0998" description="Speed of the launch for winning the Quick Time Event." />
+  <TrickCount1 type="float" default="5" description="Number of button prompts on the first set of tricks." />
+  <TrickCount2 type="float" default="0" description="Number of button prompts on the second set of tricks." />
+  <TrickCount3 type="float" default="0" description="Number of button prompts on the third set of tricks." />
+  <TrickTime1 type="float" default="5" description="Time allotted for the first set of tricks." />
+  <TrickTime2 type="float" default="0" description="Time allotted for the second set of tricks." />
+  <TrickTime3 type="float" default="0" description="Time allotted for the third set of tricks." />
+  <m_Difficulty type="float" default="1" description="" />
+  <m_Score type="float" default="3000" description="" />
+  
+  <Extra type="model" name="cmn_obj_trickpanel30M_HD.model" condition="IsSideView == true"/>
+  <Extra type="model" name="cmn_obj_trickpanel30L_HD.model" condition="IsSideView == false"/>
+  <Extra type="description" name="A special panel which initiates a Quick Time Event." />
+</Template>

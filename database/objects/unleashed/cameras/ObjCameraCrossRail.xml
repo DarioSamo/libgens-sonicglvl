@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Template>
+  <AxisType type ="float" default="0" description="" />
+  <BackStopperPos type ="float" default="3" description="" />
+  <Distance type ="float" default="8" description="" />
+  <Ease_Time_Enter type="float" default="0" description="Time taken to swap to this camera." />
+  <Ease_Time_Leave type="float" default="0" description="Time taken to swap out of this camera." />
+  <Fovy type ="float" default="45" description="" />
+  <FrontStopperPos type ="float" default="100" description="" /> 
+  <GroundOffset type="float" default="0" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsCollision type="bool" default="false" description="" />
+  <IsControllable type="bool" default="false" description="" />
+  <LeftSideAngleAxis type ="float" default="0" description="" />
+  <LeftSideType type ="float" default="0" description="" />  
+  <Length type ="float" default="13.7" description="" />
+  <LimitLeftAngleAxis type ="float" default="-45" description="" />
+  <LimitRightAngleAxis type ="float" default="45" description="" />
+  <Pitch type ="float" default="0" description="" />
+  <RightSideAngleAxis type ="float" default="0" description="" />
+  <RightSideType type ="float" default="0" description="" />
+  <Sensitivity type ="float" default="0.1" description="" />
+  <VerticalType type="float" default="1" description="" />
+  <Yaw type="float" default="0" description="" />
+  <Range type="float" default="100000" description="Area in which the camera exists." />
+  
+  <Extra type="model" name="Camera.mesh" />
+  <Extra type="description" name="" />
+</Template>

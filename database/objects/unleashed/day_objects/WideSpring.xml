@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <FirstSpeed type="float" default="25" description="Initial speed of the launch." />
+  <GroundOffset type="float" default="0" description="" />
+  <IsStartVelocityConstant type="bool" default="true" description="Sets the player to the FirstSpeed, regardless of how fast they entered it." />
+  <KeepVelocityDistance type="float" default="5" description="Distance before restoring gravity to Sonic. If set too high, gravity will be disabled until hitting another spring or object." />
+  <OutOfControl type="float" default="0.4" description="Time taken before restoring control to the player." />
+  <IsStartPositionConstant type="bool" default="true" description="" />
+  
+  <Extra type="description" name="A lengthy spring used to launch the player upwards." />
+  <Extra type="model" name="cmn_obj_widespring_HD.model" />
+</Template>

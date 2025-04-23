@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <Cycle type="float" default="18" description="" />
+  <Damage type="float" default="100" description="" />
+  <GroundOffset type="float" default="0" description="" />
+</Template>

@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<Template>
+  <AppearSpeed type="float" default="20" description="" />
+  <AppearType type="integer" default="0" description="" />
+  <AttackRatioLaser type="float" default="0.7" description="" />
+  <AttackRatioShockwave type="float" default="0.3" description="" />
+  <AttackTimeAdd type="float" default="0" description="" />
+  <AttackTimeMultiply type="float" default="0.6" description="" />
+  <CameraAppearLengthToSonic type="float" default="15" description="" />
+  <ChangeCameraEnterTime type="float" default="0.5" description="" />
+  <ChangeCameraLeaveTime type="float" default="0.5" description="" />
+  <ChaseDistance type="float" default="20" description="" />
+  <ChaseSpeedScaleFasterThanSonic type="float" default="5" description="" />
+  <ChaseSpeedScaleSlowerThanSonic type="float" default="10" description="" />
+  <EnterBoostScale type="float" default="80" description="" />
+  <FinishCameraKeepTime type="float" default="0.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsVisibleDefault type="bool" default="true" description="" />
+  <LaserCount type="float" default="1" description="" />
+  <LaserImpulseTangent type="float" default="20" description="" />
+  <LaserImpulseY type="float" default="15" description="" />
+  <LaserPreShotTime type="float" default="0.75" description="" />
+  <LaserShiftScale type="float" default="0.2" description="" />
+  <LaserSpeed type="float" default="1" description="" />
+  <LaserTime type="float" default="2" description="" />
+  <LeaveBoostScale type="float" default="40" description="" />
+  <LeaveType type="integer" default="1" description="" />
+  <LifePoint type="float" default="6" description="" />
+  <MaximumSpeed type="float" default="80" description="" />
+  <MinimumSpeed type="float" default="40" description="" />
+  <PunchImpulseTangent type="float" default="35" description="" />
+  <PunchImpulseY type="float" default="15" description="" />
+  <ShockwaveImpulseTangent type="float" default="20" description="" />
+  <ShockwaveImpulseY type="float" default="15" description="" />
+  <ShockwaveSpeed type="float" default="70" description="" />
+  <SonicAutoRunSpeed type="float" default="40" description="" />
+  <WaitTimeAfterPunch type="float" default="1" description="" />
+  
+  <Extra type="model" name="em_eday_chsb_hi.model" />
+</Template>

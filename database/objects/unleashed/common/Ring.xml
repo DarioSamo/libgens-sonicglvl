@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <IsCastShadow type="bool" default="true" description="" />
+  <IsLightSpeedDashTarget type="bool" default="false" description="Enables the player to perform the Light Speed Dash move." />
+  <IsReset type="bool" default="false" description="" />
+  <Range type="float" default="100" description="" />
+  <ResetTime type="float" default="0" description="" />
+  <Extra type="model" name="cmn_obj_ring_HD.model" />
+  <Extra type="description" name="Anti-gravitational gold-colored collectable machine, perpetually spinning 360 degrees. Disappears on contact." />
+  <Extra type="offset_rotation_y_speed" name="120" />
+</Template>

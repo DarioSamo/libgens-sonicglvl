@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <AlivePoint type="vector" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsRevival type="bool" default="false" description="" />
+</Template>

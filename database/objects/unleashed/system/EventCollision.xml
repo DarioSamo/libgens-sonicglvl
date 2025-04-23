@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="14" description="" />
+  <Collision_Length type="float" default="6" description="" />
+  <Collision_Width type="float" default="15" description="" />
+  <DefaultStatus type="integer" default="0" description="
+  0: Enabled
+  1: Disabled" />
+  <Durability type="integer" default="0" description="
+  0: Disappears after triggering?
+  1: Triggers then deactivates?" />
+  <Event0 type="integer" default="0" description="The event to fire:
+  0:No event   1:Open   2:Close  3:Kill  4:Generate  5:Get_off   6:On   7:Off  8:Attack  9:Attack_Ready  10:Can't_Attack"   />
+  <Event1 type="integer" default="0" description="Event to fire on TargetList1. Events continued: 
+  11:Return   12:Destroy  13:Start_Moving   14:Reset  15:Rise  16:Descent  17:Start   18:Invert  19:Clear
+  " />
+  <Event2 type="integer" default="0" description="Event to fire on TargetList2" />
+  <Event3 type="integer" default="0" description="Event to fire on TargetList3" />
+  <GroundOffset type="float" default="0" description="" />
+  <Shape_Type type="integer" default="0" description=" Shape of the object's collision
+  0: Box
+  1: Sphere
+  2: Cylinder" />
+  <TargetList0 type="id_list" description="The first list of objects to group" />
+  <TargetList1 type="id_list" description="The second list of objects to group" />
+  <TargetList2 type="id_list" description="The third list of objects to group" />
+  <TargetList3 type="id_list" description="The fourth list of objects to group" />
+  <Timer0 type="float" default="0" description="Delay before triggering the first event" />
+  <Timer1 type="float" default="0" description="Delay before triggering the second event" />
+  <Timer2 type="float" default="0" description="Delay before triggering the third event" />
+  <Timer3 type="float" default="0" description="Delay before triggering the fourth event" />
+  <Trigger type="id" description="Object to target when using TriggerType 1" />
+  <TriggerType type="integer" default="0" description="
+  0: Trigger on Player entry
+  1: Target an Object" />
+  
+  <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+  <Extra type="preview_box_z" name="Collision_Length" />
+  <Extra type="description" name="A volume which triggers an event on a list of objects." />
+  <Extra type="model" name="EventSetter.model" />
+</Template>

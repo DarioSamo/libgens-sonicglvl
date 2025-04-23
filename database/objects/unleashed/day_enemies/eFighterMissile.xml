@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <ActionType type="integer" default="0" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <ModelType type="integer" default="0" description="" />
+  <OnlyPlayerAttack type="bool" default="false" description="" />
+  <PlayAppearEffect type="bool" default="false" description="" />
+  <RadiusAttackFar type="float" default="70" description="" />
+  <RadiusAttackNear type="float" default="3" description="" />
+  <RadiusSearch type="float" default="115" description="" />
+  <ShotIntervel type="float" default="2" description="" />
+  <ShotTypeBackPack type="integer" default="0" description="" />
+  <ShotTypeHorizon type="integer" default="0" description="" />
+  <UserRange type="float" default="150" description="" />
+</Template>

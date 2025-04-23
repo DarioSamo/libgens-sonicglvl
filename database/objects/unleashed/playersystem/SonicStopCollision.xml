@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Height type="float" default="10.2" description="" />
+  <Length type="float" default="2.2" description="" />
+  <Width type="float" default="13.3" description="" />
+    <Extra type="preview_box_x" name="Width" />
+  <Extra type="preview_box_y" name="Height" />
+  <Extra type="preview_box_z" name="Length" />
+</Template>

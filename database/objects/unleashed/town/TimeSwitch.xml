@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <SequenceID type="string" default="ChangeTimeAfricaETF" description="The script loaded upon switching" />
+  <Extra type="description" name="The hour glass used to change the time in Entrance Stages" />
+</Template>

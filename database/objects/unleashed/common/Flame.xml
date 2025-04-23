@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <AppearTime type="float" default="0.5" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Length type="float" default="8" description="" />
+  <OffTime type="float" default="4" description="" />
+  <OnTime type="float" default="3" description="" />
+  <Phase type="float" default="0" description="" />
+  <Type type="float" default="0" description="" />
+  <Layer type="float" default="0" description="" />
+</Template>

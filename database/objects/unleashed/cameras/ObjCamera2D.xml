@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<Template>
+  <BaseSpacePathPosition type="float" default="109.711" description="" />
+  <Distance type="float" default="15" description="Distance away from the player." />
+  <Ease_Time_Enter type="float" default="0" description="Time to transition to this camera." />
+  <Ease_Time_Leave type="float" default="0" description="Time to transition out of this camera." />
+  <Fovy type="float" default="45" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsBaseSpacePlayer type="bool" default="true" description="" />
+  <IsCameraView type="bool" default="false" description="" />
+  <IsCollision type="bool" default="false" description="" />
+  <IsPositionBasePlayer type="bool" default="true" description="" />
+  <Rotation_Y type="float" default="-0.4" description="" />
+  <Rotation_Z type="float" default="-0.3" description="" />
+  <Target_Front_Offset_Bias type="float" default="1.8" description="" />
+  <Target_Front_Offset_Max type="float" default="4" description="" />
+  <Target_Front_Offset_Speed_Scale type="float" default="0.1" description="" />
+  <Target_Up_Offset type="float" default="2" description="" />
+  
+  <Extra type="model" name="Camera.mesh" />
+  <Extra type="description" name="A camera with a side-view perspective." />
+</Template>

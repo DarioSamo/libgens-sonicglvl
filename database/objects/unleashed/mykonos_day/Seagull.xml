@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<Template>
+  <DecPosition type="float" default="310" description="" />
+  <Distance type="float" default="8" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <PositionList type="vector_list" description="" />
+  <RollingSpeed type="float" default="1" description="" />
+  <SpeedMax type="float" default="70" description="" />
+  <SpeedMin type="float" default="40" description="" />
+</Template>

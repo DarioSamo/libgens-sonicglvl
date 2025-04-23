@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <OutOfControl type="float" default="0.5" description="Time taken before restoring control to the player." />
+  <Speed type="float" default="100" description="Amount of speed granted to the player." />
+  <IsStartVelocityConstant type="bool" default="true" description="Sets the player to this speed, regardless of how fast they entered it." />
+  <Extra type="offset_rotation_y" name="180" />
+  
+  <Extra type="description" name="Gotta go fast." />
+  <Extra type="model" name="cmn_obj_dashpanel_HD.model" />
+</Template>

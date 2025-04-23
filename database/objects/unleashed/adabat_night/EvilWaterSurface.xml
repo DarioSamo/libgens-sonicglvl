@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Extra type="description" name="A circle of rising water." />
+  <Extra type="model" name="evl_sea_obj_st_waterCircle.model" />
+</Template>

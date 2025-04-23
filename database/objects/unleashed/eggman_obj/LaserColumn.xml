@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<Template>
+  <GroundOffset type="float" default="0" description="" />
+  <Length type="float" default="2" description="" />
+</Template>

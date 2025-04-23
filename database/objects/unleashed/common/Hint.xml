@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<Template>
+  <Category type="integer" default="0" description="" />
+  <ChangeTime type="float" default="-0.1" description="" />
+  <CharaType type="integer" default="1" description="0 = Sonic, 1 = Chip, 2 = Tails" />
+  <DrawCharWait type="float" default="-0.01" description="" />
+  <DrawOnce type="bool" default="true" description="" />
+  <EndWait type="float" default="-0.1" description="" />
+  <ExistPlatform type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <GroupID type="string" default="WhiteIsland_ACT1_002" description="" />
+  <NeedInput type="bool" default="true" description="" />
+  <PlayerStop type="bool" default="false" description="" />
+  <UsePicture type="bool" default="false" description="" />
+</Template>

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Template>
+  <CharaType type="string" default="Man01B" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <Motion type="string" default="Newspaper1" description="" />
+</Template>

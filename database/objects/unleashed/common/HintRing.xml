@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<Template>
+  <Category type="integer" default="0" description="" />
+  <CharaType type="integer" default="1" description="0 = Sonic, 1 = Chip, 2 = Tails" />
+  <EventOff type="integer" default="0" description="" />
+  <EventOff2 type="integer" default="0" description="" />
+  <EventOn type="integer" default="0" description="" />
+  <EventOn2 type="integer" default="0" description="" />
+  <ExistPlatform type="bool" default="false" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <GroupID type="string" default="hint_S_002" description="" />
+  <NeedInput type="bool" default="true" description="" />
+  <PlayerStop type="bool" default="true" description="" />
+  <TargetListOff type="id_list" description="" />
+  <TargetListOff2 type="id_list" description="" />
+  <TargetListOn type="id_list" description="" />
+  <TargetListOn2 type="id_list" description="" />
+  <TimerOff type="float" default="0" description="" />
+  <TimerOff2 type="float" default="0" description="" />
+  <TimerOn type="float" default="0" description="" />
+  <TimerOn2 type="float" default="0" description="" />
+  <UsePicture type="bool" default="false" description="" />
+  <WaitEvent type="bool" default="false" description="" />
+  <Extra type="model" name="cmn_obj_sk2_hintring.model" />
+</Template>

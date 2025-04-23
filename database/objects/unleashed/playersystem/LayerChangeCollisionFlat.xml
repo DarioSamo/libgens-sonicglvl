@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<Template>
+  <Collision_Height type="float" default="117" description="" />
+  <Collision_Width type="float" default="30" description="" />
+  <GroundOffset type="float" default="0" description="" />
+  <IsInitAll type="bool" default="false" description="" />
+  <ONLayerIndex type="string" default="Set2" description="" />
+  <ONLayerIndex1 type="string" default="Set1" description="" />
+  <ONLayerIndex2 type="string" default="Set1" description="" />
+  <ONLayerIndex3 type="string" default="Set1" description="" />
+  <OffLayerIndex type="string" default="Set1" description="" />
+  <OffLayerIndex1 type="string" default="Set1" description="" />
+  <OffLayerIndex2 type="string" default="Set1" description="" />
+  <OffLayerIndex3 type="string" default="Set1" description="" />
+  <UseON type="bool" default="true" description="" />
+  <UseON1 type="bool" default="false" description="" />
+  <UseON2 type="bool" default="false" description="" />
+  <UseON3 type="bool" default="false" description="" />
+  <UseOff type="bool" default="true" description="" />
+  <UseOff1 type="bool" default="false" description="" />
+  <UseOff2 type="bool" default="false" description="" />
+  <UseOff3 type="bool" default="false" description="" />
+    <Extra type="preview_box_x" name="Collision_Width" />
+  <Extra type="preview_box_y" name="Collision_Height" />
+</Template>
