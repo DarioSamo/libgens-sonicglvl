@@ -178,6 +178,7 @@
     <ClCompile Include="GITextureGroup.cpp" />
     <ClCompile Include="Havok.cpp" />
     <ClCompile Include="HavokAnimationCache.cpp" />
+    <ClCompile Include="HavokEndianSwap.cpp" />
     <ClCompile Include="HavokEnviroment.cpp" />
     <ClCompile Include="HavokPhysicsCache.cpp" />
     <ClCompile Include="HavokPropertyDatabase.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="GITextureGroup.h" />
     <ClInclude Include="Havok.h" />
     <ClInclude Include="HavokAnimationCache.h" />
+    <ClInclude Include="HavokEndianSwap.h" />
     <ClInclude Include="HavokEnviroment.h" />
     <ClInclude Include="HavokPhysicsCache.h" />
     <ClInclude Include="HavokPropertyDatabase.h" />

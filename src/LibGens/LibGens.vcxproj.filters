@@ -189,6 +189,9 @@
     <ClCompile Include="Compression.cpp">
       <Filter>Packfile</Filter>
     </ClCompile>
+    <ClCompile Include="HavokEndianSwap.cpp">
+      <Filter>Havok</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AR.h">
@@ -375,6 +378,9 @@
     </ClInclude>
     <ClInclude Include="Compression.h">
       <Filter>Packfile</Filter>
+    </ClInclude>
+    <ClInclude Include="HavokEndianSwap.h">
+      <Filter>Havok</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

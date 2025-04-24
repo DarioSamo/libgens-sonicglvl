@@ -22,6 +22,7 @@
 #include "HavokPhysicsCache.h"
 #include "HavokSkeletonCache.h"
 #include "HavokAnimationCache.h"
+#include "HavokEndianSwap.h"
 
 namespace LibGens {
 	void HavokEnviroment::addFolder(string folder) {
@@ -53,6 +54,37 @@ namespace LibGens {
 	}
 
 #ifndef HAVOK_5_5_0
+	static hkResource* loadHKX(const std::string& filename) {
+		hkSerializeUtil::ErrorDetails load_error;
+		hkResource* data = hkSerializeUtil::load(filename.c_str(), &load_error);
+
+		if (load_error.id == load_error.ERRORID_PACKFILE_PLATFORM) {
+			if (data != NULL) {
+				data->removeReference();
+			}
+
+			LibGens::File file(filename, "rb");
+			if (file.valid()) {
+				vector<unsigned char> result = endianSwapHKX(&file);
+				file.close();
+
+				load_error = {};
+				data = hkSerializeUtil::load(result.data(), result.size(), &load_error);
+			}
+		}
+
+		if (load_error.id != load_error.ERRORID_NONE) {
+			if (data != NULL) {
+				data->removeReference();
+			}
+
+			Error::addMessage(Error::FILE_NOT_FOUND, "Couldn't load " + filename + " Havok file. Reason: " + ToString(load_error.defaultMessage.cString()));
+			return NULL;
+		}
+
+		return data;
+	}
+
 	HavokPhysicsCache *HavokEnviroment::getPhysics(string physics_name) {
 		for (list<HavokPhysicsCache *>::iterator it=physics_cache.begin(); it!=physics_cache.end(); it++) {
 			if ((*it)->getName() == physics_name) {
@@ -64,12 +96,7 @@ namespace LibGens {
 			string filename=(*it) + physics_name + LIBGENS_HAVOK_PHYSICS_EXTENSION;
 
 			if (File::check(filename)) {
-				hkSerializeUtil::ErrorDetails loadError;
-				hkResource *data = hkSerializeUtil::load(filename.c_str(), &loadError);
-				if (!(loadError.id == loadError.ERRORID_NONE && data != NULL)) {
-					Error::addMessage(Error::FILE_NOT_FOUND, "Couldn't load " + filename + " Havok file. Reason: " + ToString(loadError.defaultMessage.cString()));
-					continue;
-				}
+				hkResource* data = loadHKX(filename);
 
 				hkRootLevelContainer *container = data->getContents<hkRootLevelContainer>();
 				if (container) {
@@ -100,12 +127,7 @@ namespace LibGens {
 			string filename=(*it) + skeleton_name + LIBGENS_HAVOK_SKELETON_EXTENSION;
 
 			if (File::check(filename)) {
-				hkSerializeUtil::ErrorDetails loadError;
-				hkResource *data = hkSerializeUtil::load(filename.c_str(), &loadError);
-				if (!(loadError.id == loadError.ERRORID_NONE && data != NULL)) {
-					Error::addMessage(Error::FILE_NOT_FOUND, "Couldn't load " + filename + " Havok file. Reason: " + ToString(loadError.defaultMessage.cString()));
-					continue;
-				}
+				hkResource* data = loadHKX(filename);
 
 				hkRootLevelContainer *container = data->getContents<hkRootLevelContainer>();
 				if (container) {
@@ -141,12 +163,7 @@ namespace LibGens {
 			string filename=(*it) + animation_name + LIBGENS_HAVOK_ANIMATION_EXTENSION;
 
 			if (File::check(filename)) {
-				hkSerializeUtil::ErrorDetails loadError;
-				hkResource *data = hkSerializeUtil::load(filename.c_str(), &loadError);
-				if (!(loadError.id == loadError.ERRORID_NONE && data != NULL)) {
-					Error::addMessage(Error::FILE_NOT_FOUND, "Couldn't load " + filename + " Havok file. Reason: " + ToString(loadError.defaultMessage.cString()));
-					continue;
-				}
+				hkResource* data = loadHKX(filename);
 
 				hkRootLevelContainer *container = data->getContents<hkRootLevelContainer>();
 				if (container) {

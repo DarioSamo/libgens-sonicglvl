@@ -230,7 +230,7 @@ void EditorApplication::openLevel(string filename) {
 		camera_manager->setLevel(current_level->getLevel());
 	}
 	
-	if (game_mode == LIBGENS_LEVEL_GAME_GENERATIONS) {
+	if ((game_mode == LIBGENS_LEVEL_GAME_GENERATIONS) || (game_mode == LIBGENS_LEVEL_GAME_UNLEASHED)) {
 		current_level->loadCollision(havok_enviroment, scene_manager, havok_nodes_list);
 	}
 
