@@ -649,7 +649,16 @@ void EditorApplication::saveMaterialEditorMaterial() {
 	if (!material_editor_material)
 		return;
 
-	material_editor_material->save(material_editor_library_folder + "\\" + material_editor_material->getName() + ".material");
+	bool save_unleashed = false;
+
+	if (material_editor_mode == SONICGLVL_MATERIAL_EDITOR_MODE_TERRAIN && current_level != NULL) {
+		save_unleashed = (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED);
+	}
+	else {
+		save_unleashed = material_editor_unleashed;
+	}
+
+	material_editor_material->save(material_editor_library_folder + "\\" + material_editor_material->getName() + ".material", save_unleashed ? LIBGENS_MATERIAL_ROOT_UNLEASHED : LIBGENS_MATERIAL_ROOT_GENERATIONS);
 }
 
 void EditorApplication::loadMaterialEditorModelGUI() {

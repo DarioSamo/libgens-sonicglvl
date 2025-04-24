@@ -86,7 +86,7 @@ HCWindow::HCWindow(QWidget *parent) : QMainWindow(parent) {
 		converter_settings.remove_model_tags = true;
 		converter_settings.use_model_groups = true;
 		converter_settings.convert_lights = true;
-		converter_settings.group_cell_size = 25.0;
+		converter_settings.group_cell_size = 75.0;
 		converter_settings.position_x = converter_settings.position_y = converter_settings.position_z = 0.0;
 		converter_settings.scale_x = converter_settings.scale_y = converter_settings.scale_z = 100.0;
 		converter_settings.rotation_x = converter_settings.rotation_y = converter_settings.rotation_z = 0.0;
@@ -141,7 +141,7 @@ void HCWindow::loadSettings(QString filename) {
 	converter_settings.rotation_x = settings.value("rotation_x", 0.0).toDouble();
 	converter_settings.rotation_y = settings.value("rotation_y", 0.0).toDouble();
 	converter_settings.rotation_z = settings.value("rotation_z", 0.0).toDouble();
-	converter_settings.group_cell_size = settings.value("group_cell_size", 25.0).toDouble();
+	converter_settings.group_cell_size = settings.value("group_cell_size", 75.0).toDouble();
 }
 
 

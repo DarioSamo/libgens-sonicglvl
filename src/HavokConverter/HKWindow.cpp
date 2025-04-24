@@ -341,7 +341,7 @@ void HKWindow::clearSourceModelsTriggered() {
 }
 
 void HKWindow::browseOutputTriggered() {
-	QString output_file = QFileDialog::getSaveFileName(this, tr("Choose Output File..."), QString(), "*.hkx");
+	QString output_file = QFileDialog::getSaveFileName(this, tr("Choose Output File..."), QString(), "*.phy.hkx");
 	if (!output_file.isEmpty()) {
 		le_output_file->setText(output_file);
 	}

@@ -47,15 +47,39 @@
 
 const int HCWindow::BaseUnassignedGroupIndex = 0x800000;
 
-static string normalizeName(string input) {
-	string output = input;
-	for (size_t i = 0; i < input.size(); i++) {
-		if (output[i] == '.') {
-			output[i] = '_';
+template<typename T>
+static bool checkCharForbidden(T c) {
+	return
+		c == '.' ||
+		c == '\\' ||
+		c == '/' ||
+		c == ':' ||
+		c == '*' ||
+		c == '?' ||
+		c == '"' ||
+		c == '<' ||
+		c == '>' ||
+		c == '|';
+}
+
+static string normalizeName(string str) {
+	for (size_t i = 0; i < str.size(); i++) {
+		if (checkCharForbidden(str[i])) {
+			str[i] = '_';
 		}
 	}
 
-	return output;
+	return str;
+}
+
+static QString normalizeName(QString str) {
+	for (size_t i = 0; i < str.size(); i++) {
+		if (checkCharForbidden(str[i])) {
+			str[i] = '_';
+		}
+	}
+
+	return str;
 }
 
 QString HCWindow::temporaryDirTemplate() {
@@ -409,11 +433,13 @@ bool HCWindow::convert() {
 				aiString src_material_name;
 				src_material->Get(AI_MATKEY_NAME, src_material_name);
 
-				string material_name = normalizeName(src_material_name.C_Str());
+				string material_name = src_material_name.C_Str();
 				LibGens::Tags tags(material_name);
 				if (converter_settings.remove_material_tags) {
 					material_name = tags.getName();
 				}
+
+				material_name = normalizeName(material_name);
 
 				// Check if material with that name already exists
 				LibGens::Material *existing_material = NULL;
@@ -446,12 +472,14 @@ bool HCWindow::convert() {
 				aiString src_material_name;
 				src_material->Get(AI_MATKEY_NAME, src_material_name);
 
-				string material_name = normalizeName(src_material_name.C_Str());
+				string material_name = src_material_name.C_Str();
 				LibGens::Tags tags(material_name);
 				if (converter_settings.remove_material_tags) {
 					logProgress(ProgressNormal, QString("Detected material #%1 %2 tags with base name %3 for material %4.").arg(m).arg(tags.getTagCount()).arg(tags.getName().c_str()).arg(material_name.c_str()));
 					material_name = tags.getName();
 				}
+
+				material_name = normalizeName(material_name);
 
 				LibGens::Material *existing_material = existing_materials[material_name];
 				if (existing_material) {
@@ -750,15 +778,17 @@ bool HCWindow::convert() {
 			// Delete all terrain groups and terrain files inside.
 			logProgress(ProgressNormal, "Deleting previous terrain files from temporary directory...");
 
-			QStringList entry_list = configuration_dir.entryList(QStringList() << "*.terrain" << "*.terrain-group" << "*.vt" << "*.tbst");
-			foreach(QString entry, entry_list) {
-				QString remove_filename = configuration_path + "/" + entry;
-				bool removed_file = QFile::remove(remove_filename);
-				if (removed_file) {
-					logProgress(ProgressNormal, "Removed " + remove_filename + " before merging existing files.");
-				}
-				else {
-					logProgress(ProgressWarning, "Couldn't remove " + remove_filename + " before merging existing files. Skipping.");
+			for (auto& dir : { configuration_dir, resources_dir }) {
+				QStringList entry_list = dir.entryList(QStringList() << "*.terrain" << "*.terrain-group" << "*.vt" << "*.tbst");
+				foreach(QString entry, entry_list) {
+					QString remove_filename = configuration_path + "/" + entry;
+					bool removed_file = QFile::remove(remove_filename);
+					if (removed_file) {
+						logProgress(ProgressNormal, "Removed " + remove_filename + " before merging existing files.");
+					}
+					else {
+						logProgress(ProgressWarning, "Couldn't remove " + remove_filename + " before merging existing files. Skipping.");
+					}
 				}
 			}
 			logProgress(ProgressNormal, "Cleanup of previous files complete.");
@@ -928,6 +958,8 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 			if (converter_settings.remove_model_tags)
 				model_name = model_tags.getName().c_str();
 
+			model_name = normalizeName(model_name);
+
 			QString existing_model_name = "";
 			foreach(QString model_name, scene_data.model_map.keys()) {
 				if (mesh_indices == scene_data.model_map[model_name].used_meshes) {
@@ -956,7 +988,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 
 				ModelRecord record;
 				record.used_meshes = mesh_indices;
-				for (int i = 0; i < LIBGENS_MODEL_SUBMESH_SLOTS; i++) {
+				for (int i = 0; i < LIBGENS_MODEL_SUBMESH_ROOT_SLOTS; i++) {
 					record.submesh_counts[i] = 0;
 				}
 
@@ -976,11 +1008,13 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 					aiString src_material_name;
 					src_material->Get(AI_MATKEY_NAME, src_material_name);
 
-					string material_name = normalizeName(src_material_name.C_Str());
+					string material_name = src_material_name.C_Str();
 					LibGens::Tags material_tags(material_name);
 					if (converter_settings.remove_material_tags) {
 						material_name = material_tags.getName();
 					}
+
+					material_name = normalizeName(material_name);
 
 					int num_vertices = src_mesh->mNumVertices;
 					int num_faces = src_mesh->mNumFaces;
