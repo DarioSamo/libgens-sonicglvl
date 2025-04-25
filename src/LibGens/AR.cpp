@@ -111,7 +111,6 @@ namespace LibGens {
 		if (data) delete [] data;
 	}
 
-
 	ArPack::ArPack(unsigned int padding_p) {
 		padding = padding_p;
 	}
@@ -136,8 +135,6 @@ namespace LibGens {
 			}
 			return;
 		}
-
-		
 		
 		File file(filename, LIBGENS_FILE_READ_BINARY);
 		if (file.valid()) {
@@ -146,18 +143,49 @@ namespace LibGens {
 
 			size_t pos=filename.find(LIBGENS_AR_MULTIPLE_START);
 			if ((pos != string::npos) && pos==(filename.size()-6)) {
-				size_t index=1;
-				char extension[]="00";
+				size_t split_count = LIBGENS_AR_MAX_SEARCH;
 
-				while (index < LIBGENS_AR_MAX_SEARCH) {
-					sprintf_s(extension, "%02d", index);
+				filename.resize(pos);
+				filename += ".arl";
 
-					string extension_filename=filename;
-					extension_filename.resize(extension_filename.size()-2);
-					extension_filename += ToString(extension);
+				File arl_file(filename, "rb");
+				if (arl_file.valid()) {
+					size_t signature = 0;
+					arl_file.readInt32(&signature);
 
-					if (File::check(extension_filename)) {
-						LibGens::ArPack *extension_ar_pack=new LibGens::ArPack(extension_filename);
+					if (Compression::check(signature)) {
+						arl_file.goToAddress(0);
+
+						File out_file;
+						Compression::decompress(&arl_file, &out_file, CompressionType(signature));
+
+						out_file.goToAddress(0);
+
+						out_file.readInt32(&signature);
+						out_file.readInt32(&split_count);
+					}
+					else {
+						arl_file.readInt32(&split_count);
+					}
+
+					if (signature != LIBGENS_ARL_HEADER) {
+						split_count = LIBGENS_AR_MAX_SEARCH;
+					}
+
+					arl_file.close();
+				}
+
+				size_t index = 1;
+				char extension[] = LIBGENS_AR_MULTIPLE_START;
+
+				while (index < split_count) {
+					sprintf_s(extension, ".ar.%02d", index);
+
+					filename.resize(pos);
+					filename += extension;
+
+					if (File::check(filename)) {
+						LibGens::ArPack *extension_ar_pack=new LibGens::ArPack(filename);
 						merge(extension_ar_pack);
 					}
 					else break;
@@ -184,7 +212,7 @@ namespace LibGens {
 
 		file->readInt32(&ar_header_0);
 
-		if ((ar_header_0 == COMPRESSION_CAB) || (ar_header_0 == COMPRESSION_X)) {
+		if (Compression::check(ar_header_0)) {
 			file->goToAddress(0);
 
 			File out_file;
@@ -294,12 +322,12 @@ namespace LibGens {
 	}
 
 	void ArPack::saveARL(string filename) {
-		string arl_header=LIBGENS_ARL_HEADER;
+		unsigned int arl_header=LIBGENS_ARL_HEADER;
 		unsigned int split_total=split_sizes.size();
 
 		File file(filename, LIBGENS_FILE_WRITE_BINARY);
 		if (file.valid()) {
-			file.write((char *)arl_header.c_str(), 4);
+			file.writeInt32(&arl_header);
 			file.writeInt32(&split_total);
 
 			for (size_t i=0; i<split_sizes.size(); i++) {

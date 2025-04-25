@@ -202,6 +202,10 @@ namespace {
 }
 
 namespace LibGens {
+    bool Compression::check(uint32_t signature) {
+        return (signature == COMPRESSION_CAB) || (signature == COMPRESSION_X);
+    }
+
     void Compression::decompress(File* src_file, File* dst_file, CompressionType type) {
         switch (type) {
 

@@ -8,6 +8,7 @@ namespace LibGens {
 
     class Compression {
     public:
+        static bool check(uint32_t signature);
         static void decompress(File* src_file, File* dst_file, CompressionType type);
     };
 }
