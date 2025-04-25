@@ -201,9 +201,42 @@ namespace {
     };
 }
 
+// PS3 Compression
+#include <zlib/deflate.h>
+
+namespace {
+    struct SEGSHeader {
+        unsigned int signature;
+        unsigned short flags;
+        unsigned short chunk_count;
+        unsigned int uncompressed_size;
+        unsigned int total_file_size;
+
+        void endianSwap() {
+            Endian::swap(signature);
+            Endian::swap(flags);
+            Endian::swap(chunk_count);
+            Endian::swap(uncompressed_size);
+            Endian::swap(total_file_size);
+        }
+    };
+
+    struct SEGSChunk {
+        unsigned short compressed_size;
+        unsigned short uncompressed_size;
+        unsigned int offset;
+
+        void endianSwap() {
+            Endian::swap(compressed_size);
+            Endian::swap(uncompressed_size);
+            Endian::swap(offset);
+        }
+    };
+}
+
 namespace LibGens {
     bool Compression::check(uint32_t signature) {
-        return (signature == COMPRESSION_CAB) || (signature == COMPRESSION_X);
+        return (signature == COMPRESSION_CAB) || (signature == COMPRESSION_X) || (signature == COMPRESSION_SEGS);
     }
 
     void Compression::decompress(File* src_file, File* dst_file, CompressionType type) {
@@ -274,6 +307,65 @@ namespace LibGens {
                 lzxd_free(lzx);
 
                 src_file->goToAddress(end_offset);
+            }
+
+            break;
+        }
+
+        case COMPRESSION_SEGS: {
+            SEGSHeader header;
+            src_file->read(&header, sizeof(SEGSHeader));
+            header.endianSwap();
+
+            for (int i = 0; i < header.chunk_count; i++) {
+                SEGSChunk chunk;
+                src_file->read(&chunk, sizeof(SEGSChunk));
+                chunk.endianSwap();
+
+                size_t next_chunk_offset = src_file->getCurrentAddress();
+                unsigned int chunk_data_offset = chunk.offset;
+
+                vector<unsigned char> src_data;
+                src_data.resize(chunk.compressed_size);
+
+                if (chunk.compressed_size == chunk.uncompressed_size) {
+                    src_file->goToAddress(chunk_data_offset);
+                    src_file->read(src_data.data(), chunk.compressed_size);
+                    dst_file->write(src_data.data(), chunk.compressed_size);
+                    continue;
+                }
+                else {
+                    chunk_data_offset -= 1;
+                }
+
+                src_file->goToAddress(chunk_data_offset);
+                src_file->read(src_data.data(), chunk.compressed_size);
+
+                unsigned int uncomp_size = chunk.uncompressed_size;
+                if (uncomp_size == 0) {
+                    uncomp_size = 0x10000;
+                }
+
+                vector<unsigned char> out_data;
+                out_data.resize(uncomp_size);
+
+                z_stream zs = { 0 };
+
+                if (inflateInit2(&zs, -MAX_WBITS) != Z_OK) {
+                    break;
+                }
+
+                zs.next_in = (Bytef*)src_data.data();
+                zs.avail_in = src_data.size();
+                zs.next_out = (Bytef*)out_data.data();
+                zs.avail_out = out_data.size();
+
+                if (inflate(&zs, Z_SYNC_FLUSH) < Z_OK) {
+                    break;
+                }
+
+                dst_file->write(out_data.data(), zs.total_out);
+                src_file->goToAddress(next_chunk_offset);
             }
 
             break;

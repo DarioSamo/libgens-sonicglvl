@@ -85,7 +85,11 @@ namespace LibGens {
 
 		size_t header_address = file->getCurrentAddress();
 
-		if (file->getRootNodeType() >= 5) {
+		if (file->getRootNodeType() >= 1000) {
+			Error::addMessage(Error::EXCEPTION, LIBGENS_MODEL_ERROR_PS3_HEADER);
+			return;
+		}
+		else if (file->getRootNodeType() >= 5) {
 			unsigned int mesh_count = 0;
 			size_t mesh_table_address = 0;
 

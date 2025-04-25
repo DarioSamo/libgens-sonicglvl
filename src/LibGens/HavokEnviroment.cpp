@@ -98,14 +98,16 @@ namespace LibGens {
 			if (File::check(filename)) {
 				hkResource* data = loadHKX(filename);
 
-				hkRootLevelContainer *container = data->getContents<hkRootLevelContainer>();
-				if (container) {
-					hkpPhysicsData *physics = container->findObject<hkpPhysicsData>();
+				if (data) {
+					hkRootLevelContainer* container = data->getContents<hkRootLevelContainer>();
+					if (container) {
+						hkpPhysicsData* physics = container->findObject<hkpPhysicsData>();
 
-					if (physics) {
-						HavokPhysicsCache *physics_cache_entry = new HavokPhysicsCache(data, filename, physics_name, physics);
-						physics_cache.push_back(physics_cache_entry);
-						return physics_cache_entry;
+						if (physics) {
+							HavokPhysicsCache* physics_cache_entry = new HavokPhysicsCache(data, filename, physics_name, physics);
+							physics_cache.push_back(physics_cache_entry);
+							return physics_cache_entry;
+						}
 					}
 				}
 			}
@@ -113,8 +115,6 @@ namespace LibGens {
 
 		return NULL;
 	}
-
-
 
 	HavokSkeletonCache *HavokEnviroment::getSkeleton(string skeleton_name) {
 		for (list<HavokSkeletonCache *>::iterator it=skeleton_cache.begin(); it!=skeleton_cache.end(); it++) {
