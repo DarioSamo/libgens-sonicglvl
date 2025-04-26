@@ -531,6 +531,60 @@ void EditorApplication::toggleRotationSnap() {
 	}
 }
 
+void EditorApplication::snapToClosestPath() {
+	if (!current_level || selected_nodes.empty()) {
+		return;
+	}
+
+	vector<float> closest_distances(selected_nodes.size(), FLT_MAX);
+	vector<LibGens::Vector3> closest_positions(selected_nodes.size());
+
+	for (LibGens::Path *path : current_level->getLevel()->getPaths()) {
+		LibGens::PathNodeList path_node_list = path->getNodes();
+
+		for (auto& pair : path_node_list) {
+			size_t editor_node_index = 0;
+
+			for (EditorNode *editor_node : selected_nodes) {
+				if ((editor_node->getType() == EDITOR_NODE_OBJECT) || (editor_node->getType() == EDITOR_NODE_OBJECT_MSP)) {
+					Ogre::Vector3 position = editor_node->getPosition();
+					float closest_distance = FLT_MAX;
+					LibGens::Vector3 closest_position = pair.first->findClosestPoint(pair.second, LibGens::Vector3(position.x, position.y, position.z), &closest_distance);
+
+					if (closest_distance < closest_distances[editor_node_index]) {
+						closest_distances[editor_node_index] = closest_distance;
+						closest_positions[editor_node_index] = closest_position;
+					}
+				}
+
+				++editor_node_index;
+			}
+		}
+	}
+
+	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
+	size_t editor_node_index = 0;
+
+	for (EditorNode *editor_node : selected_nodes) {
+		if (closest_distances[editor_node_index] != FLT_MAX) {
+			LibGens::Vector3 closest_position = closest_positions[editor_node_index];
+
+			Ogre::Vector3 previous_position = editor_node->getPosition();
+			Ogre::Vector3 new_position(closest_position.x, closest_position.y, closest_position.z);
+
+			editor_node->setPosition(new_position);
+
+			HistoryActionMoveNode *action_move = new HistoryActionMoveNode(editor_node, previous_position, new_position);
+			wrapper->push(action_move);
+		}
+
+		++editor_node_index;
+	}
+
+	pushHistory(wrapper);
+	updateSelection();
+}
+
 void EditorApplication::createScene(void) {
 	// Initialize LibGens Managers
 	havok_enviroment = new LibGens::HavokEnviroment(100 * 1024 * 1024);

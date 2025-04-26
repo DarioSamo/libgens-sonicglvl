@@ -119,6 +119,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_LOOK_AT_POINT:
 					editor_application->openLookAtPointGUI();
 					break;
+				case IMD_SNAP_OBJECTS_TO_CLOSEST_PATH:
+					editor_application->snapToClosestPath(); 
+					break;
 
 				// Materials
 				case IMD_OPEN_MATERIAL_EDITOR :

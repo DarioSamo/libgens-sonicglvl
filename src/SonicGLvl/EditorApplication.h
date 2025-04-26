@@ -360,6 +360,7 @@ class EditorApplication : public BaseApplication {
 		void lookAt(EditorNode*, int, Ogre::Vector3);
 		void lookAtPoint(int, Ogre::Vector3);
 		void lookAtEachOther(int);
+		void snapToClosestPath();
 		void updateNodeVisibility();
 		void toggleNodeVisibility(unsigned int flag);
 		void updateVisibilityGUI();
