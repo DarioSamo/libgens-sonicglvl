@@ -18,27 +18,28 @@
 //=========================================================================
 
 #include "EditorApplication.h"
+#include <d3d9.h>
 
+namespace Ogre {
+	class __declspec(dllimport) D3D9RenderSystem {
+		public:
+			static IDirect3DDevice9 *getActiveD3D9Device();
+	};
+
+	class __declspec(dllimport) D3D9Texture {
+		public:
+			IDirect3DBaseTexture9 *getTexture();
+	};
+}
 
 void GlobalIlluminationListener::notifyRenderSingleObject(Ogre::Renderable *rend, const Ogre::Pass *pass, const Ogre::AutoParamDataSource *source, const Ogre::LightList *pLightList, bool suppressRenderStateChanges) {
 	if (pass_to_ignore == pass) return;
 
-	Ogre::Any any_ptr=rend->getUserObjectBindings().getUserAny();
+	const Ogre::Any& any_ptr=rend->getUserObjectBindings().getUserAny();
 
-	if (!any_ptr.isEmpty()) {
-		GlobalIlluminationParameter *parameter=Ogre::any_cast<GlobalIlluminationParameter *>(any_ptr);
-
-		if (parameter) {
-			Ogre::Pass *edit_pass=const_cast<Ogre::Pass *>(pass);
-
-			if (edit_pass) {
-				if (edit_pass->hasVertexProgram()) {
-					Ogre::TextureUnitState *state=edit_pass->getTextureUnitState(10);
-					state->setTexture(parameter->texture_ptr);
-					Ogre::Root::getSingleton().getRenderSystem()->_setTextureUnitSettings(10, *state);
-				}
-			}
-		}
+	if (!any_ptr.isEmpty() && any_ptr.getType() == typeid(GlobalIlluminationParameter *)) {
+		GlobalIlluminationParameter *parameter = any_ptr.get<GlobalIlluminationParameter *>();
+		Ogre::D3D9RenderSystem::getActiveD3D9Device()->SetTexture(10, reinterpret_cast<Ogre::D3D9Texture *>(parameter->texture_ptr.get())->getTexture());
 	}
 }
 
