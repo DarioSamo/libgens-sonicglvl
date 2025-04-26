@@ -421,7 +421,7 @@ bool EditorViewport::mouseMoved(const OIS::MouseEvent &arg) {
 		camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier / 600.0f, mouse_movement_y * panning_multiplier / 600.0f, 0));
 	}
 
-	if (abs(mouse_movement_z) > 0.001f) {
+	if (isMouseInLocalScreen(arg) && abs(mouse_movement_z) > 0.001f) {
 		float movement = mouse_movement_z * zooming_multiplier * -0.2f;
 		if (speeding_up) movement *= 4.0f;
 		if (slowing_down) movement *= 0.25f;
