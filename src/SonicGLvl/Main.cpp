@@ -20,6 +20,11 @@
 #include "EditorApplication.h"
 #define WIN32_LEAN_AND_MEAN
 
+extern "C" {
+	__declspec(dllexport) unsigned long NvOptimusEnablement = 0x00000001;
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 EditorApplication *editor_application;
  
 int main(int argc, char *argv[])

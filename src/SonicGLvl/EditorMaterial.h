@@ -56,7 +56,7 @@ class MaterialEditorPreviewListener : public Ogre::FrameListener, public Ogre::W
 			keyboard->capture();
 			mouse->capture();
 
-			editor_viewport->update();
+			editor_viewport->update(evt.timeSinceLastFrame);
 
 			if (animation_state) {
 				animation_state->addTime(evt.timeSinceLastFrame);

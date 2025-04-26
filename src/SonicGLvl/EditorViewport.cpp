@@ -25,15 +25,20 @@
 
 EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneManager *axis_scene_manager, Ogre::RenderWindow *window, string camera_name, int zOrder, float left, float top, float width, float height) :
 	moving(false),
+	dragging(false),
 	rotating(false),
 	zooming(false),
 	panning_left(false),
 	panning_right(false),
 	panning_up(false),
 	panning_down(false),
-	panning_multiplier(0.1),
-	rotation_multiplier(0.1),
-	zooming_multiplier(0.5)
+	panning_multiplier(60.0f),
+	rotation_multiplier(0.15f),
+	zooming_multiplier(0.5f),
+	panning_forward(false),
+	panning_backward(false),
+	speeding_up(false),
+	slowing_down(false)
 {
 	if (!scene_manager) {
 		return;
@@ -62,7 +67,7 @@ EditorViewport::EditorViewport(Ogre::SceneManager *scene_manager, Ogre::SceneMan
     camera_overlay->setNearClipDistance(1);
 	camera_overlay->setUseRenderingDistance(true);
 	camera_overlay->setFarClipDistance(EDITOR_VIEWPORT_FAR_CLIP_DEFAULT);
-	
+
 	viewport_overlay = window->addViewport(camera_overlay, zOrder+1, left, top, width, height);
     viewport_overlay->setBackgroundColour(Ogre::ColourValue(0,0,0));
 	camera_overlay->setAspectRatio(Ogre::Real(viewport_overlay->getActualWidth()) / Ogre::Real(viewport_overlay->getActualHeight()));    
@@ -88,28 +93,44 @@ void EditorViewport::resize(float left, float top, float width, float height) {
 
 
 bool EditorViewport::keyPressed(const OIS::KeyEvent &arg) {
-	if(arg.key == OIS::KC_LMENU) {
+	if (arg.key == OIS::KC_LMENU) {
 		rotating = true;
 	}
-
-	if(arg.key == OIS::KC_LCONTROL) {
+	
+	if (arg.key == OIS::KC_LCONTROL) {
 		zooming = true;
 	}
-
-	if(arg.key == OIS::KC_LEFT) {
+	
+	if (arg.key == OIS::KC_A) {
 		panning_left = true;
 	}
-
-	if(arg.key == OIS::KC_RIGHT) {
+	
+	if (arg.key == OIS::KC_D) {
 		panning_right = true;
 	}
-
-	if(arg.key == OIS::KC_UP) {
+	
+	if (arg.key == OIS::KC_W) {
+		panning_forward = true;
+	}
+	
+	if (arg.key == OIS::KC_S) {
+		panning_backward = true;
+	}
+	
+	if (arg.key == OIS::KC_SPACE) {
 		panning_up = true;
 	}
-
-	if(arg.key == OIS::KC_DOWN) {
+	
+	if (arg.key == OIS::KC_LCONTROL) {
 		panning_down = true;
+	}
+	
+	if (arg.key == OIS::KC_LSHIFT) {
+		speeding_up = true;
+	}
+	
+	if (arg.key == OIS::KC_LMENU) {
+		slowing_down = true;
 	}
 
     return true;
@@ -117,28 +138,44 @@ bool EditorViewport::keyPressed(const OIS::KeyEvent &arg) {
 
 
 bool EditorViewport::keyReleased(const OIS::KeyEvent &arg) {
-	if(arg.key == OIS::KC_LMENU) {
+	if (arg.key == OIS::KC_LMENU) {
 		rotating = false;
 	}
-
-	if(arg.key == OIS::KC_LCONTROL) {
+	
+	if (arg.key == OIS::KC_LCONTROL) {
 		zooming = false;
 	}
-
-	if(arg.key == OIS::KC_LEFT) {
+	
+	if (arg.key == OIS::KC_A) {
 		panning_left = false;
 	}
-
-	if(arg.key == OIS::KC_RIGHT) {
+	
+	if (arg.key == OIS::KC_D) {
 		panning_right = false;
 	}
-
-	if(arg.key == OIS::KC_UP) {
+	
+	if (arg.key == OIS::KC_W) {
+		panning_forward = false;
+	}
+	
+	if (arg.key == OIS::KC_S) {
+		panning_backward = false;
+	}
+	
+	if (arg.key == OIS::KC_SPACE) {
 		panning_up = false;
 	}
-
-	if(arg.key == OIS::KC_DOWN) {
+	
+	if (arg.key == OIS::KC_LCONTROL) {
 		panning_down = false;
+	}
+	
+	if (arg.key == OIS::KC_LSHIFT) {
+		speeding_up = false;
+	}
+	
+	if (arg.key == OIS::KC_LMENU) {
+		slowing_down = false;
 	}
 
     return true;
@@ -327,15 +364,36 @@ Ogre::Entity *EditorViewport::raycastEntity(float raycast_x, float raycast_y, Og
 }
 
 
-void EditorViewport::update() {
+void EditorViewport::onFocusLoss() {
+	moving = false;
+	dragging = false;
+	rotating = false;
+	zooming = false;
+	panning_left = false;
+	panning_right = false;
+	panning_up = false;
+	panning_down = false;
+	panning_forward = false;
+	panning_backward = false;
+	speeding_up = false;
+	slowing_down = false;
+}
+
+void EditorViewport::update(float delta_time) {
 	Ogre::Vector3 camera_panning_movement(0,0,0);
 
-	if (panning_left)  camera_panning_movement.x = -panning_multiplier;
-	if (panning_right) camera_panning_movement.x = panning_multiplier;
-	if (panning_down)  camera_panning_movement.y = -panning_multiplier;
-	if (panning_up)    camera_panning_movement.y = panning_multiplier;
-
-	if (panning_left || panning_right || panning_down || panning_up) {
+	if (moving) {
+		float movement = panning_multiplier * delta_time;
+		if (speeding_up) movement *= 4.0f;
+		if (slowing_down) movement *= 0.25f;
+		
+		if (panning_left) camera_panning_movement.x = -movement;
+		if (panning_right) camera_panning_movement.x = movement;
+		if (panning_up) camera_panning_movement.y = movement / 1.5f;
+		if (panning_down) camera_panning_movement.y = -movement / 1.5f;
+		if (panning_backward) camera_panning_movement.z = movement;
+		if (panning_forward) camera_panning_movement.z = -movement;
+		
 		camera->moveRelative(camera_panning_movement);
 		camera_overlay->moveRelative(camera_panning_movement);
 	}
@@ -343,28 +401,33 @@ void EditorViewport::update() {
 
 
 bool EditorViewport::mouseMoved(const OIS::MouseEvent &arg) {
-	if (moving) {
-		float mouse_movement_x=arg.state.X.rel;
-		float mouse_movement_y=arg.state.Y.rel;
+	float mouse_movement_x=arg.state.X.rel;
+	float mouse_movement_y=arg.state.Y.rel;
+	float mouse_movement_z=arg.state.Z.rel;
 
-		// Movement Priority
-		// Zooming > Rotation > Panning
+	if (dragging && zooming) {
+		camera->moveRelative(Ogre::Vector3(0, 0, mouse_movement_y * zooming_multiplier));
+		camera_overlay->moveRelative(Ogre::Vector3(0, 0, mouse_movement_y * zooming_multiplier));
+	}
+	else if (moving || (dragging && rotating)) {
+		camera->yaw(Ogre::Degree(-mouse_movement_x * rotation_multiplier));
+		camera->pitch(Ogre::Degree(-mouse_movement_y * rotation_multiplier));
+	
+		camera_overlay->yaw(Ogre::Degree(-mouse_movement_x * rotation_multiplier));
+		camera_overlay->pitch(Ogre::Degree(-mouse_movement_y * rotation_multiplier));
+	}
+	else if (dragging) {
+		camera->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier / 600.0f, mouse_movement_y * panning_multiplier / 600.0f, 0));
+		camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x * panning_multiplier / 600.0f, mouse_movement_y * panning_multiplier / 600.0f, 0));
+	}
 
-		if (zooming) {
-			camera->moveRelative(Ogre::Vector3(0, 0, mouse_movement_y*zooming_multiplier));
-			camera_overlay->moveRelative(Ogre::Vector3(0, 0, mouse_movement_y*zooming_multiplier));
-		}
-		else if (rotating) {
-			camera->yaw(Ogre::Degree(-mouse_movement_x*rotation_multiplier));
-			camera->pitch(Ogre::Degree(-mouse_movement_y*rotation_multiplier));
+	if (abs(mouse_movement_z) > 0.001f) {
+		float movement = mouse_movement_z * zooming_multiplier * -0.2f;
+		if (speeding_up) movement *= 4.0f;
+		if (slowing_down) movement *= 0.25f;
 
-			camera_overlay->yaw(Ogre::Degree(-mouse_movement_x*rotation_multiplier));
-			camera_overlay->pitch(Ogre::Degree(-mouse_movement_y*rotation_multiplier));
-		}
-		else {
-			camera->moveRelative(Ogre::Vector3(-mouse_movement_x*panning_multiplier, mouse_movement_y*panning_multiplier, 0));
-			camera_overlay->moveRelative(Ogre::Vector3(-mouse_movement_x*panning_multiplier, mouse_movement_y*panning_multiplier, 0));
-		}
+		camera->moveRelative(Ogre::Vector3(0, 0, movement));
+		camera_overlay->moveRelative(Ogre::Vector3(0, 0, movement));
 	}
 
 	// Raycast to 3D overlay
@@ -384,13 +447,17 @@ bool EditorViewport::mouseMoved(const OIS::MouseEvent &arg) {
 
 
 bool EditorViewport::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
-	if (id == OIS::MB_Middle) moving = true;
+	if (id == OIS::MB_Middle) dragging = true;
+	if (id == OIS::MB_Right) moving = true;
+
     return true;
 }
 
 
 bool EditorViewport::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
-	if (id == OIS::MB_Middle) moving = false;
+	if (id == OIS::MB_Middle) dragging = false;
+	if (id == OIS::MB_Right) moving = false;
+
     return true;
 }
 

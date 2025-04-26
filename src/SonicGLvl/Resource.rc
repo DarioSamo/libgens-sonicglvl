@@ -107,6 +107,10 @@ IDR_TOOLMENU MENUEX
             MENUITEM "Save Recording (FBX)", IMD_SAVE_GHOST_RECORDING_FBX, 0, MFS_GRAYED
         }
     }
+    POPUP "Help", 0, 0, 0
+    {
+        MENUITEM "Quick Overview", IMD_QUICK_OVERVIEW, 0, 0
+    }
 }
 
 
