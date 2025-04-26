@@ -100,6 +100,11 @@ void EditorApplication::pasteSelection() {
 }
 
 void EditorApplication::openLevelGUI() {
+	if (current_level != NULL) {
+		ERROR_MSG("You have already opened a level!");
+		return;
+	}
+
 	char *filename = (char *) malloc(1024);
 	strcpy(filename, "");
 

@@ -144,6 +144,7 @@
 #define IDB_BOTTOM_GHOST_FORWARD                40013
 #define IDB_MULTISETPARAM_CLEAR                 40013
 #define IDC_MATERIAL_ADDITIVE                   40013
+#define IMD_QUICK_OVERVIEW                      40013
 #define IDB_BOTTOM_GHOST_PLAY                   40014
 #define IDC_MATERIAL_UNKNOWN_FLAG               40014
 #define IDC_MULTISETPARAM_SNAP_PATH_CENTERS     40014

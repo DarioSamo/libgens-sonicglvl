@@ -86,6 +86,8 @@ class EditorAxis {
 		int current_axis;
 
 		float current_w_offset;
+
+		std::chrono::steady_clock::time_point mode_tap_time;
 	public:
 		EditorAxis(Ogre::SceneManager *scene_manager);
 		void update(EditorViewport *viewport);

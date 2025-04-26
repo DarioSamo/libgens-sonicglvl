@@ -39,6 +39,7 @@ EditorApplication::EditorApplication(void)
 	ghost_data = nullptr;
 	isGhostRecording = false;
 	checked_shader_library = false;
+	current_level = NULL;
 }
 
 EditorApplication::~EditorApplication(void) {
@@ -826,7 +827,7 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 	}
 
 	// Regular Mode Shorcuts
-	if (regular_mode && inFocus()) {
+	if (regular_mode && inFocus() && !viewport->isMoving()) {
 		if(arg.key == OIS::KC_DELETE) {
 			deleteSelection();
 			updateSelection();
@@ -934,6 +935,14 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 					ghost_node->setPosition(Ogre::Vector3(viewport->getCamera()->getPosition() + viewport->getCamera()->getDirection() * 10));
 					updateSelection();
 				}
+			}
+		}
+		else {
+			if (arg.key == OIS::KC_T) {
+				axis->setMode(false);
+			}
+			if (arg.key == OIS::KC_R) {
+				axis->setMode(true);
 			}
 		}
 	}
@@ -1193,8 +1202,10 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 
 
 bool EditorApplication::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id) {
+	bool last_holding = axis->mouseReleased(arg, id);
+
 	if (id == OIS::MB_Left) {
-		if (axis->mouseReleased(arg, id)) {
+		if (last_holding) {
 			if (dragging_mode != 1)
 				makeHistorySelection(axis->getMode());
 		}
@@ -1245,7 +1256,10 @@ bool EditorApplication::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 	}
 
 	// Update Editor
-	viewport->update();
+	if (!inFocus()) {
+		viewport->onFocusLoss();
+	}
+	viewport->update(timeSinceLastFrame);
 	axis->update(viewport);
 
 	// Update Objects

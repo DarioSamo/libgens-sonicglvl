@@ -445,7 +445,7 @@ void EditorApplication::createPreviewMaterialEditorGUI() {
 
 		// Create Viewport for Preview
 		material_editor_viewport = new EditorViewport(material_editor_preview_scene_manager, bogus_manager, material_editor_preview_window, SONICGLVL_CAMERA_PREVIEW_NAME);
-		material_editor_viewport->setPanningMultiplier(0.005);
+		material_editor_viewport->setPanningMultiplier(3);
 		material_editor_viewport->setZoomingMultiplier(0.04);
 		material_editor_viewport->setNearClipDistance(0.001f);
 		material_editor_viewport->setFarClipDistance(100.0f);

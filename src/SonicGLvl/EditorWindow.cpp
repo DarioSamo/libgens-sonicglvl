@@ -215,6 +215,48 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_SAVE_GHOST_RECORDING_FBX:
 					editor_application->saveGhostRecordingFbx();
 					break;
+
+				// Help
+				case IMD_QUICK_OVERVIEW:
+					INFO_MSG(
+						"Camera Controls:\n"
+						"  Middle Mouse Button:\n"
+						"    Drag: Move Camera\n"
+						"    Ctrl + Drag: Zoom In/Out\n"
+						"    Alt + Drag: Rotate View\n"
+						"    Mouse Wheel: Zoom In/Out (Speed affected by Shift/Alt)\n\n"
+
+						"  Right Mouse Button:\n"
+						"    Drag: Rotate View\n"
+						"    WASD: Move\n"
+						"    Space: Move Up\n"
+						"    Ctrl: Move Down\n"
+						"    Shift: Increase Move Speed\n"
+						"    Alt: Decrease Move Speed\n\n"
+
+						"General Hotkeys:\n"
+						"  Ctrl+O: Open Level\n"
+						"  Ctrl+S: Save Stage Data\n"
+						"  Ctrl+F: Find\n\n"
+
+						"Editing Hotkeys:\n"
+						"  Ctrl+Z: Undo\n"
+						"  Ctrl+Y: Redo\n"
+						"  Ctrl+C: Copy\n"
+						"  Ctrl+V: Paste\n"
+						"  Ctrl+D: Clear Selection\n"
+						"  Ctrl+A: Select All\n"
+						"  Del: Delete Object\n"
+						"  Ctrl+Drag: Clone Object\n"
+						"  Shift+Drag: Clone or Instance Object\n\n"
+
+						"Transform Gizmos:\n"
+						"  T: Translation Gizmo\n"
+						"  R: Rotation Gizmo\n"
+						"  Tap Right Mouse Button: Toggle Translation/Rotation Gizmo\n"
+						"  Ctrl+E: Toggle World/Local Transform\n"
+					);
+					break;
 			}
 			break;
 	}

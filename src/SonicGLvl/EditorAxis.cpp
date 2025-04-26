@@ -346,8 +346,8 @@ bool EditorAxis::mousePressed(EditorViewport *viewport, const OIS::MouseEvent &a
 		return true;
 	}
 	else if (id == OIS::MB_Right && !holding) {
-		mode = !mode;
-		return false;
+		mode_tap_time = std::chrono::steady_clock::now();
+		return true;
 	}
 	return false;
 }
@@ -357,6 +357,10 @@ bool EditorAxis::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id
 		bool last_holding=holding;
 		holding = false;
 		return last_holding;
+	}
+
+	if (id == OIS::MB_Right && (std::chrono::steady_clock::now() - mode_tap_time) < std::chrono::milliseconds(200)) {
+		mode = !mode;
 	}
 
 	return false;
