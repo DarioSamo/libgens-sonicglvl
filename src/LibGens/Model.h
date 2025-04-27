@@ -24,6 +24,7 @@
 #define LIBGENS_MODEL_ROOT_DYNAMIC_GENERATIONS    5
 
 #define LIBGENS_MODEL_ERROR_MESSAGE_NULL_FILE           "Trying to read model data from unreferenced file."
+#define LIBGENS_MODEL_ERROR_PS3_HEADER                  "Reading PS3 models is unsupported."
 #define LIBGENS_MODEL_ERROR_MESSAGE_WRITE_NULL_FILE     "Trying to write model data to an unreferenced file."
 
 namespace LibGens {
