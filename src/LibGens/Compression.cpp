@@ -180,11 +180,11 @@ namespace {
         unsigned int field_08;
         unsigned int field_0C;
         unsigned int window_size;
-        unsigned int compressed_block_size;
+        unsigned int field_14;
         unsigned long long uncompressed_size;
         unsigned long long compressed_size;
         unsigned int uncompressed_block_size;
-        unsigned int field_2C;
+		unsigned int compressed_block_size;
 
         void endianSwap() {
             Endian::swap(signature);
@@ -192,11 +192,11 @@ namespace {
             Endian::swap(field_08);
             Endian::swap(field_0C);
             Endian::swap(window_size);
-            Endian::swap(compressed_block_size);
+			Endian::swap(field_14);
             Endian::swap(uncompressed_size);
             Endian::swap(compressed_size);
             Endian::swap(uncompressed_block_size);
-            Endian::swap(field_2C);
+			Endian::swap(compressed_block_size);
         }
     };
 }
@@ -372,5 +372,94 @@ namespace LibGens {
         }
 
         }
+	}
+
+    static void compressCAB(File* src_file, File* dst_file, char *file_name, size_t window_size) {
+		CCAB ccab;
+		ZeroMemory(&ccab, sizeof(ccab));
+
+		sprintf(ccab.szCabPath, "%p", dst_file);
+
+		ERF erf;
+		HFDI fci = FCICreate(&erf, fciFilePlaced, fciAlloc, fciFree, fciOpen, fciRead, fciWrite, fciClose, fciSeek, fciDelete, fciGetTempFile, &ccab, nullptr);
+
+		char source_file[24]{};
+		sprintf(source_file, "%p", src_file);
+
+		FCIAddFile(fci, source_file, file_name, FALSE, fciGetNextCabinet, fciStatus, fciGetOpenInfo, TCOMPfromLZXWindow(window_size));
+		FCIFlushCabinet(fci, FALSE, fciGetNextCabinet, fciStatus);
+
+		FCIDestroy(fci);
     }
+
+	void Compression::compress(File *src_file, File *dst_file, CompressionType type, char *file_name) {
+		switch (type) {
+			case COMPRESSION_CAB :
+				{
+					compressCAB(src_file, dst_file, file_name, 18);
+					break;
+				}
+
+			case COMPRESSION_X :
+				{
+					File cab_file;
+					compressCAB(src_file, &cab_file, "XCompression", 17);
+
+					size_t header_address = dst_file->getCurrentAddress();
+					dst_file->writeNull(sizeof(XCompressHeader) + sizeof(unsigned int));
+
+					unsigned int data_start = 0;
+					unsigned short data_count = 0;
+					vector<unsigned char> compressed_data;
+
+					cab_file.goToAddress(0x24);
+					cab_file.readInt32(&data_start);
+					cab_file.readInt16(&data_count);
+
+					cab_file.goToAddress(data_start);
+					for (size_t i = 0; i < data_count; i++) {
+						unsigned short compressed_size = 0;
+						unsigned short uncompressed_size = 0;
+
+						cab_file.moveAddress(4);
+						cab_file.readInt16(&compressed_size);
+						cab_file.readInt16(&uncompressed_size);
+
+                        if (uncompressed_size != 0x8000) {
+							unsigned char token = 0xFF;
+							dst_file->writeUChar(&token);
+							dst_file->writeInt16BE(&uncompressed_size);
+                        }
+
+                        dst_file->writeInt16BE(&compressed_size);
+
+                        compressed_data.resize(compressed_size);
+						cab_file.read(compressed_data.data(), compressed_size);
+                        dst_file->write(compressed_data.data(), compressed_size);
+					}
+
+                    dst_file->writeNull(5);
+
+                    size_t end_address = dst_file->getCurrentAddress();
+
+                    XCompressHeader header = {};
+					header.signature = 0xFF512EE;
+					header.field_04 = 0x1030000;
+					header.window_size = (1 << 17);
+					header.field_14 = 0x80000;
+					header.uncompressed_size = src_file->getFileSize();
+					header.compressed_size = end_address - (header_address + sizeof(XCompressHeader));
+					header.uncompressed_block_size = header.uncompressed_size;
+					header.compressed_block_size = end_address - (header_address + sizeof(XCompressHeader) + sizeof(unsigned int));
+					header.endianSwap();
+
+                    dst_file->goToAddress(header_address);
+					dst_file->write(&header, sizeof(XCompressHeader));
+					dst_file->writeInt32(&header.compressed_block_size);
+					dst_file->goToAddress(end_address);
+
+					break;
+				}
+		}
+	}
 }
