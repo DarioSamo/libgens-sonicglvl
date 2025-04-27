@@ -22,7 +22,6 @@
 
 namespace LibGens {
 	ArFile::ArFile() {
-		data = NULL;
 	}
 
 	ArFile::ArFile(string filename) {
@@ -44,11 +43,11 @@ namespace LibGens {
 		absolute_data_address = header_address + data_address;
 
 		file->goToAddress(header_address + data_address);
-		data = NULL;
+		data.clear();
 
 		if (read_data) {
-			data = new unsigned char[data_size];
-			file->read(data, data_size);
+			data.resize(data_size);
+			file->read(data.data(), data_size);
 		}
 		else {
 			file->moveAddress(data_size);
@@ -57,8 +56,8 @@ namespace LibGens {
 
 	void ArFile::readData(File *file) {
 		data_size=file->getFileSize();
-		data = new unsigned char[data_size];
-		file->read(data, data_size);
+		data.resize(data_size);
+		file->read(data.data(), data_size);
 	}
 
 	void ArFile::write(File *file, unsigned int padding) {
@@ -74,7 +73,7 @@ namespace LibGens {
 
 		data_address = file->getCurrentAddress() - header_address;
 		absolute_data_address = file->getCurrentAddress();
-		file->write(data, data_size);
+		file->write(data.data(), data_size);
 
 		entry_size = file->getCurrentAddress() - header_address;
 		file->goToAddress(header_address);
@@ -87,7 +86,7 @@ namespace LibGens {
 
 	void ArFile::save(string filename) {
 		File file(filename, LIBGENS_FILE_WRITE_BINARY);
-		file.write(data, data_size);
+		file.write(data.data(), data_size);
 		file.close();
 	}
 
@@ -96,7 +95,7 @@ namespace LibGens {
 	}
 
 	unsigned char *ArFile::getData() {
-		return data;
+		return data.data();
 	}
 
 	unsigned int ArFile::getSize() {
@@ -107,8 +106,12 @@ namespace LibGens {
 		return absolute_data_address;
 	}
 
+	void ArFile::setData(vector<unsigned char> &&data_p) {
+		data = move(data_p);
+		data_size = data.size();
+	}
+
 	ArFile::~ArFile() {
-		if (data) delete [] data;
 	}
 
 	ArPack::ArPack(unsigned int padding_p) {
@@ -236,6 +239,20 @@ namespace LibGens {
 			files.push_back(ar_file);
 
 			if (file->getCurrentAddress() >= file->getFileSize()) break;
+		}
+	}
+
+	void ArPack::write(File *file) {
+		unsigned int ar_header_0 = 0;
+		unsigned int ar_header_1 = 0x10;
+		unsigned int ar_header_2 = 0x14;
+		file->writeInt32(&ar_header_0);
+		file->writeInt32(&ar_header_1);
+		file->writeInt32(&ar_header_2);
+		file->writeInt32(&padding);
+
+		for (LibGens::ArFile *ar_file : files) {
+			ar_file->write(file, padding);
 		}
 	}
 
@@ -403,11 +420,11 @@ namespace LibGens {
 	}
 
 
-	void ArPack::addFile(string filename, string override_name) {
-		File file(filename, LIBGENS_FILE_READ_BINARY);
+	void ArPack::addFile(string filepath, string override_name) {
+		File file(filepath, LIBGENS_FILE_READ_BINARY);
 
 		if (file.valid()) {
-			string name=filename;
+			string name = filepath;
 			if (override_name.size()) name=override_name;
 
 			size_t sep = name.find_last_of("\\/");
@@ -421,6 +438,18 @@ namespace LibGens {
 
 			file.close();
 		}
+	}
+
+	void ArPack::addFile(string filename, vector<unsigned char> &&data) {
+		ArFile *ar_file = new ArFile(filename);
+		ar_file->setData(move(data));
+		files.push_back(ar_file);
+	}
+
+	void ArPack::addFile(string filename, LibGens::File &file) {
+		ArFile *ar_file = new ArFile(filename);
+		ar_file->readData(&file);
+		files.push_back(ar_file);
 	}
 
 	void ArPack::extract(string folder, string add_extension, string add_prefix, vector<string> *output_filenames) {

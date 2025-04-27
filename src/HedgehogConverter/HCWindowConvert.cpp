@@ -1318,7 +1318,7 @@ bool HCWindow::packLostWorld(QString output_path, QString output_name, QString p
 	return true;
 }
 
-bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_add_path, QString output_name, QString terrain_path, QString configuration_path, Compression compression) {
+bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_add_path, QString output_name, QString terrain_path, QString configuration_path, LibGens::CompressionType compression) {
 	if (terrain_groups.size()) {
 		logProgress(ProgressNormal, "Saving terrain groups for Stage.pfd...");
 
@@ -1355,7 +1355,7 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 
 		// Save Terrain Group AR Files
 		foreach(LibGens::TerrainGroup * group, terrain_groups) {
-			QString group_filename = QString("%1/%2.ar").arg(stage_pfd_path).arg(group->getName().c_str());
+			string group_filename = group->getName() + ".ar";
 			LibGens::ArPack tg_ar;
 
 			vector<LibGens::Model *> models = group->getModels();
@@ -1368,7 +1368,7 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 					model_file.close();
 
 					tg_ar.addFile(model_filename);
-					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group->getName().c_str()));
+					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
 
@@ -1380,26 +1380,19 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 					instance_file.close();
 
 					tg_ar.addFile(instance_filename);
-					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group->getName().c_str()));
+					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
 
-			tg_ar.save(group_filename.toStdString());
+			LibGens::File ar_file;
+			tg_ar.write(&ar_file);
+			ar_file.goToAddress(0);
 
-			if (compression == CABCompression) {
-				logProgress(ProgressNormal, QString("Compressing %1 with CAB Compression.").arg(group_filename));
+			LibGens::File compressed_file;
+			LibGens::Compression::compress(&ar_file, &compressed_file, compression, &group_filename[0]);
+			stage_pfd_pack.addFile(group_filename, std::move(compressed_file.detach()));
 
-				QStringList arguments;
-				arguments << group_filename << group_filename;
-				QProcess conversion_process;
-				conversion_process.start("makecab", arguments);
-				conversion_process.waitForFinished();
-				QString conversion_output = conversion_process.readAllStandardOutput();
-				logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
-			}
-
-			stage_pfd_pack.addFile(group_filename.toStdString());
-			logProgress(ProgressNormal, "Saving terrain group to " + group_filename + "...");
+			logProgress(ProgressNormal, QString("Saved terrain group %1.").arg(group_filename.c_str()));
 		}
 
 		// Save PFD files
@@ -1422,7 +1415,7 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 }
 
 bool HCWindow::packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_name, QString terrain_path, QString resources_path) {
-	if (!packTerrainGroups(terrain_groups, output_path, output_path, output_name, terrain_path, resources_path, CABCompression)) {
+	if (!packTerrainGroups(terrain_groups, output_path, output_path, output_name, terrain_path, resources_path, LibGens::COMPRESSION_CAB)) {
 		return false;
 	}
 
@@ -1447,7 +1440,7 @@ bool HCWindow::packUnleashed(QList<LibGens::TerrainGroup *> &terrain_groups, QSt
 
 	QString output_add_path = game_output_dir.path() + "/Additional/" + output_name;
 	QDir().mkpath(output_add_path);
-	if (!packTerrainGroups(terrain_groups, output_path, output_add_path, output_name, terrain_path, configuration_path, NoCompression)) {
+	if (!packTerrainGroups(terrain_groups, output_path, output_add_path, output_name, terrain_path, configuration_path, LibGens::COMPRESSION_X)) {
 		return false;
 	}
 

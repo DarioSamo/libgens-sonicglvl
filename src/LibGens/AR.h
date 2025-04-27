@@ -32,7 +32,7 @@ namespace LibGens {
 	class ArFile {
 		protected:
 			string name;
-			unsigned char *data;
+			vector<unsigned char> data;
 			unsigned int data_size;
 			unsigned int absolute_data_address;
 		public:
@@ -46,6 +46,7 @@ namespace LibGens {
 			unsigned char *getData();
 			unsigned int getSize();
 			unsigned int getAbsoluteDataAddress();
+			void setData(vector<unsigned char> &&data_p);
 			~ArFile();
 	};
 
@@ -60,6 +61,7 @@ namespace LibGens {
 			ArPack(unsigned int padding_p=0x40);
 			ArPack(string filename, bool data=true);
 			void read(File* file, bool data=true);
+			void write(File* file);
 			void save(string filename, unsigned int padding_p=0x40);
 			void saveARL(string filename);
 			void savePFI(string filename);
@@ -69,7 +71,9 @@ namespace LibGens {
 			ArFile *getFile(string filename);
 			ArFile *getFileByIndex(size_t index);
 			void merge(ArPack *pack);
-			void addFile(string filename, string override_name="");
+			void addFile(string filepath, string override_name="");
+			void addFile(string filename, vector<unsigned char> &&data);
+			void addFile(string filename, LibGens::File &file);
 			unsigned int getFileCount();
 			XXH128_hash_t computeHash();
 			~ArPack();

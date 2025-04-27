@@ -1059,26 +1059,23 @@ unsigned int GIWindow::nextPowerOfTwo(unsigned int v) {
 	return v;
 }
 
-void GIWindow::compressFileCAB(QString filename) {
-	bool should_compress = false;
-
-	LibGens::File file(filename.toStdString(), "rb");
+void GIWindow::compressFile(string filename, string entry, LibGens::ArPack &ar_pack, LibGens::CompressionType compress_type) {
+	LibGens::File file(filename, "rb");
 	if (file.valid()) {
 		unsigned int signature = 0;
 		file.readInt32(&signature);
-		file.close();
-		should_compress = (signature != LibGens::COMPRESSION_CAB);
-	}
+		file.goToAddress(0);
 
-	if (should_compress) {
-		logProgress(ProgressNormal, "Compressing " + filename + "...");
-		QStringList arguments;
-		arguments << filename << filename;
-		QProcess compression_process;
-		compression_process.start("makecab", arguments);
-		compression_process.waitForFinished();
-		QString conversion_output = compression_process.readAllStandardOutput();
-		logProgress(ProgressNormal, QString("Cabinet Maker Output: " + conversion_output));
+		if (!LibGens::Compression::check(signature)) {
+			LibGens::File compressed_file;
+			LibGens::Compression::compress(&file, &compressed_file, compress_type, &entry[0]);
+			ar_pack.addFile(entry, std::move(compressed_file.detach()));
+		}
+		else {
+			ar_pack.addFile(entry, file);
+		}
+
+		file.close();
 	}
 }
 
@@ -1091,13 +1088,12 @@ bool GIWindow::packGenerations(QString output_path, QString output_name, QString
 		foreach(QString entry, entry_list) {
 			// Compress all AR files that have gia in their filename, since they were just created by the converter.
 			QString entry_filename = (stage_path + "/" + entry);
-			compressFileCAB(entry_filename);
-			stage_ar_pack.addFile(entry_filename.toStdString());
+			compressFile(entry_filename.toStdString(), entry.toStdString(), stage_ar_pack, LibGens::COMPRESSION_CAB);
 			logProgress(ProgressNormal, "Added " + entry + " to Stage.pfd.");
 		}
 
 		QString stage_ar_pack_filename = output_path + "/Stage.pfd";
-		stage_ar_pack.save(stage_ar_pack_filename.toStdString());
+		stage_ar_pack.save(stage_ar_pack_filename.toStdString(), 0x800);
 		stage_ar_pack.savePFI(path.toStdString() + "/Stage.pfi");
 		logProgress(ProgressNormal, "Saved " + stage_ar_pack_filename + ".");
 	}
@@ -1110,13 +1106,12 @@ bool GIWindow::packGenerations(QString output_path, QString output_name, QString
 		foreach(QString entry, entry_list) {
 			// Compress all AR files that have gia in their filename, since they were just created by the converter.
 			QString entry_filename = (stage_add_path + "/" + entry);
-			compressFileCAB(entry_filename);
-			stage_add_ar_pack.addFile(entry_filename.toStdString());
+			compressFile(entry_filename.toStdString(), entry.toStdString(), stage_add_ar_pack, LibGens::COMPRESSION_CAB);
 			logProgress(ProgressNormal, "Added " + entry + " to Stage-Add.pfd.");
 		}
 
 		QString stage_add_ar_pack_filename = output_path + "/Stage-Add.pfd";
-		stage_add_ar_pack.save(stage_add_ar_pack_filename.toStdString());
+		stage_add_ar_pack.save(stage_add_ar_pack_filename.toStdString(), 0x800);
 		stage_add_ar_pack.savePFI(path.toStdString() + "/Stage-Add.pfi");
 		logProgress(ProgressNormal, "Saved " + stage_add_ar_pack_filename + ".");
 	}
@@ -1144,12 +1139,12 @@ bool GIWindow::packUnleashed(QString output_path, QString output_name, QString p
 		QStringList entry_list = QDir(stage_path).entryList(QStringList() << "*.ar");
 		foreach(QString entry, entry_list) {
 			QString entry_filename = (stage_path + "/" + entry);
-			stage_ar_pack.addFile(entry_filename.toStdString());
+			compressFile(entry_filename.toStdString(), entry.toStdString(), stage_ar_pack, LibGens::COMPRESSION_X);
 			logProgress(ProgressNormal, "Added " + entry + " to Stage.pfd.");
 		}
 
 		QString stage_ar_pack_filename = output_path + "/Stage.pfd";
-		stage_ar_pack.save(stage_ar_pack_filename.toStdString());
+		stage_ar_pack.save(stage_ar_pack_filename.toStdString(), 0x800);
 		stage_ar_pack.savePFI(path.toStdString() + "/Stage.pfi");
 		logProgress(ProgressNormal, "Saved " + stage_ar_pack_filename + ".");
 	}
@@ -1161,7 +1156,7 @@ bool GIWindow::packUnleashed(QString output_path, QString output_name, QString p
 		QStringList entry_list = QDir(stage_add_path).entryList(QStringList() << "*.ar");
 		foreach(QString entry, entry_list) {
 			QString entry_filename = (stage_add_path + "/" + entry);
-			stage_add_ar_pack.addFile(entry_filename.toStdString());
+			compressFile(entry_filename.toStdString(), entry.toStdString(), stage_add_ar_pack, LibGens::COMPRESSION_X);
 			logProgress(ProgressNormal, "Added " + entry + " to Stage-Add.pfd.");
 		}
 
@@ -1171,7 +1166,7 @@ bool GIWindow::packUnleashed(QString output_path, QString output_name, QString p
 		QDir().mkpath(stage_add_ar_pack_filename);
 
 		stage_add_ar_pack_filename += "/Stage-Add.pfd";
-		stage_add_ar_pack.save(stage_add_ar_pack_filename.toStdString());
+		stage_add_ar_pack.save(stage_add_ar_pack_filename.toStdString(), 0x800);
 		stage_add_ar_pack.savePFI(path.toStdString() + "/Stage-Add.pfi");
 		logProgress(ProgressNormal, "Saved " + stage_add_ar_pack_filename + ".");
 	}
