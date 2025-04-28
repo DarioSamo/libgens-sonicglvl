@@ -26,6 +26,7 @@
 #include "Material.h"
 #include "TerrainInstance.h"
 #include "TerrainGroup.h"
+#include "Compression.h"
 
 struct ModelRecord {
 	LibGens::AABB aabb;
@@ -67,11 +68,6 @@ private:
 		LostWorld
 	};
 
-	enum Compression {
-		NoCompression,
-		CABCompression
-	};
-
 	struct {
 		GameEngine game_engine;
 		QStringList model_source_paths;
@@ -97,7 +93,7 @@ private:
 	QList<LibGens::TerrainGroup *> convertTerrainGroups(SceneData &scene_data);
 	void convertTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QList<LibGens::TerrainInstance *> instances, LibGens::AABB aabb);
 	bool packLostWorld(QString output_path, QString output_name, QString path);
-	bool packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_add_path, QString output_name, QString terrain_path, QString configuration_path, Compression compression);
+	bool packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_add_path, QString output_name, QString terrain_path, QString configuration_path, LibGens::CompressionType compression);
 	bool packGenerations(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_name, QString terrain_path, QString resources_path);
 	bool packUnleashed(QList<LibGens::TerrainGroup *> &terrain_groups, QString output_path, QString output_name, QString terrain_path, QString configuration_path, QString resources_path);
 	void logNodeTree(aiNode *node, QString prefix);

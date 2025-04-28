@@ -147,6 +147,8 @@ namespace LibGens {
 			bool get64BitAddressMode() const;
 			int getAddressSize() const;
 
+			vector<unsigned char> detach();
+
 			// Reverse-Engineering functions, just to track down what some values could be by printing their minimum and maximum values
 			void createComparison(size_t sz);
 			void readComparison();

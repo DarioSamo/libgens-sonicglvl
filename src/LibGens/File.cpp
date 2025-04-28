@@ -31,6 +31,7 @@ namespace LibGens {
 		virtual void seek(long offset, int origin) = 0;
 		virtual bool eof() = 0;
 		virtual void close() = 0;
+		virtual vector<unsigned char> detach() { return {}; }
 	};
 
 	class DiskFile : public FileImpl {
@@ -285,6 +286,10 @@ namespace LibGens {
 		}
 
 		void close() override {
+		}
+
+		vector<unsigned char> detach() override {
+			return move(data);
 		}
 	};
 
@@ -1105,6 +1110,16 @@ namespace LibGens {
 
 	int File::getAddressSize() const {
 		return address_64_bit_mode ? 8 : 4;
+	}
+
+	vector<unsigned char> File::detach() {
+		if (file_impl) {
+			return file_impl->detach();
+		}
+		else {
+			Error::addMessage(LibGens::Error::NULL_REFERENCE, LIBGENS_FILE_H_ERROR_READ_FILE_NULL);
+			return {};
+		}
 	}
 	
 	void File::readAddressTableBBIN(size_t table_size) {

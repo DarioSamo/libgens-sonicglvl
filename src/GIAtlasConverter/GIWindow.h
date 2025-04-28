@@ -25,6 +25,8 @@
 #include "GITextureGroup.h"
 #include "MathGens.h"
 #include "Path.h"
+#include "AR.h"
+#include "Compression.h"
 
 class GIWindow : public QMainWindow, public Ui_GIWindow {
 	Q_OBJECT
@@ -105,7 +107,7 @@ private:
 	QList<GIWindow::GIGroup> createGroups(LibGens::AABB current_aabb, QList<string> instances, LibGens::GITextureGroupInfo *gi_group_info, LibGens::PathNodeList &reference_nodes, QList<RenderItem> &render_items, const QMap<string, LibGens::AABB> &instance_aabbs);
 	bool packGenerations(QString output_path, QString output_name, QString path, QString stage_path, QString stage_add_path);
 	bool packUnleashed(QString output_path, QString output_name, QString path, QString stage_path, QString stage_add_path);
-	void compressFileCAB(QString filename);
+	void compressFile(string filename, string entry, LibGens::ArPack &ar_pack, LibGens::CompressionType compress_type);
 	unsigned int nextPowerOfTwo(unsigned int v);
 	QColor debugColor(int quality_level, int size);
 	QString temporaryDirTemplate();
