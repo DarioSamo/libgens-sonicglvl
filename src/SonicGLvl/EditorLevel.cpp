@@ -424,7 +424,14 @@ void EditorLevel::createHavokNodes(LibGens::HavokPhysicsCache *physics_cache, Og
 
 		for (int i = 0; i < systems.getSize(); i++) {
 			// Dump Physics System
-			cout << "[+] Dumping physics system #" << (i+1) << " (" << systems[i]->getName() << ")" << endl;
+			cout << "[+] Dumping physics system #" << (i + 1);
+
+			if (systems[i]->getName() != NULL) {
+				cout << " (" << systems[i]->getName() << ")";
+			}
+
+			cout << endl;
+
 			const hkArray<hkpRigidBody*> &rigidbodies = systems[i]->getRigidBodies();
 			const hkArray<hkpPhantom*> &phantoms      = systems[i]->getPhantoms();
     
