@@ -52,6 +52,8 @@ jobs:
         run: |
           Remove-Item -Path bin\.gitignore
           Remove-Item -Recurse -Force -Include *.pdb -Path bin
+          Remove-Item -Recurse -Force -Include *.exp -Path bin
+          Remove-Item -Recurse -Force -Include *.lib -Path bin
           Remove-Item -Path cache\.gitignore
           Remove-Item -Path database\CONTRIBUTING.txt
           Remove-Item -Path database\shaders\.gitignore

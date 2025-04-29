@@ -232,7 +232,7 @@ namespace {
 
 				fp->seek(4 * 16, SEEK_CUR);
 			}
-			else if ((main_type == TYPE_ARRAY)) {
+			else if ((main_type == TYPE_ARRAY) || (main_type == TYPE_HOMOGENEOUS_ARRAY)) {
 				endianSwap(fp->getCurrentAddress(), 4);
 				endianSwap(fp->getCurrentAddress() + 4, 4);
 				endianSwap(fp->getCurrentAddress() + 8, 4);
