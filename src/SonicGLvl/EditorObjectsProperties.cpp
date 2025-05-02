@@ -139,7 +139,11 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		if (selected_objects.size() == 1) {
 			LibGens::Object *first_object = (*selected_objects.begin());
 			if (first_object) {
-				group_text += " (ID:" + ToString(first_object->getID()) + ", " + first_object->getParentSet()->getName() + ")";
+				group_text += " (ID:" + ToString(first_object->getID());
+				if (first_object->getParentSet()) {
+					group_text += ", " + first_object->getParentSet()->getName();
+				}
+				group_text += ")";
 			}
 		}
 
