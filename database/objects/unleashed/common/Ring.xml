@@ -6,7 +6,7 @@
   <IsReset type="bool" default="false" description="" />
   <Range type="float" default="100" description="" />
   <ResetTime type="float" default="0" description="" />
-  <Extra type="model" name="cmn_obj_ring_HD.model" />
+  <Extra type="model" name="cmn_obj_ms_ringnormalM_000.model" />
   <Extra type="description" name="Anti-gravitational gold-colored collectable machine, perpetually spinning 360 degrees. Disappears on contact." />
   <Extra type="offset_rotation_y_speed" name="120" />
 </Template>

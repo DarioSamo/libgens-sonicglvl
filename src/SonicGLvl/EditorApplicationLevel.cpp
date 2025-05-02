@@ -219,12 +219,34 @@ void EditorApplication::openLevel(string filename) {
 	current_level->loadData(library, object_node_manager);
 
 	current_set = current_level->getLevel()->getSet("base");
-	updateSetsGUI();
-	updateSelectedSetGUI();
 
 	if (!current_set) {
 		current_set = current_level->getLevel()->getSet("Base");
 	}
+
+	if (!current_set) {
+		list<LibGens::ObjectSet *> sets = current_level->getLevel()->getSets();
+		if (!sets.empty()) {
+			current_set = sets.front();
+		}
+		else {
+			LibGens::ObjectSet *set = new LibGens::ObjectSet();
+			if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
+				set->setName("Base");
+				set->setFilename(current_level->getLevel()->getFolder() + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+			}
+			else {
+				set->setName("base");
+				set->setFilename(current_level->getLevel()->getFolder() + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+			}
+
+			current_level->getLevel()->addSet(set);
+			current_set = set;
+		}
+	}
+
+	updateSetsGUI();
+	updateSelectedSetGUI();
 
 	if (camera_manager) {
 		camera_manager->setLevel(current_level->getLevel());
@@ -292,7 +314,13 @@ void EditorApplication::newCurrentSet() {
 	else {
 		LibGens::ObjectSet *set = new LibGens::ObjectSet();
 		set->setName("rename_me");
-		set->setFilename(current_level->getLevel()->getFolder() + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+		if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
+			set->setFilename(current_level->getLevel()->getFolder() + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+		}
+		else {
+			set->setFilename(current_level->getLevel()->getFolder() + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+		}
+
 		current_level->getLevel()->addSet(set);
 		current_set = set;
 		updateSetsGUI();
@@ -328,6 +356,9 @@ void EditorApplication::renameCurrentSet(string rename_set) {
 	if (current_set && !current_level->getLevel()->getSet(rename_set)) {
 		string folder = LibGens::File::folderFromFilename(current_set->getFilename());
 		string new_filename = folder + LIBGENS_OBJECT_SET_NAME + rename_set + LIBGENS_OBJECT_SET_EXTENSION;
+		if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
+			string new_filename = folder + rename_set + LIBGENS_OBJECT_SET_EXTENSION;
+		}
 		LibGens::File::remove(current_set->getFilename());
 		current_set->setFilename(new_filename);
 		current_set->setName(rename_set);
