@@ -249,27 +249,27 @@ namespace LibGens {
 
 		// Look for the texset file in current directory.
 		string folder = File::folderFromFilename(file->getPath());
-		file = new File(folder + texset_name + LIBGENS_TEXSET_EXTENSION, LIBGENS_FILE_READ_BINARY);
+		File texset(folder + texset_name + LIBGENS_TEXSET_EXTENSION, LIBGENS_FILE_READ_BINARY);
 
-		if (file->valid()) {
-			file->readHeader();
-			file->readInt32BE(&texture_count);
-			file->readInt32BEA(&texture_address);
+		if (texset.valid()) {
+			texset.readHeader();
+			texset.readInt32BE(&texture_count);
+			texset.readInt32BEA(&texture_address);
 
 			textures.reserve(texture_count);
 			for (size_t i = 0; i < texture_count; i++) {
 				string internal_name = "";
-				file->goToAddress(texture_address + i * file->getAddressSize());
-				file->readInt32BEA(&address);
-				file->goToAddress(address);
-				file->readString(&internal_name);
+				texset.goToAddress(texture_address + i * texset.getAddressSize());
+				texset.readInt32BEA(&address);
+				texset.goToAddress(address);
+				texset.readString(&internal_name);
 
 				Texture *texture = new Texture(folder + internal_name + LIBGENS_TEXTURE_EXTENSION, internal_name);
 				textures.push_back(texture);
 			}
-		}
 
-		delete file;
+			texset.close();
+		}
 	}
 
 	void Material::readRootNodeLostWorld(File *file) {
