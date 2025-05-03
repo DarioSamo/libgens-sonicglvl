@@ -36,7 +36,7 @@ const QString GIWindow::AppName = "GIAtlas Converter";
 const QString GIWindow::VersionNumber = "0.1";
 const QString GIWindow::DefaultSettingsPath = "GIAtlasConverter.ini";
 const QString GIWindow::LogPath = "GIAtlasConverter.log";
-const QString GIWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Sonic_Generations";
+const QString GIWindow::CommunityGuideURL = "https://hedgedocs.com";
 
 GIWindow::GIWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);

@@ -38,16 +38,14 @@ const QString HKWindow::AppName = "Havok Converter";
 #ifdef HAVOKCONVERTER_LOSTWORLD
 const QString HKWindow::WindowTitle = "Havok Converter - Lost World";
 const QString HKWindow::DefaultSettingsPath = "HavokConverter_LostWorld.ini";
-const QString HKWindow::CommunityGuideURL = "https://info.sonicretro.org/SCHG:Sonic_Lost_World";
 #elif defined(HAVOKCONVERTER_UNLEASHED)
 const QString HKWindow::WindowTitle = "Havok Converter - Unleashed";
 const QString HKWindow::DefaultSettingsPath = "HavokConverter_Unleashed.ini";
-const QString HKWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Sonic_Generations";
 #else
 const QString HKWindow::WindowTitle = HKWindow::AppName;
 const QString HKWindow::DefaultSettingsPath = "HavokConverter.ini";
-const QString HKWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Sonic_Generations";
 #endif
+const QString HKWindow::CommunityGuideURL = "https://hedgedocs.com";
 
 const QString HKWindow::VersionNumber = "0.1";
 const QString HKWindow::LogPath = "HavokConverter.log";

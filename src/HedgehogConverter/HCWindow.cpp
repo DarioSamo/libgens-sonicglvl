@@ -38,7 +38,7 @@ const QString HCWindow::AppName = "Hedgehog Converter";
 const QString HCWindow::VersionNumber = "0.1";
 const QString HCWindow::DefaultSettingsPath = "HedgehogConverter.ini";
 const QString HCWindow::LogPath = "HedgehogConverter.log";
-const QString HCWindow::CommunityGuideURL = "http://info.sonicretro.org/SCHG:Sonic_Generations";
+const QString HCWindow::CommunityGuideURL = "https://hedgedocs.com";
 
 HCWindow::HCWindow(QWidget *parent) : QMainWindow(parent) {
 	setupUi(this);
