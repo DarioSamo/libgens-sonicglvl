@@ -50,15 +50,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>FREEIMAGE_LIB;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../depends/ogre/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/ogre/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/directxtex/include;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4018;4244;4267;4305</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../depends/ogre/lib;../../depends/qt/lib;../../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../depends/ogre/lib;../../depends/qt/lib;../../depends/directxtex/lib;../../lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -67,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../depends/ogre/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/ogre/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/directxtex/include;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>FREEIMAGE_LIB;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267;4305</DisableSpecificWarnings>
     </ClCompile>
@@ -75,8 +75,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../../depends/ogre/lib;../../depends/qt/lib;../../lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../depends/ogre/lib;../../depends/qt/lib;../../depends/directxtex/lib;../../lib/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;FreeImage.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
