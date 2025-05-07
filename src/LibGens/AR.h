@@ -47,6 +47,7 @@ namespace LibGens {
 			unsigned int getSize();
 			unsigned int getAbsoluteDataAddress();
 			void setData(vector<unsigned char> &&data_p);
+			vector<unsigned char> detach();
 			~ArFile();
 	};
 

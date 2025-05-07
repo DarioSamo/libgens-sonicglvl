@@ -1338,28 +1338,16 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 		string output_stage_pfd_path = output_path.toStdString() + "/Stage.pfd";
 		if (converter_settings.merge_existing && QFileInfo(output_stage_pfd_path.c_str()).exists()) {
 			LibGens::ArPack existing_stage_pfd_pack(output_stage_pfd_path);
-			logProgress(ProgressNormal, QString("Extracting %1.").arg(output_stage_pfd_path.c_str()));
-			existing_stage_pfd_pack.extract(stage_pfd_path.toStdString() + "/");
-
-			logProgress(ProgressNormal, QString("Removing existing terrain groups from %1.").arg(stage_pfd_path));
-			QStringList entry_list = QDir(stage_pfd_path).entryList(QStringList() << "tg-*.ar");
-			foreach(QString entry, entry_list) {
-				QString remove_filename = stage_pfd_path + "/" + entry;
-				bool removed_file = QFile::remove(remove_filename);
-				if (removed_file) {
-					logProgress(ProgressNormal, "Removed " + remove_filename + " before packing PFD.");
-				}
-				else {
-					logProgress(ProgressError, "Couldn't remove " + remove_filename + " before packing PFD.");
-				}
-			}
-
 			logProgress(ProgressNormal, QString("Adding existing GI groups from %1.").arg(stage_pfd_path));
-			entry_list = QDir(stage_pfd_path).entryList(QStringList() << "gia-*.ar");
-			foreach(QString entry, entry_list) {
-				QString add_filename = stage_pfd_path + "/" + entry;
-				stage_pfd_pack.addFile(add_filename.toStdString());
-				logProgress(ProgressNormal, "Added " + add_filename + " before packing PFD.");
+
+			for (unsigned int i = 0; i < existing_stage_pfd_pack.getFileCount(); i++) {
+				LibGens::ArFile* existing_ar_file = existing_stage_pfd_pack.getFileByIndex(i);
+				const string &ar_filename = existing_ar_file->getName();
+
+				if (ar_filename.find("gia-") != string::npos) {
+					stage_pfd_pack.addFile(ar_filename, std::move(existing_ar_file->detach()));
+					logProgress(ProgressNormal, QString("Added %1 before packing PFD.").arg(ar_filename.c_str()));
+				}
 			}
 		}
 
@@ -1382,6 +1370,9 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 
 					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group_filename.c_str()));
 				}
+				else {
+					logProgress(ProgressError, QString("Couldn't add %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group_filename.c_str()));
+				}
 			}
 
 			for (list<LibGens::TerrainInstance *>::iterator it = instances.begin(); it != instances.end(); it++) {
@@ -1393,6 +1384,9 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 					instance_file.close();
 
 					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group_filename.c_str()));
+				}
+				else {
+					logProgress(ProgressNormal, QString("Couldn't add %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
 

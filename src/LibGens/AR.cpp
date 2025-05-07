@@ -111,6 +111,10 @@ namespace LibGens {
 		data_size = data.size();
 	}
 
+	vector<unsigned char> ArFile::detach() {
+		return move(data);
+	}
+
 	ArFile::~ArFile() {
 	}
 
