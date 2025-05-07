@@ -60,6 +60,7 @@
       <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;Cabinet.lib;Qt5Concurrent.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/qt/lib;../../lib/$(Configuration);../../depends/fbxsdk/lib/vs2010/x86/release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
