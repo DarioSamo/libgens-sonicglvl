@@ -278,8 +278,7 @@ bool HCWindow::convert() {
 		logProgress(ProgressNormal, "Assimp importer reading model " + model_source_path + " ...");
 
 		Assimp::Importer importer;
-		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 0x8000);
-		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 0x80000);
+		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 0xFFFF);
 
 		const aiScene *scene = importer.ReadFile(model_source_path.toStdString(), aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices | 
 																				  aiProcess_CalcTangentSpace | aiProcess_FindInstances | aiProcess_SplitLargeMeshes);
@@ -1118,7 +1117,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 
 						for (int p=0; p < num_faces; p++) {
 							if (src_mesh->mFaces[p].mNumIndices == 3) {
-								LibGens::Polygon poly = { src_mesh->mFaces[p].mIndices[2], src_mesh->mFaces[p].mIndices[1], src_mesh->mFaces[p].mIndices[0] };
+								LibGens::Polygon poly = {unsigned short(src_mesh->mFaces[p].mIndices[2]), unsigned short(src_mesh->mFaces[p].mIndices[1]), unsigned short(src_mesh->mFaces[p].mIndices[0])};
 								polygons.push_back(poly);
 							}
 						}

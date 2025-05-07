@@ -32,8 +32,10 @@ namespace LibGens {
 	enum Topology;
 
 	struct Polygon {
-		unsigned int a, b, c;
+		unsigned short a, b, c;
 	};
+
+	static_assert(sizeof(Polygon) == 6, "Incorrect polygon struct size");
 
 	class Submesh {
 		friend class Submesh;
