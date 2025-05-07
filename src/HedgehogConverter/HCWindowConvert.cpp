@@ -276,6 +276,7 @@ bool HCWindow::convert() {
 
 	foreach(QString model_source_path, model_source_paths) {
 		logProgress(ProgressNormal, "Assimp importer reading model " + model_source_path + " ...");
+		flushProgress(true);
 
 		Assimp::Importer importer;
 		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 0xFFFF);
