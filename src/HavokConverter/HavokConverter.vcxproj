@@ -85,7 +85,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtConcurrent;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DisableSpecificWarnings>4018;4244;4267;4305</DisableSpecificWarnings>
@@ -93,7 +93,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Concurrent.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/qt/lib;../../lib/$(Configuration);../../depends/hk2010_2_0_r1/Lib/win32_net_9-0/hybrid_multithreaded_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -104,7 +104,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtConcurrent;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/hk2010_2_0_r1/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4018;4244;4267;4305</DisableSpecificWarnings>
       <PreprocessorDefinitions>_MBCS;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -113,7 +113,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/qt/lib;../../lib/$(Configuration);../../depends/hk2010_2_0_r1/Lib/win32_net_9-0/release_multithreaded_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Concurrent.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -124,7 +124,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/hk550/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtConcurrent;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/hk550/Source;../LibGens-externals;../LibGens;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4018;4244;4267;4305</DisableSpecificWarnings>
       <PreprocessorDefinitions>_MBCS;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;HAVOKCONVERTER_UNLEASHED;HAVOK_5_5_0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -133,7 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../depends/assimp/lib;../../depends/qt/lib;../../lib/$(Configuration);../../depends/hk550/Lib/win32_net_8-0/release_multithreaded_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkBase.lib;hkCompat.lib;hkgBridge.lib;hkgCommon.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Concurrent.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkBase.lib;hkCompat.lib;hkgBridge.lib;hkgCommon.lib;hkpCollide.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkSceneData.lib;hkSerialize.lib;hkVisualize.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -144,7 +144,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2012_2_0_r1/Source;../LibGens;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../depends/assimp/include;../../depends/qt/include;../../depends/qt/include/QtConcurrent;../../depends/qt/include/QtCore;../../depends/qt/include/QtGui;../../depends/qt/include/QtXml;../../depends/qt/include/QtWidgets;../../depends/fbxsdk/include;../../depends/pthreads/include;../../depends/hk2012_2_0_r1/Source;../LibGens;../LibGens-externals;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_MBCS;_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING;HAVOKCONVERTER_LOSTWORLD;HAVOK_2012;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267;4305</DisableSpecificWarnings>
     </ClCompile>
@@ -153,7 +153,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../../depends/qt/lib;../../depends/assimp/lib;../../lib/$(Configuration);../../depends/hk2012_2_0_r1/Lib/win32_vs2010_noSimd/release_dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkcdInternal.lib;hkcdCollide.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;LibGens.lib;LibGens-externals.lib;legacy_stdio_definitions.lib;Qt5Concurrent.lib;Qt5Core.lib;Qt5Widgets.lib;Qt5Gui.lib;Qt5Xml.lib;hkBase.lib;hkSerialize.lib;hkSceneData.lib;hkInternal.lib;hkGeometryUtilities.lib;hkVisualize.lib;hkCompat.lib;hkpCollide.lib;hkpConstraint.lib;hkpConstraintSolver.lib;hkpDynamics.lib;hkpInternal.lib;hkpUtilities.lib;hkpVehicle.lib;hkaAnimation.lib;hkaInternal.lib;hkaRagdoll.lib;hkcdInternal.lib;hkcdCollide.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalOptions>/ignore:4099,4286 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -214,6 +214,7 @@
   </ImportGroup>
   <Target Name="CopyDLLs" AfterTargets="Build">
     <ItemGroup>
+      <DLL Include="..\..\depends\qt\bin\Qt5Concurrent.dll" />
       <DLL Include="..\..\depends\qt\bin\Qt5Core.dll" />
       <DLL Include="..\..\depends\qt\bin\Qt5Gui.dll" />
       <DLL Include="..\..\depends\qt\bin\Qt5Widgets.dll" />

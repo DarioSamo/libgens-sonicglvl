@@ -103,7 +103,9 @@ private:
 	void updateSettingsFromUi();
 	void updateUiFromSettings();
 	void messageBox(QString text);
+	void logProgress(QString log_window_str, QString log_file_str);
 	void logProgress(ProgressType progress_type, QString message);
+	void flushProgress(bool force_flush);
 	void beep();
 	QString temporaryDirTemplate();
 private slots:
