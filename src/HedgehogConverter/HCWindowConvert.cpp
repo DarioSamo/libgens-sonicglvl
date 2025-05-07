@@ -88,7 +88,6 @@ QString HCWindow::temporaryDirTemplate() {
 
 bool HCWindow::convert() {
 	QMap<string, bool> overwrite_materials;
-	HCMaterialDialog dialog(&overwrite_materials, this);
 
 	const QString EmbedTexturePrefix = "embed_";
 	QStringList model_source_paths = converter_settings.model_source_paths;
@@ -460,11 +459,21 @@ bool HCWindow::convert() {
 			}
 
 			if (!overwrite_materials.isEmpty()) {
-				dialog.setupOverrideMap();
-				dialog.setFBXName(model_source_path);
-				beep();
-				dialog.exec();
-				dialog.updateOverrideMap();
+				HANDLE event = CreateEventA(nullptr, TRUE, FALSE, NULL);
+
+				QMetaObject::invokeMethod(this, [&]() {
+					HCMaterialDialog dialog(&overwrite_materials, this);
+					dialog.setupOverrideMap();
+					dialog.setFBXName(model_source_path);
+					beep();
+					dialog.exec();
+					dialog.updateOverrideMap();
+
+					SetEvent(event);
+				});
+
+				WaitForSingleObject(event, INFINITE);
+				CloseHandle(event);
 			}
 
 			for (int m = 0; m < materials_count; m++) {
