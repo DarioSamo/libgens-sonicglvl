@@ -431,7 +431,11 @@ namespace LibGens {
 			return;
 		}
 
-		file->moveAddress(1);
+		unsigned char empty=0;
+		file->readUChar(&empty);
+		if (empty != 0) {
+			return;
+		}
 
 		unsigned short texture_count=0;
 		file->readInt16(&texture_count);

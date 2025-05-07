@@ -32,6 +32,10 @@
 #include "Path.h"
 #include "Compression.h"
 
+#include <DirectXTex.h>
+#include <BC.h>
+#include <DDS.h>
+
 const int GIWindow::MinimumTextureSize = 4;
 
 QString GIWindow::temporaryDirTemplate() {
@@ -298,99 +302,125 @@ bool GIWindow::convert() {
 		logProgress(ProgressNormal, QString("Generated %1 GI Groups.").arg(gi_groups_size));
 
 		for (size_t g = 0; g < gi_groups_size; g++) {
-			QTemporaryDir gi_temp_dir(temporaryDirTemplate());
-			QString gi_temp_path = gi_temp_dir.path();
-			QDir gi_group_dir(gi_temp_path);
-
 			logProgress(ProgressNormal, QString("Organizing subtextures for group %1 with texture size %2.").arg(g).arg(converter_settings.max_texture_size));
 			gi_groups[g]->organizeSubtextures(max(converter_settings.max_atlas_texture_size, converter_settings.max_texture_size));
 			logProgress(ProgressNormal, QString("Done organizing subtextures for group %1.").arg(g));
 
-			// Create the atlas textures and save it to the directory
+			// Create the atlas textures and save it to the AR file
+			LibGens::ArPack gi_group_ar_pack;
 			unsigned int folder_size = 0;
-			int texture_index = 0;
+
 			list<LibGens::GITexture *> textures = gi_groups[g]->getTextures();
 			for (list<LibGens::GITexture *>::iterator it = textures.begin(); it != textures.end(); it++) {
 				unsigned int w = (*it)->getWidth();
 				unsigned int h = (*it)->getHeight();
 
-				// Create the bitmap with the debugging colors
-				FIBITMAP *atlas_bitmap = FreeImage_Allocate(w, h, 32);
+				vector<unsigned char> atlas_image(DirectX::DDS_MIN_HEADER_SIZE + ((w / 4) * (h / 4) * 16));
+
+				DirectX::TexMetadata metadata;
+				metadata.width = w;
+				metadata.height = h;
+				metadata.depth = 1;
+				metadata.arraySize = 1;
+				metadata.mipLevels = 1;
+				metadata.miscFlags = 0;
+				metadata.miscFlags2 = 0;
+				metadata.format = DXGI_FORMAT_BC3_UNORM;
+				metadata.dimension = DirectX::TEX_DIMENSION_TEXTURE2D;
+
+				size_t required = 0;
+				DirectX::EncodeDDSHeader(metadata, DirectX::DDS_FLAGS_FORCE_DX9_LEGACY, atlas_image.data(), atlas_image.size(), required);
 
 				list<LibGens::GISubtexture *> subtextures = (*it)->getSubtextures();
 				for (list<LibGens::GISubtexture *>::iterator it2 = subtextures.begin(); it2 != subtextures.end(); it2++) {
-					int start_x = (*it2)->getX() * w;
-					int start_y = (*it2)->getY() * h;
-					int sub_w = (*it2)->getPixelWidth();
-					int sub_h = (*it2)->getPixelHeight();
+					unsigned int sub_w = (*it2)->getPixelWidth();
+					unsigned int sub_h = (*it2)->getPixelHeight();
 					QColor color = debugColor(gi_groups[g]->getQualityLevel(), max(sub_w, sub_h));
 
-					RGBQUAD rgbquad;
-					rgbquad.rgbRed = color.red();
-					rgbquad.rgbGreen = color.green();
-					rgbquad.rgbBlue = color.blue();
-					rgbquad.rgbReserved = 0;
+					DirectX::XMVECTOR bc_colors[NUM_PIXELS_PER_BLOCK];
+					for (auto &bc_color : bc_colors) {
+						bc_color = {float(color.redF()), float(color.greenF()), float(color.blueF()), float(color.alphaF())};
+					}
 
-					for (int x = 0; x < sub_w; x++) {
-						for (int y = 0; y < sub_h; y++) {
-							FreeImage_SetPixelColor(atlas_bitmap, start_x + x, h - 1 - (start_y + y), &rgbquad);
+					unsigned char bc[16];
+					DirectX::D3DXEncodeBC3(bc, bc_colors, DirectX::BC_FLAGS_NONE);
+
+					unsigned int start_x = unsigned int((*it2)->getX() * w) / 4;
+					unsigned int start_y = unsigned int((*it2)->getY() * h) / 4;
+
+					for (unsigned int x = 0; x < (sub_w / 4); x++) {
+						for (unsigned int y = 0; y < (sub_h / 4); y++) {
+							unsigned int bc_x = start_x + x;
+							unsigned int bc_y = start_y + y;
+							unsigned int bc_pos = (bc_y * (w / 4) + bc_x);
+							unsigned int offset = DirectX::DDS_MIN_HEADER_SIZE + (bc_pos * sizeof(bc));
+
+							if ((offset + sizeof(bc)) > atlas_image.size()) {
+								logProgress(ProgressError, "Panic!!! Trying to write outside image boundaries.");
+							}
+							else {
+								memcpy(atlas_image.data() + offset, bc, sizeof(bc));
+							}
 						}
 					}
 				}
-				
-				// Save the bitmap
-				QString bitmap_name = QString("%1/%2").arg(gi_temp_path).arg((*it)->getName().c_str());
-				QString bitmap_filename = bitmap_name + ".png";
-				QString texture_filename = bitmap_name + ".dds";
 
-				FreeImage_Save(FIF_PNG, atlas_bitmap, bitmap_filename.toStdString().c_str());
-				FreeImage_Unload(atlas_bitmap);
+				logProgress(ProgressNormal, QString("Saving texture atlas %1.dds.").arg((*it)->getName().c_str()));
+				gi_group_ar_pack.addFile((*it)->getName() + ".dds", std::move(atlas_image));
 
-				// Convert the bitmap to dds
-				logProgress(ProgressNormal, QString("Calling NVDXT converter for %1 to %2").arg(bitmap_filename).arg(texture_filename));
+				// Compute folder size. Since we generate no mipmaps for the Pre-Render step, using the size of the DDS file would be inaccurate for the Post-Render step.
+				folder_size += DirectX::DDS_MIN_HEADER_SIZE;
+				do
+				{
+					if (w > 1) {
+						w >>= 1;
+					}
+					if (h > 1) {
+						h >>= 1;
+					}
 
-				const QString temp_texture = "temp.dds";
-				QStringList arguments;
-				arguments << "-file" << bitmap_filename << "-output" << temp_texture;
-
-				QProcess conversion_process;
-				conversion_process.start("nvdxt", arguments);
-				conversion_process.waitForFinished();
-				QString conversion_output = conversion_process.readAllStandardOutput();
-				logProgress(ProgressNormal, QString("NVDXT Output: " + conversion_output));
-
-				QFile::remove(bitmap_filename);
-				QFile::remove(texture_filename);
-				if (QFile::copy(temp_texture, texture_filename)) {
-					logProgress(ProgressNormal, QString("Converter NVDXT finished with %1 to %2").arg(bitmap_filename).arg(texture_filename));
-					folder_size += QFileInfo(texture_filename).size();
-				}
-				else {
-					logProgress(ProgressError, QString("Couldn't copy NVDXT's result to %1. Is this directory write-protected?").arg(texture_filename));
-				}
-
-				texture_index++;
+					folder_size += (((w + 3) & ~3) / 4) * (((h + 3) & ~3) / 4) * 16;
+				} while (w > 1 || h > 1);
 			}
 
 			logProgress(ProgressNormal, QString("Saving atlasinfo for group %1.").arg(g));
 			gi_groups[g]->setFolderSize(folder_size);
-			gi_groups[g]->saveAtlasinfo(gi_temp_path.toStdString() + "/atlasinfo");
-			total_pre_render_size += folder_size;
 
-			// Pack GI Group AR
-			LibGens::ArPack gi_group_ar_pack;
-			QStringList entry_list = gi_group_dir.entryList(QStringList() << "*.dds" << "atlasinfo");
-			foreach(QString entry, entry_list) {
-				gi_group_ar_pack.addFile((gi_temp_path + "/" + entry).toStdString());
-			}
+			LibGens::File atlasinfo_file;
+			gi_groups[g]->writeAtlasinfo(&atlasinfo_file);
+			gi_group_ar_pack.addFile("atlasinfo", std::move(atlasinfo_file.detach()));
+
+			LibGens::File gi_group_ar_file;
+			gi_group_ar_pack.write(&gi_group_ar_file);
+			gi_group_ar_file.goToAddress(0);
 
 			QString gi_group_name = QString("gia-%1.ar").arg(g);
+			QString gi_group_ar_path;
+
 			if (gi_groups[g]->getQualityLevel() == LIBGENS_GI_TEXTURE_GROUP_LOWEST_QUALITY) {
-				gi_group_ar_pack.save((stage_temp_path + "/" + gi_group_name).toStdString());
+				gi_group_ar_path = stage_temp_path + "/" + gi_group_name;
 			}
 			else {
-				gi_group_ar_pack.save((stage_add_temp_path + "/" + gi_group_name).toStdString());
+				gi_group_ar_path = stage_add_temp_path + "/" + gi_group_name;
 			}
+
+			LibGens::File gi_group_compressed_ar_file(gi_group_ar_path.toStdString(), LIBGENS_FILE_WRITE_BINARY);
+			if (gi_group_compressed_ar_file.valid()) {
+				if (converter_settings.game_engine == Unleashed) {
+					LibGens::Compression::compress(&gi_group_ar_file, &gi_group_compressed_ar_file, LibGens::COMPRESSION_X);
+				}
+				else {
+					LibGens::Compression::compress(&gi_group_ar_file, &gi_group_compressed_ar_file, LibGens::COMPRESSION_CAB, &gi_group_name.toStdString()[0]);
+				}
+				gi_group_compressed_ar_file.close();
+
+				logProgress(ProgressNormal, QString("Saved %1.").arg(gi_group_ar_path));
+			}
+			else {
+				logProgress(ProgressError, QString("Couldn't save %1. Is this directory write-protected?").arg(gi_group_ar_path));
+			}
+
+			total_pre_render_size += folder_size;
 		}
 
 		string gi_group_info_filename = temp_path.toStdString() + "/gi-texture.gi-texture-group-info";
