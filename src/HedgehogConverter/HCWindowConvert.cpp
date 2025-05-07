@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QTemporaryDir>
 #include <QProcess>
+#include <QtConcurrent>
 #include "assimp/postprocess.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
@@ -1362,8 +1363,10 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 			}
 		}
 
+		QMutex stage_pfd_mutex;
+
 		// Save Terrain Group AR Files
-		foreach(LibGens::TerrainGroup * group, terrain_groups) {
+		QtConcurrent::blockingMap(terrain_groups, [&](LibGens::TerrainGroup *group) {
 			string group_filename = group->getName() + ".ar";
 			LibGens::ArPack tg_ar;
 
@@ -1372,11 +1375,11 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 			for (vector<LibGens::Model *>::iterator it = models.begin(); it != models.end(); it++) {
 				string model_name = (*it)->getName() + ".terrain-model";
 				string model_filename = terrain_path.toStdString() + "/" + model_name;
-				LibGens::File model_file(model_filename, LIBGENS_FILE_READ_BINARY);
+				LibGens::File model_file(model_filename, LIBGENS_FILE_READ_BINARY, LIBGENS_FILE_PREFER_DISK_FILE);
 				if (model_file.valid()) {
+					tg_ar.addFile(model_name, model_file);
 					model_file.close();
 
-					tg_ar.addFile(model_filename);
 					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
@@ -1384,11 +1387,11 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 			for (list<LibGens::TerrainInstance *>::iterator it = instances.begin(); it != instances.end(); it++) {
 				string instance_name = (*it)->getName() + ".terrain-instanceinfo";
 				string instance_filename = terrain_path.toStdString() + "/" + instance_name;
-				LibGens::File instance_file(instance_filename, LIBGENS_FILE_READ_BINARY);
+				LibGens::File instance_file(instance_filename, LIBGENS_FILE_READ_BINARY, LIBGENS_FILE_PREFER_DISK_FILE);
 				if (instance_file.valid()) {
+					tg_ar.addFile(instance_name, instance_file);
 					instance_file.close();
 
-					tg_ar.addFile(instance_filename);
 					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
@@ -1399,12 +1402,17 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 
 			LibGens::File compressed_file;
 			LibGens::Compression::compress(&ar_file, &compressed_file, compression, &group_filename[0]);
+
+			stage_pfd_mutex.lock();
 			stage_pfd_pack.addFile(group_filename, std::move(compressed_file.detach()));
+			stage_pfd_mutex.unlock();
 
 			logProgress(ProgressNormal, QString("Saved terrain group %1.").arg(group_filename.c_str()));
-		}
+			flushProgress(true);
+		});
 
 		// Save PFD files
+		stage_pfd_pack.sort();
 		stage_pfd_pack.save(output_stage_pfd_path, 0x800);
 		logProgress(ProgressNormal, "Packed Stage.pfd");
 		stage_pfd_pack.savePFI(configuration_path.toStdString() + "/Stage.pfi");

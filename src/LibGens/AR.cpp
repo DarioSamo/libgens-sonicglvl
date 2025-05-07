@@ -90,7 +90,7 @@ namespace LibGens {
 		file.close();
 	}
 
-	string ArFile::getName() {
+	const string& ArFile::getName() {
 		return name;
 	}
 
@@ -421,7 +421,7 @@ namespace LibGens {
 
 
 	void ArPack::addFile(string filepath, string override_name) {
-		File file(filepath, LIBGENS_FILE_READ_BINARY);
+		File file(filepath, LIBGENS_FILE_READ_BINARY, LIBGENS_FILE_PREFER_DISK_FILE);
 
 		if (file.valid()) {
 			string name = filepath;
@@ -487,6 +487,12 @@ namespace LibGens {
 		}
 
 		return XXH3_128bits_digest(&state);
+	}
+
+	void ArPack::sort() {
+		std::sort(files.begin(), files.end(), [](ArFile *lhs, ArFile *rhs) {
+			return lhs->getName() < rhs->getName();
+		});
 	}
 
 	ArPack::~ArPack() {

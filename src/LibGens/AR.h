@@ -42,7 +42,7 @@ namespace LibGens {
 			void readData(File *file);
 			void save(string filename);
 			void write(File *file, unsigned int padding=0x40);
-			string getName();
+			const string& getName();
 			unsigned char *getData();
 			unsigned int getSize();
 			unsigned int getAbsoluteDataAddress();
@@ -76,6 +76,7 @@ namespace LibGens {
 			void addFile(string filename, LibGens::File &file);
 			unsigned int getFileCount();
 			XXH128_hash_t computeHash();
+			void sort();
 			~ArPack();
 	};
 };
