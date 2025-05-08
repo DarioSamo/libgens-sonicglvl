@@ -35,11 +35,8 @@ using namespace std;
 #define XXH_STATIC_LINKING_ONLY
 #include "xxhash/xxhash.h"
 #include "tinyxml/tinyxml.h"
+#include "meshoptimizer/meshoptimizer.h"
 #include "MathGens.h"
 #include "Error.h"
 #include "Endian.h"
 #include "File.h"
-
-#undef max
-#undef min
-#include "tristripper/tri_stripper.h"

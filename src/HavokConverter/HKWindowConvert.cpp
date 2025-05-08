@@ -105,15 +105,14 @@ bool HKWindow::convert() {
 	//*************************
 	foreach(QString model_source_path, model_source_paths) {
 		logProgress(ProgressNormal, "Assimp importer reading model " + model_source_path + " ...");
+		flushProgress(true);
 
 		Assimp::Importer importer;
-		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 0x8000);
-		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 0x80000);
 		importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_NORMALS | aiComponent_TANGENTS_AND_BITANGENTS | aiComponent_COLORS | 
 															aiComponent_TEXCOORDS | aiComponent_BONEWEIGHTS | aiComponent_TEXTURES | aiComponent_MATERIALS);
 
 		const aiScene *scene = importer.ReadFile(model_source_path.toStdString(), aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices | 
-																				  aiProcess_SplitLargeMeshes | aiProcess_RemoveComponent);
+																				  aiProcess_RemoveComponent);
 		if (!scene) {
 			logProgress(ProgressFatal, QString("Assimp failed to open %1: %2").arg(model_source_path).arg(importer.GetErrorString()));
 			return false;

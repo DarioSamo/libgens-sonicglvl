@@ -32,6 +32,7 @@ namespace LibGens {
 			bone_weights[i]=(i==0 ? 0xFF : 0);
 		}
 		color=Color();
+		parent=NULL;
 	}
 
 	Vertex::Vertex(Vertex *clone, LibGens::Matrix4 transform, float uv2_left, float uv2_right, float uv2_top, float uv2_bottom) {

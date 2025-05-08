@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QTemporaryDir>
 #include <QProcess>
+#include <QtConcurrent>
 #include "assimp/postprocess.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
@@ -88,7 +89,6 @@ QString HCWindow::temporaryDirTemplate() {
 
 bool HCWindow::convert() {
 	QMap<string, bool> overwrite_materials;
-	HCMaterialDialog dialog(&overwrite_materials, this);
 
 	const QString EmbedTexturePrefix = "embed_";
 	QStringList model_source_paths = converter_settings.model_source_paths;
@@ -276,10 +276,10 @@ bool HCWindow::convert() {
 
 	foreach(QString model_source_path, model_source_paths) {
 		logProgress(ProgressNormal, "Assimp importer reading model " + model_source_path + " ...");
+		flushProgress(true);
 
 		Assimp::Importer importer;
-		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 0x8000);
-		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 0x80000);
+		importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 0xFFFF);
 
 		const aiScene *scene = importer.ReadFile(model_source_path.toStdString(), aiProcess_Triangulate | aiProcess_SortByPType | aiProcess_JoinIdenticalVertices | 
 																				  aiProcess_CalcTangentSpace | aiProcess_FindInstances | aiProcess_SplitLargeMeshes);
@@ -460,11 +460,21 @@ bool HCWindow::convert() {
 			}
 
 			if (!overwrite_materials.isEmpty()) {
-				dialog.setupOverrideMap();
-				dialog.setFBXName(model_source_path);
-				beep();
-				dialog.exec();
-				dialog.updateOverrideMap();
+				HANDLE event = CreateEventA(nullptr, TRUE, FALSE, NULL);
+
+				QMetaObject::invokeMethod(this, [&]() {
+					HCMaterialDialog dialog(&overwrite_materials, this);
+					dialog.setupOverrideMap();
+					dialog.setFBXName(model_source_path);
+					beep();
+					dialog.exec();
+					dialog.updateOverrideMap();
+
+					SetEvent(event);
+				});
+
+				WaitForSingleObject(event, INFINITE);
+				CloseHandle(event);
 			}
 
 			for (int m = 0; m < materials_count; m++) {
@@ -1118,7 +1128,7 @@ bool HCWindow::convertSceneNode(const aiScene *scene, aiNode *node, QString path
 
 						for (int p=0; p < num_faces; p++) {
 							if (src_mesh->mFaces[p].mNumIndices == 3) {
-								LibGens::Polygon poly = { src_mesh->mFaces[p].mIndices[2], src_mesh->mFaces[p].mIndices[1], src_mesh->mFaces[p].mIndices[0] };
+								LibGens::Polygon poly = {unsigned short(src_mesh->mFaces[p].mIndices[2]), unsigned short(src_mesh->mFaces[p].mIndices[1]), unsigned short(src_mesh->mFaces[p].mIndices[0])};
 								polygons.push_back(poly);
 							}
 						}
@@ -1328,33 +1338,23 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 		string output_stage_pfd_path = output_path.toStdString() + "/Stage.pfd";
 		if (converter_settings.merge_existing && QFileInfo(output_stage_pfd_path.c_str()).exists()) {
 			LibGens::ArPack existing_stage_pfd_pack(output_stage_pfd_path);
-			logProgress(ProgressNormal, QString("Extracting %1.").arg(output_stage_pfd_path.c_str()));
-			existing_stage_pfd_pack.extract(stage_pfd_path.toStdString() + "/");
-
-			logProgress(ProgressNormal, QString("Removing existing terrain groups from %1.").arg(stage_pfd_path));
-			QStringList entry_list = QDir(stage_pfd_path).entryList(QStringList() << "tg-*.ar");
-			foreach(QString entry, entry_list) {
-				QString remove_filename = stage_pfd_path + "/" + entry;
-				bool removed_file = QFile::remove(remove_filename);
-				if (removed_file) {
-					logProgress(ProgressNormal, "Removed " + remove_filename + " before packing PFD.");
-				}
-				else {
-					logProgress(ProgressError, "Couldn't remove " + remove_filename + " before packing PFD.");
-				}
-			}
-
 			logProgress(ProgressNormal, QString("Adding existing GI groups from %1.").arg(stage_pfd_path));
-			entry_list = QDir(stage_pfd_path).entryList(QStringList() << "gia-*.ar");
-			foreach(QString entry, entry_list) {
-				QString add_filename = stage_pfd_path + "/" + entry;
-				stage_pfd_pack.addFile(add_filename.toStdString());
-				logProgress(ProgressNormal, "Added " + add_filename + " before packing PFD.");
+
+			for (unsigned int i = 0; i < existing_stage_pfd_pack.getFileCount(); i++) {
+				LibGens::ArFile* existing_ar_file = existing_stage_pfd_pack.getFileByIndex(i);
+				const string &ar_filename = existing_ar_file->getName();
+
+				if (ar_filename.find("gia-") != string::npos) {
+					stage_pfd_pack.addFile(ar_filename, std::move(existing_ar_file->detach()));
+					logProgress(ProgressNormal, QString("Added %1 before packing PFD.").arg(ar_filename.c_str()));
+				}
 			}
 		}
 
+		QMutex stage_pfd_mutex;
+
 		// Save Terrain Group AR Files
-		foreach(LibGens::TerrainGroup * group, terrain_groups) {
+		QtConcurrent::blockingMap(terrain_groups, [&](LibGens::TerrainGroup *group) {
 			string group_filename = group->getName() + ".ar";
 			LibGens::ArPack tg_ar;
 
@@ -1363,24 +1363,30 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 			for (vector<LibGens::Model *>::iterator it = models.begin(); it != models.end(); it++) {
 				string model_name = (*it)->getName() + ".terrain-model";
 				string model_filename = terrain_path.toStdString() + "/" + model_name;
-				LibGens::File model_file(model_filename, LIBGENS_FILE_READ_BINARY);
+				LibGens::File model_file(model_filename, LIBGENS_FILE_READ_BINARY, LIBGENS_FILE_PREFER_DISK_FILE);
 				if (model_file.valid()) {
+					tg_ar.addFile(model_name, model_file);
 					model_file.close();
 
-					tg_ar.addFile(model_filename);
 					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group_filename.c_str()));
+				}
+				else {
+					logProgress(ProgressError, QString("Couldn't add %1 to %2 AR Pack.").arg(model_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
 
 			for (list<LibGens::TerrainInstance *>::iterator it = instances.begin(); it != instances.end(); it++) {
 				string instance_name = (*it)->getName() + ".terrain-instanceinfo";
 				string instance_filename = terrain_path.toStdString() + "/" + instance_name;
-				LibGens::File instance_file(instance_filename, LIBGENS_FILE_READ_BINARY);
+				LibGens::File instance_file(instance_filename, LIBGENS_FILE_READ_BINARY, LIBGENS_FILE_PREFER_DISK_FILE);
 				if (instance_file.valid()) {
+					tg_ar.addFile(instance_name, instance_file);
 					instance_file.close();
 
-					tg_ar.addFile(instance_filename);
 					logProgress(ProgressNormal, QString("Added %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group_filename.c_str()));
+				}
+				else {
+					logProgress(ProgressNormal, QString("Couldn't add %1 to %2 AR Pack.").arg(instance_filename.c_str()).arg(group_filename.c_str()));
 				}
 			}
 
@@ -1390,12 +1396,17 @@ bool HCWindow::packTerrainGroups(QList<LibGens::TerrainGroup *> &terrain_groups,
 
 			LibGens::File compressed_file;
 			LibGens::Compression::compress(&ar_file, &compressed_file, compression, &group_filename[0]);
+
+			stage_pfd_mutex.lock();
 			stage_pfd_pack.addFile(group_filename, std::move(compressed_file.detach()));
+			stage_pfd_mutex.unlock();
 
 			logProgress(ProgressNormal, QString("Saved terrain group %1.").arg(group_filename.c_str()));
-		}
+			flushProgress(true);
+		});
 
 		// Save PFD files
+		stage_pfd_pack.sort();
 		stage_pfd_pack.save(output_stage_pfd_path, 0x800);
 		logProgress(ProgressNormal, "Packed Stage.pfd");
 		stage_pfd_pack.savePFI(configuration_path.toStdString() + "/Stage.pfi");

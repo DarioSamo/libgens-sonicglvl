@@ -89,7 +89,9 @@ private:
 	void updateSettingsFromUi();
 	void updateUiFromSettings();
 	void messageBox(QString text);
+	void logProgress(QString log_window_str, QString log_file_str);
 	void logProgress(ProgressType progress_type, QString message);
+	void flushProgress(bool force_flush);
 	void logNodeTree(aiNode *node, QString prefix);
 	void beep();
 	hkpRigidBody* convertNodeToRigidBody(const aiScene *scene, aiNode *node, LibGens::Matrix4 transform, std::set<std::string>& names);

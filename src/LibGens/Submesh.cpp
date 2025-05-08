@@ -322,74 +322,16 @@ namespace LibGens {
 
 
 	void Submesh::build(vector<Vertex *> vertices_p, vector<Polygon> faces_vectors_p) {
-		vertices = vertices_p;
-		faces_vectors = faces_vectors_p;
+		vertices = std::move(vertices_p);
+		faces_vectors = std::move(faces_vectors_p);
 
-		vector<LibGens::Vertex *> new_vertices;
-		new_vertices.clear();
+		meshopt_optimizeVertexCache(&faces_vectors[0].a, &faces_vectors[0].a, faces_vectors.size() * 3, vertices.size());
+		vertices.resize(meshopt_optimizeVertexFetch(vertices.data(), &faces_vectors[0].a, faces_vectors.size() * 3, vertices.data(), vertices.size(), sizeof(vertices[0])));
 
-		vector<unsigned short> new_face_map;
-		new_face_map.clear();
+		faces.resize(meshopt_stripifyBound(faces_vectors.size() * 3));
+		faces.resize(meshopt_stripify(faces.data(), reinterpret_cast<unsigned short *>(faces_vectors.data()), faces_vectors.size() * 3, vertices.size(), unsigned short(0xFFFF)));
 
-		for (size_t x=0; x<vertices.size(); x++) {
-			LibGens::Vertex *v=vertices[x];
-
-			bool clone=false;
-			for (unsigned int y=0; y<new_vertices.size(); y++) {
-				if ((*new_vertices[y])==(*v)) {
-					clone = true;
-					new_face_map.push_back(y);
-					delete v;
-					break;
-				}
-			}
-
-			if (!clone) {
-				new_vertices.push_back(v);
-				new_face_map.push_back(new_vertices.size()-1);
-			}
-		}
-
-		vertices = new_vertices;
-
-		for (size_t i=0; i<faces_vectors.size(); i++) {
-			faces_vectors[i].a = new_face_map[(int)faces_vectors[i].a];
-			faces_vectors[i].b = new_face_map[(int)faces_vectors[i].b];
-			faces_vectors[i].c = new_face_map[(int)faces_vectors[i].c];
-		}
-
-		
-		triangle_stripper::indices tri_indices;
-		for (size_t i=0; i<faces_vectors.size(); i++) {
-			tri_indices.push_back((int)faces_vectors[i].a);
-			tri_indices.push_back((int)faces_vectors[i].b);
-			tri_indices.push_back((int)faces_vectors[i].c);
-		}
-
-		triangle_stripper::tri_stripper stripper(tri_indices);
-		stripper.SetCacheSize(0);
-		stripper.SetBackwardSearch(false);
-		triangle_stripper::primitive_vector out_vector;
-		stripper.Strip(&out_vector);
-
-		for (size_t i=0; i<out_vector.size(); i+=1) {
-			if (out_vector[i].Type == triangle_stripper::TRIANGLE_STRIP) {
-				for (size_t j=0; j<out_vector[i].Indices.size(); j++) {
-					faces.push_back(out_vector[i].Indices[j]);
-				}
-				faces.push_back(0xFFFF);
-			}
-			else {
-				for (size_t j=0; j<out_vector[i].Indices.size(); j+=3) {
-					faces.push_back(out_vector[i].Indices[j]);
-					faces.push_back(out_vector[i].Indices[j+1]);
-					faces.push_back(out_vector[i].Indices[j+2]);
-					faces.push_back(0xFFFF);
-				}
-			}
-		}
-
-		if (faces[faces.size()-1]==0xFFFF) faces.resize(faces.size()-1);
+		if (faces[faces.size() - 1] == 0xFFFF) faces.resize(faces.size() - 1);
 
 		buildAABB();
 	}

@@ -293,6 +293,19 @@ namespace LibGens {
 		}
 	};
 
+	class MemoryFileFlushToDiskOnClose : public MemoryFile {
+	public:
+		FILE* file;
+
+		MemoryFileFlushToDiskOnClose(FILE *file_p) : file(file_p), MemoryFile() {
+		}
+
+		void close() override {
+			fwrite(data.data(), 1, data.size(), file);
+			fclose(file);
+		}
+	};
+
 	void File::init() {
 		file_impl = NULL;
 		root_node_address = 0;
@@ -302,10 +315,10 @@ namespace LibGens {
 		address_64_bit_mode = false;
 	}
 
-	File::File(string filename, string mode) {
+	File::File(string filename, const char *mode, bool prefer_disk_file) {
 		init();
 
-		if (mode == "rb") {
+		if (!prefer_disk_file && strcmp(mode, LIBGENS_FILE_READ_BINARY) == 0) {
 			ReadOnlyMemoryMappedFile *memory_mapped_file = new ReadOnlyMemoryMappedFile(filename.c_str());
 			if (!memory_mapped_file->data) {
 				Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
@@ -316,13 +329,18 @@ namespace LibGens {
 			file_impl = memory_mapped_file;
 		}
 		else {
-			FILE* file = fopen(filename.c_str(), mode.c_str());
+			FILE* file = fopen(filename.c_str(), mode);
 			if (!file) {
 				Error::addMessage(Error::FILE_NOT_FOUND, LIBGENS_FILE_H_ERROR_READ_FILE_BEFORE + filename + LIBGENS_FILE_H_ERROR_READ_FILE_AFTER);
 				return;
 			}
 
-			file_impl = new DiskFile(file);
+			if (!prefer_disk_file && strcmp(mode, LIBGENS_FILE_WRITE_BINARY) == 0) {
+				file_impl = new MemoryFileFlushToDiskOnClose(file);
+			}
+			else {
+				file_impl = new DiskFile(file);
+			}
 		}
 
 		path = filename;

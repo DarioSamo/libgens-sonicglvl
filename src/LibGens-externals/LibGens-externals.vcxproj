@@ -139,6 +139,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libmspack\lzxd.c" />
+    <ClCompile Include="meshoptimizer\indexgenerator.cpp" />
+    <ClCompile Include="meshoptimizer\stripifier.cpp" />
+    <ClCompile Include="meshoptimizer\vcacheoptimizer.cpp" />
+    <ClCompile Include="meshoptimizer\vfetchoptimizer.cpp" />
     <ClCompile Include="tinyxml\tinystr.cpp" />
     <ClCompile Include="tinyxml\tinyxml.cpp" />
     <ClCompile Include="tinyxml\tinyxmlerror.cpp" />
@@ -164,6 +168,7 @@
     <ClCompile Include="zlib\zutil.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="meshoptimizer\meshoptimizer.h" />
     <ClInclude Include="tinyxml\tinystr.h" />
     <ClInclude Include="tinyxml\tinyxml.h" />
     <ClInclude Include="tristripper\detail\cache_simulator.h" />

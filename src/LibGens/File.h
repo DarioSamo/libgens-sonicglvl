@@ -46,6 +46,8 @@
 #define LIBGENS_FILE_READ_BINARY                        "rb"
 #define LIBGENS_FILE_WRITE_BINARY                       "wb"
 
+#define LIBGENS_FILE_PREFER_DISK_FILE					true
+
 namespace LibGens {
 	class FileImpl;
 
@@ -68,7 +70,7 @@ namespace LibGens {
 
 			void init();
 		public:
-			File(string filename, string mode); // DiskFile, read/write
+			File(string filename, const char* mode, bool prefer_disk_file = false); // DiskFile, read/write
 			File(const void* data, size_t data_size); // ReadOnlyMemoryFile, readonly
 			File(); // MemoryFile, read/write
 			~File();

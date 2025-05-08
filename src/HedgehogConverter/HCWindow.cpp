@@ -30,6 +30,7 @@
 #include <QFile>
 #include <QListWidgetItem>
 #include <QScrollBar>
+#include <QtConcurrent>
 #include "assimp/Importer.hpp"
 #include "assimp/importerdesc.h"
 
@@ -252,38 +253,96 @@ void HCWindow::messageBox(QString text) {
 	QMessageBox::about(this, AppName, text);
 }
 
-void HCWindow::logProgress(ProgressType progress_type, QString message) {
-	QString final_message = QTime::currentTime().toString() + ": ";
-	QString log_file_message = final_message + message;
+struct LogBuffer {
+	QElapsedTimer timer;
+	QString str;
+	
+	LogBuffer() {
+		timer.start();
+	}
+	
+	static LogBuffer &window() {
+		thread_local LogBuffer buffer;
+		return buffer;
+	}
+	
+	static LogBuffer &file() {
+		thread_local LogBuffer buffer;
+		return buffer;
+	}
+};
 
-	switch (progress_type) {
-		case ProgressNormal:
-			final_message += QString("<font color=\"White\">LOG: " + message + "</font>");
-			break;
-		case ProgressSuccess:
-			final_message += QString("<font color=\"Green\">SUCCESS: " + message + "</font>");
-			break;
-		case ProgressError:
-			final_message += QString("<font color=\"DarkOrange\">ERROR: " + message + "</font>");
-			break;
-		case ProgressWarning:
-			final_message += QString("<font color=\"Gold\">WARNING: " + message + "</font>");
-			break;
-		case ProgressFatal:
-			final_message += QString("<font color=\"Red\">ERROR: " + message + "</font>");
-			break;
+void HCWindow::logProgress(QString log_window_str, QString log_file_str) {
+	if (!log_window_str.isEmpty()) {
+		te_progress->appendHtml(log_window_str);
+		te_progress->verticalScrollBar()->setValue(te_progress->verticalScrollBar()->maximum());
 	}
 
-	te_progress->appendHtml(final_message);
-	te_progress->verticalScrollBar()->setValue(te_progress->verticalScrollBar()->maximum());
+	if (!log_file_str.isEmpty()) {
+		QFile log_file(LogPath);
+		log_file.open(QIODevice::WriteOnly | QIODevice::Append);
+		QTextStream stream(&log_file);
+		stream << log_file_str << Qt::flush;
+	}
+}
 
-	// Log to file as well
-	QFile log_file(LogPath);
-    log_file.open(QIODevice::WriteOnly | QIODevice::Append);
-    QTextStream stream(&log_file);
-    stream << log_file_message << Qt::endl << Qt::flush;
+void HCWindow::logProgress(ProgressType progress_type, QString message) {
+	LogBuffer &window_buffer = LogBuffer::window();
+	QString time_str = QTime::currentTime().toString();
 
-	QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+	if (!window_buffer.str.isEmpty()) {
+		window_buffer.str += "<br>";
+	}
+
+	window_buffer.str += time_str;
+	window_buffer.str += ": ";
+
+	switch (progress_type) {
+		case ProgressNormal : window_buffer.str += "<font color=\"White\">LOG: "; break;
+		case ProgressSuccess : window_buffer.str += "<font color=\"Green\">SUCCESS: "; break;
+		case ProgressError : window_buffer.str += "<font color=\"DarkOrange\">ERROR: "; break;
+		case ProgressWarning : window_buffer.str += "<font color=\"Gold\">WARNING: "; break;
+		case ProgressFatal : window_buffer.str += "<font color=\"Red\">ERROR: "; break;
+	}
+	window_buffer.str += message;
+	window_buffer.str += "</font>";
+
+	LogBuffer &file_buffer = LogBuffer::file();
+	file_buffer.str += time_str;
+	file_buffer.str += ": ";
+	file_buffer.str += message;
+	file_buffer.str += '\n';
+
+	flushProgress(false);
+}
+
+void HCWindow::flushProgress(bool force_flush) {
+	LogBuffer &window_buffer = LogBuffer::window();
+	LogBuffer &file_buffer = LogBuffer::file();
+
+	if (QThread::currentThread() == qApp->thread()) {
+		logProgress(window_buffer.str, file_buffer.str);
+
+		window_buffer.str.clear();
+		file_buffer.str.clear();
+	}
+	else if (force_flush || window_buffer.timer.elapsed() > 50 || file_buffer.timer.elapsed() > 50) {
+		QString window_str = window_buffer.str;
+		QString file_str = file_buffer.str;
+
+		QMetaObject::invokeMethod(
+			this,
+			[=]() {
+				logProgress(window_str, file_str);
+			},
+			Qt::QueuedConnection);
+
+		window_buffer.timer.restart();
+		window_buffer.str.clear();
+
+		file_buffer.timer.restart();
+		file_buffer.str.clear();
+	}
 }
 
 void HCWindow::addSourceModelsTriggered() {
@@ -365,15 +424,21 @@ void HCWindow::convertTriggered() {
 
 	logProgress(ProgressNormal, "Starting converter...");
 
-	bool result = convert();
+	QtConcurrent::run([=]() {
+		bool result = convert();
 
-	if (result)
-		logProgress(ProgressSuccess, "Conversion complete!");
-	else
-		logProgress(ProgressFatal, "Conversion failed.");
+		if (result) 
+			logProgress(ProgressSuccess, "Conversion complete!");
+		else
+			logProgress(ProgressFatal, "Conversion failed.");
 
-	setEnabled(true);
-	beep();
+		flushProgress(true);
+
+		QMetaObject::invokeMethod(this, [=]() {
+			setEnabled(true);
+			beep();
+		});
+	});
 }
 
 void HCWindow::openSettingsTriggered() {

@@ -22,6 +22,9 @@
     <Filter Include="Externals\zlib">
       <UniqueIdentifier>{59d44688-8d9e-4009-ac36-95959a11156f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Externals\meshoptimizer">
+      <UniqueIdentifier>{d9593750-c5d1-43b6-aa05-f64b00be41c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tinyxml\tinystr.cpp">
@@ -96,6 +99,18 @@
     <ClCompile Include="zlib\zutil.c">
       <Filter>Externals\zlib</Filter>
     </ClCompile>
+    <ClCompile Include="meshoptimizer\stripifier.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\indexgenerator.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\vcacheoptimizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="meshoptimizer\vfetchoptimizer.cpp">
+      <Filter>Externals\meshoptimizer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tinyxml\tinystr.h">
@@ -163,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="zlib\zutil.h">
       <Filter>Externals\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="meshoptimizer\meshoptimizer.h">
+      <Filter>Externals\meshoptimizer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
