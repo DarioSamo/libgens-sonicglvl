@@ -188,6 +188,7 @@ void EditorApplication::selectAll() {
 				(*it)->setSelect(true);
 				wrapper->push(action_select);
 				selected_nodes.push_back(*it);
+				addTrajectory(getTrajectoryMode(*it));
 			}
 		}
 	}
