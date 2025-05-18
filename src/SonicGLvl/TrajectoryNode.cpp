@@ -142,8 +142,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	LibGens::ObjectElementFloat* speed_property;
 	LibGens::ObjectElementFloat* angle_property;
 	LibGens::ObjectElementFloat* size_property;
-	int angle_type;
-	int size_type;
+	int type;
 	float angle;
 
 	std::string impulse_speed_variable = boost ? "ImpulseSpeedOnBoost" : "ImpulseSpeedOnNormal";
@@ -151,67 +150,69 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	if (object_name == "JumpBoard")
 	{
 		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("AngleType"));
-		angle_type	= angle_property->value;
+		switch ((int)angle_property->value)
+		{
+		case 0: // 15S
+			type = 0;
+			break;
+		case 1: // 30S
+			type = 1;
+			break;
+		default:
+			return;
+		}
 	}
-	else
+	else // JumpBoard3D, AdlibTrickJump
 	{
 		size_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("SizeType"));
-		size_type = size_property->value;
+		switch ((int)size_property->value)
+		{
+		case 0: // 30M
+			type = 2;
+			break;
+		case 1: // 30L
+			type = 3;
+			break;
+		default:
+			return;
+		}
 	}
 
 	float impulse_speed = speed_property->value;
 	float y_offset = 0.0f;
-	if (object_name == "JumpBoard")
+	switch (type)
 	{
-		switch (angle_type)
-		{
-		case 0:
-			y_offset = 0.8;
-			angle = 15;
-			break;
+	case 0: // 15S
+		y_offset = 0.25;
+		angle = 15;
+		break;
 			
-		case 1:
-			y_offset = 1.0;
-			angle = 30;
-			break;
-
-		case 2:
-			y_offset = 1.5;
-			angle = 30;
-			break;
-
-		case 3:
-			y_offset = 2.5;
-			angle = 30;
-			break;
-			
-		default:
-			setPosition(node->getPosition());
-			return;
-		}
-	}
-	else
-	{
-		y_offset = size_type ? 2.5 : 1.5;
+	case 1: // 30S
+		y_offset = 0.45;
 		angle = 30;
+		break;
+
+	case 2: // 30M
+		y_offset = 1.0;
+		angle = 30;
+		break;
+
+	case 3: // 30L
+		y_offset = 2.0;
+		angle = 30;
+		break;
+			
+	default:
+		return;
 	}
 
 	Ogre::Vector3 direction(0, 0, 1);
 	Ogre::Quaternion obj_rotation = node->getRotation();
-	Ogre::Radian y_rad, p_rad, r_rad;
-	Ogre::Matrix3 rot_matrix;
-	obj_rotation.ToRotationMatrix(rot_matrix);
-	rot_matrix.ToEulerAnglesYXZ(y_rad, p_rad, r_rad);
 
-	Ogre::Real yaw_rad	 = y_rad.valueRadians();
-	Ogre::Real pitch_rad = p_rad.valueRadians();
-	Ogre::Real roll_rad  = r_rad.valueRadians();
-	pitch_rad += (angle * LIBGENS_MATH_PI) / 180;
+	Ogre::Vector3 right_axis = node->getRotation() * Ogre::Vector3(1, 0, 0);
+	Ogre::Quaternion pitch_rotation(Ogre::Radian((angle * LIBGENS_MATH_PI) / 180), right_axis);
 
-	rot_matrix.FromEulerAnglesYXZ(Ogre::Radian(yaw_rad), Ogre::Radian(pitch_rad), Ogre::Radian(roll_rad));
-	obj_rotation.FromRotationMatrix(rot_matrix);
-
-	direction = obj_rotation * direction;
+	direction = node->getRotation() * pitch_rotation * direction;
 	direction *= -1;
 
 	if (m_total_time >= m_max_time)
@@ -222,12 +223,13 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	float delta_y   = (impulse_speed * m_total_time * direction.y) + (0.5 * -gravity * (m_total_time * m_total_time));
 
 	float new_pos_x = (impulse_speed * m_total_time) * direction.x;
-	float new_pos_y = delta_y + y_offset;
+	float new_pos_y = delta_y;
 	float new_pos_z = (impulse_speed * m_total_time) * direction.z;
 
 	Ogre::Vector3 new_position = node->getPosition();
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
-	new_position += position_add;
+	Ogre::Vector3 local_offset = node->getRotation() * Ogre::Vector3(0, y_offset, 0);
+	new_position += position_add + local_offset;
 	boost ? m_linesExtra->addPoint(new_position) : m_lines->addPoint(new_position);
 }
 
