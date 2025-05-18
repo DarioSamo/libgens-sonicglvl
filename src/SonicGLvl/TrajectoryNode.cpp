@@ -251,14 +251,13 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 		return;
 	}
 
-	Ogre::Vector3 direction(0, 0, 1);
+	Ogre::Vector3 direction(0, 0, -1);
 	Ogre::Quaternion obj_rotation = node->getRotation();
 
 	Ogre::Vector3 right_axis = node->getRotation() * Ogre::Vector3(1, 0, 0);
 	Ogre::Quaternion pitch_rotation(Ogre::Radian((angle * LIBGENS_MATH_PI) / 180), right_axis);
 
-	direction = node->getRotation() * pitch_rotation * direction;
-	direction *= -1;
+	direction = pitch_rotation * node->getRotation() * direction;
 
 	if (m_total_time >= m_max_time)
 		return;
