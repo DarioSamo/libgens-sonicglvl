@@ -6,12 +6,13 @@
 enum TrajectoryMode
 {
 	NONE			= 0,
-	SPRING			= 1,
-	WIDE_SPRING		= 2,
-	JUMP_POLE		= 4,
-	JUMP_PANEL		= 8,
-	DASH_RING		= 16,
-	SELECT_CANNON	= 32
+	SPRING			= 1 << 0,
+	WIDE_SPRING		= 1 << 1,
+	JUMP_POLE		= 1 << 2,
+	JUMP_PANEL		= 1 << 3,
+	DASH_RING		= 1 << 4,
+	SELECT_CANNON	= 1 << 5,
+	TRICK_JUMPER	= 1 << 6,
 };
 
 class TrajectoryNode : public EditorNode
@@ -66,4 +67,5 @@ public:
 	void getTrajectorySpring(EditorNode* node);
 	void getTrajectoryJumpBoard(EditorNode* node, bool boost);
 	void getTrajectoryDashRing(EditorNode* node);
+	void getTrajectoryTrickJumper(EditorNode* node);
 };

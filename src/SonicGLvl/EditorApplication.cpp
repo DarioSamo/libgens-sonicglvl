@@ -1546,6 +1546,8 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 		mode = JUMP_PANEL;
 	else if ((object_name == "DashRing") || (object_name == "RainbowRing") || (object_name == "MissionTailsDashRing"))
 		mode = DASH_RING;
+	else if ((object_name == "TrickJumper"))
+		mode = TRICK_JUMPER;
 
 	return mode;
 }

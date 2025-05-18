@@ -69,6 +69,11 @@ void TrajectoryNode::restart(EditorNode* node, TrajectoryMode mode)
 			getTrajectoryDashRing(node);
 			break;
 
+		case TRICK_JUMPER:
+			getTrajectoryTrickJumper(node);
+			update_data2 = true;
+			break;
+
 		default:
 			return;
 		}
@@ -136,9 +141,6 @@ void TrajectoryNode::getTrajectorySpring(EditorNode* node)
 		switched_line = true; // add point on both lines
 	}
 
-	if (m_total_time >= m_max_time)
-		return;
-
 	float delta_y = getTrajectoryGravity(first_speed, ignore_distance, direction.y);
 	float new_pos_x, new_pos_y, new_pos_z;
 
@@ -185,8 +187,8 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	}
 
 	LibGens::ObjectElementFloat* speed_property;
-	LibGens::ObjectElementFloat* angle_property;
-	LibGens::ObjectElementFloat* size_property;
+	LibGens::ObjectElementInteger* angle_property;
+	LibGens::ObjectElementInteger* size_property;
 	int type;
 	float angle;
 
@@ -194,8 +196,8 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(impulse_speed_variable));
 	if (object_name == "JumpBoard")
 	{
-		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("AngleType"));
-		switch ((int)angle_property->value)
+		angle_property = static_cast<LibGens::ObjectElementInteger*>(object->getElement("AngleType"));
+		switch (angle_property->value)
 		{
 		case 0: // 15S
 			type = 0;
@@ -209,8 +211,8 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	}
 	else // JumpBoard3D, AdlibTrickJump
 	{
-		size_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("SizeType"));
-		switch ((int)size_property->value)
+		size_property = static_cast<LibGens::ObjectElementInteger*>(object->getElement("SizeType"));
+		switch (size_property->value)
 		{
 		case 0: // 30M
 			type = 2;
@@ -256,11 +258,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 
 	Ogre::Vector3 right_axis = node->getRotation() * Ogre::Vector3(1, 0, 0);
 	Ogre::Quaternion pitch_rotation(Ogre::Radian((angle * LIBGENS_MATH_PI) / 180), right_axis);
-
 	direction = pitch_rotation * node->getRotation() * direction;
-
-	if (m_total_time >= m_max_time)
-		return;
 
 	act_gravity		= true;
 	float gravity   = LIBGENS_MATH_GRAVITY;
@@ -305,9 +303,6 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 		switched_line = true; // add point on both lines
 	}
 
-	if (m_total_time >= m_max_time)
-		return;
-
 	float delta_y	= getTrajectoryGravity(first_speed, ignore_distance, direction.y);
 
 	float new_pos_x = first_speed * m_total_time * direction.x;
@@ -323,4 +318,82 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 
 	if (switched_line || !m_lineData1.m_draw_out_of_control)
 		m_lineData1.m_lines->addPoint(new_position);
+}
+
+void TrajectoryNode::getTrajectoryTrickJumper(EditorNode* node)
+{
+	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
+	LibGens::Object* object = object_node->getObject();
+	std::string object_name = object->getName();
+
+	LibGens::ObjectElementFloat* first_out_of_control_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("FirstOutOfControl"));
+	LibGens::ObjectElementFloat* first_pitch_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("FirstPitch"));
+	LibGens::ObjectElementFloat* first_speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("FirstSpeed"));
+
+	LibGens::ObjectElementFloat* second_out_of_control_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("SecondOutOfControl"));
+	LibGens::ObjectElementFloat* second_pitch_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("SecondPitch"));
+	LibGens::ObjectElementFloat* second_speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("SecondSpeed"));
+
+	LibGens::ObjectElementBool* is_side_view_property = static_cast<LibGens::ObjectElementBool*>(object->getElement("IsSideView"));
+
+	Ogre::Quaternion obj_rotation = node->getRotation();
+	Ogre::Vector3 right_axis = obj_rotation * Ogre::Vector3(1, 0, 0);
+	Ogre::Quaternion first_pitch_rotation(Ogre::Radian((first_pitch_property->value * LIBGENS_MATH_PI) / 180), right_axis);
+	Ogre::Quaternion second_pitch_rotation(Ogre::Radian((second_pitch_property->value * LIBGENS_MATH_PI) / 180), right_axis);
+	Ogre::Vector3 first_direction = first_pitch_rotation * obj_rotation * Ogre::Vector3(0, 0, -1);
+	Ogre::Vector3 second_direction = second_pitch_rotation * obj_rotation * Ogre::Vector3(0, 0, -1);
+
+	act_gravity = true;
+	float gravity = LIBGENS_MATH_GRAVITY;
+	float y_offset = is_side_view_property->value ? 1.0 : 2.0;
+	Ogre::Vector3 local_offset = node->getRotation() * Ogre::Vector3(0, y_offset, 0);
+
+	// fail line
+	{
+		bool switched_line = false;
+		if (m_lineData1.m_draw_out_of_control && m_total_time >= first_out_of_control_property->value)
+		{
+			m_lineData1.m_draw_out_of_control = false;
+			switched_line = true; // add point on both lines
+		}
+
+		Ogre::Vector3 new_position = node->getPosition() + local_offset;
+		new_position.x += (first_speed_property->value * m_total_time) * first_direction.x;
+		new_position.y += (first_speed_property->value * m_total_time * first_direction.y) + (0.5 * -gravity * (m_total_time * m_total_time));
+		new_position.z += (first_speed_property->value * m_total_time) * first_direction.z;
+
+		if (switched_line || m_lineData1.m_draw_out_of_control)
+			m_lineData1.m_lines_out_of_control->addPoint(new_position);
+		if (switched_line || !m_lineData1.m_draw_out_of_control)
+			m_lineData1.m_lines->addPoint(new_position);
+	}
+
+	// success line
+	{
+		bool switched_line = false;
+		if (m_lineData2.m_draw_out_of_control && m_total_time >= first_out_of_control_property->value)
+		{
+			m_lineData2.m_draw_out_of_control = false;
+			switched_line = true; // add point on both lines
+		}
+
+		float peak_time = first_speed_property->value * first_direction.y / gravity;
+		Ogre::Vector3 start_position = node->getPosition() + local_offset;
+		if (peak_time > 0.0f)
+		{
+			start_position.x += (first_speed_property->value * peak_time) * first_direction.x;
+			start_position.y += (first_speed_property->value * peak_time * first_direction.y) + (0.5 * -gravity * (peak_time * peak_time));
+			start_position.z += (first_speed_property->value * peak_time) * first_direction.z;
+		}
+
+		Ogre::Vector3 new_position = start_position;
+		new_position.x += (second_speed_property->value * m_total_time) * second_direction.x;
+		new_position.y += (second_speed_property->value * m_total_time * second_direction.y) + (0.5 * -gravity * (m_total_time * m_total_time));
+		new_position.z += (second_speed_property->value * m_total_time) * second_direction.z;
+
+		if (switched_line || m_lineData2.m_draw_out_of_control)
+			m_lineData2.m_lines_out_of_control->addPoint(new_position);
+		if (switched_line || !m_lineData2.m_draw_out_of_control)
+			m_lineData2.m_lines->addPoint(new_position);
+	}
 }
