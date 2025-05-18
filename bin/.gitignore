@@ -5,8 +5,6 @@ RelWithDebInfo/
 *.dll
 *.ini
 *.log
-*.lib
-*.exp
 
 !nvdxt.exe
 !HavokConverter_LostWorld.ini
