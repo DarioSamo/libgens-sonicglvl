@@ -197,8 +197,16 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	if (object_name == "ClassicJumpBoard")
 	{
 		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(boost ? "ClassicJumpAngleOnBoost" :"ClassicJumpAngleOnNormal"));
-		angle = angle_property->value;
 		type = 4;
+	}
+	else if (object_name == "CteTrickJumpSkateBoard")
+	{
+		if (boost)
+			return;
+
+		speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("ApplyVelocity"));
+		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("LaunchAngle"));
+		type = 5;
 	}
 	else if (object_name == "JumpBoard")
 	{
@@ -259,6 +267,12 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 
 	case 4: // Classic
 		y_offset = 0.0;
+		angle = angle_property->value;
+		break;
+
+	case 5: // CteTrickJump -> 0xF4A428
+		y_offset = 0.1;
+		angle = 30 + angle_property->value;
 		break;
 			
 	default:
