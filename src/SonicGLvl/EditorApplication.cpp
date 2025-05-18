@@ -1569,9 +1569,6 @@ void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
 	if (!selected_nodes.size())
 		return;
 
-	for (int count = 0; count < trajectory_preview_nodes.size(); ++count)
-		trajectory_preview_nodes[count]->addTime(timeSinceLastFrame);
-
 	int count = 0;
 	list<EditorNode*>::iterator it = selected_nodes.begin();
 
