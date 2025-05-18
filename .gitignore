@@ -21,7 +21,6 @@ build/
 bld/
 backup/
 [Oo]bj/
-database/
 
 # Roslyn cache directories
 *.ide/
