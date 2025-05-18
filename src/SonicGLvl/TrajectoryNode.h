@@ -24,8 +24,18 @@ private:
 	float keep_velocity_distance;
 	bool act_gravity;
 
+	DynamicLines* m_lines;
+	DynamicLines* m_linesExtra;
+	Ogre::Vector3 m_lastPos;
+	Ogre::Quaternion m_lastRot;
+
 public:
-	TrajectoryNode(Ogre::SceneManager* scene_manager, TrajectoryMode mode = NONE);
+	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode = NONE);
+	~TrajectoryNode()
+	{
+		delete m_lines;
+		delete m_linesExtra;
+	}
 
 	void addTime(Ogre::Real time)
 	{
@@ -33,12 +43,8 @@ public:
 		m_gravity_time += time;
 	}
 
-	void resetTime()
-	{
-		m_total_time = 0.0f;
-		m_gravity_time = 0.0f;
-		act_gravity = false;
-	}
+	void restart(EditorNode* node);
+	void restartIfChanged(EditorNode* node, TrajectoryMode mode);
 
 	void setPosition(Ogre::Vector3 position)
 	{

@@ -1,28 +1,78 @@
 #include "StdAfx.h"
 #include "EditorApplication.h"
 
-TrajectoryNode::TrajectoryNode(Ogre::SceneManager* scene_manager, TrajectoryMode mode)
+TrajectoryNode::TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode)
 {
 	type = EDITOR_NODE_TRAJECTORY;
 
 	scene_node = scene_manager->getRootSceneNode()->createChildSceneNode();
 	scene_node->setPosition(position);
-	scene_node->setScale(Ogre::Vector3(0.015f));
+	scene_node->setScale(scale);
 	scene_node->getUserObjectBindings().setUserAny("EditorNodePtr", Ogre::Any((EditorNode*)this));
 
-	Ogre::Entity* entity = scene_manager->createEntity("w_axis.mesh");
-	entity->setQueryFlags(0x100);
-	entity->setRenderQueueGroup(Ogre::RENDER_QUEUE_MAX);
-	scene_node->attachObject(entity);
+	m_lines = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
+	scene_node->attachObject(m_lines);
+	m_linesExtra = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
+	scene_node->attachObject(m_linesExtra);
 
 	selected = false;
 
-	m_gravity_time			= 0;
-	m_total_time			= 0;
-	m_max_time				= 5;
+	m_max_time				= 10; // TODO: > OutOfControl
 	keep_velocity_distance	= 0;
-	m_mode					= mode;
-	act_gravity				= false;
+	m_mode					= NONE;
+
+	restartIfChanged(node, mode);
+}
+
+void TrajectoryNode::restart(EditorNode* node)
+{
+	m_total_time = 0.0f;
+	m_gravity_time = 0.0f;
+	act_gravity = false;
+
+	m_lines->clear();
+	m_linesExtra->clear();
+	while (m_total_time <= m_max_time)
+	{
+		switch (m_mode)
+		{
+		case SPRING:
+		case WIDE_SPRING:
+			getTrajectorySpring(node);
+			break;
+
+		case JUMP_PANEL:
+			getTrajectoryJumpBoard(node, false);
+			getTrajectoryJumpBoard(node, true);
+			break;
+
+		case DASH_RING:
+			getTrajectoryDashRing(node);
+			break;
+
+		default:
+			return;
+		}
+
+		addTime(1.0f / 30.0f);
+	}
+
+	m_lines->update();
+	m_linesExtra->update();
+}
+
+void TrajectoryNode::restartIfChanged(EditorNode* node, TrajectoryMode mode)
+{
+	Ogre::Vector3 object_position = node->getPosition();
+	Ogre::Quaternion object_rotation = node->getRotation();
+
+	if (m_mode != mode || m_lastPos != object_position || m_lastRot != object_rotation)
+	{
+		m_lastPos = object_position;
+		m_lastRot = object_rotation;
+		m_mode = mode;
+		restart(node);
+	}
 }
 
 float TrajectoryNode::getTrajectoryGravity(float first_speed, float ignore_distance, float y_direction)
@@ -67,7 +117,7 @@ void TrajectoryNode::getTrajectorySpring(EditorNode* node)
 	Ogre::Vector3 direction = node->getRotation() * spring_dir;
 
 	if (m_total_time >= m_max_time)
-		resetTime();
+		return;
 
 	float delta_y = getTrajectoryGravity(first_speed, ignore_distance, direction.y);
 	float new_pos_x, new_pos_y, new_pos_z;
@@ -90,7 +140,7 @@ void TrajectoryNode::getTrajectorySpring(EditorNode* node)
 	Ogre::Vector3 new_position = node->getPosition();
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
-	setPosition(new_position);
+	m_lines->addPoint(new_position);
 }
 
 void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
@@ -175,7 +225,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	direction *= -1;
 
 	if (m_total_time >= m_max_time)
-		resetTime();
+		return;
 
 	act_gravity		= true;
 	float gravity   = LIBGENS_MATH_GRAVITY;
@@ -188,7 +238,7 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	Ogre::Vector3 new_position = node->getPosition();
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
-	setPosition(new_position);
+	boost ? m_linesExtra->addPoint(new_position) : m_lines->addPoint(new_position);
 }
 
 void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
@@ -206,8 +256,8 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 	direction  = node_rotation * direction;
 	direction *= -1;
 
-	if (m_total_time > m_max_time)
-		resetTime();
+	if (m_total_time >= m_max_time)
+		return;
 
 	float delta_y	= getTrajectoryGravity(first_speed, ignore_distance, direction.y);
 
@@ -218,5 +268,5 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 	Ogre::Vector3 new_position = node->getPosition();
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
-	setPosition(new_position);
+	m_lines->addPoint(new_position);
 }

@@ -368,7 +368,7 @@ class EditorApplication : public BaseApplication {
 		list<EditorNode*> getSelectedNodes();
 		ObjectNode* getObjectNodeFromEditorNode(EditorNode* node);
 		TrajectoryMode getTrajectoryMode(EditorNode* node);
-		void addTrajectory(TrajectoryMode mode);
+		void addTrajectory(EditorNode* node);
 		void removeAllTrajectoryNodes();
 		bool isUpdatePosRot();
 

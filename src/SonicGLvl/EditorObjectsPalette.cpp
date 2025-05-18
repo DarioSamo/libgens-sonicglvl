@@ -216,7 +216,7 @@ void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent 
 				HistoryActionSelectNode *action_select = new HistoryActionSelectNode(new_object_node, false, true, &selected_nodes);
 				new_object_node->setSelect(true);
 				selected_nodes.push_back(new_object_node);
-				addTrajectory(getTrajectoryMode(new_object_node));
+				addTrajectory(new_object_node);
 				wrapper->push(action_select);
 			}
 		}

@@ -188,7 +188,7 @@ void EditorApplication::selectAll() {
 				(*it)->setSelect(true);
 				wrapper->push(action_select);
 				selected_nodes.push_back(*it);
-				addTrajectory(getTrajectoryMode(*it));
+				addTrajectory(*it);
 			}
 		}
 	}
@@ -1171,7 +1171,7 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, false, true, &selected_nodes);
 							current_node->setSelect(true);
 							selected_nodes.push_back(current_node);
-							addTrajectory(getTrajectoryMode(current_node));
+							addTrajectory(current_node);
 							pushHistory(action_select);
 
 						}
@@ -1554,16 +1554,14 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 	return mode;
 }
 
-void EditorApplication::addTrajectory(TrajectoryMode mode)
+void EditorApplication::addTrajectory(EditorNode* node)
 {
+	TrajectoryMode mode = getTrajectoryMode(node);
+
 	if (mode == NONE)
 		return;
 
-	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
-	
-	// JumpBoards need two nodes. One for normal, and the other for boost
-	if (mode == JUMP_PANEL)
-		trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
+	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, node, mode));
 }
 
 void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
@@ -1583,26 +1581,7 @@ void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
 		{
 			EditorNode* node = *it;
 			TrajectoryMode mode = getTrajectoryMode(node);
-			switch (mode)
-			{
-			case SPRING:
-			case WIDE_SPRING:
-				trajectory_preview_nodes[count]->getTrajectorySpring(node);
-				break;
-
-			case JUMP_PANEL:
-				trajectory_preview_nodes[count++]->getTrajectoryJumpBoard(node, false);
-				trajectory_preview_nodes[count]->getTrajectoryJumpBoard(node, true);
-				break;
-
-			case DASH_RING:
-				trajectory_preview_nodes[count]->getTrajectoryDashRing(node);
-				break;
-
-			default:
-				break;
-			}
-
+			trajectory_preview_nodes[count]->restartIfChanged(node, mode);
 			++count;
 		}
 		else
