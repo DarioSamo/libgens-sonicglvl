@@ -1542,7 +1542,7 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 		mode = WIDE_SPRING;
 	else if (object_name ==  "JumpPole")
 		mode = JUMP_POLE;
-	else if ((object_name == "JumpBoard") || (object_name == "JumpBoard3D") || (object_name == "AdlibTrickJump"))
+	else if ((object_name == "JumpBoard") || (object_name == "JumpBoard3D") || (object_name == "AdlibTrickJump") || (object_name == "ClassicJumpBoard"))
 		mode = JUMP_PANEL;
 	else if ((object_name == "DashRing") || (object_name == "RainbowRing") || (object_name == "MissionTailsDashRing"))
 		mode = DASH_RING;

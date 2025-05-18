@@ -187,17 +187,23 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	}
 
 	LibGens::ObjectElementFloat* speed_property;
-	LibGens::ObjectElementInteger* angle_property;
+	LibGens::ObjectElementFloat* angle_property;
 	LibGens::ObjectElementInteger* size_property;
 	int type;
 	float angle;
 
 	std::string impulse_speed_variable = boost ? "ImpulseSpeedOnBoost" : "ImpulseSpeedOnNormal";
 	speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(impulse_speed_variable));
-	if (object_name == "JumpBoard")
+	if (object_name == "ClassicJumpBoard")
 	{
-		angle_property = static_cast<LibGens::ObjectElementInteger*>(object->getElement("AngleType"));
-		switch (angle_property->value)
+		angle_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement(boost ? "ClassicJumpAngleOnBoost" :"ClassicJumpAngleOnNormal"));
+		angle = angle_property->value;
+		type = 4;
+	}
+	else if (object_name == "JumpBoard")
+	{
+		size_property = static_cast<LibGens::ObjectElementInteger*>(object->getElement("AngleType"));
+		switch (size_property->value)
 		{
 		case 0: // 15S
 			type = 0;
@@ -225,6 +231,8 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 		}
 	}
 
+	// angle -> sub_1033F60
+	// offset -> sub_10341F0
 	float impulse_speed = speed_property->value;
 	float y_offset = 0.0f;
 	switch (type)
@@ -247,6 +255,10 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	case 3: // 30L
 		y_offset = 2.0;
 		angle = 30;
+		break;
+
+	case 4: // Classic
+		y_offset = 0.0;
 		break;
 			
 	default:
