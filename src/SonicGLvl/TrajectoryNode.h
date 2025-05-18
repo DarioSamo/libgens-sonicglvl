@@ -26,8 +26,6 @@ private:
 
 	DynamicLines* m_lines;
 	DynamicLines* m_linesExtra;
-	Ogre::Vector3 m_lastPos;
-	Ogre::Quaternion m_lastRot;
 
 public:
 	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode = NONE);
@@ -43,8 +41,7 @@ public:
 		m_gravity_time += time;
 	}
 
-	void restart(EditorNode* node);
-	void restartIfChanged(EditorNode* node, TrajectoryMode mode);
+	void restart(EditorNode* node, TrajectoryMode mode);
 
 	void setPosition(Ogre::Vector3 position)
 	{

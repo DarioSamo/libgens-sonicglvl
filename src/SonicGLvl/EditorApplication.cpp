@@ -125,7 +125,6 @@ void EditorApplication::deleteSelection() {
 			}
 		}
 
-		removeAllTrajectoryNodes();
 		selected_nodes.clear();
 		axis->setVisible(false);
 
@@ -156,7 +155,6 @@ void EditorApplication::clearSelection() {
 		delete wrapper;
 	}
 
-	removeAllTrajectoryNodes();
 	selected_nodes.clear();
 	axis->setVisible(false);
 }
@@ -188,7 +186,6 @@ void EditorApplication::selectAll() {
 				(*it)->setSelect(true);
 				wrapper->push(action_select);
 				selected_nodes.push_back(*it);
-				addTrajectory(*it);
 			}
 		}
 	}
@@ -1171,7 +1168,6 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, false, true, &selected_nodes);
 							current_node->setSelect(true);
 							selected_nodes.push_back(current_node);
-							addTrajectory(current_node);
 							pushHistory(action_select);
 
 						}
@@ -1554,42 +1550,33 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 	return mode;
 }
 
-void EditorApplication::addTrajectory(EditorNode* node)
-{
-	TrajectoryMode mode = getTrajectoryMode(node);
-
-	if (mode == NONE)
-		return;
-
-	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, node, mode));
-}
-
 void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
 {
-	if (!selected_nodes.size())
-		return;
-
 	int count = 0;
 	list<EditorNode*>::iterator it = selected_nodes.begin();
 
 	for (; it != selected_nodes.end(); ++it)
 	{
-		if (count < trajectory_preview_nodes.size())
+		EditorNode* node = *it;
+		TrajectoryMode mode = getTrajectoryMode(node);
+
+		if (mode == NONE)
+			continue;
+
+		// create new TrajectoryNode for those that need it
+		if (count >= trajectory_preview_nodes.size())
 		{
-			EditorNode* node = *it;
-			TrajectoryMode mode = getTrajectoryMode(node);
-			trajectory_preview_nodes[count]->restartIfChanged(node, mode);
-			++count;
+			trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, node, mode));
 		}
-		else
-			break;
+
+		trajectory_preview_nodes[count]->restart(node, mode);
+		++count;
 	}
-}
 
-void EditorApplication::removeAllTrajectoryNodes()
-{
-	for (vector<TrajectoryNode*>::iterator it = trajectory_preview_nodes.begin(); it != trajectory_preview_nodes.end(); ++it)
-		delete* it;
-
-	trajectory_preview_nodes.clear();
+	// auto shrink vector size
+	while (count < trajectory_preview_nodes.size())
+	{
+		delete trajectory_preview_nodes.back();
+		trajectory_preview_nodes.pop_back();
+	}
 }

@@ -21,11 +21,15 @@ TrajectoryNode::TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* no
 	keep_velocity_distance	= 0;
 	m_mode					= NONE;
 
-	restartIfChanged(node, mode);
+	restart(node, mode);
 }
 
-void TrajectoryNode::restart(EditorNode* node)
+void TrajectoryNode::restart(EditorNode* node, TrajectoryMode mode)
 {
+	Ogre::Vector3 object_position = node->getPosition();
+	Ogre::Quaternion object_rotation = node->getRotation();
+	m_mode = mode;
+
 	m_total_time = 0.0f;
 	m_gravity_time = 0.0f;
 	act_gravity = false;
@@ -59,20 +63,6 @@ void TrajectoryNode::restart(EditorNode* node)
 
 	m_lines->update();
 	m_linesExtra->update();
-}
-
-void TrajectoryNode::restartIfChanged(EditorNode* node, TrajectoryMode mode)
-{
-	Ogre::Vector3 object_position = node->getPosition();
-	Ogre::Quaternion object_rotation = node->getRotation();
-
-	if (m_mode != mode || m_lastPos != object_position || m_lastRot != object_rotation)
-	{
-		m_lastPos = object_position;
-		m_lastRot = object_rotation;
-		m_mode = mode;
-		restart(node);
-	}
 }
 
 float TrajectoryNode::getTrajectoryGravity(float first_speed, float ignore_distance, float y_direction)
