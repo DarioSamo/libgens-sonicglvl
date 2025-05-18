@@ -18,54 +18,54 @@ enum TrajectoryMode
 class TrajectoryNode : public EditorNode
 {
 private:
-	Ogre::Real m_total_time;
-	Ogre::Real m_gravity_time;
-	Ogre::Real m_max_time;
-	TrajectoryMode m_mode;
+	Ogre::Real total_time;
+	Ogre::Real gravity_time;
+	Ogre::Real max_time;
+	TrajectoryMode mode;
 	float keep_velocity_distance;
 	bool act_gravity;
 
 	struct LineData
 	{
-		DynamicLines* m_lines;
-		DynamicLines* m_lines_out_of_control;
-		bool m_draw_out_of_control;
+		DynamicLines* lines;
+		DynamicLines* lines_out_of_control;
+		bool draw_out_of_control;
 	};
 
-	LineData m_lineData1;
-	LineData m_lineData2;
+	LineData line_data1;
+	LineData line_data2;
 
 public:
-	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode = NONE);
+	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* n, TrajectoryMode m = NONE);
 	~TrajectoryNode()
 	{
-		delete m_lineData1.m_lines;
-		delete m_lineData1.m_lines_out_of_control;
-		delete m_lineData2.m_lines;
-		delete m_lineData2.m_lines_out_of_control;
+		delete line_data1.lines;
+		delete line_data1.lines_out_of_control;
+		delete line_data2.lines;
+		delete line_data2.lines_out_of_control;
 	}
 
 	void addTime(Ogre::Real time)
 	{
-		m_total_time += time;
-		m_gravity_time += time;
+		total_time += time;
+		gravity_time += time;
 	}
 
-	void restart(EditorNode* node, TrajectoryMode mode);
+	void restart(EditorNode* n, TrajectoryMode m);
 
 	void setPosition(Ogre::Vector3 position)
 	{
 		EditorNode::setPosition(position);
 	}
 
-	void setMode(TrajectoryMode mode)
+	void setMode(TrajectoryMode m)
 	{
-		m_mode = mode;
+		mode = m;
 	}
 
 	float getTrajectoryGravity(float first_speed, float keep_distance, float y_direction);
-	void getTrajectorySpring(EditorNode* node);
-	void getTrajectoryJumpBoard(EditorNode* node, bool boost);
-	void getTrajectoryDashRing(EditorNode* node);
-	void getTrajectoryTrickJumper(EditorNode* node);
+	void getTrajectorySpring(EditorNode* n);
+	void getTrajectoryJumpBoard(EditorNode* n, bool boost);
+	void getTrajectoryDashRing(EditorNode* n);
+	void getTrajectoryTrickJumper(EditorNode* n);
 };
