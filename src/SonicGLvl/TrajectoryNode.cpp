@@ -10,10 +10,17 @@ TrajectoryNode::TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* no
 	scene_node->setScale(scale);
 	scene_node->getUserObjectBindings().setUserAny("EditorNodePtr", Ogre::Any((EditorNode*)this));
 
-	m_lines = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
-	scene_node->attachObject(m_lines);
-	m_linesExtra = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
-	scene_node->attachObject(m_linesExtra);
+	m_lineData1.m_lines = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
+	m_lineData1.m_lines_out_of_control = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
+	m_lineData1.m_lines_out_of_control->setMaterial("outofcontrol");
+	scene_node->attachObject(m_lineData1.m_lines);
+	scene_node->attachObject(m_lineData1.m_lines_out_of_control);
+
+	m_lineData2.m_lines = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
+	m_lineData2.m_lines_out_of_control = new DynamicLines(Ogre::RenderOperation::OT_LINE_STRIP);
+	m_lineData2.m_lines_out_of_control->setMaterial("outofcontrol");
+	scene_node->attachObject(m_lineData2.m_lines);
+	scene_node->attachObject(m_lineData2.m_lines_out_of_control);
 
 	selected = false;
 
@@ -34,8 +41,15 @@ void TrajectoryNode::restart(EditorNode* node, TrajectoryMode mode)
 	m_gravity_time = 0.0f;
 	act_gravity = false;
 
-	m_lines->clear();
-	m_linesExtra->clear();
+	m_lineData1.m_lines->clear();
+	m_lineData1.m_lines_out_of_control->clear();
+	m_lineData1.m_draw_out_of_control = true;
+
+	m_lineData2.m_lines->clear();
+	m_lineData2.m_lines_out_of_control->clear();
+	m_lineData2.m_draw_out_of_control = true;
+
+	bool update_data2 = false;
 	while (m_total_time <= m_max_time)
 	{
 		switch (m_mode)
@@ -48,6 +62,7 @@ void TrajectoryNode::restart(EditorNode* node, TrajectoryMode mode)
 		case JUMP_PANEL:
 			getTrajectoryJumpBoard(node, false);
 			getTrajectoryJumpBoard(node, true);
+			update_data2 = true;
 			break;
 
 		case DASH_RING:
@@ -61,8 +76,14 @@ void TrajectoryNode::restart(EditorNode* node, TrajectoryMode mode)
 		addTime(1.0f / 30.0f);
 	}
 
-	m_lines->update();
-	m_linesExtra->update();
+	m_lineData1.m_lines->update();
+	m_lineData1.m_lines_out_of_control->update();
+
+	if (update_data2)
+	{
+		m_lineData2.m_lines->update();
+		m_lineData2.m_lines_out_of_control->update();
+	}
 }
 
 float TrajectoryNode::getTrajectoryGravity(float first_speed, float ignore_distance, float y_direction)
@@ -99,12 +120,21 @@ void TrajectoryNode::getTrajectorySpring(EditorNode* node)
 
 	LibGens::ObjectElementFloat* first_speed_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("FirstSpeed"));
 	LibGens::ObjectElementFloat* keep_distance_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("KeepVelocityDistance"));
+	LibGens::ObjectElementFloat* out_of_control_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("OutOfControl"));
 	float first_speed	  = first_speed_property->value;
 	float ignore_distance = keep_distance_property->value;
+	float out_of_control = out_of_control_property->value;
 
 	// Springs use Y-direction
 	Ogre::Vector3 spring_dir(0, 1, 0);
 	Ogre::Vector3 direction = node->getRotation() * spring_dir;
+
+	bool switched_line = false;
+	if (m_lineData1.m_draw_out_of_control && m_total_time >= out_of_control)
+	{
+		m_lineData1.m_draw_out_of_control = false;
+		switched_line = true; // add point on both lines
+	}
 
 	if (m_total_time >= m_max_time)
 		return;
@@ -130,7 +160,11 @@ void TrajectoryNode::getTrajectorySpring(EditorNode* node)
 	Ogre::Vector3 new_position = node->getPosition();
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
-	m_lines->addPoint(new_position);
+
+	if (switched_line || m_lineData1.m_draw_out_of_control)
+		m_lineData1.m_lines_out_of_control->addPoint(new_position);
+	if (switched_line || !m_lineData1.m_draw_out_of_control)
+		m_lineData1.m_lines->addPoint(new_position);
 }
 
 void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
@@ -138,6 +172,17 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
 	LibGens::Object* object = object_node->getObject();
 	std::string object_name = object->getName();
+
+	LibGens::ObjectElementFloat* out_of_control_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("OutOfControl"));
+	float out_of_control = out_of_control_property->value;
+
+	LineData& line_data = boost ? m_lineData1 : m_lineData2;
+	bool switched_line = false;
+	if (line_data.m_draw_out_of_control && m_total_time >= out_of_control)
+	{
+		line_data.m_draw_out_of_control = false;
+		switched_line = true; // add point on both lines
+	}
 
 	LibGens::ObjectElementFloat* speed_property;
 	LibGens::ObjectElementFloat* angle_property;
@@ -230,7 +275,11 @@ void TrajectoryNode::getTrajectoryJumpBoard(EditorNode* node, bool boost)
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	Ogre::Vector3 local_offset = node->getRotation() * Ogre::Vector3(0, y_offset, 0);
 	new_position += position_add + local_offset;
-	boost ? m_linesExtra->addPoint(new_position) : m_lines->addPoint(new_position);
+
+	if (switched_line || line_data.m_draw_out_of_control)
+		line_data.m_lines_out_of_control->addPoint(new_position);
+	if (switched_line || !line_data.m_draw_out_of_control)
+		line_data.m_lines->addPoint(new_position);
 }
 
 void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
@@ -240,13 +289,22 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 
 	LibGens::ObjectElementFloat* first_speed_property   = static_cast<LibGens::ObjectElementFloat*>(object->getElement("FirstSpeed"));
 	LibGens::ObjectElementFloat* keep_distance_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("KeepVelocityDistance"));
+	LibGens::ObjectElementFloat* out_of_control_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("OutOfControl"));
 	float first_speed	  = first_speed_property->value;
 	float ignore_distance = keep_distance_property->value;
+	float out_of_control = out_of_control_property->value;
 
 	Ogre::Vector3 direction(0, 0, 1);
 	Ogre::Quaternion node_rotation = node->getRotation();
 	direction  = node_rotation * direction;
 	direction *= -1;
+
+	bool switched_line = false;
+	if (m_lineData1.m_draw_out_of_control && m_total_time >= out_of_control)
+	{
+		m_lineData1.m_draw_out_of_control = false;
+		switched_line = true; // add point on both lines
+	}
 
 	if (m_total_time >= m_max_time)
 		return;
@@ -260,5 +318,10 @@ void TrajectoryNode::getTrajectoryDashRing(EditorNode* node)
 	Ogre::Vector3 new_position = node->getPosition();
 	Ogre::Vector3 position_add(new_pos_x, new_pos_y, new_pos_z);
 	new_position += position_add;
-	m_lines->addPoint(new_position);
+
+	if (switched_line || m_lineData1.m_draw_out_of_control)
+		m_lineData1.m_lines_out_of_control->addPoint(new_position);
+
+	if (switched_line || !m_lineData1.m_draw_out_of_control)
+		m_lineData1.m_lines->addPoint(new_position);
 }

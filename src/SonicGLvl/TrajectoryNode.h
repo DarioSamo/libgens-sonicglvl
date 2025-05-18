@@ -24,15 +24,24 @@ private:
 	float keep_velocity_distance;
 	bool act_gravity;
 
-	DynamicLines* m_lines;
-	DynamicLines* m_linesExtra;
+	struct LineData
+	{
+		DynamicLines* m_lines;
+		DynamicLines* m_lines_out_of_control;
+		bool m_draw_out_of_control;
+	};
+
+	LineData m_lineData1;
+	LineData m_lineData2;
 
 public:
 	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode = NONE);
 	~TrajectoryNode()
 	{
-		delete m_lines;
-		delete m_linesExtra;
+		delete m_lineData1.m_lines;
+		delete m_lineData1.m_lines_out_of_control;
+		delete m_lineData2.m_lines;
+		delete m_lineData2.m_lines_out_of_control;
 	}
 
 	void addTime(Ogre::Real time)
