@@ -24,7 +24,6 @@ TrajectoryNode::TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* no
 
 	selected = false;
 
-	m_max_time				= 10; // TODO: > OutOfControl
 	keep_velocity_distance	= 0;
 	m_mode					= NONE;
 
@@ -36,6 +35,11 @@ void TrajectoryNode::restart(EditorNode* node, TrajectoryMode mode)
 	Ogre::Vector3 object_position = node->getPosition();
 	Ogre::Quaternion object_rotation = node->getRotation();
 	m_mode = mode;
+
+	ObjectNode* object_node = editor_application->getObjectNodeFromEditorNode(node);
+	LibGens::Object* object = object_node->getObject();
+	LibGens::ObjectElementFloat* out_of_control_property = static_cast<LibGens::ObjectElementFloat*>(object->getElement("OutOfControl"));
+	m_max_time = max(10.0f, out_of_control_property->value);
 
 	m_total_time = 0.0f;
 	m_gravity_time = 0.0f;
