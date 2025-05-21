@@ -386,12 +386,6 @@ void EditorApplication::renameLayer(int index, string name) {
 	}
 }
 
-void EditorApplication::enableLayerDelete() {
-	int index = SendMessage(GetDlgItem(hLeftDlg, IDL_LAYER_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-	HWND hLayersDelete = GetDlgItem(hLeftDlg, IDB_LAYER_DELETE);
-	EnableWindow(hLayersDelete, set_mapping.count(index) && set_mapping.size() > 1);
-}
-
 void EditorApplication::deleteLayer() {
 	int index = SendMessage(GetDlgItem(hLeftDlg, IDL_LAYER_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
 	if (set_mapping.count(index) && set_mapping.size() > 1)
@@ -517,7 +511,17 @@ INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 			case NM_CLICK:
 			{
 				// check if selected layer can be deleted
-				editor_application->enableLayerDelete();
+				HWND hLayersList = GetDlgItem(hDlg, IDL_LAYER_LIST);
+				selection_index = SendMessage(hLayersList, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+				HWND hLayersDelete = GetDlgItem(hDlg, IDB_LAYER_DELETE);
+				EnableWindow(hLayersDelete, selection_index >= 0 && ListView_GetItemCount(hLayersList) > 1);
+				return true;
+			}
+			case NM_DBLCLK:
+			{
+				// select all objects in selected layer
+				selection_index = SendMessage(GetDlgItem(hDlg, IDL_LAYER_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+				editor_application->selectAll(selection_index);
 				return true;
 			}
 			}

@@ -176,19 +176,41 @@ void EditorApplication::showSelectionNames() {
 	SHOW_MSG(message.c_str());
 }
 
-void EditorApplication::selectAll() {
+void EditorApplication::selectAll(int layer_index) {
 	bool stuff_selected = false;
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
 
 	if (editor_mode == EDITOR_NODE_QUERY_OBJECT) {
 		list<ObjectNode *> object_nodes = object_node_manager->getObjectNodes();
 		for (list<ObjectNode *>::iterator it=object_nodes.begin(); it!=object_nodes.end(); it++) {
-			if (!(*it)->isSelected() && !(*it)->isForceHidden()) {
+			bool isObjectInLayer = true;
+			if (layer_index >= 0)
+			{
+				if (set_mapping.count(layer_index))
+				{
+					LibGens::ObjectSet* set = set_mapping[layer_index];
+					isObjectInLayer = set->hasObject((*it)->getObject());
+				}
+				else
+				{
+					isObjectInLayer = false;
+				}
+			}
+			
+			if (!(*it)->isSelected() && !(*it)->isForceHidden() && isObjectInLayer) {
 				stuff_selected = true;
 				HistoryActionSelectNode *action_select = new HistoryActionSelectNode((*it), false, true, &selected_nodes);
 				(*it)->setSelect(true);
 				wrapper->push(action_select);
 				selected_nodes.push_back(*it);
+			}
+			else if ((*it)->isSelected() && ((*it)->isForceHidden() || !isObjectInLayer))
+			{
+				stuff_selected = true;
+				HistoryActionSelectNode* action_select = new HistoryActionSelectNode((*it), true, false, &selected_nodes);
+				(*it)->setSelect(false);
+				wrapper->push(action_select);
+				selected_nodes.remove(*it);
 			}
 		}
 	}

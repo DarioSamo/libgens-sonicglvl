@@ -351,7 +351,7 @@ class EditorApplication : public BaseApplication {
 		void cloneSelection();
 		void temporaryCloneSelection();
 		void showSelectionNames();
-		void selectAll();
+		void selectAll(int layer_index = -1);
 		void translateSelection(Ogre::Vector3 v);
 		void rotateSelection(Ogre::Quaternion q);
 		void setSelectionRotation(Ogre::Quaternion q);
@@ -431,7 +431,6 @@ class EditorApplication : public BaseApplication {
 		void updateLayerControlGUI();
 		void setLayerVisibility(int index, bool v);
 		void renameLayer(int index, string name);
-		void enableLayerDelete();
 		void deleteLayer();
 		void newLayer();
 
