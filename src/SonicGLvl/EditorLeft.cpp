@@ -398,7 +398,7 @@ void EditorApplication::deleteLayer() {
 	{
 		LibGens::ObjectSet* set = set_mapping[index];
 		list<LibGens::Object*> objects = set->getObjects();
-		string text = "Do you want to delete'" + set->getName() + "' layer and " + to_string(objects.size()) + " objects in it?";
+		string text = "Do you want to delete '" + set->getName() + "' layer and " + to_string(objects.size()) + " objects in it?";
 		text += "\nThis action CANNOT be undone.";
 		if (MessageBox(NULL, text.c_str(), "Delete Layer", MB_YESNO | MB_ICONWARNING) == IDYES)
 		{
