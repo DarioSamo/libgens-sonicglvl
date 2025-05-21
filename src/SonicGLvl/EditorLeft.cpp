@@ -268,6 +268,87 @@ bool EditorApplication::isRegularMode() {
 	return regular_mode;
 }
 
+void EditorApplication::createLayerControlGUI() {
+	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
+	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_NEW_LAYER);
+	HWND hLayersDelete = GetDlgItem(hLeftDlg, IDB_DELETE_LAYER);
+
+	LVCOLUMN Col;
+	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+	Col.cx = 142;
+	Col.pszText = "Name";
+	Col.cchTextMax = strlen(Col.pszText);
+	ListView_InsertColumn(hLayersList, 0, &Col);
+
+
+	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+	Col.cx = 115;
+	Col.pszText = "Objects";
+	Col.cchTextMax = strlen(Col.pszText);
+	ListView_InsertColumn(hLayersList, 1, &Col);
+
+	ListView_SetExtendedListViewStyleEx(hLayersList, LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES, LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
+	EnableWindow(hLayersList, false);
+	EnableWindow(hLayersNew, false);
+	EnableWindow(hLayersDelete, false);
+
+	current_layer_index = -1;
+}
+
+void EditorApplication::updateLayerControlGUI() {
+	set_mapping.clear();
+	set_visibility.clear();
+	
+	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
+	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_NEW_LAYER);
+
+	if (ListView_GetItemCount(hLayersList) != 0)
+	{
+		ListView_DeleteAllItems(hLayersList);
+		ListView_SetItemCount(hLayersList, 0);
+	}
+
+	char name_str[1024] = "";
+	char value_str[1024] = "";
+
+	int i = 0;
+	list<LibGens::ObjectSet*> sets = current_level->getLevel()->getSets();
+	for (list<LibGens::ObjectSet*>::iterator it = sets.begin(); it != sets.end(); it++)
+	{
+		string set_name = (*it)->getName();
+		strcpy(name_str, set_name.c_str());
+		string set_size = to_string((*it)->getObjects().size());
+		strcpy(value_str, set_size.c_str());
+
+		LV_ITEM Item;
+		Item.mask = LVIF_TEXT;
+		Item.pszText = name_str;
+		Item.cchTextMax = strlen(name_str);
+		Item.iSubItem = 0;
+		Item.lParam = (LPARAM)NULL;
+		Item.iItem = i;
+		ListView_InsertItem(hLayersList, &Item);
+		ListView_SetItemText(hLayersList, i, 1, value_str);
+		ListView_SetCheckState(hLayersList, i, true);
+
+		set_mapping[i] = *it;
+		set_visibility[*it] = true;
+
+		i++;
+	}
+
+	EnableWindow(hLayersList, true);
+	EnableWindow(hLayersNew, true);
+}
+
+void EditorApplication::setLayerVisibility(int index, bool v) {
+	if (set_mapping.count(index))
+	{
+		LibGens::ObjectSet* set = set_mapping[index];
+		set_visibility[set] = v;
+		object_node_manager->updateSetVisibility(set, v);
+	}
+}
 
 INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	int list_view_index = ListView_GetNextItem(GetDlgItem(hDlg, IDL_PALETTE_LIST), -1, LVIS_SELECTED | LVIS_FOCUSED);
@@ -300,6 +381,24 @@ INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 						selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
 						editor_application->editObjectPropertyIndex(selection_index);
 						return true;
+					}
+					break;
+				case IDL_LAYER_LIST:
+					if (((LPNMHDR)lParam)->code == LVN_ITEMCHANGED) {
+						// detect layer checkbox changes
+						LPNMLISTVIEW listview = ((LPNMLISTVIEW)lParam);
+						int oldState = listview->uOldState & LVIS_STATEIMAGEMASK;
+						int newState = listview->uNewState & LVIS_STATEIMAGEMASK;
+						if (oldState != newState && (newState != INDEXTOSTATEIMAGEMASK(0)))
+						{
+							bool checked = (newState == INDEXTOSTATEIMAGEMASK(2));
+							editor_application->setLayerVisibility(listview->iItem, checked);
+						}
+						return true;
+					}
+					else if (((LPNMHDR)lParam)->code == LVN_ENDLABELEDITA) {
+						// detect layer name edit
+						LPNMLISTVIEW listview = ((LPNMLISTVIEW)lParam);
 					}
 					break;
 			}

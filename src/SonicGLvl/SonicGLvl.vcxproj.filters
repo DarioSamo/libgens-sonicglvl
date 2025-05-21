@@ -76,7 +76,7 @@
     <ClCompile Include="EditorMaterial.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="EditorObjectsPalette.cpp">
+    <ClCompile Include="EditorLeft.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
     <ClCompile Include="EditorObjectsProperties.cpp">

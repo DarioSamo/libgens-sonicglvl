@@ -656,6 +656,7 @@ void EditorApplication::createScene(void) {
 	updateObjectCategoriesGUI();
 	updateObjectsPaletteGUI();
 	createObjectsPropertiesGUI();
+	createLayerControlGUI();
 
 	current_category_index     = 0;
 	palette_cloning_mode       = false;

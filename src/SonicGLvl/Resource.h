@@ -64,7 +64,7 @@
 #define IDC_LOOK_AT_VIEWPORT                    40003
 #define IDE_BOTTOM_SELECTION_ROT_X              40003
 #define IDE_EDIT_VECTOR_LIST_Y                  40003
-#define IDG_STAGE_INFORMATION                   40003
+#define IDG_LAYER_GROUP                         40003
 #define IDS_EDIT_VECTOR_X                       40003
 #define IDS_MULTISETPARAM_X                     40003
 #define IDT_MATERIAL_MODEL_OPEN                 40003
@@ -111,6 +111,7 @@
 #define IDB_MATERIAL_DELETE_MATERIAL            40008
 #define IDB_MULTISETPARAM_CREATE                40008
 #define IDC_EDIT_ID_LIST_ADD_FROM_VIEWPORT      40008
+#define IDE_PALETTE_SEARCH                      40008
 #define IDG_FIND_BASIC                          40008
 #define IDL_EDIT_VECTOR_LIST_LIST               40008
 #define IDR_LOOK_AT_AXIS_Z                      40008
@@ -120,16 +121,19 @@
 #define IDE_EDIT_ID_LIST_VALUE                  40009
 #define IDE_MATERIAL_NAME                       40009
 #define IDG_FIND_ADVANCED                       40009
+#define IDL_LAYER_LIST                          40009
 #define IDS_BOTTOM_SELECTION_ROT_X              40009
 #define IDS_LOOK_AT_Y                           40009
 #define IDS_MULTISETPARAM_COUNT                 40009
 #define IMD_DELETE                              40009
 #define IDB_EDIT_VECTOR_LIST_DELETE             40010
+#define IDB_NEW_LAYER                           40010
 #define IDC_MATERIAL_SHADER                     40010
 #define IDR_MULTISETPARAM_CLONE                 40010
 #define IDS_BOTTOM_SELECTION_ROT_Y              40010
 #define IDS_LOOK_AT_X                           40010
 #define IMD_SELECT_ALL                          40010
+#define IDB_DELETE_LAYER                        40011
 #define IDB_EDIT_VECTOR_LIST_MOVE_UP            40011
 #define IDC_MATERIAL_MESH_SLOT                  40011
 #define IDR_MULTISETPARAM_MSP                   40011

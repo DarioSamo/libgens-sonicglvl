@@ -115,7 +115,7 @@
     <ClCompile Include="EditorNode.cpp" />
     <ClCompile Include="EditorNodeHistory.cpp" />
     <ClCompile Include="EditorObjects.cpp" />
-    <ClCompile Include="EditorObjectsPalette.cpp" />
+    <ClCompile Include="EditorLeft.cpp" />
     <ClCompile Include="EditorObjectsProperties.cpp" />
     <ClCompile Include="EditorPaths.cpp" />
     <ClCompile Include="EditorPhysics.cpp" />

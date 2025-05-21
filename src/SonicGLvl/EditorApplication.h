@@ -149,7 +149,8 @@ class EditorApplication : public BaseApplication {
 		EditorLevelDatabase *level_database;
 		EditorLevel *current_level;
 		string current_level_filename;
-		map<LibGens::ObjectSet *, int> set_indices;
+		map<LibGens::ObjectSet *, int> set_indices; // Brian TODO: delete
+		map<int, LibGens::ObjectSet*> set_mapping;
 		map<LibGens::ObjectSet *, bool> set_visibility;
 
 		int current_vector_list_selection;
@@ -248,13 +249,17 @@ class EditorApplication : public BaseApplication {
 		HWND hMultiSetParamDlg;
 		HWND hFindObjectDlg;
 		HWND hLookAtPointDlg;
+
 		// Object Palette
 		int current_category_index;
 		LibGens::Object *last_palette_selection;
 		LibGens::Object *current_palette_selection;
 		list<ObjectNode *> current_palette_nodes;
-		LibGens::ObjectSet *current_set;
+		LibGens::ObjectSet *current_set; // Brian TODO: move to object property
 		bool palette_cloning_mode;
+
+		// Layer Control
+		int current_layer_index;
 
 		// Object Properties
 		list<LibGens::Object *> current_object_list_properties;
@@ -423,15 +428,19 @@ class EditorApplication : public BaseApplication {
 
 		void saveXNAnimation();
 
+		void createLayerControlGUI();
+		void updateLayerControlGUI();
+		void setLayerVisibility(int index, bool v);
+
 		void updateBottomSelectionGUI();
 		void updateMenu();
-		void updateSetsGUI();
-		void updateSelectedSetGUI();
-		void newCurrentSet();
-		void deleteCurrentSet();
-		void updateCurrentSetVisible(bool v);
-		void changeCurrentSet(string change_set);
-		void renameCurrentSet(string rename_set);
+		void updateSetsGUI(); // Brian TODO: delete
+		void updateSelectedSetGUI(); // Brian TODO: delete
+		void newCurrentSet(); // Brian TODO: delete
+		void deleteCurrentSet(); // Brian TODO: delete
+		void updateCurrentSetVisible(bool v); // Brian TODO: delete
+		void changeCurrentSet(string change_set); // Brian TODO: delete
+		void renameCurrentSet(string rename_set); // Brian TODO: delete
 
 		void openPhysicsEditorGUI();
 		void clearPhysicsEditorGUI();
