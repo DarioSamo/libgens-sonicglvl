@@ -127,13 +127,12 @@
 #define IDS_MULTISETPARAM_COUNT                 40009
 #define IMD_DELETE                              40009
 #define IDB_EDIT_VECTOR_LIST_DELETE             40010
-#define IDB_NEW_LAYER                           40010
+#define IDB_LAYER_DELETE                        40010
 #define IDC_MATERIAL_SHADER                     40010
 #define IDR_MULTISETPARAM_CLONE                 40010
 #define IDS_BOTTOM_SELECTION_ROT_Y              40010
 #define IDS_LOOK_AT_X                           40010
 #define IMD_SELECT_ALL                          40010
-#define IDB_DELETE_LAYER                        40011
 #define IDB_EDIT_VECTOR_LIST_MOVE_UP            40011
 #define IDC_MATERIAL_MESH_SLOT                  40011
 #define IDR_MULTISETPARAM_MSP                   40011
@@ -141,6 +140,7 @@
 #define IDS_LOOK_AT_Z                           40011
 #define IMD_LOAD_ALL_TERRAIN                    40011
 #define IDB_EDIT_VECTOR_LIST_MOVE_DOWN          40012
+#define IDB_LAYER_NEW                           40012
 #define IDB_LOOK_AT_FOCUS                       40012
 #define IDC_BOTTOM_CURRENT_OBJECT_SET           40012
 #define IDC_MATERIAL_BACKFACE_CULLING           40012

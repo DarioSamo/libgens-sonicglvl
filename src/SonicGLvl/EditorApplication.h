@@ -259,7 +259,6 @@ class EditorApplication : public BaseApplication {
 		bool palette_cloning_mode;
 
 		// Layer Control
-		int current_layer_index;
 
 		// Object Properties
 		list<LibGens::Object *> current_object_list_properties;
@@ -432,6 +431,8 @@ class EditorApplication : public BaseApplication {
 		void updateLayerControlGUI();
 		void setLayerVisibility(int index, bool v);
 		void renameLayer(int index, string name);
+		void enableLayerDelete();
+		void deleteLayer();
 
 		void updateBottomSelectionGUI();
 		void updateMenu();

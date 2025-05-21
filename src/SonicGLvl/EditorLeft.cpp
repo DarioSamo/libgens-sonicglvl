@@ -270,8 +270,8 @@ bool EditorApplication::isRegularMode() {
 
 void EditorApplication::createLayerControlGUI() {
 	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
-	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_NEW_LAYER);
-	HWND hLayersDelete = GetDlgItem(hLeftDlg, IDB_DELETE_LAYER);
+	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
+	HWND hLayersDelete = GetDlgItem(hLeftDlg, IDB_LAYER_DELETE);
 
 	LVCOLUMN Col;
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
@@ -291,8 +291,6 @@ void EditorApplication::createLayerControlGUI() {
 	EnableWindow(hLayersList, false);
 	EnableWindow(hLayersNew, false);
 	EnableWindow(hLayersDelete, false);
-
-	current_layer_index = -1;
 }
 
 void EditorApplication::updateLayerControlGUI() {
@@ -300,7 +298,7 @@ void EditorApplication::updateLayerControlGUI() {
 	set_visibility.clear();
 	
 	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
-	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_NEW_LAYER);
+	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
 
 	if (ListView_GetItemCount(hLayersList) != 0)
 	{
@@ -385,70 +383,143 @@ void EditorApplication::renameLayer(int index, string name) {
 	}
 }
 
+void EditorApplication::enableLayerDelete() {
+	int index = SendMessage(GetDlgItem(hLeftDlg, IDL_LAYER_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+	HWND hLayersDelete = GetDlgItem(hLeftDlg, IDB_LAYER_DELETE);
+	EnableWindow(hLayersDelete, set_mapping.count(index) && set_mapping.size() > 1);
+}
+
+void EditorApplication::deleteLayer() {
+	int index = SendMessage(GetDlgItem(hLeftDlg, IDL_LAYER_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+	if (set_mapping.count(index) && set_mapping.size() > 1)
+	{
+		LibGens::ObjectSet* set = set_mapping[index];
+		list<LibGens::Object*> objects = set->getObjects();
+		string text = "Do you want to delete'" + set->getName() + "' layer and " + to_string(objects.size()) + " objects in it?";
+		text += "\nThis action CANNOT be undone.";
+		if (MessageBox(NULL, text.c_str(), "Delete Layer", MB_YESNO | MB_ICONWARNING) == IDYES)
+		{
+			// permanently remove objects in this layer
+			for (auto it : objects)
+			{
+				object_node_manager->deleteObjectNode(it);
+			}
+
+			LibGens::File::remove(set->getFilename());
+			current_level->getLevel()->removeSet(set);
+			delete set;
+
+			updateLayerControlGUI();
+
+			// Brian TODO: clear history
+		}
+	}
+}
+
 INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	int list_view_index = ListView_GetNextItem(GetDlgItem(hDlg, IDL_PALETTE_LIST), -1, LVIS_SELECTED | LVIS_FOCUSED);
 	editor_application->updateObjectsPaletteSelection(list_view_index);
 	int selection_index=0;
 
-	switch(msg) {
-		case WM_INITDIALOG:
-			return true;
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		return true;
 
-		case WM_ACTIVATE:
-			return false;
+	case WM_ACTIVATE:
+		return false;
 
-		case WM_DESTROY:
-			return true;
+	case WM_DESTROY:
+		return true;
 
-		case WM_CLOSE:
-			return false;
+	case WM_CLOSE:
+		return false;
 
-		case WM_NOTIFY:
-			switch(LOWORD(wParam)) {
-				case IDL_PROPERTIES_LIST:
-					if (((LPNMHDR)lParam)->code == NM_CLICK) {
-						selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-						editor_application->updateObjectPropertyIndex(selection_index);
-						return true;
-					}
-
-					if (((LPNMHDR)lParam)->code == NM_DBLCLK) {
-						selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-						editor_application->editObjectPropertyIndex(selection_index);
-						return true;
-					}
-					break;
-				case IDL_LAYER_LIST:
-					if (((LPNMHDR)lParam)->code == LVN_ITEMCHANGED) {
-						// detect layer checkbox changes
-						LPNMLISTVIEW listview = ((LPNMLISTVIEW)lParam);
-						int oldState = listview->uOldState & LVIS_STATEIMAGEMASK;
-						int newState = listview->uNewState & LVIS_STATEIMAGEMASK;
-						if (oldState != newState && (newState != INDEXTOSTATEIMAGEMASK(0)))
-						{
-							bool checked = (newState == INDEXTOSTATEIMAGEMASK(2));
-							editor_application->setLayerVisibility(listview->iItem, checked);
-						}
-						return true;
-					}
-					else if (((LPNMHDR)lParam)->code == LVN_ENDLABELEDITA) {
-						// detect layer name edit
-						LPNMLVDISPINFOA info = ((LPNMLVDISPINFOA)lParam);
-						editor_application->renameLayer(info->item.iItem, info->item.pszText);
-					}
-					break;
+	case WM_NOTIFY:
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDL_PROPERTIES_LIST:
+			switch (((LPNMHDR)lParam)->code)
+			{
+			case NM_CLICK:
+			{
+				selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+				editor_application->updateObjectPropertyIndex(selection_index);
+				return true;
 			}
-
-		case WM_COMMAND:
-			if(HIWORD(wParam) == CBN_SELCHANGE) { 
-				int item_index = SendMessage((HWND) lParam, (UINT) CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
-				if (LOWORD(wParam)==IDC_PALETTE_CATEGORY) {
-					editor_application->updateObjectsPaletteGUI(item_index);
-					break;
-				}
+			case NM_DBLCLK:
+			{
+				selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+				editor_application->editObjectPropertyIndex(selection_index);
+				return true;
 			}
-
+			}
 			break;
+		case IDL_LAYER_LIST:
+		{
+			switch (((LPNMHDR)lParam)->code)
+			{
+			case LVN_ITEMCHANGED:
+			{
+				// detect layer checkbox changes
+				LPNMLISTVIEW listview = ((LPNMLISTVIEW)lParam);
+				int oldState = listview->uOldState & LVIS_STATEIMAGEMASK;
+				int newState = listview->uNewState & LVIS_STATEIMAGEMASK;
+				if (oldState != newState && (newState != INDEXTOSTATEIMAGEMASK(0)))
+				{
+					bool checked = (newState == INDEXTOSTATEIMAGEMASK(2));
+					editor_application->setLayerVisibility(listview->iItem, checked);
+				}
+				return true;
+			}
+			case LVN_ENDLABELEDITA:
+			{
+				// detect layer name edit
+				LPNMLVDISPINFOA info = ((LPNMLVDISPINFOA)lParam);
+				if (info->item.pszText)
+				{
+					editor_application->renameLayer(info->item.iItem, info->item.pszText);
+				}
+				return true;
+			}
+			case NM_CLICK:
+			{
+				// check if selected layer can be deleted
+				editor_application->enableLayerDelete();
+				return true;
+			}
+			}
+			break;
+		}
+		}
+		break;
+	}
+	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDC_PALETTE_CATEGORY:
+		{
+			switch (HIWORD(wParam))
+			{
+			case CBN_SELCHANGE:
+			{
+				int item_index = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+				editor_application->updateObjectsPaletteGUI(item_index);
+				return true;
+			}
+			}
+			break;
+		}
+		case IDB_LAYER_DELETE:
+		{
+			editor_application->deleteLayer();
+			return true;
+		}
+		}
+		break;
+	}
 	}
 
 	return false;

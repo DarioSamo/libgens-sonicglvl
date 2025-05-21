@@ -328,8 +328,8 @@ FONT 8, "Ms Shell Dlg"
     CONTROL         "", IDL_PALETTE_LIST, WC_LISTVIEW, WS_TABSTOP | WS_BORDER | LVS_ALIGNLEFT | LVS_SINGLESEL | LVS_LIST, 5, 40, 174, 95, WS_EX_LEFT
     GROUPBOX        "Help", IDG_HELP_GROUP, 0, 400, 181, 52, 0, WS_EX_LEFT
     LTEXT           "Description lines of current selection. Object's Description will be used if selected on stage or palette. Property description will be used if a property is selected.", IDT_HELP_DESCRIPTION, 5, 411, 173, 37, SS_LEFT, WS_EX_LEFT
-    PUSHBUTTON      "New", IDB_NEW_LAYER, 5, 255, 85, 14, 0, WS_EX_LEFT
-    PUSHBUTTON      "Delete", IDB_DELETE_LAYER, 95, 255, 85, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "New", IDB_LAYER_NEW, 5, 255, 85, 14, 0, WS_EX_LEFT
+    PUSHBUTTON      "Delete", IDB_LAYER_DELETE, 95, 255, 85, 14, 0, WS_EX_LEFT
 }
 
 
