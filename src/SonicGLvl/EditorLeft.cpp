@@ -412,8 +412,9 @@ void EditorApplication::deleteLayer() {
 			delete set;
 
 			updateLayerControlGUI();
+			history->clear();
 
-			// Brian TODO: clear history, update current object layer
+			// Brian TODO: update current object layer
 		}
 	}
 }
