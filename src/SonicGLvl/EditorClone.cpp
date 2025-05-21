@@ -87,6 +87,7 @@ void EditorApplication::createMultiSetParamObjects()
 
 					if (current_set) {
 						current_set->addObject(new_obj);
+						updateLayerControlGUI();
 
 						if (!current_level) {
 							new_obj->setID(current_set->newObjectID());
@@ -187,6 +188,7 @@ void EditorApplication::deleteTemporaryNodes()
 				LibGens::ObjectSet* object_set = object->getParentSet();
 				if (object_set) {
 					object_set->eraseObject(object);
+					updateLayerControlGUI();
 				}
 
 				(*it)->setSelect(false);

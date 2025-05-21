@@ -199,6 +199,7 @@ void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent 
 			
 				if (current_set) {
 					current_set->addObject(new_object);
+					updateLayerControlGUI();
 
 					if (!current_level) {
 						new_object->setID(current_set->newObjectID());
@@ -282,7 +283,7 @@ void EditorApplication::createLayerControlGUI() {
 
 
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-	Col.cx = 115;
+	Col.cx = 80;
 	Col.pszText = "Objects";
 	Col.cchTextMax = strlen(Col.pszText);
 	ListView_InsertColumn(hLayersList, 1, &Col);
@@ -299,6 +300,7 @@ void EditorApplication::updateLayerControlGUI() {
 	
 	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
 	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
+	HWND hLayersDelete = GetDlgItem(hLeftDlg, IDB_LAYER_DELETE);
 
 	if (ListView_GetItemCount(hLayersList) != 0)
 	{
@@ -337,6 +339,7 @@ void EditorApplication::updateLayerControlGUI() {
 
 	EnableWindow(hLayersList, true);
 	EnableWindow(hLayersNew, true);
+	EnableWindow(hLayersDelete, false);
 }
 
 void EditorApplication::setLayerVisibility(int index, bool v) {
@@ -351,7 +354,7 @@ void EditorApplication::setLayerVisibility(int index, bool v) {
 void EditorApplication::renameLayer(int index, string name) {
 	if (current_level->getLevel()->getSet(name))
 	{
-		MessageBox(NULL, "A set with that name already exists!", "SonicGLvl", MB_OK);
+		MessageBox(NULL, "A set with that name already exists!", "SonicGLvl", MB_OK | MB_ICONWARNING);
 		return;
 	}
 	
@@ -440,7 +443,7 @@ void EditorApplication::newLayer() {
 		current_level->getLevel()->addSet(set);
 		updateLayerControlGUI();
 
-		// Brian TODO: clear history, update current object layer
+		// Brian TODO: update current object layer
 	}
 }
 

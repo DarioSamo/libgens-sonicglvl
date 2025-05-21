@@ -17,6 +17,7 @@
 //    Read AUTHORS.txt, LICENSE.txt and COPYRIGHT.txt for more details.
 //=========================================================================
 
+#include "EditorApplication.h"
 #include "ObjectNodeHistory.h"
 #include "ObjectSet.h"
 
@@ -29,6 +30,7 @@ void HistoryActionCreateObjectNode::undo() {
 
 	if (object_set) {
 		object_set->eraseObject(object);
+		editor_application->updateLayerControlGUI();
 	}
 
 	if (object_node_manager) {
@@ -44,6 +46,7 @@ void HistoryActionCreateObjectNode::redo() {
 
 	if (object_set) {
 		object_set->addObject(object);
+		editor_application->updateLayerControlGUI();
 	}
 
 	if (object_node_manager) {
@@ -71,6 +74,7 @@ void HistoryActionDeleteObjectNode::undo() {
 
 	if (object_set) {
 		object_set->addObject(object);
+		editor_application->updateLayerControlGUI();
 	}
 
 	if (object_node_manager) {
@@ -86,6 +90,7 @@ void HistoryActionDeleteObjectNode::redo() {
 
 	if (object_set) {
 		object_set->eraseObject(object);
+		editor_application->updateLayerControlGUI();
 	}
 
 	if (object_node_manager) {

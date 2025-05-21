@@ -106,6 +106,7 @@ void EditorApplication::deleteSelection() {
 					LibGens::ObjectSet *object_set=object->getParentSet();
 					if (object_set) {
 						object_set->eraseObject(object);
+						updateLayerControlGUI();
 					}
 
 					object_node_manager->hideObjectNode(object, true);
@@ -241,6 +242,7 @@ void EditorApplication::cloneSelection() {
 				LibGens::ObjectSet *parent_set = object->getParentSet();
 				if (parent_set) {
 					parent_set->addObject(new_object);
+					updateLayerControlGUI();
 				}
 
 				// Create
@@ -287,6 +289,7 @@ void EditorApplication::temporaryCloneSelection() {
 				LibGens::ObjectSet* parent_set = object->getParentSet();
 				if (parent_set) {
 					parent_set->addObject(new_object);
+					updateLayerControlGUI();
 				}
 
 				// Create
