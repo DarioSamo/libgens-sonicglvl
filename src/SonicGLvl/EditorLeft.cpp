@@ -399,6 +399,8 @@ void EditorApplication::deleteLayer() {
 		text += "\nThis action CANNOT be undone.";
 		if (MessageBox(NULL, text.c_str(), "Delete Layer", MB_YESNO | MB_ICONWARNING) == IDYES)
 		{
+			clearSelection();
+
 			// permanently remove objects in this layer
 			for (auto it : objects)
 			{
