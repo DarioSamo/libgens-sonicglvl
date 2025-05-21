@@ -413,8 +413,33 @@ void EditorApplication::deleteLayer() {
 
 			updateLayerControlGUI();
 
-			// Brian TODO: clear history
+			// Brian TODO: clear history, update current object layer
 		}
+	}
+}
+
+void EditorApplication::newLayer() {
+	if (current_level->getLevel()->getSet("rename_me")) 
+	{
+		MessageBox(NULL, "Rename the object set called \"rename_me\" first before creating a new object set.", "SonicGLvl", MB_OK | MB_ICONINFORMATION);
+	}
+	else 
+	{
+		LibGens::ObjectSet* set = new LibGens::ObjectSet();
+		string folder = current_level->getLevel()->getFolder();
+		set->setName("rename_me");
+		if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) 
+		{
+			set->setFilename(folder + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+		}
+		else {
+			set->setFilename(folder + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
+		}
+
+		current_level->getLevel()->addSet(set);
+		updateLayerControlGUI();
+
+		// Brian TODO: clear history, update current object layer
 	}
 }
 
@@ -517,6 +542,11 @@ INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 		case IDB_LAYER_DELETE:
 		{
 			editor_application->deleteLayer();
+			return true;
+		}
+		case IDB_LAYER_NEW:
+		{
+			editor_application->newLayer();
 			return true;
 		}
 		}

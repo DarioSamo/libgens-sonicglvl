@@ -433,6 +433,7 @@ class EditorApplication : public BaseApplication {
 		void renameLayer(int index, string name);
 		void enableLayerDelete();
 		void deleteLayer();
+		void newLayer();
 
 		void updateBottomSelectionGUI();
 		void updateMenu();
