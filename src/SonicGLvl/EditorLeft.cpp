@@ -350,6 +350,41 @@ void EditorApplication::setLayerVisibility(int index, bool v) {
 	}
 }
 
+void EditorApplication::renameLayer(int index, string name) {
+	if (current_level->getLevel()->getSet(name))
+	{
+		MessageBox(NULL, "A set with that name already exists!", "SonicGLvl", MB_OK);
+		return;
+	}
+	
+	if (set_mapping.count(index))
+	{
+		LibGens::ObjectSet* set = set_mapping[index];
+		string folder = LibGens::File::folderFromFilename(set->getFilename());
+		string new_filename;
+		if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) 
+		{
+			new_filename = folder + name + LIBGENS_OBJECT_SET_EXTENSION;
+		}
+		else
+		{
+			// generations
+			new_filename = folder + LIBGENS_OBJECT_SET_NAME + name + LIBGENS_OBJECT_SET_EXTENSION;
+		}
+		LibGens::File::remove(set->getFilename());
+		set->setFilename(new_filename);
+		set->setName(name);
+		set->saveXML(new_filename);
+
+		HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
+		char name_str[1024] = "";
+		strcpy(name_str, name.c_str());
+		ListView_SetItemText(hLayersList, index, 0, name_str);
+
+		// Brian TODO: rename current object layer
+	}
+}
+
 INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	int list_view_index = ListView_GetNextItem(GetDlgItem(hDlg, IDL_PALETTE_LIST), -1, LVIS_SELECTED | LVIS_FOCUSED);
 	editor_application->updateObjectsPaletteSelection(list_view_index);
@@ -398,7 +433,8 @@ INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 					}
 					else if (((LPNMHDR)lParam)->code == LVN_ENDLABELEDITA) {
 						// detect layer name edit
-						LPNMLISTVIEW listview = ((LPNMLISTVIEW)lParam);
+						LPNMLVDISPINFOA info = ((LPNMLVDISPINFOA)lParam);
+						editor_application->renameLayer(info->item.iItem, info->item.pszText);
 					}
 					break;
 			}

@@ -431,6 +431,7 @@ class EditorApplication : public BaseApplication {
 		void createLayerControlGUI();
 		void updateLayerControlGUI();
 		void setLayerVisibility(int index, bool v);
+		void renameLayer(int index, string name);
 
 		void updateBottomSelectionGUI();
 		void updateMenu();
