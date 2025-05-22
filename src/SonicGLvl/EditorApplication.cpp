@@ -125,7 +125,6 @@ void EditorApplication::deleteSelection() {
 			}
 		}
 
-		removeAllTrajectoryNodes();
 		selected_nodes.clear();
 		axis->setVisible(false);
 
@@ -156,7 +155,6 @@ void EditorApplication::clearSelection() {
 		delete wrapper;
 	}
 
-	removeAllTrajectoryNodes();
 	selected_nodes.clear();
 	axis->setVisible(false);
 }
@@ -1170,7 +1168,6 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, false, true, &selected_nodes);
 							current_node->setSelect(true);
 							selected_nodes.push_back(current_node);
-							addTrajectory(getTrajectoryMode(current_node));
 							pushHistory(action_select);
 
 						}
@@ -1545,74 +1542,44 @@ TrajectoryMode EditorApplication::getTrajectoryMode(EditorNode* node)
 		mode = WIDE_SPRING;
 	else if (object_name ==  "JumpPole")
 		mode = JUMP_POLE;
-	else if ((object_name == "JumpBoard") || (object_name == "JumpBoard3D") || (object_name == "AdlibTrickJump"))
+	else if ((object_name == "JumpBoard") || (object_name == "JumpBoard3D") || (object_name == "AdlibTrickJump") || 
+		(object_name == "ClassicJumpBoard") || (object_name == "CteTrickJumpSkateBoard"))
 		mode = JUMP_PANEL;
-	else if ((object_name == "DashRing") || (object_name == "RainbowRing"))
+	else if ((object_name == "DashRing") || (object_name == "RainbowRing") || (object_name == "MissionTailsDashRing"))
 		mode = DASH_RING;
+	else if ((object_name == "TrickJumper"))
+		mode = TRICK_JUMPER;
 
 	return mode;
 }
 
-void EditorApplication::addTrajectory(TrajectoryMode mode)
-{
-	if (mode == NONE)
-		return;
-
-	trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
-	
-	// JumpBoards need two nodes. One for normal, and the other for boost
-	if (mode == JUMP_PANEL)
-		trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, mode));
-}
-
 void EditorApplication::updateTrajectoryNodes(Ogre::Real timeSinceLastFrame)
 {
-	if (!selected_nodes.size())
-		return;
-
-	for (int count = 0; count < trajectory_preview_nodes.size(); ++count)
-		trajectory_preview_nodes[count]->addTime(timeSinceLastFrame);
-
 	int count = 0;
 	list<EditorNode*>::iterator it = selected_nodes.begin();
 
 	for (; it != selected_nodes.end(); ++it)
 	{
-		if (count < trajectory_preview_nodes.size())
+		EditorNode* node = *it;
+		TrajectoryMode mode = getTrajectoryMode(node);
+
+		if (mode == NONE)
+			continue;
+
+		// create new TrajectoryNode for those that need it
+		if (count >= trajectory_preview_nodes.size())
 		{
-			EditorNode* node = *it;
-			TrajectoryMode mode = getTrajectoryMode(node);
-			switch (mode)
-			{
-			case SPRING:
-			case WIDE_SPRING:
-				trajectory_preview_nodes[count]->getTrajectorySpring(node);
-				break;
-
-			case JUMP_PANEL:
-				trajectory_preview_nodes[count++]->getTrajectoryJumpBoard(node, false);
-				trajectory_preview_nodes[count]->getTrajectoryJumpBoard(node, true);
-				break;
-
-			case DASH_RING:
-				trajectory_preview_nodes[count]->getTrajectoryDashRing(node);
-				break;
-
-			default:
-				break;
-			}
-
-			++count;
+			trajectory_preview_nodes.push_back(new TrajectoryNode(scene_manager, node, mode));
 		}
-		else
-			break;
+
+		trajectory_preview_nodes[count]->restart(node, mode);
+		++count;
 	}
-}
 
-void EditorApplication::removeAllTrajectoryNodes()
-{
-	for (vector<TrajectoryNode*>::iterator it = trajectory_preview_nodes.begin(); it != trajectory_preview_nodes.end(); ++it)
-		delete* it;
-
-	trajectory_preview_nodes.clear();
+	// auto shrink vector size
+	while (count < trajectory_preview_nodes.size())
+	{
+		delete trajectory_preview_nodes.back();
+		trajectory_preview_nodes.pop_back();
+	}
 }

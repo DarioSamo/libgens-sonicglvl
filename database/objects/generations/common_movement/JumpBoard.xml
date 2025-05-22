@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <Template>
-  <AngleType type="float" default="0" description="" />
+  <AngleType type="integer" default="0" description="" />
   <GroundOffset type="float" default="0" description="" />
   <ImpulseSpeedOnBoost type="float" default="50" description="" />
   <ImpulseSpeedOnNormal type="float" default="35" description="" />

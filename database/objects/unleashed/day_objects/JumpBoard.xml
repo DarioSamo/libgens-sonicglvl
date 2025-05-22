@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <Template>
-  <AngleType type="float" default="0" description="Angle at which the player will launch." />
+  <AngleType type="integer" default="0" description="Angle at which the player will launch." />
   <GroundOffset type="float" default="0" description="" />
   <ImpulseSpeedOnBoost type="float" default="50" description="Launch speed when boosting." />
   <ImpulseSpeedOnNormal type="float" default="35" description="Launch speed when running." />
   <OutOfControl type="float" default="1.5" description="Time taken before restoring control to the player." />
-  <SizeType type="float" default="0" description="Size of the board.
+  <SizeType type="integer" default="0" description="Size of the board.
   0: Small
   1: Big" />
   
