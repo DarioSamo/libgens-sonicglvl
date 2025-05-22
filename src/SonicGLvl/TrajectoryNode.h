@@ -36,14 +36,8 @@ private:
 	LineData line_data2;
 
 public:
-	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* n, TrajectoryMode m = NONE);
-	~TrajectoryNode()
-	{
-		delete line_data1.lines;
-		delete line_data1.lines_out_of_control;
-		delete line_data2.lines;
-		delete line_data2.lines_out_of_control;
-	}
+	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode_p = NONE);
+	~TrajectoryNode();
 
 	void addTime(Ogre::Real time)
 	{
@@ -51,21 +45,21 @@ public:
 		gravity_time += time;
 	}
 
-	void restart(EditorNode* n, TrajectoryMode m);
+	void restart(EditorNode* node, TrajectoryMode mode_p);
 
 	void setPosition(Ogre::Vector3 position)
 	{
 		EditorNode::setPosition(position);
 	}
 
-	void setMode(TrajectoryMode m)
+	void setMode(TrajectoryMode mode_p)
 	{
-		mode = m;
+		mode = mode_p;
 	}
 
 	float getTrajectoryGravity(float first_speed, float keep_distance, float y_direction);
-	void getTrajectorySpring(EditorNode* n);
-	void getTrajectoryJumpBoard(EditorNode* n, bool boost);
-	void getTrajectoryDashRing(EditorNode* n);
-	void getTrajectoryTrickJumper(EditorNode* n);
+	void getTrajectorySpring(EditorNode* node);
+	void getTrajectoryJumpBoard(EditorNode* node, bool boost);
+	void getTrajectoryDashRing(EditorNode* node);
+	void getTrajectoryTrickJumper(EditorNode* node);
 };

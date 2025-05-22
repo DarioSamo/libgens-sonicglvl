@@ -834,6 +834,13 @@ namespace LibGens {
 						(*it_e) = new_element;
 					}
 
+					if ((type_current == OBJECT_ELEMENT_FLOAT) && (type_template == OBJECT_ELEMENT_INTEGER)) {
+						ObjectElementInteger *new_element = (ObjectElementInteger *)cloneElement(*it);
+						new_element->value = ((ObjectElementFloat *)(*it_e))->value;
+						delete (*it_e);
+						(*it_e) = new_element;
+					}
+
 					found=true;
 					break;
 				}
