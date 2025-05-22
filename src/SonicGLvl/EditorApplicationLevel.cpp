@@ -204,6 +204,16 @@ void EditorApplication::openLevel(string filename) {
 
 	updateObjectCategoriesGUI();
 
+	// clean up objects placed before a level is loaded
+	clearSelection();
+	for (auto node : object_node_manager->getObjectNodes())
+	{
+		LibGens::Object* obj = node->getObject();
+		object_node_manager->deleteObjectNode(obj);
+		delete obj;
+	}
+	history->clear();
+
 	current_level_filename=filename;
 
 	current_level = new EditorLevel(folder, slot_name, geometry_name, slot_id_name, game_mode);
