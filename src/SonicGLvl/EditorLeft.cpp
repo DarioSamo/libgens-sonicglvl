@@ -35,6 +35,59 @@ void EditorApplication::updateObjectCategoriesGUI() {
 	SendDlgItemMessage(hLeftDlg, IDC_PALETTE_CATEGORY, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
 }
 
+void EditorApplication::searchObjectsPalette(string search_name) {
+	if (!library) return;
+	if (current_category_search == search_name) return;
+
+	current_category_search = search_name;
+	if (search_name.empty())
+	{
+		updateObjectsPaletteGUI(current_category_index);
+		return;
+	}
+
+	HWND hPaletteList = GetDlgItem(hLeftDlg, IDL_PALETTE_LIST);
+
+	// Cleanup old palette
+	if (ListView_GetItemCount(hPaletteList) != 0) {
+		ListView_DeleteAllItems(hPaletteList);
+		while (ListView_DeleteColumn(hPaletteList, 0) > 0);
+		ListView_SetItemCount(hPaletteList, 0);
+	}
+
+	vector<string> found_object_names;
+
+	// search palette with matching name
+	for (auto object_category : library->getCategories())
+	{
+		for (auto object : object_category->getTemplates())
+		{
+			string object_name = object->getName();
+			std::transform(object_name.begin(), object_name.end(), object_name.begin(), [](unsigned char c) { return std::tolower(c); });
+			std::transform(search_name.begin(), search_name.end(), search_name.begin(), [](unsigned char c) { return std::tolower(c); });
+
+			if (object_name.find(search_name) != string::npos)
+			{
+				found_object_names.push_back(object->getName());
+			}
+		}
+	}
+
+	char temp[128];
+	sort(found_object_names.begin(), found_object_names.end());
+	for (string const& name : found_object_names)
+	{
+		LV_ITEM Item;
+		Item.mask = LVIF_TEXT;
+		strcpy(temp, name.c_str());
+		Item.pszText = temp;
+		Item.cchTextMax = strlen(temp);
+		Item.iSubItem = 0;
+		Item.lParam = (LPARAM)NULL;
+		Item.iItem = ListView_GetItemCount(hPaletteList);
+		ListView_InsertItem(hPaletteList, &Item);
+	}
+}
 
 void EditorApplication::updateObjectsPaletteGUI(int index) {
 	if (!library) return;
@@ -68,6 +121,9 @@ void EditorApplication::updateObjectsPaletteGUI(int index) {
 			ListView_InsertItem(hPaletteList, &Item);
 		}
 	}
+
+	// Clear search text
+	SetDlgItemText(hLeftDlg, IDE_PALETTE_SEARCH, "");
 }
 
 
@@ -91,11 +147,31 @@ void EditorApplication::updateObjectsPaletteSelection(int index) {
 		current_palette_selection = NULL;
 	}
 	else {
-		LibGens::ObjectCategory *object_category=library->getCategoryByIndex(current_category_index);
-	
-		if (object_category) {
-			LibGens::Object *target_selection=object_category->getTemplateByIndex(index);
-			current_palette_selection = target_selection;
+		char value_str[1024] = "";
+		GetDlgItemText(hLeftDlg, IDE_PALETTE_SEARCH, value_str, 1024);
+		if (ToString(value_str).empty())
+		{
+			LibGens::ObjectCategory* object_category = library->getCategoryByIndex(current_category_index);
+
+			if (object_category) {
+				LibGens::Object* target_selection = object_category->getTemplateByIndex(index);
+				current_palette_selection = target_selection;
+			}
+		}
+		else
+		{
+			HWND hPaletteList = GetDlgItem(hLeftDlg, IDL_PALETTE_LIST);
+			ListView_GetItemText(hPaletteList, index, 0, value_str, 1024);
+			string selected_name = ToString(value_str);
+			for (auto object_category : library->getCategories())
+			{
+				LibGens::Object* target_selection = object_category->getTemplate(ToString(value_str));
+				if (target_selection != NULL)
+				{
+					current_palette_selection = target_selection;
+					break;
+				}
+			}
 		}
 	}
 }
@@ -535,6 +611,20 @@ INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 	{
 		switch (LOWORD(wParam))
 		{
+		case IDE_PALETTE_SEARCH:
+		{
+			switch (HIWORD(wParam))
+			{
+			case EN_CHANGE:
+			{
+				char value_str[1024] = "";
+				GetDlgItemText(hDlg, IDE_PALETTE_SEARCH, value_str, 1024);
+				editor_application->searchObjectsPalette(ToString(value_str));
+				return true;
+			}
+			}
+			break;
+		}
 		case IDC_PALETTE_CATEGORY:
 		{
 			switch (HIWORD(wParam))

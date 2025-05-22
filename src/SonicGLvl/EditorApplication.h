@@ -251,6 +251,7 @@ class EditorApplication : public BaseApplication {
 		HWND hLookAtPointDlg;
 
 		// Object Palette
+		string current_category_search;
 		int current_category_index;
 		LibGens::Object *last_palette_selection;
 		LibGens::Object *current_palette_selection;
@@ -554,6 +555,7 @@ class EditorApplication : public BaseApplication {
 		
 
 		void updateObjectCategoriesGUI();
+		void searchObjectsPalette(string search_name);
 		void updateObjectsPaletteGUI(int index=0);
 		void updateObjectsPaletteSelection(int index);
 		void updateObjectsPalettePreview();
