@@ -402,6 +402,7 @@ void EditorApplication::deleteLayer() {
 			for (auto it : objects)
 			{
 				object_node_manager->deleteObjectNode(it);
+				delete it;
 			}
 
 			LibGens::File::remove(set->getFilename());
