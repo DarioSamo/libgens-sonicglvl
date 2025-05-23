@@ -182,11 +182,11 @@ void EditorApplication::updateObjectsPalettePreview() {
 		closeEditPropertyGUI();
 		clearObjectsPalettePreview();
 
-		clearSelection();
-		updateSelection();
-
 		// Create Object Previewing Node
 		if (current_palette_selection) {
+			clearSelection();
+			updateSelection();
+
 			current_palette_selection->setPosition(LibGens::Vector3(LIBGENS_AABB_MAX_START, LIBGENS_AABB_MAX_START, LIBGENS_AABB_MAX_START));
 
 			palette_cloning_mode = true;
