@@ -258,7 +258,6 @@ class EditorApplication : public BaseApplication {
 		LibGens::Object *last_palette_selection;
 		LibGens::Object *current_palette_selection;
 		list<ObjectNode *> current_palette_nodes;
-		LibGens::ObjectSet *current_set; // Brian TODO: move to object property
 		bool palette_cloning_mode;
 
 		// Layer Control
@@ -443,13 +442,6 @@ class EditorApplication : public BaseApplication {
 
 		void updateBottomSelectionGUI();
 		void updateMenu();
-		void updateSetsGUI(); // Brian TODO: delete
-		void updateSelectedSetGUI(); // Brian TODO: delete
-		void newCurrentSet(); // Brian TODO: delete
-		void deleteCurrentSet(); // Brian TODO: delete
-		void updateCurrentSetVisible(bool v); // Brian TODO: delete
-		void changeCurrentSet(string change_set); // Brian TODO: delete
-		void renameCurrentSet(string rename_set); // Brian TODO: delete
 
 		void openPhysicsEditorGUI();
 		void clearPhysicsEditorGUI();
@@ -645,9 +637,14 @@ class EditorApplication : public BaseApplication {
 		EditorLevel *getCurrentLevel() {
 			return current_level;
 		}
-
+		
 		LibGens::ObjectSet *getCurrentSet() {
-			return current_set;
+			int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
+			if (set_mapping.count(selected_index))
+			{
+				return set_mapping[selected_index];
+			}
+			return NULL;
 		}
 
 		EditorAnimationsList *getAnimationsList() {

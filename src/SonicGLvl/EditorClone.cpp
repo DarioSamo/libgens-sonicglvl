@@ -85,12 +85,13 @@ void EditorApplication::createMultiSetParamObjects()
 						}
 					}
 
-					if (current_set) {
-						current_set->addObject(new_obj);
+					LibGens::ObjectSet* set = getCurrentSet();
+					if (set) {
+						set->addObject(new_obj);
 						updateLayerControlGUI();
 
 						if (!current_level) {
-							new_obj->setID(current_set->newObjectID());
+							new_obj->setID(set->newObjectID());
 						}
 					}
 

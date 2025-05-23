@@ -175,11 +175,7 @@ INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 		}
 
 		case WM_COMMAND:
-			if (LOWORD(wParam) == IDC_BOTTOM_CURRENT_OBJECT_SET_VISIBLE) {
-				bool current_set_visible = IsDlgButtonChecked(hDlg, IDC_BOTTOM_CURRENT_OBJECT_SET_VISIBLE);
-				editor_application->updateCurrentSetVisible(current_set_visible);
-			}
-			else if (HIWORD(wParam) == EN_CHANGE) {
+			if (HIWORD(wParam) == EN_CHANGE) {
 				if (!editor_application->getEditorAxis()->isHolding() && editor_application->isUpdatePosRot()) {
 					if ((LOWORD(wParam) == IDE_BOTTOM_SELECTION_POS_X) || (LOWORD(wParam) == IDE_BOTTOM_SELECTION_POS_Y) || (LOWORD(wParam) == IDE_BOTTOM_SELECTION_POS_Z)) {
 						float value_x = GetDlgItemFloat(hDlg, IDE_BOTTOM_SELECTION_POS_X);
@@ -195,37 +191,6 @@ INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 						float value_z = GetDlgItemFloat(hDlg, IDE_BOTTOM_SELECTION_ROT_Z);
 
 						editor_application->updateBottomSelectionRotation(value_x, value_y, value_z);
-					}
-				}
-			}
-			else if(HIWORD(wParam) == CBN_SELCHANGE) { 
-				char value_str[1024] = "";
-				int nIndex=SendDlgItemMessage(hDlg, LOWORD(wParam), (UINT) CB_GETCURSEL, (WPARAM) 0, (LPARAM) 0);
-				SendDlgItemMessage(hDlg, LOWORD(wParam), (UINT)CB_GETLBTEXT, (WPARAM)nIndex, (LPARAM)value_str);
-
-				if (LOWORD(wParam) == IDC_BOTTOM_CURRENT_OBJECT_SET)  {
-					string change_set = ToString(value_str);
-					if (change_set == NEW_SET_OPTION) {
-						editor_application->newCurrentSet();
-					}
-					else if (change_set == DELETE_SET_OPTION) {
-						editor_application->deleteCurrentSet();
-					}
-					else {
-						editor_application->changeCurrentSet(change_set);
-					}
-				}
-			}
-			else if (HIWORD(wParam) == CBN_EDITCHANGE) {
-				char value_str[1024] = "";
-				GetDlgItemText(hDlg, LOWORD(wParam), value_str, 1024);
-
-				if (LOWORD(wParam) == IDC_BOTTOM_CURRENT_OBJECT_SET)  {
-					int index = ComboBox_FindStringExact(GetDlgItem(hDlg, IDC_BOTTOM_CURRENT_OBJECT_SET), 0, editor_application->getCurrentSet()->getName().c_str());
-					if (index >= 0) {
-						SendDlgItemMessage(hDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, (UINT)CB_DELETESTRING, (WPARAM)index, (LPARAM)0);
-						SendDlgItemMessage(hDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, (UINT)CB_INSERTSTRING, (WPARAM)index, (LPARAM)value_str);
-						editor_application->renameCurrentSet(ToString(value_str));
 					}
 				}
 			}
@@ -258,26 +223,4 @@ INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lP
 	}
 
 	return false;
-}
-
-void EditorApplication::updateSetsGUI() {
-	set_indices.clear();
-	SendDlgItemMessage(hBottomDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
-
-	int index = 0;
-	list<LibGens::ObjectSet *> sets = current_level->getLevel()->getSets();
-	for (list<LibGens::ObjectSet *>::iterator it = sets.begin(); it != sets.end(); it++) {
-		string set_name = (*it)->getName();
-		SendDlgItemMessage(hBottomDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)set_name.c_str());
-		set_indices[*it] = index++;
-		set_visibility[*it] = true;
-	}
-
-	SendDlgItemMessage(hBottomDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM) NEW_SET_OPTION);
-	SendDlgItemMessage(hBottomDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM) DELETE_SET_OPTION);
-}
-
-void EditorApplication::updateSelectedSetGUI() {
-	SendDlgItemMessage(hBottomDlg, IDC_BOTTOM_CURRENT_OBJECT_SET, CB_SETCURSEL, (WPARAM)set_indices[current_set], (LPARAM)0);
-	SendDlgItemMessage(hBottomDlg, IDC_BOTTOM_CURRENT_OBJECT_SET_VISIBLE, BM_SETCHECK, (WPARAM) set_visibility[current_set], 0);
 }

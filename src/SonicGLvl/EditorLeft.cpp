@@ -278,13 +278,14 @@ void EditorApplication::mousePressedObjectsPalettePreview(const OIS::MouseEvent 
 						new_object->setID(current_level->getLevel()->newObjectID());
 					}
 				}
-			
-				if (current_set) {
-					current_set->addObject(new_object);
+
+				LibGens::ObjectSet* set = getCurrentSet();
+				if (set) {
+					set->addObject(new_object);
 					updateLayerControlGUI();
 
 					if (!current_level) {
-						new_object->setID(current_set->newObjectID());
+						new_object->setID(set->newObjectID());
 					}
 				}
 
