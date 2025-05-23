@@ -975,6 +975,7 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 			if(arg.key == OIS::KC_T) {
 				clearSelection();
+				updateSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_TERRAIN ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_TERRAIN);
 			}
 
@@ -985,6 +986,7 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			if(arg.key == OIS::KC_G) {
 				setupGhost();
 				clearSelection();
+				updateSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
 			}
 
