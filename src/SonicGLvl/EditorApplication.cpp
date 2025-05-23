@@ -87,6 +87,7 @@ void EditorApplication::updateSelection() {
 	}
 
 	updateBottomSelectionGUI();
+	updateCurrentLayerGUI();
 }
 
 void EditorApplication::deleteSelection() {

@@ -21,6 +21,7 @@
 #include "ObjectSet.h"
 
 void EditorApplication::initializeCurrentLayerGUI() {
+	// fill combo box with available list of sets
 	SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
 	
 	for (int i = 0; i < set_mapping.size(); i++)
@@ -29,6 +30,53 @@ void EditorApplication::initializeCurrentLayerGUI() {
 	}
 
 	SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+}
+
+void EditorApplication::updateCurrentLayerGUI() {
+	// update current layer base on selected objects
+	if (selected_nodes.empty())
+	{
+		int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
+		if (!set_mapping.count(selected_index) && !set_mapping.empty())
+		{
+			// reset to first layer
+			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+		}
+		return;
+	}
+
+	LibGens::ObjectSet* set_to_display = NULL;
+	for (auto node : selected_nodes)
+	{
+		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
+		if (!object_node)
+		{
+			// not an object, ignore
+			return;
+		}
+
+		LibGens::ObjectSet* set = object_node->getObject()->getParentSet();
+		if (set_to_display == NULL)
+		{
+			set_to_display = set;
+		}
+		else if (set_to_display != set)
+		{
+			// there are multiple sets, set as blank selection
+			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, -1, (LPARAM)0);
+			return;
+		}
+	}
+
+	for (auto& it : set_mapping)
+	{
+		// find index to display
+		if (set_to_display == it.second)
+		{
+			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, it.first, (LPARAM)0);
+			return;
+		}
+	}
 }
 
 INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) 
