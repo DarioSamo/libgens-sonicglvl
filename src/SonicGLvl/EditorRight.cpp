@@ -196,16 +196,16 @@ void EditorApplication::updateTransformGUI() {
 		SetDlgItemText(hRightDlg, IDE_RIGHT_SELECTION_ROT_Z, "");
 	}
 }
-void EditorApplication::updateSelectionPosition(float value_x, float value_y, float value_z) {
+void EditorApplication::updateSelectionPosition(float value_x, float value_y, float value_z, bool push_history) {
 	rememberSelection(false);
 	{
 		axis->setPositionAndTranslate(Ogre::Vector3(value_x, value_y, value_z));
 		translateSelection(axis->getTranslate());
 	}
-	makeHistorySelection(false);
+	if (push_history) makeHistorySelection(false);
 }
 
-void EditorApplication::updateSelectionRotation(float value_x, float value_y, float value_z) {
+void EditorApplication::updateSelectionRotation(float value_x, float value_y, float value_z, bool push_history) {
 	rememberSelection(true);
 	{
 		Ogre::Radian yRad = Ogre::Degree(value_y);
@@ -222,7 +222,7 @@ void EditorApplication::updateSelectionRotation(float value_x, float value_y, fl
 			setSelectionRotation(rotation);
 		}
 	}
-	makeHistorySelection(true);
+	if (push_history) makeHistorySelection(true);
 }
 
 bool EditorApplication::isUpdatePosRot()
@@ -248,9 +248,42 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 	case WM_NOTIFY:
 	{
-		switch (LOWORD(wParam))
+		if (((LPNMUPDOWN)lParam)->hdr.code == UDN_DELTAPOS)
 		{
-		
+			int delta = (LPNMUPDOWN(lParam))->iDelta;
+
+			bool update_transform = false;
+			float pos_x = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_X);
+			float pos_y = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_Y);
+			float pos_z = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_Z);
+			float rot_x = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_X);
+			float rot_y = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_Y);
+			float rot_z = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_Z);
+
+			switch (LOWORD(wParam))
+			{
+			case IDS_RIGHT_SELECTION_POS_X: update_transform = true; pos_x += (float)delta * 0.01f; break;
+			case IDS_RIGHT_SELECTION_POS_Y: update_transform = true; pos_y += (float)delta * 0.01f; break;
+			case IDS_RIGHT_SELECTION_POS_Z: update_transform = true; pos_z += (float)delta * 0.01f; break;
+			case IDS_RIGHT_SELECTION_ROT_X: update_transform = true; rot_x += (float)delta; break;
+			case IDS_RIGHT_SELECTION_ROT_Y: update_transform = true; rot_y += (float)delta; break;
+			case IDS_RIGHT_SELECTION_ROT_Z: update_transform = true; rot_z += (float)delta; break;
+			}
+			
+			if (update_transform)
+			{
+				SetDlgItemText(hDlg, IDE_RIGHT_SELECTION_POS_X, ToString((float)pos_x).c_str());
+				SetDlgItemText(hDlg, IDE_RIGHT_SELECTION_POS_Y, ToString((float)pos_y).c_str());
+				SetDlgItemText(hDlg, IDE_RIGHT_SELECTION_POS_Z, ToString((float)pos_z).c_str());
+				editor_application->updateSelectionPosition(pos_x, pos_y, pos_z, false);
+
+				SetDlgItemText(hDlg, IDE_RIGHT_SELECTION_ROT_X, ToString((float)rot_x).c_str());
+				SetDlgItemText(hDlg, IDE_RIGHT_SELECTION_ROT_Y, ToString((float)rot_y).c_str());
+				SetDlgItemText(hDlg, IDE_RIGHT_SELECTION_ROT_Z, ToString((float)rot_z).c_str());
+				editor_application->updateSelectionRotation(rot_x, rot_y, rot_z, false);
+			}
+
+			return true;
 		}
 		break;
 	}

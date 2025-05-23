@@ -677,8 +677,8 @@ class EditorApplication : public BaseApplication {
 			return configuration;
 		}
 
-		void updateSelectionPosition(float value_x, float value_y, float value_z);
-		void updateSelectionRotation(float value_x, float value_y, float value_z);
+		void updateSelectionPosition(float value_x, float value_y, float value_z, bool push_history = true);
+		void updateSelectionRotation(float value_x, float value_y, float value_z, bool push_history = true);
 };
 
 extern EditorApplication *editor_application;
