@@ -182,6 +182,9 @@ void EditorApplication::updateObjectsPalettePreview() {
 		closeEditPropertyGUI();
 		clearObjectsPalettePreview();
 
+		clearSelection();
+		updateSelection();
+
 		// Create Object Previewing Node
 		if (current_palette_selection) {
 			current_palette_selection->setPosition(LibGens::Vector3(LIBGENS_AABB_MAX_START, LIBGENS_AABB_MAX_START, LIBGENS_AABB_MAX_START));
@@ -201,6 +204,9 @@ void EditorApplication::overrideObjectsPalettePreview(list<LibGens::Object *> ov
 	closeVectorQueryMode();
 	closeEditPropertyGUI();
 	clearObjectsPalettePreview();
+
+	clearSelection();
+	updateSelection();
 
 	current_palette_selection = NULL;
 	last_palette_selection = NULL;
@@ -485,6 +491,7 @@ void EditorApplication::deleteLayer() {
 		if (MessageBox(NULL, text.c_str(), "Delete Layer", MB_YESNO | MB_ICONWARNING) == IDYES)
 		{
 			clearSelection();
+			updateSelection();
 
 			// permanently remove objects in this layer
 			for (auto it : objects)
