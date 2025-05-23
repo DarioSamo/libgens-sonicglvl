@@ -372,7 +372,6 @@ void EditorApplication::createLayerControlGUI() {
 
 void EditorApplication::updateLayerControlGUI() {
 	set_mapping.clear();
-	set_visibility.clear();
 	
 	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
 	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
@@ -396,6 +395,12 @@ void EditorApplication::updateLayerControlGUI() {
 		string set_size = to_string((*it)->getObjects().size());
 		strcpy(value_str, set_size.c_str());
 
+		bool visible = true;
+		if (set_visibility.count(*it))
+		{
+			visible = set_visibility[*it];
+		}
+
 		LV_ITEM Item;
 		Item.mask = LVIF_TEXT;
 		Item.pszText = name_str;
@@ -405,10 +410,10 @@ void EditorApplication::updateLayerControlGUI() {
 		Item.iItem = i;
 		ListView_InsertItem(hLayersList, &Item);
 		ListView_SetItemText(hLayersList, i, 1, value_str);
-		ListView_SetCheckState(hLayersList, i, true);
+		ListView_SetCheckState(hLayersList, i, visible);
 
 		set_mapping[i] = *it;
-		set_visibility[*it] = true;
+		set_visibility[*it] = visible;
 
 		i++;
 	}
@@ -485,6 +490,7 @@ void EditorApplication::deleteLayer() {
 			current_level->getLevel()->removeSet(set);
 			delete set;
 
+			set_visibility.erase(set);
 			updateLayerControlGUI();
 			history->clear();
 
