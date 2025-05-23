@@ -463,7 +463,14 @@ void EditorApplication::renameLayer(int index, string name) {
 		strcpy(name_str, name.c_str());
 		ListView_SetItemText(hLayersList, index, 0, name_str);
 
-		// Brian TODO: rename current object layer
+		// update current layer list
+		int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
+		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_DELETESTRING, index, 0);
+		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_INSERTSTRING, index, (LPARAM)set->getName().c_str());
+		if (selected_index == index)
+		{
+			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, selected_index, 0);
+		}
 	}
 }
 
@@ -494,7 +501,13 @@ void EditorApplication::deleteLayer() {
 			updateLayerControlGUI();
 			history->clear();
 
-			// Brian TODO: update current object layer
+			// update current layer list
+			int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
+			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_DELETESTRING, index, 0);
+			if (selected_index >= index)
+			{
+				SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, selected_index - 1, 0);
+			}
 		}
 	}
 }
@@ -520,7 +533,8 @@ void EditorApplication::newLayer() {
 		current_level->getLevel()->addSet(set);
 		updateLayerControlGUI();
 
-		// Brian TODO: update current object layer
+		// update current layer list
+		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)set->getName().c_str());
 	}
 }
 

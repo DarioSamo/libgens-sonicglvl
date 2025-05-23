@@ -84,6 +84,7 @@
 #define SONICGLVL_HAVOK_PRECISION_FPS          30.0f
 
 #define SONICGLVL_GUI_LEFT_WIDTH               280
+#define SONICGLVL_GUI_RIGHT_WIDTH              280
 #define SONICGLVL_GUI_BOTTOM_HEIGHT            83
 
 #define SONICGLVL_MATERIAL_EDITOR_MODE_MODEL     0
@@ -237,6 +238,7 @@ class EditorApplication : public BaseApplication {
 		// WinAPI
 		HMENU hMenu;
 		HWND hLeftDlg;
+		HWND hRightDlg;
 		HWND hBottomDlg;
 		HWND hEditPropertyDlg;
 
@@ -430,6 +432,7 @@ class EditorApplication : public BaseApplication {
 
 		void createLayerControlGUI();
 		void updateLayerControlGUI();
+		void initializeCurrentLayerGUI();
 		void setLayerVisibility(int index, bool v);
 		void renameLayer(int index, string name);
 		void deleteLayer();

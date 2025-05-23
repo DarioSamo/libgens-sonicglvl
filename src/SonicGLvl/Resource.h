@@ -20,8 +20,10 @@
 #define IDD_PHYSICS_EDITOR                      137
 #define IDD_FIND_DIALOG                         139
 #define IDD_LOOK_AT_POINT                       141
+#define IDD_RIGHT_DIALOG                        143
 #define IDC_EDIT_FLOAT_VALUE                    40000
 #define IDC_PALETTE_CATEGORY                    40000
+#define IDC_RIGHT_CURRENT_LAYER                 40000
 #define IDE_BOTTOM_SELECTION_POS_X              40000
 #define IDE_EDIT_VECTOR_X                       40000
 #define IDE_FIND_VALUE                          40000
@@ -44,6 +46,7 @@
 #define IDL_PALETTE_LIST                        40001
 #define IDR_MATERIAL_MATERIAL_MODE              40001
 #define IDS_EDIT_VECTOR_LIST_Y                  40001
+#define IDT_RIGHT_OBJECT_NAME                   40001
 #define IMD_SAVE_LEVEL_DATA                     40001
 #define IDB_EDIT_ID_LIST_CREATE                 40002
 #define IDB_IMPORT_PHYSICS                      40002

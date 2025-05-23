@@ -119,6 +119,7 @@
     <ClCompile Include="EditorObjectsProperties.cpp" />
     <ClCompile Include="EditorPaths.cpp" />
     <ClCompile Include="EditorPhysics.cpp" />
+    <ClCompile Include="EditorRight.cpp" />
     <ClCompile Include="EditorSceneExporter.cpp" />
     <ClCompile Include="EditorTerrain.cpp" />
     <ClCompile Include="EditorViewport.cpp" />

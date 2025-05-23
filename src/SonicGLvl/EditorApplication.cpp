@@ -27,6 +27,7 @@
 Ogre::Rectangle2D* mMiniScreen=NULL;
 
 INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 void Game_ProcessMessage(PipeClient* client, PipeMessage* msg);
 
@@ -667,6 +668,9 @@ void EditorApplication::createScene(void) {
 	hLeftDlg=CreateDialog(NULL, MAKEINTRESOURCE(IDD_LEFT_DIALOG), hwnd, LeftBarCallback);
 	SetParent(hLeftDlg, hwnd);
 
+	hRightDlg =CreateDialog(NULL, MAKEINTRESOURCE(IDD_RIGHT_DIALOG), hwnd, RightBarCallback);
+	SetParent(hRightDlg, hwnd);
+
 	hBottomDlg=CreateDialog(NULL, MAKEINTRESOURCE(IDD_BOTTOM_DIALOG), hwnd, BottomBarCallback);
 	SetParent(hBottomDlg, hwnd);
 
@@ -761,6 +765,7 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 
 	// Move Windows
 	if (hLeftDlg)   MoveWindow(hLeftDlg,   0, 0, SONICGLVL_GUI_LEFT_WIDTH, left_window_height, true);
+	if (hRightDlg)	MoveWindow(hRightDlg, screen_width - SONICGLVL_GUI_RIGHT_WIDTH, 0, SONICGLVL_GUI_RIGHT_WIDTH, 60, true);
 	if (hBottomDlg) MoveWindow(hBottomDlg, 0, screen_height-SONICGLVL_GUI_BOTTOM_HEIGHT, screen_width+1, SONICGLVL_GUI_BOTTOM_HEIGHT+1, true);
 	/* Brian TODO: resize
 	// Move Left Bar Elements

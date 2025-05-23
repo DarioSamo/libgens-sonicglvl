@@ -258,6 +258,7 @@ void EditorApplication::openLevel(string filename) {
 	updateSetsGUI();
 	updateSelectedSetGUI();
 	updateLayerControlGUI();
+	initializeCurrentLayerGUI();
 
 	if (camera_manager) {
 		camera_manager->setLevel(current_level->getLevel());

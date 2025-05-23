@@ -141,6 +141,7 @@
     <ClCompile Include="TrajectoryNode.cpp">
       <Filter>Editor Nodes</Filter>
     </ClCompile>
+    <ClCompile Include="EditorRight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseApplication.h">
