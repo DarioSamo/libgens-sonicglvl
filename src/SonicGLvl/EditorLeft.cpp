@@ -87,6 +87,9 @@ void EditorApplication::searchObjectsPalette(string search_name) {
 		Item.iItem = ListView_GetItemCount(hPaletteList);
 		ListView_InsertItem(hPaletteList, &Item);
 	}
+
+	// make combo box show blank
+	SendDlgItemMessage(hLeftDlg, IDC_PALETTE_CATEGORY, CB_SETCURSEL, -1, 0);
 }
 
 void EditorApplication::updateObjectsPaletteGUI(int index) {
