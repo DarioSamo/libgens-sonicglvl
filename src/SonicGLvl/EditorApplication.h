@@ -432,12 +432,14 @@ class EditorApplication : public BaseApplication {
 
 		void createLayerControlGUI();
 		void updateLayerControlGUI();
-		void initializeCurrentLayerGUI();
-		void updateCurrentLayerGUI();
 		void setLayerVisibility(int index, bool v);
 		void renameLayer(int index, string name);
 		void deleteLayer();
 		void newLayer();
+
+		void initializeCurrentLayerGUI();
+		void updateCurrentLayerGUI();
+		void transferObjectsToLayer(int index);
 
 		void updateBottomSelectionGUI();
 		void updateMenu();

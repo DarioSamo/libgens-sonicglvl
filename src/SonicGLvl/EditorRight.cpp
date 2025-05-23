@@ -79,6 +79,46 @@ void EditorApplication::updateCurrentLayerGUI() {
 	}
 }
 
+void EditorApplication::transferObjectsToLayer(int index) {
+	if (selected_nodes.empty() || !set_mapping.count(index)) return;
+
+	for (auto node : selected_nodes)
+	{
+		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
+		if (!object_node)
+		{
+			// not an object, ignore
+			updateCurrentLayerGUI();
+			return;
+		}
+	}
+
+	LibGens::ObjectSet* new_set = set_mapping[index];
+	if (selected_nodes.size() > 1)
+	{
+		string text = "Do you want to move " + to_string(selected_nodes.size()) + " selected objects to '" + new_set->getName() + "' layer?";
+		if (MessageBox(NULL, text.c_str(), "Transfer Objects To Layer", MB_YESNO | MB_ICONWARNING) != IDYES)
+		{
+			updateCurrentLayerGUI();
+			return;
+		}
+	}
+
+	for (auto node : selected_nodes)
+	{
+		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
+		LibGens::Object* object = object_node->getObject();
+		LibGens::ObjectSet* prev_set = object->getParentSet();
+		prev_set->eraseObject(object);
+		new_set->addObject(object);
+
+		// Brian TODO: undo?
+	}
+
+	// update object count
+	updateLayerControlGUI();
+}
+
 INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) 
 {
 	switch (msg)
@@ -107,7 +147,19 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 		switch (LOWORD(wParam))
 		{
-		
+		case IDC_RIGHT_CURRENT_LAYER:
+		{
+			switch (HIWORD(wParam))
+			{
+			case CBN_SELCHANGE:
+			{
+				int selected_index = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+				editor_application->transferObjectsToLayer(selected_index);
+				return true;
+			}
+			}
+			break;
+		}
 		}
 		break;
 	}

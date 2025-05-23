@@ -766,7 +766,7 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 
 	// Move Windows
 	if (hLeftDlg)   MoveWindow(hLeftDlg,   0, 0, SONICGLVL_GUI_LEFT_WIDTH, left_window_height, true);
-	if (hRightDlg)	MoveWindow(hRightDlg, screen_width - SONICGLVL_GUI_RIGHT_WIDTH, 0, SONICGLVL_GUI_RIGHT_WIDTH, 60, true);
+	if (hRightDlg)	MoveWindow(hRightDlg, screen_width - SONICGLVL_GUI_RIGHT_WIDTH, 0, SONICGLVL_GUI_RIGHT_WIDTH, left_window_height, true);
 	if (hBottomDlg) MoveWindow(hBottomDlg, 0, screen_height-SONICGLVL_GUI_BOTTOM_HEIGHT, screen_width+1, SONICGLVL_GUI_BOTTOM_HEIGHT+1, true);
 	/* Brian TODO: resize
 	// Move Left Bar Elements
@@ -852,7 +852,7 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	// Resize Viewport
 	float left  = (float)SONICGLVL_GUI_LEFT_WIDTH / (float)screen_width;
 	float top   = 0.0f;
-	float width = (float)(screen_width  - SONICGLVL_GUI_LEFT_WIDTH) / (float)screen_width;
+	float width = (float)(screen_width  - SONICGLVL_GUI_LEFT_WIDTH - SONICGLVL_GUI_RIGHT_WIDTH) / (float)screen_width;
 	float height= (float)(screen_height - SONICGLVL_GUI_BOTTOM_HEIGHT) / (float)screen_height;
 	/*
 	float left   = 0.0f;
