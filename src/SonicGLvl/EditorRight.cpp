@@ -196,29 +196,33 @@ void EditorApplication::updateTransformGUI() {
 		SetDlgItemText(hRightDlg, IDE_RIGHT_SELECTION_ROT_Z, "");
 	}
 }
-void EditorApplication::updateBottomSelectionPosition(float value_x, float value_y, float value_z) {
-	axis->setPositionAndTranslate(Ogre::Vector3(value_x, value_y, value_z));
-	translateSelection(axis->getTranslate());
-
-	// Brian TODO: undo?
+void EditorApplication::updateSelectionPosition(float value_x, float value_y, float value_z) {
+	rememberSelection(false);
+	{
+		axis->setPositionAndTranslate(Ogre::Vector3(value_x, value_y, value_z));
+		translateSelection(axis->getTranslate());
+	}
+	makeHistorySelection(false);
 }
 
-void EditorApplication::updateBottomSelectionRotation(float value_x, float value_y, float value_z) {
-	Ogre::Radian yRad = Ogre::Degree(value_y);
-	Ogre::Radian pRad = Ogre::Degree(value_x);
-	Ogre::Radian rRad = Ogre::Degree(value_z);
+void EditorApplication::updateSelectionRotation(float value_x, float value_y, float value_z) {
+	rememberSelection(true);
+	{
+		Ogre::Radian yRad = Ogre::Degree(value_y);
+		Ogre::Radian pRad = Ogre::Degree(value_x);
+		Ogre::Radian rRad = Ogre::Degree(value_z);
 
-	Ogre::Matrix3 mat;
-	mat.FromEulerAnglesYXZ(yRad, pRad, rRad);
+		Ogre::Matrix3 mat;
+		mat.FromEulerAnglesYXZ(yRad, pRad, rRad);
 
-	Ogre::Quaternion rotation(mat);
+		Ogre::Quaternion rotation(mat);
 
-	if (!rotation.isNaN() && (rotation.Norm() > 0)) {
-		axis->setRotationAndTranslate(rotation);
-		setSelectionRotation(rotation);
+		if (!rotation.isNaN() && (rotation.Norm() > 0)) {
+			axis->setRotationAndTranslate(rotation);
+			setSelectionRotation(rotation);
+		}
 	}
-
-	// Brian TODO: undo?
+	makeHistorySelection(true);
 }
 
 bool EditorApplication::isUpdatePosRot()
@@ -280,7 +284,7 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 					float value_x = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_X);
 					float value_y = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_Y);
 					float value_z = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_Z);
-					editor_application->updateBottomSelectionPosition(value_x, value_y, value_z);
+					editor_application->updateSelectionPosition(value_x, value_y, value_z);
 					return true;
 				}
 			}
@@ -300,7 +304,7 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 					float value_x = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_X);
 					float value_y = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_Y);
 					float value_z = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_Z);
-					editor_application->updateBottomSelectionRotation(value_x, value_y, value_z);
+					editor_application->updateSelectionRotation(value_x, value_y, value_z);
 					return true;
 				}
 			}
