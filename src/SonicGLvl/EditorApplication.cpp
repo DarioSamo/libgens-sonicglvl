@@ -793,53 +793,23 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_NEW), layer_control_y_coordinate, 7, 131, 85, 14);
 	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_DELETE), layer_control_y_coordinate, 95, 131, 85, 14);
 
-	int left_window_palette_properties_height = layer_control_y_coordinate - 5;
-	fnResize(GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP), 0, 2, 0, 181, 0, left_window_palette_properties_height);
-	fnResize(GetDlgItem(hLeftDlg, IDL_PALETTE_LIST), 0, 6, 41, 174, 0, left_window_palette_properties_height - 74);
+	int palette_list_height = layer_control_y_coordinate - 5;
+	fnResize(GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP), 0, 2, 0, 181, 0, palette_list_height);
+	fnResize(GetDlgItem(hLeftDlg, IDL_PALETTE_LIST), 0, 6, 41, 174, 0, palette_list_height -  74);
 
 	int help_y_coordinate = screen_height - 90;
 	fnResize(GetDlgItem(hRightDlg, IDG_RIGHT_HELP_GROUP), help_y_coordinate, 2, 0, 181, 52);
 	fnResize(GetDlgItem(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION), help_y_coordinate, 7, 11, 173, 37);
 
-	/*HWND hPropertiesGroup = GetDlgItem(hLeftDlg, IDG_PROPERTIES_GROUP);
-	HWND hPropertiesList  = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
-
-	int properties_y_coordinate= 93 + left_window_palette_properties_height;
-	// Properties Group
-	temp_rect.left = 2;
-	temp_rect.top = 0;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPropertiesGroup, temp_rect.left, temp_rect.top + properties_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 8, true);
-	temp_rect.top += properties_y_coordinate;
-	temp_rect.bottom += properties_y_coordinate;
-	temp_rect.bottom += left_window_palette_properties_height - 8;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Properties List
-	temp_rect.left = 6;
-	temp_rect.top = 11;
-	temp_rect.right = 174 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPropertiesList, temp_rect.left, temp_rect.top + properties_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 33, true);
-	temp_rect.top += properties_y_coordinate;
-	temp_rect.bottom += properties_y_coordinate;
-	temp_rect.bottom += left_window_palette_properties_height - 33;
-	InvalidateRect(hLeftDlg, &temp_rect, true);*/
+	int object_properties_height = help_y_coordinate - 95;
+	fnResize(GetDlgItem(hRightDlg, IDG_RIGHT_PROPERTIES_GROUP), 0, 2, 56, 181, 0, object_properties_height);
+	fnResize(GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST), 0, 6, 67, 174, 0, object_properties_height - 25);
 	
 	// Resize Viewport
 	float left  = (float)SONICGLVL_GUI_LEFT_WIDTH / (float)screen_width;
 	float top   = 0.0f;
 	float width = (float)(screen_width  - SONICGLVL_GUI_LEFT_WIDTH - SONICGLVL_GUI_RIGHT_WIDTH) / (float)screen_width;
 	float height= (float)(screen_height) / (float)screen_height;
-	/*
-	float left   = 0.0f;
-	float top    = 0.0f;
-	float width  = 1.0f;
-	float height = 1.0f;
-	*/
 
 	viewport->resize(left, top, width, height);
 }
