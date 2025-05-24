@@ -27,6 +27,7 @@
 Ogre::Rectangle2D* mMiniScreen=NULL;
 
 INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK BottomBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 void Game_ProcessMessage(PipeClient* client, PipeMessage* msg);
 
@@ -85,7 +86,7 @@ void EditorApplication::updateSelection() {
 		updateObjectsPropertiesGUI();
 	}
 
-	updateBottomSelectionGUI();
+	updateTransformGUI();
 }
 
 void EditorApplication::deleteSelection() {
@@ -106,6 +107,7 @@ void EditorApplication::deleteSelection() {
 					LibGens::ObjectSet *object_set=object->getParentSet();
 					if (object_set) {
 						object_set->eraseObject(object);
+						updateLayerControlGUI();
 					}
 
 					object_node_manager->hideObjectNode(object, true);
@@ -175,19 +177,41 @@ void EditorApplication::showSelectionNames() {
 	SHOW_MSG(message.c_str());
 }
 
-void EditorApplication::selectAll() {
+void EditorApplication::selectAll(int layer_index) {
 	bool stuff_selected = false;
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
 
 	if (editor_mode == EDITOR_NODE_QUERY_OBJECT) {
 		list<ObjectNode *> object_nodes = object_node_manager->getObjectNodes();
 		for (list<ObjectNode *>::iterator it=object_nodes.begin(); it!=object_nodes.end(); it++) {
-			if (!(*it)->isSelected() && !(*it)->isForceHidden()) {
+			bool isObjectInLayer = true;
+			if (layer_index >= 0)
+			{
+				if (set_mapping.count(layer_index))
+				{
+					LibGens::ObjectSet* set = set_mapping[layer_index];
+					isObjectInLayer = set->hasObject((*it)->getObject());
+				}
+				else
+				{
+					isObjectInLayer = false;
+				}
+			}
+			
+			if (!(*it)->isSelected() && !(*it)->isForceHidden() && isObjectInLayer) {
 				stuff_selected = true;
 				HistoryActionSelectNode *action_select = new HistoryActionSelectNode((*it), false, true, &selected_nodes);
 				(*it)->setSelect(true);
 				wrapper->push(action_select);
 				selected_nodes.push_back(*it);
+			}
+			else if ((*it)->isSelected() && ((*it)->isForceHidden() || !isObjectInLayer))
+			{
+				stuff_selected = true;
+				HistoryActionSelectNode* action_select = new HistoryActionSelectNode((*it), true, false, &selected_nodes);
+				(*it)->setSelect(false);
+				wrapper->push(action_select);
+				selected_nodes.remove(*it);
 			}
 		}
 	}
@@ -241,6 +265,7 @@ void EditorApplication::cloneSelection() {
 				LibGens::ObjectSet *parent_set = object->getParentSet();
 				if (parent_set) {
 					parent_set->addObject(new_object);
+					updateLayerControlGUI();
 				}
 
 				// Create
@@ -287,6 +312,7 @@ void EditorApplication::temporaryCloneSelection() {
 				LibGens::ObjectSet* parent_set = object->getParentSet();
 				if (parent_set) {
 					parent_set->addObject(new_object);
+					updateLayerControlGUI();
 				}
 
 				// Create
@@ -348,6 +374,8 @@ void EditorApplication::rememberSelection(bool mode) {
 }
 
 void EditorApplication::makeHistorySelection(bool mode) {
+	if (current_property_index < (int)current_properties_types.size()) return;
+
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
 	int index = 0;
 	bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;
@@ -642,6 +670,9 @@ void EditorApplication::createScene(void) {
 	hLeftDlg=CreateDialog(NULL, MAKEINTRESOURCE(IDD_LEFT_DIALOG), hwnd, LeftBarCallback);
 	SetParent(hLeftDlg, hwnd);
 
+	hRightDlg =CreateDialog(NULL, MAKEINTRESOURCE(IDD_RIGHT_DIALOG), hwnd, RightBarCallback);
+	SetParent(hRightDlg, hwnd);
+
 	hBottomDlg=CreateDialog(NULL, MAKEINTRESOURCE(IDD_BOTTOM_DIALOG), hwnd, BottomBarCallback);
 	SetParent(hBottomDlg, hwnd);
 
@@ -656,13 +687,13 @@ void EditorApplication::createScene(void) {
 	updateObjectCategoriesGUI();
 	updateObjectsPaletteGUI();
 	createObjectsPropertiesGUI();
+	createLayerControlGUI();
 
 	current_category_index     = 0;
 	palette_cloning_mode       = false;
 	ignore_mouse_clicks_frames = 0;
 	last_palette_selection     = NULL;
 	current_palette_selection  = NULL;
-	current_set                = NULL;
 	current_single_property_object = NULL;
 	history_edit_property_wrapper = NULL;
 	cloning_mode = SONICGLVL_MULTISETPARAM_MODE_CLONE;
@@ -735,99 +766,51 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 
 	// Move Windows
 	if (hLeftDlg)   MoveWindow(hLeftDlg,   0, 0, SONICGLVL_GUI_LEFT_WIDTH, left_window_height, true);
-	if (hBottomDlg) MoveWindow(hBottomDlg, 0, screen_height-SONICGLVL_GUI_BOTTOM_HEIGHT, screen_width+1, SONICGLVL_GUI_BOTTOM_HEIGHT+1, true);
-
+	if (hRightDlg)	MoveWindow(hRightDlg, screen_width - SONICGLVL_GUI_RIGHT_WIDTH, 0, SONICGLVL_GUI_RIGHT_WIDTH, screen_height, true);
+	if (hBottomDlg) MoveWindow(hBottomDlg, 0, screen_height-SONICGLVL_GUI_BOTTOM_HEIGHT, SONICGLVL_GUI_LEFT_WIDTH, SONICGLVL_GUI_BOTTOM_HEIGHT+1, true);
+	
 	// Move Left Bar Elements
 	RECT temp_rect;
+
+	auto fnResize = [this, &temp_rect](HWND hDlg, int nIDDlgItem, float top_y, float x, float y, float width, float height, float height_add = 0.0f)
+	{
+		HWND item = GetDlgItem(hDlg, nIDDlgItem);
+		temp_rect.left = x;
+		temp_rect.top = y;
+		temp_rect.right = width + temp_rect.left;
+		temp_rect.bottom = height + temp_rect.top;
+		MapDialogRect(hDlg, &temp_rect);
+		MoveWindow(item, temp_rect.left, temp_rect.top + top_y, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + height_add, true);
+		temp_rect.top += top_y;
+		temp_rect.bottom += top_y;
+		InvalidateRect(hDlg, &temp_rect, true);
+	};
+
+	int layer_control_y_coordinate = left_window_height - 245;
+	fnResize(hLeftDlg, IDG_LAYER_GROUP, layer_control_y_coordinate, 2, 0, 181, 148);
+	fnResize(hLeftDlg, IDT_LAYER_CURRENT, layer_control_y_coordinate, 7, 12, 64, 14);
+	fnResize(hLeftDlg, IDC_LAYER_CURRENT, layer_control_y_coordinate, 60, 11, 119, 14);
+	fnResize(hLeftDlg, IDL_LAYER_LIST, layer_control_y_coordinate, 7, 27, 173, 100);
+	fnResize(hLeftDlg, IDB_LAYER_NEW, layer_control_y_coordinate, 7, 131, 85, 14);
+	fnResize(hLeftDlg, IDB_LAYER_DELETE, layer_control_y_coordinate, 95, 131, 85, 14);
+
+	int palette_list_height = layer_control_y_coordinate - 5;
+	fnResize(hLeftDlg, IDG_PALETTE_GROUP, 0, 2, 0, 181, 0, palette_list_height);
+	fnResize(hLeftDlg, IDL_PALETTE_LIST, 0, 6, 41, 174, 0, palette_list_height -  74);
+
+	int help_y_coordinate = screen_height - 90;
+	fnResize(hRightDlg, IDG_RIGHT_HELP_GROUP, help_y_coordinate, 2, 0, 181, 52);
+	fnResize(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION, help_y_coordinate, 7, 11, 173, 37);
+
+	int object_properties_height = help_y_coordinate - 95;
+	fnResize(hRightDlg, IDG_RIGHT_PROPERTIES_GROUP, 0, 2, 56, 181, 0, object_properties_height);
+	fnResize(hRightDlg, IDL_RIGHT_PROPERTIES_LIST, 0, 6, 67, 174, 0, object_properties_height - 25);
 	
-	HWND hHelpGroup = GetDlgItem(hLeftDlg, IDG_HELP_GROUP);
-	HWND hHelpText  = GetDlgItem(hLeftDlg, IDT_HELP_DESCRIPTION);
-	// Help Group
-	int help_y_coordinate=left_window_height - 90;
-	temp_rect.left = 2;
-	temp_rect.top = 0;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 52 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hHelpGroup, temp_rect.left, temp_rect.top + help_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += help_y_coordinate;
-	temp_rect.bottom += help_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Help Text
-	temp_rect.left = 7;
-	temp_rect.top = 11;
-	temp_rect.right = 173 + temp_rect.left;
-	temp_rect.bottom = 37 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hHelpText, temp_rect.left, temp_rect.top + help_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += help_y_coordinate;
-	temp_rect.bottom += help_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-
-	HWND hPaletteGroup      = GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP);
-	HWND hPaletteList       = GetDlgItem(hLeftDlg, IDL_PALETTE_LIST);
-	int left_window_palette_properties_height=(left_window_height - 90 - 90) / 2;
-	// Palette Group
-	temp_rect.left = 2;
-	temp_rect.top = 55;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPaletteGroup, temp_rect.left, temp_rect.top, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height, true);
-	temp_rect.bottom += left_window_palette_properties_height;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Palette List
-	temp_rect.left = 6;
-	temp_rect.top = 82;
-	temp_rect.right = 174 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPaletteList, temp_rect.left, temp_rect.top, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 50, true);
-	temp_rect.bottom += left_window_palette_properties_height - 50;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	HWND hPropertiesGroup = GetDlgItem(hLeftDlg, IDG_PROPERTIES_GROUP);
-	HWND hPropertiesList  = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
-
-	int properties_y_coordinate= 93 + left_window_palette_properties_height;
-	// Properties Group
-	temp_rect.left = 2;
-	temp_rect.top = 0;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPropertiesGroup, temp_rect.left, temp_rect.top + properties_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 8, true);
-	temp_rect.top += properties_y_coordinate;
-	temp_rect.bottom += properties_y_coordinate;
-	temp_rect.bottom += left_window_palette_properties_height - 8;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Properties List
-	temp_rect.left = 6;
-	temp_rect.top = 11;
-	temp_rect.right = 174 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPropertiesList, temp_rect.left, temp_rect.top + properties_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 33, true);
-	temp_rect.top += properties_y_coordinate;
-	temp_rect.bottom += properties_y_coordinate;
-	temp_rect.bottom += left_window_palette_properties_height - 33;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
 	// Resize Viewport
 	float left  = (float)SONICGLVL_GUI_LEFT_WIDTH / (float)screen_width;
 	float top   = 0.0f;
-	float width = (float)(screen_width  - SONICGLVL_GUI_LEFT_WIDTH) / (float)screen_width;
-	float height= (float)(screen_height - SONICGLVL_GUI_BOTTOM_HEIGHT) / (float)screen_height;
-	/*
-	float left   = 0.0f;
-	float top    = 0.0f;
-	float width  = 1.0f;
-	float height = 1.0f;
-	*/
+	float width = (float)(screen_width  - SONICGLVL_GUI_LEFT_WIDTH - SONICGLVL_GUI_RIGHT_WIDTH) / (float)screen_width;
+	float height= (float)(screen_height) / (float)screen_height;
 
 	viewport->resize(left, top, width, height);
 }
@@ -944,6 +927,7 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 
 			if(arg.key == OIS::KC_T) {
 				clearSelection();
+				updateSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_TERRAIN ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_TERRAIN);
 			}
 
@@ -954,6 +938,7 @@ bool EditorApplication::keyPressed(const OIS::KeyEvent &arg) {
 			if(arg.key == OIS::KC_G) {
 				setupGhost();
 				clearSelection();
+				updateSelection();
 				editor_mode = (editor_mode == EDITOR_NODE_QUERY_GHOST ? EDITOR_NODE_QUERY_OBJECT : EDITOR_NODE_QUERY_GHOST);
 			}
 
@@ -1105,7 +1090,7 @@ bool EditorApplication::mouseMoved(const OIS::MouseEvent &arg) {
 			else
 				rotateSelection(axis->getRotate());
 
-			updateBottomSelectionGUI();
+			updateTransformGUI();
 		}
 
 		if (axis->isHighlighted()) {
@@ -1173,6 +1158,13 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 							addTrajectory(getTrajectoryMode(current_node));
 							pushHistory(action_select);
 
+						}
+						else
+						{
+							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, true, false, &selected_nodes);
+							current_node->setSelect(false);
+							selected_nodes.remove(current_node);
+							pushHistory(action_select);
 						}
 
 						updateSelection();

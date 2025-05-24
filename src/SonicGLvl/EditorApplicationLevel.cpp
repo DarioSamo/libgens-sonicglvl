@@ -204,6 +204,17 @@ void EditorApplication::openLevel(string filename) {
 
 	updateObjectCategoriesGUI();
 
+	// clean up objects placed before a level is loaded
+	clearSelection();
+	updateSelection();
+	for (auto node : object_node_manager->getObjectNodes())
+	{
+		LibGens::Object* obj = node->getObject();
+		object_node_manager->deleteObjectNode(obj);
+		delete obj;
+	}
+	history->clear();
+
 	current_level_filename=filename;
 
 	current_level = new EditorLevel(folder, slot_name, geometry_name, slot_id_name, game_mode);
@@ -218,35 +229,8 @@ void EditorApplication::openLevel(string filename) {
 	object_node_manager->setSlotIdName(slot_id_name);
 	current_level->loadData(library, object_node_manager);
 
-	current_set = current_level->getLevel()->getSet("base");
-
-	if (!current_set) {
-		current_set = current_level->getLevel()->getSet("Base");
-	}
-
-	if (!current_set) {
-		list<LibGens::ObjectSet *> sets = current_level->getLevel()->getSets();
-		if (!sets.empty()) {
-			current_set = sets.front();
-		}
-		else {
-			LibGens::ObjectSet *set = new LibGens::ObjectSet();
-			if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
-				set->setName("Base");
-				set->setFilename(current_level->getLevel()->getFolder() + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
-			}
-			else {
-				set->setName("base");
-				set->setFilename(current_level->getLevel()->getFolder() + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
-			}
-
-			current_level->getLevel()->addSet(set);
-			current_set = set;
-		}
-	}
-
-	updateSetsGUI();
-	updateSelectedSetGUI();
+	updateLayerControlGUI();
+	initializeCurrentLayerGUI();
 
 	if (camera_manager) {
 		camera_manager->setLevel(current_level->getLevel());
@@ -305,77 +289,6 @@ void EditorApplication::openLevel(string filename) {
 	printf("Finished loading!\n");
 
 	updateNodeVisibility();
-}
-
-void EditorApplication::newCurrentSet() {
-	if (current_level->getLevel()->getSet("rename_me")) {
-		MessageBox(NULL, "Rename the object set called \"rename_me\" first before creating a new object set.", "SonicGLvl", MB_OK);
-	}
-	else {
-		LibGens::ObjectSet *set = new LibGens::ObjectSet();
-		set->setName("rename_me");
-		if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
-			set->setFilename(current_level->getLevel()->getFolder() + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
-		}
-		else {
-			set->setFilename(current_level->getLevel()->getFolder() + LIBGENS_OBJECT_SET_NAME + set->getName() + LIBGENS_OBJECT_SET_EXTENSION);
-		}
-
-		current_level->getLevel()->addSet(set);
-		current_set = set;
-		updateSetsGUI();
-		updateSelectedSetGUI();
-	}
-}
-
-void EditorApplication::deleteCurrentSet() {
-	if (current_set) {
-		if (current_set->getName() != LIBGENS_OBJECT_SET_BASE) {
-			current_level->getLevel()->removeSet(current_set);
-			delete current_set;
-			current_set = current_level->getLevel()->getSet(LIBGENS_OBJECT_SET_BASE);
-			updateSetsGUI();
-			updateSelectedSetGUI();
-		}
-		else
-			MessageBox(NULL, "You can't delete the base object set.", "SonicGLvl", MB_OK);
-	}
-}
-
-void EditorApplication::changeCurrentSet(string change_set) {
-	LibGens::ObjectSet *set = current_level->getLevel()->getSet(change_set);
-	if (set) {
-		current_set = set;
-		updateSelectedSetGUI();
-	}
-	else
-		MessageBox(NULL, "Could not change to that set because no set with that name exists on the level.", "SonicGLvl", MB_OK);
-}
-
-void EditorApplication::renameCurrentSet(string rename_set) {
-	if (current_set && !current_level->getLevel()->getSet(rename_set)) {
-		string folder = LibGens::File::folderFromFilename(current_set->getFilename());
-		string new_filename = folder + LIBGENS_OBJECT_SET_NAME + rename_set + LIBGENS_OBJECT_SET_EXTENSION;
-		if (current_level->getGameMode() == LIBGENS_LEVEL_GAME_UNLEASHED) {
-			string new_filename = folder + rename_set + LIBGENS_OBJECT_SET_EXTENSION;
-		}
-		LibGens::File::remove(current_set->getFilename());
-		current_set->setFilename(new_filename);
-		current_set->setName(rename_set);
-		current_set->saveXML(new_filename);
-	}
-	else {
-		MessageBox(NULL, "A set with that name already exists!", "SonicGLvl", MB_OK);
-		updateSetsGUI();
-		updateSelectedSetGUI();
-	}
-}
-
-void EditorApplication::updateCurrentSetVisible(bool v) {
-	if (current_set) {
-		set_visibility[current_set] = v;
-		object_node_manager->updateSetVisibility(current_set, v);
-	}
 }
 
 void EditorApplication::createDirectionalLight(LibGens::Light *direct_light) {

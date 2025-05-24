@@ -84,6 +84,7 @@
 #define SONICGLVL_HAVOK_PRECISION_FPS          30.0f
 
 #define SONICGLVL_GUI_LEFT_WIDTH               280
+#define SONICGLVL_GUI_RIGHT_WIDTH              280
 #define SONICGLVL_GUI_BOTTOM_HEIGHT            83
 
 #define SONICGLVL_MATERIAL_EDITOR_MODE_MODEL     0
@@ -149,7 +150,7 @@ class EditorApplication : public BaseApplication {
 		EditorLevelDatabase *level_database;
 		EditorLevel *current_level;
 		string current_level_filename;
-		map<LibGens::ObjectSet *, int> set_indices;
+		map<int, LibGens::ObjectSet*> set_mapping;
 		map<LibGens::ObjectSet *, bool> set_visibility;
 
 		int current_vector_list_selection;
@@ -236,6 +237,7 @@ class EditorApplication : public BaseApplication {
 		// WinAPI
 		HMENU hMenu;
 		HWND hLeftDlg;
+		HWND hRightDlg;
 		HWND hBottomDlg;
 		HWND hEditPropertyDlg;
 
@@ -248,13 +250,16 @@ class EditorApplication : public BaseApplication {
 		HWND hMultiSetParamDlg;
 		HWND hFindObjectDlg;
 		HWND hLookAtPointDlg;
+
 		// Object Palette
+		string current_category_search;
 		int current_category_index;
 		LibGens::Object *last_palette_selection;
 		LibGens::Object *current_palette_selection;
 		list<ObjectNode *> current_palette_nodes;
-		LibGens::ObjectSet *current_set;
 		bool palette_cloning_mode;
+
+		// Layer Control
 
 		// Object Properties
 		list<LibGens::Object *> current_object_list_properties;
@@ -347,7 +352,7 @@ class EditorApplication : public BaseApplication {
 		void cloneSelection();
 		void temporaryCloneSelection();
 		void showSelectionNames();
-		void selectAll();
+		void selectAll(int layer_index = -1);
 		void translateSelection(Ogre::Vector3 v);
 		void rotateSelection(Ogre::Quaternion q);
 		void setSelectionRotation(Ogre::Quaternion q);
@@ -423,15 +428,21 @@ class EditorApplication : public BaseApplication {
 
 		void saveXNAnimation();
 
+		void initializeCurrentLayerGUI();
+		void createLayerControlGUI();
+		void updateLayerControlGUI();
+		void setLayerVisibility(int index, bool v);
+		void renameLayer(int index, string name);
+		void deleteLayer();
+		void newLayer();
+
+		void openMoveToLayerGUI();
+		void populateMoveToLayerTargets(HWND hDlg);
+		void moveObjectsToLayer(int index);
+		void updateTransformGUI();
+
 		void updateBottomSelectionGUI();
 		void updateMenu();
-		void updateSetsGUI();
-		void updateSelectedSetGUI();
-		void newCurrentSet();
-		void deleteCurrentSet();
-		void updateCurrentSetVisible(bool v);
-		void changeCurrentSet(string change_set);
-		void renameCurrentSet(string rename_set);
 
 		void openPhysicsEditorGUI();
 		void clearPhysicsEditorGUI();
@@ -543,6 +554,7 @@ class EditorApplication : public BaseApplication {
 		
 
 		void updateObjectCategoriesGUI();
+		void searchObjectsPalette(string search_name);
 		void updateObjectsPaletteGUI(int index=0);
 		void updateObjectsPaletteSelection(int index);
 		void updateObjectsPalettePreview();
@@ -626,9 +638,14 @@ class EditorApplication : public BaseApplication {
 		EditorLevel *getCurrentLevel() {
 			return current_level;
 		}
-
+		
 		LibGens::ObjectSet *getCurrentSet() {
-			return current_set;
+			int selected_index = SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_GETCURSEL, 0, 0);
+			if (set_mapping.count(selected_index))
+			{
+				return set_mapping[selected_index];
+			}
+			return NULL;
 		}
 
 		EditorAnimationsList *getAnimationsList() {
@@ -660,8 +677,8 @@ class EditorApplication : public BaseApplication {
 			return configuration;
 		}
 
-		void updateBottomSelectionPosition(float value_x, float value_y, float value_z);
-		void updateBottomSelectionRotation(float value_x, float value_y, float value_z);
+		void updateSelectionPosition(float value_x, float value_y, float value_z, bool push_history = true);
+		void updateSelectionRotation(float value_x, float value_y, float value_z, bool push_history = true);
 };
 
 extern EditorApplication *editor_application;

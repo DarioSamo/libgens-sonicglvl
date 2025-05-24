@@ -76,7 +76,7 @@
     <ClCompile Include="EditorMaterial.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="EditorObjectsPalette.cpp">
+    <ClCompile Include="EditorLeft.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
     <ClCompile Include="EditorObjectsProperties.cpp">
@@ -140,6 +140,12 @@
     </ClCompile>
     <ClCompile Include="TrajectoryNode.cpp">
       <Filter>Editor Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorMoveToLayer.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorRight.cpp">
+      <Filter>Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

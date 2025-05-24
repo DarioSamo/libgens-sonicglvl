@@ -81,9 +81,11 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				// Edit
 				case IMD_UNDO:
 					editor_application->undoHistory();
+					editor_application->updateSelection();
 					break;
 				case IMD_REDO:
 					editor_application->redoHistory();
+					editor_application->updateSelection();
 					break;
 				case IMD_CUT:
 					editor_application->copySelection();
@@ -121,6 +123,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					break;
 				case IMD_SNAP_OBJECTS_TO_CLOSEST_PATH:
 					editor_application->snapToClosestPath(); 
+					break;
+				case IMD_MOVE_LAYER:
+					editor_application->openMoveToLayerGUI(); 
 					break;
 
 				// Materials
