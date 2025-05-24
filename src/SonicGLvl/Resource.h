@@ -54,7 +54,6 @@
 #define IDE_LOOK_AT_Z                           40002
 #define IDE_MULTISETPARAM_Z                     40002
 #define IDE_RIGHT_SELECTION_ROT_X               40002
-#define IDL_PROPERTIES_LIST                     40002
 #define IDR_MATERIAL_TERRAIN_MODE               40002
 #define IDS_EDIT_VECTOR_LIST_Z                  40002
 #define IMD_SAVE_LEVEL_RESOURCES                40002
@@ -85,7 +84,7 @@
 #define IDB_EDIT_VECTOR_LIST_CREATE             40005
 #define IDB_MATERIAL_SAVE_MODEL                 40005
 #define IDC_FIND_ALL                            40005
-#define IDG_PROPERTIES_GROUP                    40005
+#define IDL_RIGHT_PROPERTIES_LIST               40005
 #define IDS_EDIT_VECTOR_Z                       40005
 #define IDS_MULTISETPARAM_Y                     40005
 #define IMD_REDO                                40005
@@ -160,6 +159,7 @@
 #define IDS_MATERIAL_TEXTURE_UNIT_LIST          40015
 #define IDS_MULTISETPARAM_SPACING               40015
 #define IMD_SAVE_TEMPLATES_DATABASE             40015
+#define IDG_RIGHT_PROPERTIES_GROUP              40016
 #define IDL_MATERIAL_TEXTURE_UNIT_LIST          40016
 #define IMD_GAME_SHADERS                        40016
 #define IDB_MATERIAL_NEW_TEXTURE_UNIT           40017

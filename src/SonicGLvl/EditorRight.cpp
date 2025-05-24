@@ -285,6 +285,29 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 
 			return true;
 		}
+
+		switch (LOWORD(wParam))
+		{
+		case IDL_RIGHT_PROPERTIES_LIST:
+		{
+			switch (((LPNMHDR)lParam)->code)
+			{
+			case NM_CLICK:
+			{
+				int selection_index = SendMessage(GetDlgItem(hDlg, IDL_RIGHT_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+				editor_application->updateObjectPropertyIndex(selection_index);
+				return true;
+			}
+			case NM_DBLCLK:
+			{
+				int selection_index = SendMessage(GetDlgItem(hDlg, IDL_RIGHT_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
+				editor_application->editObjectPropertyIndex(selection_index);
+				return true;
+			}
+			}
+			break;
+		}
+		}
 		break;
 	}
 	case WM_COMMAND:

@@ -572,23 +572,6 @@ INT_PTR CALLBACK LeftBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPar
 	{
 		switch (LOWORD(wParam))
 		{
-		case IDL_PROPERTIES_LIST:
-			switch (((LPNMHDR)lParam)->code)
-			{
-			case NM_CLICK:
-			{
-				selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-				editor_application->updateObjectPropertyIndex(selection_index);
-				return true;
-			}
-			case NM_DBLCLK:
-			{
-				selection_index = SendMessage(GetDlgItem(hDlg, IDL_PROPERTIES_LIST), LVM_GETNEXTITEM, -1, LVNI_SELECTED);
-				editor_application->editObjectPropertyIndex(selection_index);
-				return true;
-			}
-			}
-			break;
 		case IDL_LAYER_LIST:
 		{
 			switch (((LPNMHDR)lParam)->code)

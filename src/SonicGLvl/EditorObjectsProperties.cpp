@@ -41,7 +41,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 	string object_name = "";
 	bool multiple_object_types = false;
 	bool multiple_multiset_types = false;
-	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
+	HWND hPropertiesList = GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST);
 
 	if (current_single_property_object) {
 		updateObjectsPropertiesValuesGUI(current_single_property_object);
@@ -140,9 +140,6 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 			LibGens::Object *first_object = (*selected_objects.begin());
 			if (first_object) {
 				group_text += " (ID:" + ToString(first_object->getID());
-				if (first_object->getParentSet()) {
-					group_text += ", " + first_object->getParentSet()->getName();
-				}
 				group_text += ")";
 			}
 		}
@@ -154,7 +151,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		group_text = "(No selection)";
 	}
 
-	SetDlgItemText(hLeftDlg, IDG_PROPERTIES_GROUP, group_text.c_str());
+	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_NAME, group_text.c_str());
 
 	// Scan for Common Properties in the list of selected objects
 	current_properties_names.clear();
@@ -287,7 +284,7 @@ void EditorApplication::updateObjectsPropertiesValuesGUI(LibGens::Object *object
 		return;
 	}
 
-	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
+	HWND hPropertiesList = GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST);
 	
 	for (size_t i=0; i<current_properties_names.size(); i++) {
 		string element_name = current_properties_names[i];
@@ -359,7 +356,7 @@ void EditorApplication::updateObjectsPropertiesValuesGUI(LibGens::Object *object
 
 
 void EditorApplication::createObjectsPropertiesGUI() {
-	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
+	HWND hPropertiesList = GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST);
 
 	LVCOLUMN Col;                                   
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
