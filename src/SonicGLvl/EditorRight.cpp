@@ -18,6 +18,7 @@
 //=========================================================================
 
 #include "EditorApplication.h"
+#include "ObjectNodeHistory.h"
 #include "ObjectSet.h"
 
 void EditorApplication::initializeCurrentLayerGUI() {
@@ -104,6 +105,7 @@ void EditorApplication::transferObjectsToLayer(int index) {
 		}
 	}
 
+	HistoryActionWrapper* wrapper = new HistoryActionWrapper();
 	for (auto node : selected_nodes)
 	{
 		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
@@ -112,8 +114,11 @@ void EditorApplication::transferObjectsToLayer(int index) {
 		prev_set->eraseObject(object);
 		new_set->addObject(object);
 
-		// Brian TODO: undo?
+		// Push to History
+		HistoryActionMoveObjectToLayer* action = new HistoryActionMoveObjectToLayer(object, prev_set, new_set);
+		wrapper->push(action);
 	}
+	pushHistory(wrapper);
 
 	// update object count
 	updateLayerControlGUI();

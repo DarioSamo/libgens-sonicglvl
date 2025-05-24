@@ -109,6 +109,24 @@ HistoryActionDeleteObjectNode::~HistoryActionDeleteObjectNode() {
 	}
 }
 
+// Move objects to layer
+void HistoryActionMoveObjectToLayer::undo() {
+	if (!object) return;
+
+	to_set->eraseObject(object);
+	from_set->addObject(object);
+
+	editor_application->updateLayerControlGUI();
+}
+
+void HistoryActionMoveObjectToLayer::redo() {
+	if (!object) return;
+
+	from_set->eraseObject(object);
+	to_set->addObject(object);
+
+	editor_application->updateLayerControlGUI();
+}
 
 // Edit Bool
 void HistoryActionEditObjectElementBool::undo() {
