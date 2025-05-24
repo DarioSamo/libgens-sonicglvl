@@ -375,6 +375,8 @@ void EditorApplication::rememberSelection(bool mode) {
 }
 
 void EditorApplication::makeHistorySelection(bool mode) {
+	if (current_property_index < (int)current_properties_types.size()) return;
+
 	HistoryActionWrapper *wrapper = new HistoryActionWrapper();
 	int index = 0;
 	bool is_list = current_properties_types[current_property_index] == LibGens::OBJECT_ELEMENT_VECTOR_LIST;

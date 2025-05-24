@@ -314,6 +314,14 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 			{
 				if (!editor_application->getEditorAxis()->isHolding() && editor_application->isUpdatePosRot())
 				{
+					char value_str[1024] = "";
+					GetDlgItemText(hDlg, IDE_RIGHT_SELECTION_POS_X, value_str, 1024);
+					if (ToString(value_str).empty()) return false;
+					GetDlgItemText(hDlg, IDE_RIGHT_SELECTION_POS_Y, value_str, 1024);
+					if (ToString(value_str).empty()) return false;
+					GetDlgItemText(hDlg, IDE_RIGHT_SELECTION_POS_Z, value_str, 1024);
+					if (ToString(value_str).empty()) return false;
+
 					float value_x = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_X);
 					float value_y = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_Y);
 					float value_z = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_POS_Z);
@@ -334,6 +342,14 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 			{
 				if (!editor_application->getEditorAxis()->isHolding() && editor_application->isUpdatePosRot())
 				{
+					char value_str[1024] = "";
+					GetDlgItemText(hDlg, IDE_RIGHT_SELECTION_ROT_X, value_str, 1024);
+					if (ToString(value_str).empty()) return false;
+					GetDlgItemText(hDlg, IDE_RIGHT_SELECTION_ROT_Y, value_str, 1024);
+					if (ToString(value_str).empty()) return false;
+					GetDlgItemText(hDlg, IDE_RIGHT_SELECTION_ROT_Z, value_str, 1024);
+					if (ToString(value_str).empty()) return false;
+
 					float value_x = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_X);
 					float value_y = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_Y);
 					float value_z = GetDlgItemFloat(hDlg, IDE_RIGHT_SELECTION_ROT_Z);
