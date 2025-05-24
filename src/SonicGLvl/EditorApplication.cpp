@@ -772,14 +772,14 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	// Move Left Bar Elements
 	RECT temp_rect;
 
-	auto fnResize = [this, &temp_rect](HWND hWND, float top_y, float x, float y, float width, float height)
+	auto fnResize = [this, &temp_rect](HWND hWND, float top_y, float x, float y, float width, float height, float height_add = 0.0f)
 	{
 		temp_rect.left = x;
 		temp_rect.top = y;
 		temp_rect.right = width + temp_rect.left;
 		temp_rect.bottom = height + temp_rect.top;
 		MapDialogRect(hLeftDlg, &temp_rect);
-		MoveWindow(hWND, temp_rect.left, temp_rect.top + top_y, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
+		MoveWindow(hWND, temp_rect.left, temp_rect.top + top_y, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + height_add, true);
 		temp_rect.top += top_y;
 		temp_rect.bottom += top_y;
 		InvalidateRect(hLeftDlg, &temp_rect, true);
@@ -793,55 +793,13 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_NEW), layer_control_y_coordinate, 7, 131, 85, 14);
 	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_DELETE), layer_control_y_coordinate, 95, 131, 85, 14);
 
-	HWND hHelpGroup = GetDlgItem(hLeftDlg, IDG_HELP_GROUP);
-	HWND hHelpText  = GetDlgItem(hLeftDlg, IDT_HELP_DESCRIPTION);
-	int help_y_coordinate = layer_control_y_coordinate - 90;
+	int left_window_palette_properties_height = layer_control_y_coordinate - 5;
+	fnResize(GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP), 0, 2, 0, 181, 0, left_window_palette_properties_height);
+	fnResize(GetDlgItem(hLeftDlg, IDL_PALETTE_LIST), 0, 6, 41, 174, 0, left_window_palette_properties_height - 74);
 
-	// Help Group
-	temp_rect.left = 2;
-	temp_rect.top = 0;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 52 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hHelpGroup, temp_rect.left, temp_rect.top + help_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += help_y_coordinate;
-	temp_rect.bottom += help_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Help Text
-	temp_rect.left = 7;
-	temp_rect.top = 11;
-	temp_rect.right = 173 + temp_rect.left;
-	temp_rect.bottom = 37 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hHelpText, temp_rect.left, temp_rect.top + help_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += help_y_coordinate;
-	temp_rect.bottom += help_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	HWND hPaletteGroup      = GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP);
-	HWND hPaletteList       = GetDlgItem(hLeftDlg, IDL_PALETTE_LIST);
-	int left_window_palette_properties_height = help_y_coordinate - 5;
-
-	// Palette Group
-	temp_rect.left = 2;
-	temp_rect.top = 0;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPaletteGroup, temp_rect.left, temp_rect.top, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height, true);
-	temp_rect.bottom += left_window_palette_properties_height;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Palette List
-	temp_rect.left = 6;
-	temp_rect.top = 41;
-	temp_rect.right = 174 + temp_rect.left;
-	temp_rect.bottom = 0 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPaletteList, temp_rect.left, temp_rect.top, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 74, true);
-	temp_rect.bottom += left_window_palette_properties_height - 74;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
+	int help_y_coordinate = screen_height - 90;
+	fnResize(GetDlgItem(hRightDlg, IDG_RIGHT_HELP_GROUP), help_y_coordinate, 2, 0, 181, 52);
+	fnResize(GetDlgItem(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION), help_y_coordinate, 7, 11, 173, 37);
 
 	/*HWND hPropertiesGroup = GetDlgItem(hLeftDlg, IDG_PROPERTIES_GROUP);
 	HWND hPropertiesList  = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);

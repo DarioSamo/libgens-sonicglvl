@@ -32,6 +32,7 @@
 #define IDS_EDIT_VECTOR_LIST_X                  40000
 #define IDT_EDIT_ID_LIST_POINT                  40000
 #define IDT_EDIT_ID_POINT                       40000
+#define IDT_RIGHT_HELP_DESCRIPTION              40000
 #define IMD_OPEN_LEVEL                          40000
 #define IDB_DELETE_PHYSICS                      40001
 #define IDC_EDIT_STRING_VALUE                   40001
@@ -94,7 +95,6 @@
 #define IDC_EDIT_VECTOR_EDITING                 40006
 #define IDC_FIND_FILTERED                       40006
 #define IDE_MULTISETPARAM_SPACING               40006
-#define IDG_HELP_GROUP                          40006
 #define IDL_MATERIAL_MATERIAL_LIST              40006
 #define IDR_LOOK_AT_AXIS_Y                      40006
 #define IDS_RIGHT_SELECTION_POS_X               40006
@@ -106,7 +106,6 @@
 #define IDR_LOOK_AT_AXIS_X                      40007
 #define IDS_RIGHT_SELECTION_POS_Z               40007
 #define IDT_FIND_OBJECT_NAME                    40007
-#define IDT_HELP_DESCRIPTION                    40007
 #define IMD_COPY                                40007
 #define IDB_MATERIAL_DELETE_MATERIAL            40008
 #define IDB_MULTISETPARAM_CREATE                40008
@@ -157,9 +156,9 @@
 #define IDE_RIGHT_SELECTION_POS_Z               40014
 #define IMD_RELOAD_TEMPLATES_DATABASE           40014
 #define IDB_BOTTOM_GHOST_PAUSE                  40015
-#define IDE_RIGHT_OBJECT_ID                     40015
 #define IDS_MATERIAL_TEXTURE_UNIT_LIST          40015
 #define IDS_MULTISETPARAM_SPACING               40015
+#define IDT_RIGHT_OBJECT_ID_LAYER               40015
 #define IMD_SAVE_TEMPLATES_DATABASE             40015
 #define IDG_RIGHT_PROPERTIES_GROUP              40016
 #define IDL_MATERIAL_TEXTURE_UNIT_LIST          40016
@@ -170,6 +169,7 @@
 #define IMD_FRAMEBUFFER                         40017
 #define IDB_BOTTOM_GHOST_BACK                   40018
 #define IDB_MATERIAL_DELETE_TEXTURE_UNIT        40018
+#define IDG_RIGHT_HELP_GROUP                    40018
 #define IMD_UV_ANIMATIONS                       40018
 #define IDB_MATERIAL_CREATE_TEXTURE_UNITS       40019
 #define IMD_SKYBOX                              40019
