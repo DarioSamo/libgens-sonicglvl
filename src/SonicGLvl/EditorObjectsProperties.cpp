@@ -130,9 +130,23 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 	updateHelpWithObjectGUI(NULL);
 
 	string group_text = "";
-	string id_text = "";
+	string layer_text = "";
+	int id = -1;
 	if (multiple_object_types || multiple_multiset_types) {
 		group_text = "Multiple Objects";
+
+		for (auto object : selected_objects) {
+			LibGens::ObjectSet* set = object->getParentSet();
+			if (set) {
+				if (layer_text.empty()) {
+					layer_text = set->getName();
+				}
+				else if (layer_text != set->getName()) {
+					layer_text = "(multiple)";
+					break;
+				}
+			}
+		}
 	}
 	else if (object_name.size()) {
 		group_text = object_name;
@@ -140,7 +154,10 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		if (selected_objects.size() == 1) {
 			LibGens::Object *first_object = (*selected_objects.begin());
 			if (first_object) {
-				id_text = ToString(first_object->getID());
+				id = first_object->getID();
+				
+				LibGens::ObjectSet* set = first_object->getParentSet();
+				if (set) layer_text = set->getName();
 			}
 		}
 
@@ -151,8 +168,9 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		group_text = "(No selection)";
 	}
 
-	EnableWindow(GetDlgItem(hRightDlg, IDE_RIGHT_OBJECT_ID), !id_text.empty());
-	SetDlgItemText(hRightDlg, IDE_RIGHT_OBJECT_ID, id_text.c_str());
+	string id_text = id >= 0 ? ToString(id) : "---";
+	string id_layer_text = "ID: " + id_text + "     Layer: " + (layer_text.empty() ? "---" : layer_text);
+	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_ID_LAYER, id_layer_text.c_str());
 	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_NAME, group_text.c_str());
 
 	// Scan for Common Properties in the list of selected objects
@@ -1119,8 +1137,8 @@ void EditorApplication::updateHelpWithPropertyGUI(LibGens::ObjectElement *elemen
 		help_description = element->getDescription();
 	}
 
-	SetDlgItemText(hLeftDlg, IDG_HELP_GROUP, help_name.c_str());
-	SetDlgItemText(hLeftDlg, IDT_HELP_DESCRIPTION, help_description.c_str());
+	SetDlgItemText(hRightDlg, IDG_RIGHT_HELP_GROUP, help_name.c_str());
+	SetDlgItemText(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION, help_description.c_str());
 }
 
 void EditorApplication::clearEditPropertyGUI() {
