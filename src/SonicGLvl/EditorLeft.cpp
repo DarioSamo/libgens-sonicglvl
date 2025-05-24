@@ -368,7 +368,7 @@ void EditorApplication::createLayerControlGUI() {
 
 
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-	Col.cx = 80;
+	Col.cx = 90;
 	Col.pszText = "Objects";
 	Col.cchTextMax = strlen(Col.pszText);
 	ListView_InsertColumn(hLayersList, 1, &Col);

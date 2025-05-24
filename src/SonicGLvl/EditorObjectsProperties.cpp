@@ -387,7 +387,7 @@ void EditorApplication::createObjectsPropertiesGUI() {
 
 
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-	Col.cx = 115;
+	Col.cx = 90;
 	Col.pszText = "Value";
 	Col.cchTextMax = strlen(Col.pszText);
 	ListView_InsertColumn(hPropertiesList, 1, &Col);
