@@ -142,6 +142,7 @@
       <Filter>Editor Nodes</Filter>
     </ClCompile>
     <ClCompile Include="EditorRight.cpp" />
+    <ClCompile Include="EditorMoveToLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseApplication.h">

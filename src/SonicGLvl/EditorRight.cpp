@@ -21,39 +21,6 @@
 #include "ObjectNodeHistory.h"
 #include "ObjectSet.h"
 
-void EditorApplication::transferObjectsToLayer(int index) {
-	if (selected_nodes.empty() || !set_mapping.count(index)) return;
-
-	for (auto node : selected_nodes)
-	{
-		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
-		if (!object_node)
-		{
-			// not an object, ignore
-			return;
-		}
-	}
-
-	LibGens::ObjectSet* new_set = set_mapping[index];
-	HistoryActionWrapper* wrapper = new HistoryActionWrapper();
-	for (auto node : selected_nodes)
-	{
-		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
-		LibGens::Object* object = object_node->getObject();
-		LibGens::ObjectSet* prev_set = object->getParentSet();
-		prev_set->eraseObject(object);
-		new_set->addObject(object);
-
-		// Push to History
-		HistoryActionMoveObjectToLayer* action = new HistoryActionMoveObjectToLayer(object, prev_set, new_set);
-		wrapper->push(action);
-	}
-	pushHistory(wrapper);
-
-	// update object count
-	updateLayerControlGUI();
-}
-
 void EditorApplication::updateTransformGUI() {
 	HWND hSelectionEditPosX = GetDlgItem(hRightDlg, IDE_RIGHT_SELECTION_POS_X);
 	HWND hSelectionEditPosY = GetDlgItem(hRightDlg, IDE_RIGHT_SELECTION_POS_Y);

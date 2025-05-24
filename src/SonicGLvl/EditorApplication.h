@@ -436,7 +436,9 @@ class EditorApplication : public BaseApplication {
 		void deleteLayer();
 		void newLayer();
 
-		void transferObjectsToLayer(int index);
+		void openMoveToLayerGUI();
+		void populateMoveToLayerTargets(HWND hDlg);
+		void moveObjectsToLayer(int index);
 		void updateTransformGUI();
 
 		void updateBottomSelectionGUI();

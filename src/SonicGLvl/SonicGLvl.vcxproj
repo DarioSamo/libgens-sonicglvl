@@ -112,6 +112,7 @@
     <ClCompile Include="EditorLevel.cpp" />
     <ClCompile Include="EditorLookAt.cpp" />
     <ClCompile Include="EditorMaterial.cpp" />
+    <ClCompile Include="EditorMoveToLayer.cpp" />
     <ClCompile Include="EditorNode.cpp" />
     <ClCompile Include="EditorNodeHistory.cpp" />
     <ClCompile Include="EditorObjects.cpp" />

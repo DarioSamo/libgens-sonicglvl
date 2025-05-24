@@ -124,6 +124,9 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				case IMD_SNAP_OBJECTS_TO_CLOSEST_PATH:
 					editor_application->snapToClosestPath(); 
 					break;
+				case IMD_MOVE_LAYER:
+					editor_application->openMoveToLayerGUI(); 
+					break;
 
 				// Materials
 				case IMD_OPEN_MATERIAL_EDITOR :

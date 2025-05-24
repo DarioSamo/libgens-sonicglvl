@@ -21,7 +21,9 @@
 #define IDD_FIND_DIALOG                         139
 #define IDD_LOOK_AT_POINT                       141
 #define IDD_RIGHT_DIALOG                        143
+#define IDD_MOVE_LAYER_DIALOG                   145
 #define IDC_EDIT_FLOAT_VALUE                    40000
+#define IDC_MOVE_LAYER_TARGETS                  40000
 #define IDC_PALETTE_CATEGORY                    40000
 #define IDE_EDIT_VECTOR_X                       40000
 #define IDE_FIND_VALUE                          40000
@@ -192,6 +194,7 @@
 #define IDE_MATERIAL_PARAMETER_2_N              40028
 #define IMD_OPEN_MATERIAL_EDITOR                40028
 #define IDE_MATERIAL_PARAMETER_3_N              40029
+#define IMD_MOVE_LAYER                          40029
 #define IDE_MATERIAL_PARAMETER_4_N              40030
 #define IMD_LOCAL_ROTATION                      40030
 #define IDE_MATERIAL_PARAMETER_5_N              40031
