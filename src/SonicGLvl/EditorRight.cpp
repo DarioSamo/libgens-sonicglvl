@@ -21,65 +21,6 @@
 #include "ObjectNodeHistory.h"
 #include "ObjectSet.h"
 
-void EditorApplication::initializeCurrentLayerGUI() {
-	// fill combo box with available list of sets
-	SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
-	
-	for (int i = 0; i < set_mapping.size(); i++)
-	{
-		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)set_mapping[i]->getName().c_str());
-	}
-
-	SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
-}
-
-void EditorApplication::updateCurrentLayerGUI() {
-	// update current layer base on selected objects
-	if (selected_nodes.empty())
-	{
-		int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
-		if (!set_mapping.count(selected_index) && !set_mapping.empty())
-		{
-			// reset to first layer
-			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
-		}
-		return;
-	}
-
-	LibGens::ObjectSet* set_to_display = NULL;
-	for (auto node : selected_nodes)
-	{
-		ObjectNode* object_node = getObjectNodeFromEditorNode(node);
-		if (!object_node)
-		{
-			// not an object, ignore
-			return;
-		}
-
-		LibGens::ObjectSet* set = object_node->getObject()->getParentSet();
-		if (set_to_display == NULL)
-		{
-			set_to_display = set;
-		}
-		else if (set_to_display != set)
-		{
-			// there are multiple sets, set as blank selection
-			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, -1, (LPARAM)0);
-			return;
-		}
-	}
-
-	for (auto& it : set_mapping)
-	{
-		// find index to display
-		if (set_to_display == it.second)
-		{
-			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, it.first, (LPARAM)0);
-			return;
-		}
-	}
-}
-
 void EditorApplication::transferObjectsToLayer(int index) {
 	if (selected_nodes.empty() || !set_mapping.count(index)) return;
 
@@ -89,22 +30,11 @@ void EditorApplication::transferObjectsToLayer(int index) {
 		if (!object_node)
 		{
 			// not an object, ignore
-			updateCurrentLayerGUI();
 			return;
 		}
 	}
 
 	LibGens::ObjectSet* new_set = set_mapping[index];
-	if (selected_nodes.size() > 1)
-	{
-		string text = "Do you want to move " + to_string(selected_nodes.size()) + " selected objects to '" + new_set->getName() + "' layer?";
-		if (MessageBox(NULL, text.c_str(), "Transfer Objects To Layer", MB_YESNO | MB_ICONWARNING) != IDYES)
-		{
-			updateCurrentLayerGUI();
-			return;
-		}
-	}
-
 	HistoryActionWrapper* wrapper = new HistoryActionWrapper();
 	for (auto node : selected_nodes)
 	{
@@ -319,19 +249,6 @@ INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPa
 	{
 		switch (LOWORD(wParam))
 		{
-		case IDC_RIGHT_CURRENT_LAYER:
-		{
-			switch (HIWORD(wParam))
-			{
-			case CBN_SELCHANGE:
-			{
-				int selected_index = SendMessage((HWND)lParam, (UINT)CB_GETCURSEL, (WPARAM)0, (LPARAM)0);
-				editor_application->transferObjectsToLayer(selected_index);
-				return true;
-			}
-			}
-			break;
-		}
 		case IDE_RIGHT_SELECTION_POS_X:
 		case IDE_RIGHT_SELECTION_POS_Y:
 		case IDE_RIGHT_SELECTION_POS_Z:

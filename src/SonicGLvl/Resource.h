@@ -23,7 +23,6 @@
 #define IDD_RIGHT_DIALOG                        143
 #define IDC_EDIT_FLOAT_VALUE                    40000
 #define IDC_PALETTE_CATEGORY                    40000
-#define IDC_RIGHT_CURRENT_LAYER                 40000
 #define IDE_EDIT_VECTOR_X                       40000
 #define IDE_FIND_VALUE                          40000
 #define IDE_LOOK_AT_X                           40000
@@ -49,6 +48,7 @@
 #define IDB_EDIT_ID_LIST_CREATE                 40002
 #define IDB_IMPORT_PHYSICS                      40002
 #define IDC_EDIT_ID_VALUE                       40002
+#define IDC_LAYER_CURRENT                       40002
 #define IDE_EDIT_VECTOR_Z                       40002
 #define IDE_FIND_VALUE_VALUE                    40002
 #define IDE_LOOK_AT_Z                           40002
@@ -87,6 +87,7 @@
 #define IDL_RIGHT_PROPERTIES_LIST               40005
 #define IDS_EDIT_VECTOR_Z                       40005
 #define IDS_MULTISETPARAM_Y                     40005
+#define IDT_LAYER_CURRENT                       40005
 #define IMD_REDO                                40005
 #define IDB_EDIT_ID_LIST_GO_TO_TARGET           40006
 #define IDB_EDIT_VECTOR_LIST_FOCUS              40006

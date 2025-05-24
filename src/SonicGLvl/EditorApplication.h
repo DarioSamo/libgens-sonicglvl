@@ -428,6 +428,7 @@ class EditorApplication : public BaseApplication {
 
 		void saveXNAnimation();
 
+		void initializeCurrentLayerGUI();
 		void createLayerControlGUI();
 		void updateLayerControlGUI();
 		void setLayerVisibility(int index, bool v);
@@ -435,8 +436,6 @@ class EditorApplication : public BaseApplication {
 		void deleteLayer();
 		void newLayer();
 
-		void initializeCurrentLayerGUI();
-		void updateCurrentLayerGUI();
 		void transferObjectsToLayer(int index);
 		void updateTransformGUI();
 
@@ -639,7 +638,7 @@ class EditorApplication : public BaseApplication {
 		}
 		
 		LibGens::ObjectSet *getCurrentSet() {
-			int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
+			int selected_index = SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_GETCURSEL, 0, 0);
 			if (set_mapping.count(selected_index))
 			{
 				return set_mapping[selected_index];

@@ -355,6 +355,18 @@ bool EditorApplication::isRegularMode() {
 	return regular_mode;
 }
 
+void EditorApplication::initializeCurrentLayerGUI() {
+	// fill combo box with available list of sets
+	SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_RESETCONTENT, (WPARAM)0, (LPARAM)0);
+
+	for (int i = 0; i < set_mapping.size(); i++)
+	{
+		SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)set_mapping[i]->getName().c_str());
+	}
+
+	SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_SETCURSEL, (WPARAM)0, (LPARAM)0);
+}
+
 void EditorApplication::createLayerControlGUI() {
 	HWND hLayersList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
 	HWND hLayersNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
@@ -474,12 +486,12 @@ void EditorApplication::renameLayer(int index, string name) {
 		ListView_SetItemText(hLayersList, index, 0, name_str);
 
 		// update current layer list
-		int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
-		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_DELETESTRING, index, 0);
-		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_INSERTSTRING, index, (LPARAM)set->getName().c_str());
+		int selected_index = SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_GETCURSEL, 0, 0);
+		SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_DELETESTRING, index, 0);
+		SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_INSERTSTRING, index, (LPARAM)set->getName().c_str());
 		if (selected_index == index)
 		{
-			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, selected_index, 0);
+			SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_SETCURSEL, selected_index, 0);
 		}
 	}
 }
@@ -513,11 +525,11 @@ void EditorApplication::deleteLayer() {
 			history->clear();
 
 			// update current layer list
-			int selected_index = SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_GETCURSEL, 0, 0);
-			SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_DELETESTRING, index, 0);
+			int selected_index = SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_GETCURSEL, 0, 0);
+			SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_DELETESTRING, index, 0);
 			if (selected_index >= index)
 			{
-				SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, CB_SETCURSEL, selected_index - 1, 0);
+				SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, CB_SETCURSEL, selected_index - 1, 0);
 			}
 		}
 	}
@@ -545,7 +557,7 @@ void EditorApplication::newLayer() {
 		updateLayerControlGUI();
 
 		// update current layer list
-		SendDlgItemMessage(hRightDlg, IDC_RIGHT_CURRENT_LAYER, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)set->getName().c_str());
+		SendDlgItemMessage(hLeftDlg, IDC_LAYER_CURRENT, (UINT)CB_ADDSTRING, (WPARAM)0, (LPARAM)set->getName().c_str());
 	}
 }
 

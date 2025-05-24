@@ -87,7 +87,6 @@ void EditorApplication::updateSelection() {
 	}
 
 	updateTransformGUI();
-	updateCurrentLayerGUI();
 }
 
 void EditorApplication::deleteSelection() {
@@ -773,55 +772,26 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	// Move Left Bar Elements
 	RECT temp_rect;
 
-	HWND hLayerGroup = GetDlgItem(hLeftDlg, IDG_LAYER_GROUP);
-	HWND hLayerList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
-	HWND hLayerNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
-	HWND hLayerDelete = GetDlgItem(hLeftDlg, IDB_LAYER_DELETE);
-	int layer_control_y_coordinate = left_window_height - 220;
+	auto fnResize = [this, &temp_rect](HWND hWND, float top_y, float x, float y, float width, float height)
+	{
+		temp_rect.left = x;
+		temp_rect.top = y;
+		temp_rect.right = width + temp_rect.left;
+		temp_rect.bottom = height + temp_rect.top;
+		MapDialogRect(hLeftDlg, &temp_rect);
+		MoveWindow(hWND, temp_rect.left, temp_rect.top + top_y, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
+		temp_rect.top += top_y;
+		temp_rect.bottom += top_y;
+		InvalidateRect(hLeftDlg, &temp_rect, true);
+	};
 
-	// Layer Group
-	temp_rect.left = 2;
-	temp_rect.top = 0;
-	temp_rect.right = 181 + temp_rect.left;
-	temp_rect.bottom = 133 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hLayerGroup, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += layer_control_y_coordinate;
-	temp_rect.bottom += layer_control_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Layer List
-	temp_rect.left = 7;
-	temp_rect.top = 11;
-	temp_rect.right = 173 + temp_rect.left;
-	temp_rect.bottom = 100 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hLayerList, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += layer_control_y_coordinate;
-	temp_rect.bottom += layer_control_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Layer New
-	temp_rect.left = 7;
-	temp_rect.top = 113;
-	temp_rect.right = 85 + temp_rect.left;
-	temp_rect.bottom = 14 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hLayerNew, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += layer_control_y_coordinate;
-	temp_rect.bottom += layer_control_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-
-	// Layer Delete
-	temp_rect.left = 95;
-	temp_rect.top = 113;
-	temp_rect.right = 85 + temp_rect.left;
-	temp_rect.bottom = 14 + temp_rect.top;
-	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hLayerDelete, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
-	temp_rect.top += layer_control_y_coordinate;
-	temp_rect.bottom += layer_control_y_coordinate;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
+	int layer_control_y_coordinate = left_window_height - 245;
+	fnResize(GetDlgItem(hLeftDlg, IDG_LAYER_GROUP), layer_control_y_coordinate, 2, 0, 181, 148);
+	fnResize(GetDlgItem(hLeftDlg, IDT_LAYER_CURRENT), layer_control_y_coordinate, 7, 12, 64, 14);
+	fnResize(GetDlgItem(hLeftDlg, IDC_LAYER_CURRENT), layer_control_y_coordinate, 60, 11, 119, 14);
+	fnResize(GetDlgItem(hLeftDlg, IDL_LAYER_LIST), layer_control_y_coordinate, 7, 27, 173, 100);
+	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_NEW), layer_control_y_coordinate, 7, 131, 85, 14);
+	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_DELETE), layer_control_y_coordinate, 95, 131, 85, 14);
 
 	HWND hHelpGroup = GetDlgItem(hLeftDlg, IDG_HELP_GROUP);
 	HWND hHelpText  = GetDlgItem(hLeftDlg, IDT_HELP_DESCRIPTION);
