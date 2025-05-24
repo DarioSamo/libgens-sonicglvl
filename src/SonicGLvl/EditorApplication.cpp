@@ -772,38 +772,39 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	// Move Left Bar Elements
 	RECT temp_rect;
 
-	auto fnResize = [this, &temp_rect](HWND hWND, float top_y, float x, float y, float width, float height, float height_add = 0.0f)
+	auto fnResize = [this, &temp_rect](HWND hDlg, int nIDDlgItem, float top_y, float x, float y, float width, float height, float height_add = 0.0f)
 	{
+		HWND item = GetDlgItem(hDlg, nIDDlgItem);
 		temp_rect.left = x;
 		temp_rect.top = y;
 		temp_rect.right = width + temp_rect.left;
 		temp_rect.bottom = height + temp_rect.top;
-		MapDialogRect(hLeftDlg, &temp_rect);
-		MoveWindow(hWND, temp_rect.left, temp_rect.top + top_y, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + height_add, true);
+		MapDialogRect(hDlg, &temp_rect);
+		MoveWindow(item, temp_rect.left, temp_rect.top + top_y, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + height_add, true);
 		temp_rect.top += top_y;
 		temp_rect.bottom += top_y;
-		InvalidateRect(hLeftDlg, &temp_rect, true);
+		InvalidateRect(hDlg, &temp_rect, true);
 	};
 
 	int layer_control_y_coordinate = left_window_height - 245;
-	fnResize(GetDlgItem(hLeftDlg, IDG_LAYER_GROUP), layer_control_y_coordinate, 2, 0, 181, 148);
-	fnResize(GetDlgItem(hLeftDlg, IDT_LAYER_CURRENT), layer_control_y_coordinate, 7, 12, 64, 14);
-	fnResize(GetDlgItem(hLeftDlg, IDC_LAYER_CURRENT), layer_control_y_coordinate, 60, 11, 119, 14);
-	fnResize(GetDlgItem(hLeftDlg, IDL_LAYER_LIST), layer_control_y_coordinate, 7, 27, 173, 100);
-	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_NEW), layer_control_y_coordinate, 7, 131, 85, 14);
-	fnResize(GetDlgItem(hLeftDlg, IDB_LAYER_DELETE), layer_control_y_coordinate, 95, 131, 85, 14);
+	fnResize(hLeftDlg, IDG_LAYER_GROUP, layer_control_y_coordinate, 2, 0, 181, 148);
+	fnResize(hLeftDlg, IDT_LAYER_CURRENT, layer_control_y_coordinate, 7, 12, 64, 14);
+	fnResize(hLeftDlg, IDC_LAYER_CURRENT, layer_control_y_coordinate, 60, 11, 119, 14);
+	fnResize(hLeftDlg, IDL_LAYER_LIST, layer_control_y_coordinate, 7, 27, 173, 100);
+	fnResize(hLeftDlg, IDB_LAYER_NEW, layer_control_y_coordinate, 7, 131, 85, 14);
+	fnResize(hLeftDlg, IDB_LAYER_DELETE, layer_control_y_coordinate, 95, 131, 85, 14);
 
 	int palette_list_height = layer_control_y_coordinate - 5;
-	fnResize(GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP), 0, 2, 0, 181, 0, palette_list_height);
-	fnResize(GetDlgItem(hLeftDlg, IDL_PALETTE_LIST), 0, 6, 41, 174, 0, palette_list_height -  74);
+	fnResize(hLeftDlg, IDG_PALETTE_GROUP, 0, 2, 0, 181, 0, palette_list_height);
+	fnResize(hLeftDlg, IDL_PALETTE_LIST, 0, 6, 41, 174, 0, palette_list_height -  74);
 
 	int help_y_coordinate = screen_height - 90;
-	fnResize(GetDlgItem(hRightDlg, IDG_RIGHT_HELP_GROUP), help_y_coordinate, 2, 0, 181, 52);
-	fnResize(GetDlgItem(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION), help_y_coordinate, 7, 11, 173, 37);
+	fnResize(hRightDlg, IDG_RIGHT_HELP_GROUP, help_y_coordinate, 2, 0, 181, 52);
+	fnResize(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION, help_y_coordinate, 7, 11, 173, 37);
 
 	int object_properties_height = help_y_coordinate - 95;
-	fnResize(GetDlgItem(hRightDlg, IDG_RIGHT_PROPERTIES_GROUP), 0, 2, 56, 181, 0, object_properties_height);
-	fnResize(GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST), 0, 6, 67, 174, 0, object_properties_height - 25);
+	fnResize(hRightDlg, IDG_RIGHT_PROPERTIES_GROUP, 0, 2, 56, 181, 0, object_properties_height);
+	fnResize(hRightDlg, IDL_RIGHT_PROPERTIES_LIST, 0, 6, 67, 174, 0, object_properties_height - 25);
 	
 	// Resize Viewport
 	float left  = (float)SONICGLVL_GUI_LEFT_WIDTH / (float)screen_width;
