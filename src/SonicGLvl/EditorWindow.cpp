@@ -81,9 +81,11 @@ LRESULT APIENTRY SubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				// Edit
 				case IMD_UNDO:
 					editor_application->undoHistory();
+					editor_application->updateSelection();
 					break;
 				case IMD_REDO:
 					editor_application->redoHistory();
+					editor_application->updateSelection();
 					break;
 				case IMD_CUT:
 					editor_application->copySelection();
