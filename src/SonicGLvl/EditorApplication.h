@@ -150,7 +150,6 @@ class EditorApplication : public BaseApplication {
 		EditorLevelDatabase *level_database;
 		EditorLevel *current_level;
 		string current_level_filename;
-		map<LibGens::ObjectSet *, int> set_indices; // Brian TODO: delete
 		map<int, LibGens::ObjectSet*> set_mapping;
 		map<LibGens::ObjectSet *, bool> set_visibility;
 
