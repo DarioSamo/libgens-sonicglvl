@@ -206,6 +206,7 @@ void EditorApplication::openLevel(string filename) {
 
 	// clean up objects placed before a level is loaded
 	clearSelection();
+	updateSelection();
 	for (auto node : object_node_manager->getObjectNodes())
 	{
 		LibGens::Object* obj = node->getObject();
