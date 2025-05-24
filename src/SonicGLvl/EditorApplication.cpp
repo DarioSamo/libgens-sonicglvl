@@ -1158,6 +1158,13 @@ bool EditorApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButto
 							pushHistory(action_select);
 
 						}
+						else
+						{
+							HistoryActionSelectNode* action_select = new HistoryActionSelectNode(current_node, true, false, &selected_nodes);
+							current_node->setSelect(false);
+							selected_nodes.remove(current_node);
+							pushHistory(action_select);
+						}
 
 						updateSelection();
 					}
