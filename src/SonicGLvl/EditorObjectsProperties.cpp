@@ -95,35 +95,6 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		}
 	}
 
-
-	// Compare the current selected objects list with the last one
-	bool same_list = true;
-
-	if (selected_objects.size() != current_object_list_properties.size()) {
-		same_list = false;
-	}
-	else {
-		for (list<LibGens::Object *>::iterator it=selected_objects.begin(); it!=selected_objects.end(); it++) {
-			bool found=false;
-
-			for (list<LibGens::Object *>::iterator it_o=current_object_list_properties.begin(); it_o!=current_object_list_properties.end(); it_o++) {
-				if ((*it) == (*it_o)) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found) {
-				same_list = false;
-				break;
-			}
-		}
-	}
-
-	if (same_list) {
-		return;
-	}
-
 	current_object_list_properties = selected_objects;
 
 	// Update text
