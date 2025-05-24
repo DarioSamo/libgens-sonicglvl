@@ -165,6 +165,19 @@ bool EditorApplication::isUpdatePosRot()
 	return is_update_pos_rot;
 }
 
+void EditorApplication::updateHelpWithObjectGUI(LibGens::Object* object) {
+	string help_name = "";
+	string help_description = "";
+
+	if (object) {
+		help_name = object->getName();
+		help_description = object->queryExtraName(OBJECT_NODE_EXTRA_DESCRIPTION);
+	}
+
+	SetDlgItemText(hRightDlg, IDG_RIGHT_HELP_GROUP, help_name.c_str());
+	SetDlgItemText(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION, help_description.c_str());
+}
+
 INT_PTR CALLBACK RightBarCallback(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) 
 {
 	switch (msg)

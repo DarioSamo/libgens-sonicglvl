@@ -130,19 +130,6 @@ void EditorApplication::updateObjectsPaletteGUI(int index) {
 }
 
 
-void EditorApplication::updateHelpWithObjectGUI(LibGens::Object *object) {
-	string help_name="";
-	string help_description="";
-
-	if (object) {
-		help_name = object->getName();
-		help_description = object->queryExtraName(OBJECT_NODE_EXTRA_DESCRIPTION);
-	}
-
-	SetDlgItemText(hLeftDlg, IDG_HELP_GROUP, help_name.c_str());
-	SetDlgItemText(hLeftDlg, IDT_HELP_DESCRIPTION, help_description.c_str());
-}
-
 void EditorApplication::updateObjectsPaletteSelection(int index) {
 	if (!library) return;
 
