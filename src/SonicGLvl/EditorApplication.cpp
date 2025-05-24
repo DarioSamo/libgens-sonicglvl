@@ -769,14 +769,65 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	if (hLeftDlg)   MoveWindow(hLeftDlg,   0, 0, SONICGLVL_GUI_LEFT_WIDTH, left_window_height, true);
 	if (hRightDlg)	MoveWindow(hRightDlg, screen_width - SONICGLVL_GUI_RIGHT_WIDTH, 0, SONICGLVL_GUI_RIGHT_WIDTH, screen_height, true);
 	if (hBottomDlg) MoveWindow(hBottomDlg, 0, screen_height-SONICGLVL_GUI_BOTTOM_HEIGHT, SONICGLVL_GUI_LEFT_WIDTH, SONICGLVL_GUI_BOTTOM_HEIGHT+1, true);
-	/* Brian TODO: resize
+	
 	// Move Left Bar Elements
 	RECT temp_rect;
-	
+
+	HWND hLayerGroup = GetDlgItem(hLeftDlg, IDG_LAYER_GROUP);
+	HWND hLayerList = GetDlgItem(hLeftDlg, IDL_LAYER_LIST);
+	HWND hLayerNew = GetDlgItem(hLeftDlg, IDB_LAYER_NEW);
+	HWND hLayerDelete = GetDlgItem(hLeftDlg, IDB_LAYER_DELETE);
+	int layer_control_y_coordinate = left_window_height - 220;
+
+	// Layer Group
+	temp_rect.left = 2;
+	temp_rect.top = 0;
+	temp_rect.right = 181 + temp_rect.left;
+	temp_rect.bottom = 133 + temp_rect.top;
+	MapDialogRect(hLeftDlg, &temp_rect);
+	MoveWindow(hLayerGroup, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
+	temp_rect.top += layer_control_y_coordinate;
+	temp_rect.bottom += layer_control_y_coordinate;
+	InvalidateRect(hLeftDlg, &temp_rect, true);
+
+	// Layer List
+	temp_rect.left = 7;
+	temp_rect.top = 11;
+	temp_rect.right = 173 + temp_rect.left;
+	temp_rect.bottom = 100 + temp_rect.top;
+	MapDialogRect(hLeftDlg, &temp_rect);
+	MoveWindow(hLayerList, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
+	temp_rect.top += layer_control_y_coordinate;
+	temp_rect.bottom += layer_control_y_coordinate;
+	InvalidateRect(hLeftDlg, &temp_rect, true);
+
+	// Layer New
+	temp_rect.left = 7;
+	temp_rect.top = 113;
+	temp_rect.right = 85 + temp_rect.left;
+	temp_rect.bottom = 14 + temp_rect.top;
+	MapDialogRect(hLeftDlg, &temp_rect);
+	MoveWindow(hLayerNew, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
+	temp_rect.top += layer_control_y_coordinate;
+	temp_rect.bottom += layer_control_y_coordinate;
+	InvalidateRect(hLeftDlg, &temp_rect, true);
+
+	// Layer Delete
+	temp_rect.left = 95;
+	temp_rect.top = 113;
+	temp_rect.right = 85 + temp_rect.left;
+	temp_rect.bottom = 14 + temp_rect.top;
+	MapDialogRect(hLeftDlg, &temp_rect);
+	MoveWindow(hLayerDelete, temp_rect.left, temp_rect.top + layer_control_y_coordinate, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top, true);
+	temp_rect.top += layer_control_y_coordinate;
+	temp_rect.bottom += layer_control_y_coordinate;
+	InvalidateRect(hLeftDlg, &temp_rect, true);
+
 	HWND hHelpGroup = GetDlgItem(hLeftDlg, IDG_HELP_GROUP);
 	HWND hHelpText  = GetDlgItem(hLeftDlg, IDT_HELP_DESCRIPTION);
+	int help_y_coordinate = layer_control_y_coordinate - 90;
+
 	// Help Group
-	int help_y_coordinate=left_window_height - 90;
 	temp_rect.left = 2;
 	temp_rect.top = 0;
 	temp_rect.right = 181 + temp_rect.left;
@@ -798,13 +849,13 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	temp_rect.bottom += help_y_coordinate;
 	InvalidateRect(hLeftDlg, &temp_rect, true);
 
-
 	HWND hPaletteGroup      = GetDlgItem(hLeftDlg, IDG_PALETTE_GROUP);
 	HWND hPaletteList       = GetDlgItem(hLeftDlg, IDL_PALETTE_LIST);
-	int left_window_palette_properties_height=(left_window_height - 90 - 90) / 2;
+	int left_window_palette_properties_height = help_y_coordinate - 5;
+
 	// Palette Group
 	temp_rect.left = 2;
-	temp_rect.top = 55;
+	temp_rect.top = 0;
 	temp_rect.right = 181 + temp_rect.left;
 	temp_rect.bottom = 0 + temp_rect.top;
 	MapDialogRect(hLeftDlg, &temp_rect);
@@ -814,15 +865,15 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 
 	// Palette List
 	temp_rect.left = 6;
-	temp_rect.top = 82;
+	temp_rect.top = 41;
 	temp_rect.right = 174 + temp_rect.left;
 	temp_rect.bottom = 0 + temp_rect.top;
 	MapDialogRect(hLeftDlg, &temp_rect);
-	MoveWindow(hPaletteList, temp_rect.left, temp_rect.top, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 50, true);
-	temp_rect.bottom += left_window_palette_properties_height - 50;
+	MoveWindow(hPaletteList, temp_rect.left, temp_rect.top, temp_rect.right - temp_rect.left, temp_rect.bottom - temp_rect.top + left_window_palette_properties_height - 74, true);
+	temp_rect.bottom += left_window_palette_properties_height - 74;
 	InvalidateRect(hLeftDlg, &temp_rect, true);
 
-	HWND hPropertiesGroup = GetDlgItem(hLeftDlg, IDG_PROPERTIES_GROUP);
+	/*HWND hPropertiesGroup = GetDlgItem(hLeftDlg, IDG_PROPERTIES_GROUP);
 	HWND hPropertiesList  = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
 
 	int properties_y_coordinate= 93 + left_window_palette_properties_height;
@@ -848,8 +899,8 @@ void EditorApplication::windowResized(Ogre::RenderWindow* rw) {
 	temp_rect.top += properties_y_coordinate;
 	temp_rect.bottom += properties_y_coordinate;
 	temp_rect.bottom += left_window_palette_properties_height - 33;
-	InvalidateRect(hLeftDlg, &temp_rect, true);
-	*/
+	InvalidateRect(hLeftDlg, &temp_rect, true);*/
+	
 	// Resize Viewport
 	float left  = (float)SONICGLVL_GUI_LEFT_WIDTH / (float)screen_width;
 	float top   = 0.0f;
