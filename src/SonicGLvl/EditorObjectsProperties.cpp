@@ -130,6 +130,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 	updateHelpWithObjectGUI(NULL);
 
 	string group_text = "";
+	string id_text = "";
 	if (multiple_object_types || multiple_multiset_types) {
 		group_text = "Multiple Objects";
 	}
@@ -139,8 +140,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		if (selected_objects.size() == 1) {
 			LibGens::Object *first_object = (*selected_objects.begin());
 			if (first_object) {
-				group_text += " (ID:" + ToString(first_object->getID());
-				group_text += ")";
+				id_text = ToString(first_object->getID());
 			}
 		}
 
@@ -151,6 +151,8 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		group_text = "(No selection)";
 	}
 
+	EnableWindow(GetDlgItem(hRightDlg, IDE_RIGHT_OBJECT_ID), !id_text.empty());
+	SetDlgItemText(hRightDlg, IDE_RIGHT_OBJECT_ID, id_text.c_str());
 	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_NAME, group_text.c_str());
 
 	// Scan for Common Properties in the list of selected objects

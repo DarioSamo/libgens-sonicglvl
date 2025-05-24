@@ -156,6 +156,7 @@
 #define IDE_RIGHT_SELECTION_POS_Z               40014
 #define IMD_RELOAD_TEMPLATES_DATABASE           40014
 #define IDB_BOTTOM_GHOST_PAUSE                  40015
+#define IDE_RIGHT_OBJECT_ID                     40015
 #define IDS_MATERIAL_TEXTURE_UNIT_LIST          40015
 #define IDS_MULTISETPARAM_SPACING               40015
 #define IMD_SAVE_TEMPLATES_DATABASE             40015
