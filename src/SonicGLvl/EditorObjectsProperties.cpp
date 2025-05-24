@@ -142,7 +142,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 	string id_text = id >= 0 ? ToString(id) : "---";
 	string id_layer_text = "ID: " + id_text + "     Layer: " + (layer_text.empty() ? "---" : layer_text);
 	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_ID_LAYER, id_layer_text.c_str());
-	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_NAME, group_text.c_str());
+	SetDlgItemText(hRightDlg, IDG_RIGHT_OBJECT_NAME, group_text.c_str());
 
 	// Scan for Common Properties in the list of selected objects
 	current_properties_names.clear();
