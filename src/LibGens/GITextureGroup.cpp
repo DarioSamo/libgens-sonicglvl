@@ -432,18 +432,17 @@ namespace LibGens {
 		}
 
 		unsigned char empty=0;
+		unsigned short texture_count = 0;
+
 		file->readUChar(&empty);
-		if (empty != 0) {
-			return;
-		}
+		if (empty == 0) {
+			file->readInt16(&texture_count);
 
-		unsigned short texture_count=0;
-		file->readInt16(&texture_count);
-
-		for (size_t i=0; i<texture_count; i++) {
-			GITexture *texture=new GITexture(terrain_folder);
-			texture->read(file);
-			textures.push_back(texture);
+			for (size_t i = 0; i < texture_count; i++) {
+				GITexture *texture = new GITexture(terrain_folder);
+				texture->read(file);
+				textures.push_back(texture);
+			}
 		}
 
 		if (instance_names.size() != texture_count) {
