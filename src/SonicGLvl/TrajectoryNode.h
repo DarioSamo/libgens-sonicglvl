@@ -6,52 +6,60 @@
 enum TrajectoryMode
 {
 	NONE			= 0,
-	SPRING			= 1,
-	WIDE_SPRING		= 2,
-	JUMP_POLE		= 4,
-	JUMP_PANEL		= 8,
-	DASH_RING		= 16,
-	SELECT_CANNON	= 32
+	SPRING			= 1 << 0,
+	WIDE_SPRING		= 1 << 1,
+	JUMP_POLE		= 1 << 2,
+	JUMP_PANEL		= 1 << 3,
+	DASH_RING		= 1 << 4,
+	SELECT_CANNON	= 1 << 5,
+	TRICK_JUMPER	= 1 << 6,
 };
 
 class TrajectoryNode : public EditorNode
 {
 private:
-	Ogre::Real m_total_time;
-	Ogre::Real m_gravity_time;
-	Ogre::Real m_max_time;
-	TrajectoryMode m_mode;
+	Ogre::Real total_time;
+	Ogre::Real gravity_time;
+	Ogre::Real max_time;
+	TrajectoryMode mode;
 	float keep_velocity_distance;
 	bool act_gravity;
 
+	struct LineData
+	{
+		DynamicLines* lines;
+		DynamicLines* lines_out_of_control;
+		bool draw_out_of_control;
+	};
+
+	LineData line_data1;
+	LineData line_data2;
+
 public:
-	TrajectoryNode(Ogre::SceneManager* scene_manager, TrajectoryMode mode = NONE);
+	TrajectoryNode(Ogre::SceneManager* scene_manager, EditorNode* node, TrajectoryMode mode_p = NONE);
+	~TrajectoryNode();
 
 	void addTime(Ogre::Real time)
 	{
-		m_total_time += time;
-		m_gravity_time += time;
+		total_time += time;
+		gravity_time += time;
 	}
 
-	void resetTime()
-	{
-		m_total_time = 0.0f;
-		m_gravity_time = 0.0f;
-		act_gravity = false;
-	}
+	void restart(EditorNode* node, TrajectoryMode mode_p);
 
 	void setPosition(Ogre::Vector3 position)
 	{
 		EditorNode::setPosition(position);
 	}
 
-	void setMode(TrajectoryMode mode)
+	void setMode(TrajectoryMode mode_p)
 	{
-		m_mode = mode;
+		mode = mode_p;
 	}
 
 	float getTrajectoryGravity(float first_speed, float keep_distance, float y_direction);
 	void getTrajectorySpring(EditorNode* node);
 	void getTrajectoryJumpBoard(EditorNode* node, bool boost);
 	void getTrajectoryDashRing(EditorNode* node);
+	void getTrajectoryTrickJumper(EditorNode* node);
 };
