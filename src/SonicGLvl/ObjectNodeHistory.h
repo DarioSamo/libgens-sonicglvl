@@ -62,6 +62,22 @@ class HistoryActionDeleteObjectNode : public HistoryAction {
 		~HistoryActionDeleteObjectNode();
 };
 
+class HistoryActionMoveObjectToLayer : public HistoryAction {
+	protected:
+		LibGens::Object* object;
+		LibGens::ObjectSet* from_set;
+		LibGens::ObjectSet* to_set;
+	public:
+		HistoryActionMoveObjectToLayer(LibGens::Object* object_p, LibGens::ObjectSet* from_set_p, LibGens::ObjectSet* to_set_p) {
+			object = object_p;
+			from_set = from_set_p;
+			to_set = to_set_p;
+		}
+
+		void undo();
+		void redo();
+};
+
 class HistoryActionEditObjectElementBool : public HistoryAction {
 	protected:
 		LibGens::Object *object;

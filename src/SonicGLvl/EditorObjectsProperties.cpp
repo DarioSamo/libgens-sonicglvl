@@ -41,7 +41,7 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 	string object_name = "";
 	bool multiple_object_types = false;
 	bool multiple_multiset_types = false;
-	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
+	HWND hPropertiesList = GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST);
 
 	if (current_single_property_object) {
 		updateObjectsPropertiesValuesGUI(current_single_property_object);
@@ -95,43 +95,29 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		}
 	}
 
-
-	// Compare the current selected objects list with the last one
-	bool same_list = true;
-
-	if (selected_objects.size() != current_object_list_properties.size()) {
-		same_list = false;
-	}
-	else {
-		for (list<LibGens::Object *>::iterator it=selected_objects.begin(); it!=selected_objects.end(); it++) {
-			bool found=false;
-
-			for (list<LibGens::Object *>::iterator it_o=current_object_list_properties.begin(); it_o!=current_object_list_properties.end(); it_o++) {
-				if ((*it) == (*it_o)) {
-					found = true;
-					break;
-				}
-			}
-
-			if (!found) {
-				same_list = false;
-				break;
-			}
-		}
-	}
-
-	if (same_list) {
-		return;
-	}
-
 	current_object_list_properties = selected_objects;
 
 	// Update text
 	updateHelpWithObjectGUI(NULL);
 
 	string group_text = "";
+	string layer_text = "";
+	int id = -1;
 	if (multiple_object_types || multiple_multiset_types) {
 		group_text = "Multiple Objects";
+
+		for (auto object : selected_objects) {
+			LibGens::ObjectSet* set = object->getParentSet();
+			if (set) {
+				if (layer_text.empty()) {
+					layer_text = set->getName();
+				}
+				else if (layer_text != set->getName()) {
+					layer_text = "(multiple)";
+					break;
+				}
+			}
+		}
 	}
 	else if (object_name.size()) {
 		group_text = object_name;
@@ -139,11 +125,10 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		if (selected_objects.size() == 1) {
 			LibGens::Object *first_object = (*selected_objects.begin());
 			if (first_object) {
-				group_text += " (ID:" + ToString(first_object->getID());
-				if (first_object->getParentSet()) {
-					group_text += ", " + first_object->getParentSet()->getName();
-				}
-				group_text += ")";
+				id = first_object->getID();
+				
+				LibGens::ObjectSet* set = first_object->getParentSet();
+				if (set) layer_text = set->getName();
 			}
 		}
 
@@ -154,7 +139,10 @@ void EditorApplication::updateObjectsPropertiesGUI() {
 		group_text = "(No selection)";
 	}
 
-	SetDlgItemText(hLeftDlg, IDG_PROPERTIES_GROUP, group_text.c_str());
+	string id_text = id >= 0 ? ToString(id) : "---";
+	string id_layer_text = "ID: " + id_text + "     Layer: " + (layer_text.empty() ? "---" : layer_text);
+	SetDlgItemText(hRightDlg, IDT_RIGHT_OBJECT_ID_LAYER, id_layer_text.c_str());
+	SetDlgItemText(hRightDlg, IDG_RIGHT_OBJECT_NAME, group_text.c_str());
 
 	// Scan for Common Properties in the list of selected objects
 	current_properties_names.clear();
@@ -287,7 +275,7 @@ void EditorApplication::updateObjectsPropertiesValuesGUI(LibGens::Object *object
 		return;
 	}
 
-	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
+	HWND hPropertiesList = GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST);
 	
 	for (size_t i=0; i<current_properties_names.size(); i++) {
 		string element_name = current_properties_names[i];
@@ -359,7 +347,7 @@ void EditorApplication::updateObjectsPropertiesValuesGUI(LibGens::Object *object
 
 
 void EditorApplication::createObjectsPropertiesGUI() {
-	HWND hPropertiesList = GetDlgItem(hLeftDlg, IDL_PROPERTIES_LIST);
+	HWND hPropertiesList = GetDlgItem(hRightDlg, IDL_RIGHT_PROPERTIES_LIST);
 
 	LVCOLUMN Col;                                   
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
@@ -370,7 +358,7 @@ void EditorApplication::createObjectsPropertiesGUI() {
 
 
 	Col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-	Col.cx = 115;
+	Col.cx = 90;
 	Col.pszText = "Value";
 	Col.cchTextMax = strlen(Col.pszText);
 	ListView_InsertColumn(hPropertiesList, 1, &Col);
@@ -1120,8 +1108,8 @@ void EditorApplication::updateHelpWithPropertyGUI(LibGens::ObjectElement *elemen
 		help_description = element->getDescription();
 	}
 
-	SetDlgItemText(hLeftDlg, IDG_HELP_GROUP, help_name.c_str());
-	SetDlgItemText(hLeftDlg, IDT_HELP_DESCRIPTION, help_description.c_str());
+	SetDlgItemText(hRightDlg, IDG_RIGHT_HELP_GROUP, help_name.c_str());
+	SetDlgItemText(hRightDlg, IDT_RIGHT_HELP_DESCRIPTION, help_description.c_str());
 }
 
 void EditorApplication::clearEditPropertyGUI() {
