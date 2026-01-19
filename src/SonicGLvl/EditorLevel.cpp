@@ -142,7 +142,7 @@ void EditorLevel::unpackData() {
 
 	LibGens::ArPack *level_data_ar_pack=new LibGens::ArPack(main_filename);
 	XXH128_hash_t hash = level_data_ar_pack->computeHash();
-	bool unpack=!XXH128_isEqual(hash, data_hash);
+	bool unpack = true;// !XXH128_isEqual(hash, data_hash);
 
 	if (unpack) {
 		cleanData();
